@@ -4,7 +4,7 @@
 
 @inject Costumer cst  
 @inject IJSRuntime JSRuntime;
-@inject NavigationManager NavManager 
+@inject NavigationManager NavMan
 
     <div class="main-panel bg-home">
         <!-- Navbar -->
@@ -76,7 +76,7 @@
                                         <td>&emsp;<span style="font-weight: bold;">@cst.strMPembayaran</span></td>
                                     </tr>
                                 </table>
-                                <button class="btn btn-danger btn-right" @onclick="@(()=>NavigateTo("/bpp/4"))" id="btn-ok" value="">OK</button>
+                                <button class="btn btn-danger btn-right" @onclick="@(()=>NavMan.NavigateTo("/bpp/4"))" id="btn-ok" value="">OK</button>
                             </div>
                         }
                     </div>
