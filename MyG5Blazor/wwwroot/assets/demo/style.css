@@ -400,14 +400,15 @@ footer {
     color: black;
   }
 
-  .text-body {
+.text-body {
+    font-family: "Helvetica", Helvetica;
     margin-top: 20px;
     font-size: 21pt;
     text-align: left;
     padding-left: 36px;
     line-height: 1.8;
     color: black;
-  }
+}
 
   .text-nps {
     margin-top: 20px;

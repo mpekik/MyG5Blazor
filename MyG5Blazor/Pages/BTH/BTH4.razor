@@ -1,9 +1,10 @@
 ﻿@page "/bth/4"
 
 @using MyG5Blazor.Data
- 
-@inject IJSRuntime JSRuntime;
-@inject Costumer cst  
+
+@inject IJSRuntime JSRuntime
+@inject Costumer cst
+@inject NavigationManager NavMan  
 
 <div class=@pageClass>
     <!-- Navbar -->
@@ -21,7 +22,7 @@
                     <div class="checklist">
                         @if (IsLoading)
                         {
-                        <img src="../../assets/image/loader.gif" />
+                            <img src="../../assets/image/loader.gif" />
                         }
                         else if (IsSuccess)
                         {
@@ -59,10 +60,9 @@
                     case 2:
                         {
                             <div class="col-md-6">
-                                <div class="teks-title">Bayar Tagihan KartuHalo</div>
-
-                                @if (IsVisible)
+                                @if (!IsFail && !IsSuccess)
                                 {
+                                    <div class="teks-title">Bayar Tagihan KartuHalo</div>
                                     <div id="teks-silakan">
                                         <div class="teks-top"> Silakan Masukan Uang Kertas pada Alat Penerima Uang Tunai secara Lembar per Lembar </div>
                                     </div>
@@ -76,7 +76,6 @@
                                         <div class="teks-bot2" style="text-transform: uppercase; font-weight: bold; margin-top: 70%;">NILAI DARI KELEBIHAN PEMBAYARAN SECARA OTOMATIS AKAN MENGURANGI TAGIHAN KARTUHALO ANDA DI BULAN BERIKUTNYA.</div>
                                     </div>
                                 }
-
                                 @if (IsVisible2)
                                 {
                                     <div id="teks-sudah-sesuai">
@@ -84,7 +83,7 @@
                                     </div>
                                 }
 
-                                @if (IsVisible && IsVisible2)
+                                @if (IsFail)
                                 {
                                     <div id="status-pay" class="teks-status2">Proses Pembayaran Tagihan KartuHalo <br><b class="red">Tidak Berhasil</b></div>
                                     <div id="nominal-pay" class="teks-center"> Silakan Ambil Struk Transaksi dan <br> Hubungi Kasir GraPARI untuk Bantuan</div>
@@ -92,25 +91,34 @@
                             </div>
 
                             <div class="col-md-6" id="proses-bill">
-                                <div id="">
-                                    <img class="tunai" onclick="buttonNext()" id="" src="../../assets/image/tunai.png">
-                                </div>
-                                <div>
-                                    <div class="jumlah-bayar">Jumlah yang Harus Dibayar</div>
-                                    <div class="nominal-rupiah">Rp @strBill</div>
-                                </div><br>
+                                @if (!IsFail&&!IsSuccess)
+                                {
+                                    <div id="">
+                                        <img class="tunai" onclick="buttonNext()" id="" src="../../assets/image/tunai.png">
+                                    </div>
+                                    <div>
+                                        <div class="jumlah-bayar">Jumlah yang Harus Dibayar</div>
+                                        <div class="nominal-rupiah">Rp @strBill</div>
+                                    </div><br>
 
-                                <div id="">
-                                    <div class="jumlah-bayar">Uang yang telah Anda Masukan</div>
-                                    @if (intAccBill < intBill)
-                                    {
-                                        <div class="nominal-rupiah" id="nominal-kurang">Rp @strAccBill</div>
-                                    }
-                                    else
-                                    {
-                                        <div class="nominal-rupiah" id="nominal-pas">Rp @strAccBill</div>
-                                    }
-                                </div><br>
+                                    <div id="">
+                                        <div class="jumlah-bayar">Uang yang telah Anda Masukan</div>
+                                        @if (intAccBill < intBill)
+                                        {
+                                            <div class="nominal-rupiah" id="nominal-kurang">Rp @strAccBill</div>
+                                        }
+                                        else
+                                        {
+                                            <div class="nominal-rupiah" id="nominal-pas">Rp @strAccBill</div>
+                                        }
+                                    </div><br>
+                                }
+                                else
+                                {
+                                    <div id="image-pulsa" class="image-center2">
+                                        <img src="../../assets/image/Logo/pulsa-prabayar.png" alt="" width="450px" height="280px">
+                                    </div>
+                                }
                             </div>
                             break;
                         }
@@ -133,20 +141,40 @@
     </div>
 
 
-<footer>
-    <div class="footer-side1">
-        <span class="dot">1</span>
-        <span class="dot">2</span>
-        <span class="dot">3</span>
-        <span class="dot" id="dot-active">4</span>
+    <footer>
+        <div class="footer-side1">
+            <span class="dot">1</span>
+            <span class="dot">2</span>
+            <span class="dot">3</span>
+            <span class="dot" id="dot-active">4</span>
+        </div>
+        <div class="footer-side2">
+            @if (MetodePembayaran == 2&&!IsFail&&!IsSuccess)
+            {
+            <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Menu Utama</button>
+            }
+            <!--<sup>Powered By </sup>Trilogi Persada -->
+        </div>
+    </footer>
+</div>
+@if (IsExit)
+{
+<div id="myModal" class="modal">
+
+    <!-- Modal content -->
+    <div class="modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>seluruh uang yang Anda masukkan dapat diambil di<br>Kasir GraPARI dengan menunjukkan struk dari<br>MyGraPARI.</p>
+                <button class="btn btn-danger modal-button" @onclick="TunaiExitFail" id="btn-lanjut">Lanjut</button>
+                <button @onclick="@(()=>IsExit = false)" class="btn btn-light modal-button">Batal</button>
+            </div>
+        </div>
     </div>
-    <div class="footer-side2">
-        <!-- <button class="btn-arrow btn" value="">Kembali</button>
-        <button class="btn-arrow btn" value="">Menu Utama</button>
-        <sup>Powered By </sup>Trilogi Persada -->
-    </div>
-</footer>
-    </div>
+</div>
+<!-- end modal -->
+}
 @if (IsVisible)
 {
     <!-- The Modal -->
@@ -159,16 +187,16 @@
                 <div class="modal-body">
                     <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
                     <p class="text-nps">Seberapa besar kemungkinan Anda untuk merekomendasikan layanan MyGraPARI kepada teman atau kolega Anda? </p>
-                    <button class="btn nps-button" value="1" @onclick="@(() => InputNPS1("1"))">1</button>
-                    <button class="btn nps-button" value="2" @onclick="@(() => InputNPS1("2"))">2</button>
-                    <button class="btn nps-button" value="3" @onclick="@(() => InputNPS1("3"))">3</button>
-                    <button class="btn nps-button" value="4" @onclick="@(() => InputNPS1("4"))">4</button>
-                    <button class="btn nps-button" value="5" @onclick="@(() => InputNPS1("5"))">5</button>
-                    <button class="btn nps-button" value="6" @onclick="@(() => InputNPS1("6"))">6</button>
-                    <button class="btn nps-button" value="7" @onclick="@(() => InputNPS1("7"))">7</button>
-                    <button class="btn nps-button" value="8" @onclick="@(() => InputNPS1("8"))">8</button>
-                    <button class="btn nps-button" value="9" @onclick="@(() => InputNPS1("9"))">9</button>
-                    <button class="btn nps-button" value="10" @onclick="@(() => InputNPS1("10"))">10</button>
+                    <button class="btn nps-button" value="1" @onclick="@(() => strNPS1Value = "1")">1</button>
+                    <button class="btn nps-button" value="2" @onclick="@(() => strNPS1Value = "2")">2</button>
+                    <button class="btn nps-button" value="3" @onclick="@(() => strNPS1Value = "3")">3</button>
+                    <button class="btn nps-button" value="4" @onclick="@(() => strNPS1Value = "4")">4</button>
+                    <button class="btn nps-button" value="5" @onclick="@(() => strNPS1Value = "5")">5</button>
+                    <button class="btn nps-button" value="6" @onclick="@(() => strNPS1Value = "6")">6</button>
+                    <button class="btn nps-button" value="7" @onclick="@(() => strNPS1Value = "7")">7</button>
+                    <button class="btn nps-button" value="8" @onclick="@(() => strNPS1Value = "8")">8</button>
+                    <button class="btn nps-button" value="9" @onclick="@(() => strNPS1Value = "9")">9</button>
+                    <button class="btn nps-button" value="10" @onclick="@(() => strNPS1Value = "10")">10</button>
                     <button @onclick="CheckNPS" class="btn btn-danger button-nps">OK</button>
                     <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                 </div>
@@ -177,8 +205,8 @@
     </div>
 }
 
-                       @if (IsVisible2)
-                       {
+@if (IsVisible2)
+{
     <!-- The Modal -->
     <div id="myModal" class="modal">
         <div class="modal-dialog-centered" role="document">
@@ -189,11 +217,11 @@
                 <div class="modal-body">
                     <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
                     <p class="text-nps">Hal apa yang Anda rasa perlu ditingkatkan pada mesin layanan MyGraPARI? </p>
-                    <button class="btn nps-button2" value="" @onclick="@(() => test(0))">Tampilan/Estetika</button>
-                    <button class="btn nps-button2" value="" @onclick="@(() => test(1))">Kecepatan Proses</button>
-                    <button class="btn nps-button2" value="" @onclick="@(() => test(2))">Kemudahan Penggunaan</button>
-                    <button class="btn nps-button2" value="" @onclick="@(() => test(3))">Kejelasan Bahasa</button>
-                    <a href=""><button class="btn btn-danger button-nps" value="">OK</button></a>
+                    <button class="btn nps-button2" value="">Tampilan/Estetika</button>
+                    <button class="btn nps-button2" value="">Kecepatan Proses</button>
+                    <button class="btn nps-button2" value="">Kemudahan Penggunaan</button>
+                    <button class="btn nps-button2" value="">Kejelasan Bahasa</button>
+                    <button @onclick="@(()=>NavMan.NavigateTo(""))" class="btn btn-danger button-nps" value="">OK</button>
                 </div>
             </div>
         </div>
@@ -207,15 +235,13 @@
     private bool IsLoading = false;
     private bool IsSuccess = false;
     private bool IsFail = false;
-    private bool[] IsPressed = { false, false, false, false };
+    private bool IsExit = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
     private int MetodePembayaran = 0;
 
     private string strNPS1Value = string.Empty;
-    private string[] strNPS2Value = { "", "", "", "" };
-    private string[] strBtnClass = { "btn nps-button2", "btn nps-button2", "btn nps-button2", "btn nps-button2" };
 
     private int intBill = 0;
     private int intAccBill = 0;
@@ -231,24 +257,44 @@
         intBill = cst.intTagihan;
         intAccBill = 10000;
         intMinus = intBill - intAccBill;
-        if(MetodePembayaran==2)
+        switch (MetodePembayaran)
         {
-            pageClass = "main-panel bg-home";
+            case 1:
+                {
+                    pageClass = "main-panel bg-edc-process";
+
+                    //TODO Integrate with EDC Debit Card
+                    break;
+                }
+            case 2:
+                {
+                    pageClass = "main-panel bg-home";
+                    //TODO Integrate with Bill Acceptor
+                    //CountMoneyBillAcceptor();
+                    break;
+                }
+            case 3:
+                {
+                    pageClass = "main-panel bg-edc-process";
+
+                    //TODO Integrate with EDC Credit Card
+                    break;
+                }
+        }
+    }
+    private void TunaiExitFail()
+    {
+        IsExit = false;
+        IsFail = true;
+    }
+    private void CountMoneyBillAcceptor()
+    {
+        while (intAccBill < intBill)
+        {
+            //TODO Integrate with Bill Acceptor
         }
     }
 
-    private void test(int i)
-    {
-        if (IsPressed[i])
-        {
-            IsPressed[i] = false;
-            strNPS2Value[i] = string.Empty;
-        } else
-        {
-            IsPressed[i] = true;
-            strNPS2Value[i] = i.ToString();
-        }
-    }
     private void CheckPerso()
     {
         if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
@@ -265,11 +311,6 @@
         }
     }
 
-    private void InputNPS1(string strInput)
-    {
-        strNPS1Value = strInput;
-    }
-
     private void CheckNPS()
     {
         if (!IsVisible)
@@ -283,4 +324,9 @@
             IsVisible2 = true;
         }
     }
-    } 
+
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+} 
