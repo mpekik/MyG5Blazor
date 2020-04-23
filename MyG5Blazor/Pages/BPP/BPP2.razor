@@ -1,0 +1,99 @@
+﻿@page "/bpp/2"
+
+@using MyG5Blazor.Data 
+
+@inject IJSRuntime JSRuntime;
+@inject Costumer cst; 
+@inject NavigationManager Navmanager; 
+
+    <div class="main-panel bg-home">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+                <div class="navbar-wrapper">
+                    <div class="logo">
+                        <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                    </div>
+                    <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+                </div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="teks-title">Beli Pulsa Prabayar</div>
+                        <div id="proses-pindai">
+                            <div class="teks-center"> Pilih Nominal Pulsa yang Anda Inginkan </div>
+                        </div>
+                    </div>
+
+                    <div class="col-md-6">
+                        <div class="row" style="margin-left: 10px;">
+                            <div class="col">
+                                <img @onclick="@(()=>Nominal(10000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_10.png">
+                            </div>
+                            <div class="col">
+                                <img @onclick="@(()=>Nominal(20000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_20.png">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-left: 10px;">
+                            <div class="col">
+                                <img @onclick="@(()=>Nominal(30000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_30.png">
+                            </div>
+                            <div class="col">
+                                <img @onclick="@(()=>Nominal(40000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_40.png">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-left: 10px;">
+                            <div class="col">
+                                <img @onclick="@(()=>Nominal(50000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_50.png">
+                            </div>
+                            <div class="col">
+                                <img @onclick="@(()=>Nominal(100000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_100.png">
+                            </div>
+                        </div>
+                        <div class="row" style="margin-left: 10px;">
+                            <div class="col">
+                                <img @onclick="@(()=>Nominal(150000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_150.png">
+                            </div>
+                            <div class="col">
+                                <img @onclick="@(()=>Nominal(200000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_200.png">
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+        <footer>
+            <div class="footer-side1">
+                <span class="dot">1</span>
+                <span class="dot" id="dot-active">2</span>
+                <span class="dot">3</span>
+                <span class="dot">4</span>
+            </div>
+            <div class="footer-side2">
+                <button @onclick="@(()=>NavigateTo("/bpp/1"))" class="btn-arrow btn" value="">Kembali</button>
+                <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
+                <!-- <sup>Powered By </sup>Trilogi Persada -->
+            </div>
+        </footer>
+    </div>
+
+@code
+{
+    private void Nominal(int intNominal)
+    {
+        cst.intTagihan = intNominal;
+        Navmanager.NavigateTo("/bpp/3");
+    }
+
+    private void NavigateTo(string strURL)
+    {
+        Navmanager.NavigateTo(strURL);
+    }
+}

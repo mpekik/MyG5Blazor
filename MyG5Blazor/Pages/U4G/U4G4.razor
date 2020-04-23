@@ -1,0 +1,398 @@
+﻿@page "/u4g/4"
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq; 
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Threading.Tasks;
+@using MyG5Blazor.Data
+@inject Card_Dispenser cds
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavMan
+@inject Costumer cst
+
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+            <form class="col-md-6">
+                <div class="input-group no-border">
+                    <div class="checklist">
+                        @if (IsLoading)
+                        {
+                            <img src="../../assets/image/loader.gif" />
+                        }
+                        else if (IsSuccess)
+                        {
+                            <img src="../../assets/image/tanda_checklist.png" />
+                        }
+                        else if (IsFail)
+                        {
+                            <img src="../../assets/image/tanda_x.png" />
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="teks-title">Upgrade dan Ganti Kartu 4G </div>
+                    @if (IsFail)
+                    {
+                        <p class="teks-center" style="font-weight: bold;">
+                            Proses Upgrade dan Ganti Kartu 4G <br>
+                            Tidak Berhasil
+                        </p><br>
+
+                        <p class="teks-footer">
+                            Silakan Hubungi Customer Service
+                            GraPARI untuk Bantuan
+                        </p>
+                    }
+                    else if (IsSuccess)
+                    {
+                        <p class="teks-status"><span style="font-weight: bold;">Proses Upgrade dan Ganti Kartu <span style="color: green;"> Berhasil</span></span></p>
+                        <p class="teks-footer">Silakan Ambil Kartu SIM Anda dan Pastikan Melakukan Pengaturan Jaringan 4G pada Perangkat</p>
+                    }
+                    else
+                    {
+                        <p class="teks-center">
+                            Prose Upgrade dan ganti kartu 4G <br>
+                            sedang berjalan, mohon tunggu <br>
+                            beberapa saat
+                        </p>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <div class="image-center">
+                        <img src="../../assets/image/card-01.png" alt="" width="350px" height="200px">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-side1">
+        <span class="dot">1</span>
+        <span class="dot">2</span>
+        <span class="dot">3</span>
+        <span class="dot" id="dot-active">4</span>
+    </div>
+    <div class="footer-side2">
+        <!-- <button class="btn-arrow btn" value="">Kembali</button>
+        <button class="btn-arrow btn" value="">Menu Utama</button>
+        <sup>Powered By </sup>Trilogi Persada -->
+    </div>
+</footer>
+
+@if (IsVisible)
+{
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-nps">
+                <!-- <div class="modal-header">
+                  <span class="close">&times;</span>
+                </div> -->
+                <div class="modal-body">
+                    <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
+                    <p class="text-nps">Seberapa besar kemungkinan Anda untuk merekomendasikan layanan MyGraPARI kepada teman atau kolega Anda? </p>
+                    <button class="btn nps-button" value="1" @onclick="@(() => InputNPS1("1"))">1</button>
+                    <button class="btn nps-button" value="2" @onclick="@(() => InputNPS1("2"))">2</button>
+                    <button class="btn nps-button" value="3" @onclick="@(() => InputNPS1("3"))">3</button>
+                    <button class="btn nps-button" value="4" @onclick="@(() => InputNPS1("4"))">4</button>
+                    <button class="btn nps-button" value="5" @onclick="@(() => InputNPS1("5"))">5</button>
+                    <button class="btn nps-button" value="6" @onclick="@(() => InputNPS1("6"))">6</button>
+                    <button class="btn nps-button" value="7" @onclick="@(() => InputNPS1("7"))">7</button>
+                    <button class="btn nps-button" value="8" @onclick="@(() => InputNPS1("8"))">8</button>
+                    <button class="btn nps-button" value="9" @onclick="@(() => InputNPS1("9"))">9</button>
+                    <button class="btn nps-button" value="10" @onclick="@(() => InputNPS1("10"))">10</button>
+                    <button @onclick="CheckNPS" class="btn btn-danger button-nps">OK</button>
+                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (IsVisible2)
+{
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-nps">
+                <!-- <div class="modal-header">
+                  <span class="close">&times;</span>
+                </div> -->
+                <div class="modal-body">
+                    <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
+                    <p class="text-nps">Hal apa yang Anda rasa perlu ditingkatkan pada mesin layanan MyGraPARI? </p>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(0))">Tampilan/Estetika</button>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(1))">Kecepatan Proses</button>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(2))">Kemudahan Penggunaan</button>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(3))">Kejelasan Bahasa</button>
+                    <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger button-nps" value="">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code{
+    private bool IsVisible = false;
+    private bool IsVisible2 = false;
+    private bool IsLoading = false;
+    private bool IsSuccess = false;
+    private bool IsFail = false;
+    private bool[] IsPressed = { false, false, false, false };
+
+    private int intTryCount = 1;
+    private int intTryLimit = 3;
+
+    private string strNPS1Value = string.Empty;
+    private string[] strNPS2Value = { "", "", "", "" };
+    private string[] strBtnClass = { "btn nps-button2", "btn nps-button2", "btn nps-button2", "btn nps-button2" };
+
+    private string msg = string.Empty;
+    private string errorcode = string.Empty;
+    private string strCOM = "COM5";
+    private string readerName = "Generic Smart Card Reader Interface 0";
+    private string strPanjang = "7dcc52aa55959352ea5566fc41110da81e1ee496a7e931a2b3d1c6211450" +
+        "ed5ab8b1e62ca1d5a89bd341aee103ad341535806ae365a0ab14a8c95cecab3dff1f8ed332ec54e25551" +
+        "5db76aff29634f3ff4341649fc7302b83c9239c373fcf9e4f882977a15b6cdaae83f14307efae1d921e4" +
+        "1c42285dd44ac82ffe9ca430876b649985729d1e41ba7294aa7ff94e2ae91c46a7dbc1ea4e45c2ddb5b8" +
+        "b8920abb3cc5567b1c3a81ecc89adf2432141df1c28ecb744e642372eae238b1f4c0168e8c97bc71d826" +
+        "2eff0b3fb09ca4f13201bc9f4d05ac9df89ec5b3c9c07a594e527e20a4df2644dd01da036ac7484571bf" +
+        "f3f3acb33abbebeeac0b1c08978641dde127922e976438d36753566ae69a118e3753150250a0cc34";
+    private string p_icc_id = string.Empty;
+    private string mypersoexe = "C:\\Perso\\myperso.exe";
+
+    /*JSON POST
+            "transactionId" : "didapat dari init awal",
+            "terminalId" : "T0999",
+            "noHp" : "no hp yang diinput, depanya ganti 62",
+            "nik" : "nik yang didapat dari ektp reader",
+            "buid" : "buid yang didapat pas init",
+            "serialNumber" : "serial number kartu"
+            {\"terminalId\": \"T0999\"}*/
+    private static string myURL = "https://b00f7977.ngrok.io/mygrapari/upgrade4g/v1/perso";
+    private static string myJson = string.Empty;
+
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        OurUtility.Write_Log("== Perso Page", "step-action");
+        IsLoading = true;
+        await MyPerso();
+    }
+
+    public static async Task<string> PostCallAPI(string url, string jsonString)
+    {
+        try
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(url, content);
+                if (response != null)
+                {
+                    var jsonStringResult = await response.Content.ReadAsStringAsync();
+                    return jsonStringResult;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+        return null;
+    }
+
+    private async Task MyPerso()
+    {
+        await Task.Run(() => MoveToICC());
+        await CardReaderScan();
+
+        string myJson = "{ \"transactionId\" : \"" + cst.transactionID+ "\"," +
+                        "\"terminalId\" : \"" + cst.terminalID + "\"," +
+                        "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                        "\"nik\" : \"3175055212690001\"," +
+                        "\"buid\" : \"" + cst.buID + "\"," +
+                        "\"serialNumber\" : \"" + p_icc_id + "\"" +
+                        "}";
+        string strResult = await PostCallAPI(myURL, myJson);
+        if (strResult != null)
+        {
+            JObject jobjResult = JObject.Parse(strResult);
+            if ((string)jobjResult["transaction"]["statusCode"] == "00")
+            {
+                if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+                {
+                    IsLoading = false;
+                    IsSuccess = true;
+                    await Task.Run(() => MoveToFrontHold());
+                }
+                else
+                {
+                    await Task.Run(() => MoveToBin());
+                    if (intTryCount <= intTryLimit)
+                        intTryCount += 1;
+                    else
+                        IsFail = true;
+                }
+            }else
+            {
+                NavMan.NavigateTo("/error");
+            }
+        }else
+        {
+            NavMan.NavigateTo("/error");
+        }
+    }
+
+    private void test(int i)
+    {
+        if (IsPressed[i])
+        {
+            IsPressed[i] = false;
+            strNPS2Value[i] = string.Empty;
+        }
+        else
+        {
+            IsPressed[i] = true;
+            strNPS2Value[i] = i.ToString();
+        }
+    }
+
+    private async Task CheckPerso()
+    {
+        if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
+        {
+            IsLoading = true;
+        }
+        else if (IsLoading && !IsSuccess)
+        {
+            IsLoading = false;
+            if (intTryCount <= intTryLimit)
+                intTryCount += 1;
+            else
+                IsFail = true;
+        }
+    }
+
+    private void InputNPS1(string strInput)
+    {
+        strNPS1Value = strInput;
+    }
+
+    private async Task CheckPerso2()
+    {
+        if (IsLoading)
+        {
+            IsLoading = false;
+            IsSuccess = true;
+            IsFail = false;
+        }
+    }
+
+    private async Task CheckNPS()
+    {
+        if (!IsVisible)
+        {
+            IsVisible = true;
+        }
+        else
+        {
+            strNPS1Value = string.Empty;
+            IsVisible = false;
+            IsVisible2 = true;
+        }
+    }
+
+    private void MoveToICC()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " + errorcode + "message: " + msg, "step-action");
+            return;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_IC_Card", "step-action");
+        while (!cds.MoveTo_IC_Card(ref errorcode, ref msg)) { }
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+    }
+
+    private void MoveToFrontHold()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To Front Hold Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " +errorcode +"message: "+msg, "step-action");
+            return;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
+        cds.MoveTo_The_Front_Hold(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+    }
+
+    private void MoveToBin()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
+        cds.MoveTo_Bin(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+    }
+
+    private async Task CardReaderScan()
+    {
+        OurUtility.Write_Log("=== Card Reader Scan IC", "step-action");
+        Card_Reader cdr = new Card_Reader();
+        OurUtility.Write_Log("==== 1. Card_Reader.Read", "step-action");
+        if (await Task.Run(() => cdr.Read(readerName, ref p_icc_id, ref msg)).ConfigureAwait(true))
+        {
+            cdr.DisconnectedCard();
+        }
+    }
+}

@@ -1,0 +1,235 @@
+﻿@page "/u4g/2"
+@inject IJSRuntime JSRuntime;
+@inject BlazorTimer Timer
+@inject NavigationManager NavMan
+@inject Ektp_Data ktp
+
+@using MyG5Blazor.Data
+
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+            <form class="col-md-6">
+                <div class="input-group no-border">
+                    <div class="checklist">
+                        @if (IsLoading)
+                        {
+                            <img src="../../assets/image/loader.gif" />
+                        }
+                        else if (IsSuccess)
+                        {
+                            <img src="../../assets/image/tanda_checklist.png" />
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="teks-title">Upgrade dan Ganti Kartu 4G</div>
+
+                    @if (!IsSuccess)
+                    {
+                        <div id="proses-pindai">
+                            <div class="teks-center"> Letakkan <span style="font-weight: bold;">e-KTP</span> Anda pada Alat Pemindai</div>
+                            <div class="teks-footer"> Lalu tekan <span style="font-weight: bold;">"Pindai"</span></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="proses-berhasil">
+                            <div class="teks-center"> Proses Pindai e-Ktp Berhasil</div>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <img class="ktp" src="../../assets/image/Scan_KTP-01.png">
+                    @if (!IsSuccess)
+                    {
+                        <a id="myBtn" href="" @onclick="CheckEKTP" @onclick:preventDefault>
+                            <img class="pindai" src="../../assets/image/Pindai.png">
+                        </a>
+                    }
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+    <footer>
+        <div class="footer-side1">
+            <span class="dot">1</span>
+            <span class="dot" id="dot-active">2</span>
+            <span class="dot">3</span>
+            <span class="dot">4</span>
+        </div>
+        <div class="footer-side2">
+            <button @onclick="@(()=>NavigateTo("/u4g/1"))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
+            <!-- <sup>Powered By </sup>Trilogi Persada -->
+        </div>
+    </footer>
+    @if (IsVisible)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        @if (intTryCount <= intTryLimit)
+                        {
+                            <p class="text-body">Silakan pindai kembali e-Ktp Anda, pastikan alat pemindai dalam keadaan bersih.</p>
+                            <button class="btn btn-danger modal-button" @onclick="CheckEKTP">OK</button>
+                        }
+                        else
+                        {
+                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
+                            <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger modal-button" id="span1">OK</button>
+                        }
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+</div>
+
+@code{
+    private bool IsVisible = false;
+    private bool IsLoading = false;
+    private bool IsSuccess = false;
+    private bool IsFail = false;
+
+    private int intTryCount = 1;
+    private int intTryLimit = 3;
+
+    private IntPtr hContext = IntPtr.Zero;
+
+    /* FIXME: change to the right PCID & CONFIGFILE  */
+    byte[] pbPcid = { 0x20, 0x19, 0xBB, 0x12, 0x07, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x35, 0x28 };
+
+    byte[] pbConf = { 0x24,0xEB,0x7F,0x15,0x1E,0xCA,0xA3,
+            0xC6,0xC4,0x49,0xC6,0x5F,0xA6,0x50,0x62,0x88,0x5B,0x56,0xFB,0x1A,0xC5,
+            0x3F,0x80,0xC9,0x65,0xF0,0x10,0x9C,0x0F,0x44,0x1A,0x41 };
+
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        OurUtility.Write_Log("== Scan e-KTP Page", "step-action");
+    }
+
+    private async Task CheckEKTP()
+    {
+        if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
+        {
+            await ScanKTP();
+        }
+        else if (IsVisible)
+        {
+            IsVisible = false;
+        }
+    }
+
+    //FIXME: Create as Service
+    private async Task ScanKTP()
+    {
+        IsLoading = true;
+        OurUtility.Write_Log("=== Switcher.UP_eKTP", "step-action");
+        await Task.Run(()=>Switcher.UP_eKTP("3000"));
+        if (intTryCount <= intTryLimit)
+        {
+            OurUtility.Write_Log("=== Scan e-KTP", "step-action");
+            OurUtility.Write_Log("==== 1. Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
+            if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)
+            {
+                OurUtility.Write_Log("==== 2. Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
+                Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_PCID, pbPcid, pbPcid.Length);
+                OurUtility.Write_Log("==== 3. Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
+                Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_CONFIG, pbConf, pbConf.Length);
+            }
+            OurUtility.Write_Log("==== 4. Ektp_Sdk.EktpConnect", "step-action");
+            await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
+
+            int length = 2048;
+            byte[] tempBuffer = new byte[length];
+            int ret = -1;
+            OurUtility.Write_Log("==== 5. Ektp_Sdk.ReadDemographic From eKTP", "step-action");
+            ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer)).ConfigureAwait(false);
+            if (length == 0 || ret != 0)
+            {
+                OurUtility.Write_Log("==== 6. Ektp_Sdk.ReadDemographic Failed", "step-action");
+                IsLoading = false;
+                if (intTryCount <= intTryLimit)
+                {
+                    IsVisible = true;
+                    intTryCount += 1;
+                }
+                else
+                {
+                    IsFail = true;
+                }
+                return;
+            }
+            byte[] demoGraphic = new byte[length];
+            for (int i = 0; i < length; i++)
+            {
+                demoGraphic[i] = tempBuffer[i];
+            }
+            OurUtility.Write_Log("==== 6. Ektp_Sdk.ReadDemographic Success", "step-action");
+            ktp.demographic = demoGraphic;
+            IsVisible = false;
+            IsLoading = false;
+            IsSuccess = true;
+
+            if (IsSuccess)
+            {
+                int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
+                byte[] leftData = new byte[leftLen];
+                byte[] rightData = new byte[rightLen];
+
+                OurUtility.Write_Log("==== 7. Ektp_Sdk.ReadFingerPrints", "step-action");
+                ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(false);
+                if (ret != 0 || leftLen == 0 || rightLen == 0)
+                {
+                    OurUtility.Write_Log("==== 8. Ektp_Sdk.ReadFingerPrints Failed", "step-action");
+
+                    //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
+                    return;
+                }
+                ktp.minutiae1 = leftData;
+                ktp.minutiae2 = rightData;
+                ktp.minu1len = leftLen;
+                ktp.minu2len = rightLen;
+
+                OurUtility.Write_Log("==== 8. Ektp_Sdk.ReadFingerPrints Success", "step-action");
+                Timer.SetTimer(1000);
+                Timer.OnElapsed += TimerElapsedHandler;
+            }
+        }
+    }
+
+    private void TimerElapsedHandler()
+    {
+        NavMan.NavigateTo("/u4g/3");
+    }
+}

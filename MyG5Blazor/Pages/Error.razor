@@ -1,0 +1,32 @@
+﻿@page "/error"
+@inject IJSRuntime JSRuntime;
+
+@using MyG5Blazor.Data
+
+@inject Costumer cst
+@inject NavigationManager NavMan
+
+    <div class="container-fluid">
+        <div class="card" style="text-align: center; margin-top: 18%;">
+            <div class="card-body">
+                <h2><strong>Mohon maaf, terjadi gangguan pada layanan Telkomsel </strong></h2>
+                <h3>
+                    Silahkan hubungi customer service untuk melanjutkan layanan ini.
+                </h3>
+                <p></p>
+                <p><b>{{ Code }}</b></p>
+                <div class="d-flex justify-content-center">
+                    <div class="p-2" style="text-align: center">
+                        <button class="btn btn-block btn-lg btn-danger" @onclick="@(()=>NavigateTo(""))"> OK </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+@code{
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo("");
+    }
+}

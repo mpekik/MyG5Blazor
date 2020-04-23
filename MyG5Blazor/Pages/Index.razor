@@ -1,0 +1,206 @@
+﻿@page "/"
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq; 
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Threading.Tasks;
+@using MyG5Blazor.Data
+
+@inject NavigationManager NavMan
+@inject Costumer cst  
+
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+            <form class="navbar-form">
+                <div class="input-group no-border">
+                    <button type="submit" class="btn btn-white btn-round btn-just-icon" style="font-size: 15px; margin-top: -40px;">
+                        ID
+                    </button>
+                    <button type="submit" class="btn btn-white btn-round btn-just-icon" style="font-size: 15px; margin-top: -40px;">
+                        EN
+                    </button>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="centered-2">Silakan Tekan Menu yang Anda Inginkan</div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="card-body" style="margin-top: 10%;">
+                        @if (Menu[0])
+                        {
+                            @if (MenuCount == 0)
+                            {
+                                <img @onclick="@(()=>NavMan.NavigateTo(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG height=@HeightPNG style=@strStyle[0]>
+                            }
+                            else
+                            {
+                                <img @onclick="@(()=>NavMan.NavigateTo(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG style=@strStyle[0]>
+                            }
+                            MenuCount += 1;
+                        }
+                        @if (Menu[1])
+                        {
+                            @if (MenuCount == 0)
+                            {
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG height=@HeightPNG style=@strStyle[1]>
+                            }
+                            else
+                            {
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG style=@strStyle[1]>
+                            }
+                            MenuCount += 1;
+                        }
+                        @if (Menu[2])
+                        {
+                            @if (MenuCount == 0)
+                            {
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG height=@HeightPNG style=@strStyle[2]>
+                            }
+                            else
+                            {
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG style=@strStyle[2]>
+                            }
+                            MenuCount += 1;
+                        }
+                        @if (Menu[3])
+                        {
+                            @if (MenuCount == 0)
+                            {
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[3]))" src="../assets/image/Menu Utama/@AssetsPNG[3]" width=@WidthPNG height=@HeightPNG style=@strStyle[3]>
+                            }
+                            else
+                            {
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[3]))" src="../assets/image/Menu Utama/@AssetsPNG[3]" width=@WidthPNG style=@strStyle[3]>
+                            }
+                            MenuCount += 1;
+                        }
+
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+</div>
+
+@code
+{
+    private string[] hrefMenu = { "bth/1", "u4g/1", "bpp/1", "gk/1" };
+    private string[] AssetsPNG = { "Menu_Bayar_Tagihan.png", "Menu_Upgrade4G.png", "Menu_Beli_Pulsa.png", "Menu_Ganti_kartu.png" };
+
+    private string[] strHref = { "", "", "", "" };
+    private string[] strAssets = { "", "", "", "" };
+    private string WidthPNG = "40%";
+    private string HeightPNG = "20%";
+
+    private string[] StylePNG = { "margin-left: 10%;", "margin-left: 5%;", "margin-left: 10%; margin-top: 5%;", "margin-left: 5%; margin-top: 5%;" };
+    private string[] strStyle = { "", "", "", "" };
+    private int MenuCount = 0;
+    private int intMenu = 0;
+
+    private bool IsLoading = false;
+
+    private static string myURL = "https://b00f7977.ngrok.io/mygrapari/upgrade4g/v1/init";
+
+    //Menu[0] = Bayar Tagihan
+    //Menu[1] = Upgrade 4G
+    //Menu[2] = Beli Pulsa
+    //Menu[3] = Ganti Kartu
+    private bool[] Menu = { true, true, true, true };
+
+    protected override async Task OnInitializedAsync()
+    {
+        cst.Clear();
+        for (int i = 0; i < 4; i++)
+        {
+            if (Menu[i])
+            {
+                strHref[i] = hrefMenu[i];
+                strAssets[i] = AssetsPNG[i];
+                strStyle[i] = StylePNG[intMenu];
+                intMenu += 1;
+            }
+        }
+
+        intMenu = 0;
+    }
+
+    private void CheckMenuStatus()
+    {
+        for (int i = 0; i < 4; i++)
+        {
+            if (Menu[i])
+            {
+                strHref[i] = hrefMenu[i];
+                strAssets[i] = AssetsPNG[i];
+                strStyle[i] = StylePNG[intMenu];
+                intMenu += 1;
+            }
+        }
+    }
+
+    private async Task CheckStatus(string strURL)
+    {
+        string myJson = "{\"terminalId\": \"T0999\"}";
+        IsLoading = true;
+        OurUtility.Write_Log("Get Status Code", "step-action");
+        string strResult = await PostCallAPI(myURL, myJson);
+        if(strResult != null)
+        {
+            JObject jobjResult = JObject.Parse(strResult);
+            if ((string)jobjResult["transaction"]["statusCode"] == "00")
+            {
+                OurUtility.Write_Log("Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                cst.SetTransaction((string)jobjResult["transaction"]["transactionId"], (string)jobjResult["config"]["apiBuid"],(string)jobjResult["terminal"]["terminalId"]);
+                OurUtility.Write_Log(cst.transactionID +" "+ cst.buID+" "+cst.terminalID+ " {Success}", "step-action");
+                NavMan.NavigateTo(strURL);
+            }else
+            {
+                OurUtility.Write_Log("Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
+            }
+        }else
+        {
+            OurUtility.Write_Log("Error : Hit WebService {Error}", "step-action");
+        }
+    }
+
+    public static async Task<string> PostCallAPI(string url, string jsonString)
+    {
+        try
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(url, content);
+                if (response != null)
+                {
+                    var jsonStringResult = await response.Content.ReadAsStringAsync();
+                    return jsonStringResult;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+        return null;
+    }
+}

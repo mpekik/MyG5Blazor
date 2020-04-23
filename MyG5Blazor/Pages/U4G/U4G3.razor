@@ -1,0 +1,271 @@
+﻿@page "/u4g/3"
+@using MyG5Blazor.Data
+@using System.Threading
+@inject IJSRuntime JSRuntime;
+@inject BlazorTimer Timer
+@inject Ektp_Data ktp
+@inject NavigationManager NavMan
+
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+            <form class="col-md-6">
+                <div class="input-group no-border">
+                    <div class="checklist">
+                        @if (IsLoading)
+                        {
+                            <img src="../../assets/image/loader.gif" />
+                        }
+                        else if (IsSuccess)
+                        {
+                            <img src="../../assets/image/tanda_checklist.png" />
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="teks-title">Upgrade dan Ganti Kartu 4G</div>
+                    @if (!IsSuccess)
+                    {
+                        <div id="proses-pindai">
+                            <div class="teks-center"> Letakkan <span style="font-weight: bold;"> Telunjuk Kanan/Kiri </span> Anda pada Alat Pemindai Sidik Jari</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="proses-berhasil">
+                            <div class="teks-center">Proses Pindai Sidik Jari Berhasil</div>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                        <img class="ktp" id="myBtn" @onclick="CheckFinger" src="../../assets/image/Scan_Finger-01.png">
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+    <footer>
+        <div class="footer-side1">
+            <span class="dot">1</span>
+            <span class="dot">2</span>
+            <span class="dot" id="dot-active">3</span>
+            <span class="dot">4</span>
+        </div>
+        <div class="footer-side2">
+            <button @onclick="@(()=>NavigateTo("/u4g/2"))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
+            <!-- <sup>Powered By </sup>Trilogi Persada -->
+        </div>
+    </footer>
+    @if (IsVisible)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        @if (intTryCount <= intTryLimit)
+                        {
+                            <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;"> Jari Telunjuk Kanan/Kiri </span>Anda, pastikan alat pemindai dalam keadaan bersih.</p>
+                            <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
+                        }
+                        else
+                        {
+                            <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>Anda tidak terbaca pada sistem MyGraPARI. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
+                            <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger modal-button" id="span1">OK</button>
+                        }
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+
+</div>
+
+@code{
+    private bool IsVisible = false;
+    private bool IsLoading = false;
+    private bool IsSuccess = false;
+    private bool IsFail = false;
+
+    private int intTryCount = 1;
+    private int intTryLimit = 3;
+
+    private IntPtr hContext = IntPtr.Zero;
+
+    /* FIXME: change to the right PCID & CONFIGFILE  */
+    byte[] pbPcid = { 0x20, 0x19, 0xBB, 0x12, 0x07, 0x05, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x00, 0x04, 0x35, 0x28 };
+
+    byte[] pbConf = { 0x24,0xEB,0x7F,0x15,0x1E,0xCA,0xA3,
+            0xC6,0xC4,0x49,0xC6,0x5F,0xA6,0x50,0x62,0x88,0x5B,0x56,0xFB,0x1A,0xC5,
+            0x3F,0x80,0xC9,0x65,0xF0,0x10,0x9C,0x0F,0x44,0x1A,0x41 };
+
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+    private async Task CheckFinger()
+    {
+        if (IsVisible)
+        {
+            IsVisible = false;
+            await FingerPrintScan();
+        }
+        else if (!IsLoading && !IsSuccess && !IsFail)
+        {
+            IsLoading = true;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        OurUtility.Write_Log("== Finger Print Scan Page", "step-action");
+        await FingerPrintScan();
+    }
+
+    private async Task FingerPrintScan()
+    {
+        //ektp.InitializeEktp();
+        IsLoading = true;
+        OurUtility.Write_Log("=== Scan Finger Print", "step-action");
+        OurUtility.Write_Log("==== 1. Ektp_Sdk.EktpConnect, Connect Reader", "step-action");
+        await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
+
+        int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
+        byte[] leftData = new byte[leftLen];
+        byte[] rightData = new byte[rightLen];
+
+        OurUtility.Write_Log("==== 2. Ektp_Sdk.OpenFingerPrintReader", "step-action");
+
+        // -- Step 2, Open Device Fingerprint
+        IntPtr reader = IntPtr.Zero;
+        int result = -1;
+        result = await Task.Run(() => Ektp_Sdk.OpenFingerPrintReader(ref reader, "uareu")).ConfigureAwait(false);
+        if (reader == IntPtr.Zero)
+        {
+            OurUtility.Write_Log("==== 3. Ektp_Sdk.OpenFingerPrintReader Failed", "step-action");
+
+            //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
+        }
+        else
+        {
+            OurUtility.Write_Log("==== 3. Ektp_Sdk.OpenFingerPrintReader Success", "step-action");
+            OurUtility.Write_Log("==== 4. Ektp_Sdk.StartEngine", "step-action");
+
+            IntPtr engine = IntPtr.Zero;
+            int engineType = 0;//engineType = 0, it means that finger print engine is uareu
+            result = await Task.Run(() => Ektp_Sdk.StartEngine(engineType, ref engine)).ConfigureAwait(false);
+            if (engine == IntPtr.Zero)
+            {
+                OurUtility.Write_Log("==== 5. Ektp_Sdk.StartEngine Failed", "step-action");
+            }
+            else
+            {
+                OurUtility.Write_Log("==== 5. Ektp_Sdk.StartEngine Success", "step-action");
+
+                Thread.Sleep(1500);
+
+                OurUtility.Write_Log("==== 6. -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.CaptureFingerPrint", "step-action");
+
+                int size = 120000;
+                int score = -1;
+                byte[] image = new byte[size];
+                result = await Task.Run(() => Ektp_Sdk.CaptureFingerPrint(reader, image, ref size, ref score)).ConfigureAwait(false);
+                if (result != 0)
+                {
+                    OurUtility.Write_Log("==== 7. Ektp_Sdk.CaptureFingerPrint Failed", "step-action");
+                    //break;
+                }else
+                {
+                    OurUtility.Write_Log("==== 8. -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.MatchFingerPrint", "step-action");
+
+                    // -- Step 5, Compare
+
+                    int matched = 0;//matched == 1, it means finger print matched
+                    int format = 0;//format == 0, it means finger print template type is ISO
+
+                    //matched right finger
+                    result = await Task.Run(() => Ektp_Sdk.MatchFingerPrint(engine, image, size,
+                                                        ktp.minutiae2, ktp.minu2len,
+                                                        ref score, ref matched, format)).ConfigureAwait(false);
+
+                    if (matched == 1)
+                    {
+                        OurUtility.Write_Log("==== 9. -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                        IsLoading = false;
+                        IsSuccess = true;
+                        Timer.SetTimer(1000);
+                        Timer.OnElapsed += TimerElapsedHandler;
+                        //break;
+                    }
+                    else
+                    {
+                        result = await Task.Run(() => Ektp_Sdk.MatchFingerPrint(engine, image, size,
+                                                        ktp.minutiae1, ktp.minu1len,
+                                                        ref score, ref matched, format)).ConfigureAwait(false);
+                        if (matched == 1)
+                        {
+                            OurUtility.Write_Log("==== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                            IsLoading = false;
+                            IsSuccess = true;
+
+                            OurUtility.Write_Log("==== 10. Ektp_Sdk.CloseReader", "step-action");
+                            result = Ektp_Sdk.CloseReader(reader);
+
+                            OurUtility.Write_Log("== Switcher.DOWN_eKTP", "step-action");
+                            await Task.Run(() => Switcher.DOWN_eKTP("500"));
+
+                            Timer.SetTimer(1000);
+                            Timer.OnElapsed += TimerElapsedHandler;
+                            //break;
+                        }
+                        else
+                        {
+                            OurUtility.Write_Log("==== 9. -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                            OurUtility.Write_Log("==== 10. Ektp_Sdk.CloseReader", "step-action");
+                            result = Ektp_Sdk.CloseReader(reader);
+
+                            intTryCount += 1;
+                            IsLoading = false;
+                            IsVisible = true;
+                            if (intTryCount > intTryLimit)
+                            {
+                                IsFail = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void TimerElapsedHandler()
+    {
+        NavMan.NavigateTo("/u4g/4");
+
+    }
+}

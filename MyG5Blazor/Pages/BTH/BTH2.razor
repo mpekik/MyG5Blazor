@@ -1,0 +1,95 @@
+﻿@page "/bth/2"
+
+@using MyG5Blazor.Data 
+
+@inject IJSRuntime JSRuntime;
+@inject Costumer cst; 
+@inject NavigationManager Navmanager; 
+
+    <div class="main-panel bg-home">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+                <div class="navbar-wrapper">
+                    <div class="logo">
+                        <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                    </div>
+                    <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+                </div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="teks-title">Beli Pulsa Prabayar</div>
+                            <div id="konfirmasi-teks" class="teks-status-halo">
+                                Pada nomor <b class="teks-bold"> @cst.PhoneNumber</b> terbaca
+                                memiliki tagihan sebesar <b class="teks-bold">Rp @cst.strTagihan.</b>
+                                dengan rincian sebagai berikut:
+                            </div>
+                            <div id="list-tagihan" class="teks-footer-halo">
+                                @foreach (dynamic t in cst.GetlistTaggihan)
+                                {
+                                    <li>@t.tanggalTagihan  <b>=</b> Rp @t.jumlahTagihan</li>
+                                }
+                            </div>
+                    </div>
+
+                    <div class="col-md-6">
+                            <div id="btn-lanjut" class="teks-lanjut">
+                                 Tekan <b class="teks-bold">LANJUT</b> Untuk Melanjutkan
+                                 <button class="btn btn-danger btn-right" @onclick="@(()=>NavigateTo("/bth/3"))" id="btn-ok" value="">Lanjut</button>
+                            </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+        <footer>
+            <div class="footer-side1">
+                <span class="dot">1</span>
+                <span class="dot" id="dot-active">2</span>
+                <span class="dot">3</span>
+                <span class="dot">4</span>
+            </div>
+            <div class="footer-side2">
+                    <button @onclick="@(()=>NavigateTo("/bth/1"))" class="btn-arrow btn" value="">Kembali</button>
+
+                <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
+                <!-- <sup>Powered By </sup>Trilogi Persada -->
+            </div>
+        </footer>
+    </div>
+
+@code
+{
+    private bool IsLanjut = false;
+
+    protected override async Task OnInitializedAsync()
+    {
+        cst.ClearTagihan();
+        cst.AddlistTagihan("asd", "123");
+        cst.AddlistTagihan("qwe", "456");
+        cst.AddlistTagihan("zxc", "789");
+    }
+
+    private void buttonOk()
+    {
+        IsLanjut = !IsLanjut;
+    }
+
+    private void Nominal(int intNominal)
+    {
+        cst.intTagihan = intNominal;
+        Navmanager.NavigateTo("/bth/3");
+    }
+
+    private void NavigateTo(string strURL)
+    {
+        Navmanager.NavigateTo(strURL);
+    }
+}

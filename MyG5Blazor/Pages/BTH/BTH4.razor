@@ -1,0 +1,273 @@
+﻿@page "/bth/4"
+
+@using MyG5Blazor.Data
+ 
+@inject IJSRuntime JSRuntime;
+@inject Costumer cst  
+
+<div class=@pageClass>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+            <form class="col-md-6">
+                <div class="input-group no-border">
+                    <div class="checklist">
+                        @if (IsLoading)
+                        {
+                        <img src="../../assets/image/loader.gif" />
+                        }
+                        else if (IsSuccess)
+                        {
+                            <img src="../../assets/image/tanda_checklist.png" />
+                        }
+                        else if (IsFail)
+                        {
+                            <img src="../../assets/image/tanda_x.png" />
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                @switch (MetodePembayaran)
+                {
+                    case 1:
+                        {
+                            <div id="credit-payment" class="modal-blank-1" style="background-image: url(../image/bg-02.jpg); background-size: cover; background-position: center center;background-attachment: fixed; ">
+                                <img src="../../assets/image/debit.png" class="img-debit" id="myBtn">
+                                <div class="modal-blank-text">
+                                    <div class="text1" id="teks-temukan">Temukan mesin EDC pada <br> MyGraPARI seperti gambar di atas</div>
+                                    <div class="text2">Gesek Kartu Debit Anda dengan <br> bagian pita hitam menghadap ke <br> arah mesin EDC</div>
+                                    <div class="text3">Masukkan PIN dan tekan OK <br> <p class="green">(tombol hijau)</p></div>
+                                </div>
+                            </div>
+
+                            break;
+                        }
+                    case 2:
+                        {
+                            <div class="col-md-6">
+                                <div class="teks-title">Bayar Tagihan KartuHalo</div>
+
+                                @if (IsVisible)
+                                {
+                                <div id="teks-silakan">
+                                    <div class="teks-top"> Silakan Masukan Uang Kertas pada Alat Penerima Uang Tunai secara Lembar per Lembar </div>
+                                </div>
+                                <div id="teks-pastikan">
+                                    <div class="teks-center" style="margin-top: 32%;"> Pastikan Pembayaran Menggunakan <br> Uang Kertas Minimal Pecahan Rp 10.000 </div>
+                                </div>
+                                <div id="bayar2">
+                                    <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian</div>
+                                </div>
+                                <div id="bayar3">
+                                    <div class="teks-bot2" style="text-transform: uppercase; font-weight: bold; margin-top: 70%;">NILAI DARI KELEBIHAN PEMBAYARAN SECARA OTOMATIS AKAN MENGURANGI TAGIHAN KARTUHALO ANDA DI BULAN BERIKUTNYA.</div>
+                                </div>
+                                }
+
+                                @if (IsVisible2)
+                                {
+                                <div id="teks-sudah-sesuai">
+                                    <div class="teks-center" style="margin-top: 38%;"> Uang yang Anda Masukkan Sudah Sesuai dengan Jumlah yang Harus Dibayarkan </div>
+                                </div>
+                                }
+
+                                @if (IsVisible && IsVisible2)
+                                {
+                                <div id="status-pay" class="teks-status2">Proses Pembayaran Tagihan KartuHalo <br><b class="red">Tidak Berhasil</b></div>
+                                <div id="nominal-pay" class="teks-center"> Silakan Ambil Struk Transaksi dan <br> Hubungi Kasir GraPARI untuk Bantuan</div>
+                                }
+                            </div>
+
+                            <div class="col-md-6" id="proses-bill">
+                                <div id="">
+                                    <img class="tunai" onclick="buttonNext()" id="" src="../../assets/image/tunai.png">
+                                </div>
+                                <div>
+                                    <div class="jumlah-bayar">Jumlah yang Harus Dibayar</div>
+                                    <div class="nominal-rupiah">Rp @strBill</div>
+                                </div><br>
+
+                                <div id="">
+                                    <div class="jumlah-bayar">Uang yang telah Anda Masukan</div>
+                                    <div class="nominal-rupiah" id="nominal-kurang">Rp @strMinus</div>
+                                    <div class="nominal-rupiah" id="nominal-pas">Rp @strAccBill</div>
+                                </div><br>
+                            </div>
+                            break;
+                        }
+                }
+            </div>
+        </div>
+    </div>
+
+
+<footer>
+    <div class="footer-side1">
+        <span class="dot">1</span>
+        <span class="dot">2</span>
+        <span class="dot">3</span>
+        <span class="dot" id="dot-active">4</span>
+    </div>
+    <div class="footer-side2">
+        <!-- <button class="btn-arrow btn" value="">Kembali</button>
+        <button class="btn-arrow btn" value="">Menu Utama</button>
+        <sup>Powered By </sup>Trilogi Persada -->
+    </div>
+</footer>
+    </div>
+@if (IsVisible)
+{
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-nps">
+                <!-- <div class="modal-header">
+                  <span class="close">&times;</span>
+                </div> -->
+                <div class="modal-body">
+                    <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
+                    <p class="text-nps">Seberapa besar kemungkinan Anda untuk merekomendasikan layanan MyGraPARI kepada teman atau kolega Anda? </p>
+                    <button class="btn nps-button" value="1" @onclick="@(() => InputNPS1("1"))">1</button>
+                    <button class="btn nps-button" value="2" @onclick="@(() => InputNPS1("2"))">2</button>
+                    <button class="btn nps-button" value="3" @onclick="@(() => InputNPS1("3"))">3</button>
+                    <button class="btn nps-button" value="4" @onclick="@(() => InputNPS1("4"))">4</button>
+                    <button class="btn nps-button" value="5" @onclick="@(() => InputNPS1("5"))">5</button>
+                    <button class="btn nps-button" value="6" @onclick="@(() => InputNPS1("6"))">6</button>
+                    <button class="btn nps-button" value="7" @onclick="@(() => InputNPS1("7"))">7</button>
+                    <button class="btn nps-button" value="8" @onclick="@(() => InputNPS1("8"))">8</button>
+                    <button class="btn nps-button" value="9" @onclick="@(() => InputNPS1("9"))">9</button>
+                    <button class="btn nps-button" value="10" @onclick="@(() => InputNPS1("10"))">10</button>
+                    <button @onclick="CheckNPS" class="btn btn-danger button-nps">OK</button>
+                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+                       @if (IsVisible2)
+                       {
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-nps">
+                <!-- <div class="modal-header">
+                  <span class="close">&times;</span>
+                </div> -->
+                <div class="modal-body">
+                    <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
+                    <p class="text-nps">Hal apa yang Anda rasa perlu ditingkatkan pada mesin layanan MyGraPARI? </p>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(0))">Tampilan/Estetika</button>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(1))">Kecepatan Proses</button>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(2))">Kemudahan Penggunaan</button>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(3))">Kejelasan Bahasa</button>
+                    <a href=""><button class="btn btn-danger button-nps" value="">OK</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+                   @code{
+                       private string pageClass = "main-panel bg-home";
+                       private bool IsVisible = false;
+                       private bool IsVisible2 = false;
+                       private bool IsLoading = false;
+                       private bool IsSuccess = false;
+                       private bool IsFail = false;
+                       private bool[] IsPressed = { false,false,false,false};
+
+                       private int intTryCount = 1;
+                       private int intTryLimit = 3;
+                       private int MetodePembayaran = 0;
+
+                       private string strNPS1Value = string.Empty;
+                       private string[] strNPS2Value = { "", "", "", "" };
+                       private string[] strBtnClass = { "btn nps-button2", "btn nps-button2", "btn nps-button2", "btn nps-button2" };
+
+                       private int intBill = 0;
+                       private int intAccBill = 0;
+                       private int intMinus = 0;
+
+                       private string strBill => (intBill / 1000).ToString() + ".000";
+                       private string strAccBill => (intAccBill / 1000).ToString() + ".000";
+                       private string strMinus => (intMinus / 1000).ToString() + ".000";
+
+                       protected override async Task OnInitializedAsync()
+                       {
+                           MetodePembayaran = cst.intMPembayaran;
+                           intBill = cst.intTagihan;
+                           intAccBill = 10000;
+                           intMinus = intBill - intAccBill;
+                           switch (MetodePembayaran)
+                           {
+                               case 1:
+                                   {
+                                       pageClass = "main-panel bg-edc-process";
+                                       break;
+                                   }
+                               case 3:
+                                   pageClass = "main-panel bg-edc-process";
+                                   break;
+                           }
+                       }
+                       private void test(int i)
+                       {
+                           if(IsPressed[i])
+                           {
+                               IsPressed[i] = false;
+                               strNPS2Value[i] = string.Empty;
+                           }else
+                           {
+                               IsPressed[i] = true;
+                               strNPS2Value[i] = i.ToString();
+                           }
+                       }
+                       private void CheckPerso()
+                       {
+                           if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
+                           {
+                               IsLoading = true;
+                           }
+                           else if (IsLoading && !IsSuccess)
+                           {
+                               IsLoading = false;
+                               if (intTryCount <= intTryLimit)
+                                   intTryCount += 1;
+                               else
+                                   IsFail = true;
+                           }
+                       }
+
+                       private void InputNPS1(string strInput)
+                       {
+                           strNPS1Value = strInput;
+                       }
+
+                       private void CheckNPS()
+                       {
+                           if (!IsVisible)
+                           {
+                               IsVisible = true;
+                           }
+                           else
+                           {
+                               strNPS1Value = string.Empty;
+                               IsVisible = false;
+                               IsVisible2 = true;
+                           }
+                       }
+                   }

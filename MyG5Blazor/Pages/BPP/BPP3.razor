@@ -1,0 +1,133 @@
+﻿@page "/bpp/3"
+
+@using MyG5Blazor.Data
+
+@inject Costumer cst  
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager NavManager 
+
+    <div class="main-panel bg-home">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+                <div class="navbar-wrapper">
+                    <div class="logo">
+                        <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                    </div>
+                    <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+                </div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="teks-title">Beli Pulsa Prabayar</div>
+                        @if (!IsMethod)
+                        {
+                            <div id="">
+                                <div class="teks-center"> Pilih Metode Pembayaran </div>
+                            </div>
+                        }
+                        else
+                        {
+                            if (cst.intMPembayaran == 2)
+                            {
+                                <div id="teks-konfirmasi">
+                                    <div class="teks-status"> Konfirmasi Pembelian Pulsa Prabayar </div>
+                                </div>
+                                <div id="bayar1">
+                                    <div class="teks-center" style="text-transform: uppercase; font-weight: bold;">Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian</div>
+                                </div>
+                            }
+                            else
+                            {
+                                <div id="konfirmasi-teks" class="teks-center"> Konfirmasi Pembelian Pulsa Prabayar</div>
+                            }
+                        }
+                    </div>
+
+                    <div class="col-md-6">
+                        @if (!IsMethod)
+                        {
+                            <img @onclick="@(() => SetPaymentMethod(1))" id="" class="pembayaran" src="../../assets/image/Bayar_Debit.png">
+                            <img @onclick="@(() => SetPaymentMethod(2))" id="" class="pembayaran" src="../../assets/image/Bayar_Tunai.png">
+                            <img @onclick="@(() => SetPaymentMethod(3))" id="" class="pembayaran" src="../../assets/image/Bayar_Kredit.png">
+                        }
+                        else
+                        {
+                            <div class="teks-nominal">
+                                <table id="tabel">
+                                    <tr>
+                                        <td>Nomor</td>
+                                        <td> &emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">@cst.PhoneNumber</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nominal</td>
+                                        <td>&emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">Rp @cst.strTagihan</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Metode Bayar</td>
+                                        <td>&emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">@cst.strMPembayaran</span></td>
+                                    </tr>
+                                </table>
+                                <button class="btn btn-danger btn-right" @onclick="@(()=>NavigateTo("/bpp/4"))" id="btn-ok" value="">OK</button>
+                            </div>
+                        }
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+        <footer>
+            <div class="footer-side1">
+                <span class="dot">1</span>
+                <span class="dot">2</span>
+                <span class="dot" id="dot-active">3</span>
+                <span class="dot">4</span>
+            </div>
+            <div class="footer-side2">
+                <button @onclick="@(()=>NavigateTo("/bpp/2"))" class="btn-arrow btn" value="">Kembali</button>
+                <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
+                <!-- <sup>Powered By </sup>Trilogi Persada -->
+            </div>
+        </footer>
+    </div>
+
+@code
+{
+    private bool IsMethod = false;
+    private void SetPaymentMethod(int _intMPembayaran)
+    {
+        if (!IsMethod)
+        {
+            cst.intMPembayaran = _intMPembayaran;
+            IsMethod = true;
+        }
+    }
+
+    private void NavigateTo(string strURL)
+    {
+        if (strURL !="")
+        {
+            if (!IsMethod)
+            {
+                NavManager.NavigateTo(strURL);
+            }
+            else
+            {
+                cst.intMPembayaran = 0;
+                IsMethod = false;
+            }
+        } else
+        {
+            NavManager.NavigateTo(strURL);
+        }
+    }
+}

@@ -1,0 +1,208 @@
+﻿@page "/bpp/4"
+@inject IJSRuntime JSRuntime;
+
+<div class=@pageBG>
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+            <form class="col-md-6">
+                <div class="input-group no-border">
+                    <div class="checklist">
+                        @if (IsLoading)
+                        {
+                        <img src="../../assets/image/loader.gif" />
+                        }
+                        else if (IsSuccess)
+                        {
+                            <img src="../../assets/image/tanda_checklist.png" />
+                        }
+                        else if (IsFail)
+                        {
+                            <img src="../../assets/image/tanda_x.png" />
+                        }
+                    </div>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="teks-title">Upgrade dan Ganti Kartu 4G </div>
+                    @if (IsFail)
+                    {
+                        <p class="teks-center" style="font-weight: bold;">
+                            Proses Upgrade dan Ganti Kartu 4G <br>
+                            Tidak Berhasil
+                        </p><br>
+
+                        <p class="teks-footer">
+                            Silakan Hubungi Customer Service
+                            GraPARI untuk Bantuan
+                        </p>
+                    }
+                    else if (IsSuccess)
+                    {
+                        <p class="teks-status"><span style="font-weight: bold;">Proses Upgrade dan Ganti Kartu <span style="color: green;"> Berhasil</span></span></p>
+                        <p class="teks-footer">Silakan Ambil Kartu SIM Anda dan Pastikan Melakukan Pengaturan Jaringan 4G pada Perangkat</p>
+                    }
+                    else
+                    {
+                        <p class="teks-center">
+                            Prose Upgrade dan ganti kartu 4G <br>
+                            sedang berjalan, mohon tunggu <br>
+                            beberapa saat
+                        </p>
+                    }
+                </div>
+
+                <div class="col-md-6">
+                    <div class="image-center">
+                            <img src="../../assets/image/card-01.png" alt="" width="350px" height="200px">
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<footer>
+    <div class="footer-side1">
+        <span class="dot">1</span>
+        <span class="dot">2</span>
+        <span class="dot">3</span>
+        <span class="dot" id="dot-active">4</span>
+    </div>
+    <div class="footer-side2">
+        <!-- <button class="btn-arrow btn" value="">Kembali</button>
+        <button class="btn-arrow btn" value="">Menu Utama</button>
+        <sup>Powered By </sup>Trilogi Persada -->
+    </div>
+</footer>
+
+@if (IsVisible)
+{
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-nps">
+                <!-- <div class="modal-header">
+                  <span class="close">&times;</span>
+                </div> -->
+                <div class="modal-body">
+                    <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
+                    <p class="text-nps">Seberapa besar kemungkinan Anda untuk merekomendasikan layanan MyGraPARI kepada teman atau kolega Anda? </p>
+                    <button class="btn nps-button" value="1" @onclick="@(() => InputNPS1("1"))">1</button>
+                    <button class="btn nps-button" value="2" @onclick="@(() => InputNPS1("2"))">2</button>
+                    <button class="btn nps-button" value="3" @onclick="@(() => InputNPS1("3"))">3</button>
+                    <button class="btn nps-button" value="4" @onclick="@(() => InputNPS1("4"))">4</button>
+                    <button class="btn nps-button" value="5" @onclick="@(() => InputNPS1("5"))">5</button>
+                    <button class="btn nps-button" value="6" @onclick="@(() => InputNPS1("6"))">6</button>
+                    <button class="btn nps-button" value="7" @onclick="@(() => InputNPS1("7"))">7</button>
+                    <button class="btn nps-button" value="8" @onclick="@(() => InputNPS1("8"))">8</button>
+                    <button class="btn nps-button" value="9" @onclick="@(() => InputNPS1("9"))">9</button>
+                    <button class="btn nps-button" value="10" @onclick="@(() => InputNPS1("10"))">10</button>
+                    <button @onclick="CheckNPS" class="btn btn-danger button-nps">OK</button>
+                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (IsVisible2)
+{
+    <!-- The Modal -->
+    <div id="myModal" class="modal">
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-nps">
+                <!-- <div class="modal-header">
+                  <span class="close">&times;</span>
+                </div> -->
+                <div class="modal-body">
+                    <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
+                    <p class="text-nps">Hal apa yang Anda rasa perlu ditingkatkan pada mesin layanan MyGraPARI? </p>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(0))">Tampilan/Estetika</button>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(1))">Kecepatan Proses</button>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(2))">Kemudahan Penggunaan</button>
+                    <button class="btn nps-button2" value="" @onclick="@(() => test(3))">Kejelasan Bahasa</button>
+                    <a href=""><button class="btn btn-danger button-nps" value="">OK</button></a>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code{
+    private string pageBG = "main-panel bg-home";
+    private bool IsVisible = false;
+    private bool IsVisible2 = false;
+    private bool IsLoading = false;
+    private bool IsSuccess = false;
+    private bool IsFail = false;
+    private bool[] IsPressed = { false,false,false,false};
+
+    private int intTryCount = 1;
+    private int intTryLimit = 3;
+
+    private string strNPS1Value = string.Empty;
+    private string[] strNPS2Value = { "", "", "", "" };
+    private string[] strBtnClass = { "btn nps-button2", "btn nps-button2", "btn nps-button2", "btn nps-button2" };
+
+    private void test(int i)
+    {
+        if(IsPressed[i])
+        {
+            IsPressed[i] = false;
+            strNPS2Value[i] = string.Empty;
+        }else
+        {
+            IsPressed[i] = true;
+            strNPS2Value[i] = i.ToString();
+        }
+    }
+    private void CheckPerso()
+    {
+        if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
+        {
+            IsLoading = true;
+        }
+        else if (IsLoading && !IsSuccess)
+        {
+            IsLoading = false;
+            if (intTryCount <= intTryLimit)
+                intTryCount += 1;
+            else
+                IsFail = true;
+        }
+    }
+
+    private void InputNPS1(string strInput)
+    {
+        strNPS1Value = strInput;
+    }
+
+    private void CheckNPS()
+    {
+        if (!IsVisible)
+        {
+            IsVisible = true;
+        }
+        else
+        {
+            strNPS1Value = string.Empty;
+            IsVisible = false;
+            IsVisible2 = true;
+        }
+    }
+}
