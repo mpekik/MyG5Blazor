@@ -102,8 +102,14 @@
 
                                 <div id="">
                                     <div class="jumlah-bayar">Uang yang telah Anda Masukan</div>
-                                    <div class="nominal-rupiah" id="nominal-kurang">Rp @strMinus</div>
+                                @if (intAccBill < intBill)
+                                {
+                                    <div class="nominal-rupiah" id="nominal-kurang">Rp @strAccBill</div>
+                                }
+                                else
+                                {
                                     <div class="nominal-rupiah" id="nominal-pas">Rp @strAccBill</div>
+                                }
                                 </div><br>
                             </div>
                             break;
@@ -180,94 +186,94 @@
         </div>
     </div>
 }
+@code
+{
+        private string pageClass = "main-panel bg-home";
+        private bool IsVisible = false;
+        private bool IsVisible2 = false;
+        private bool IsLoading = false;
+        private bool IsSuccess = false;
+        private bool IsFail = false;
+        private bool[] IsPressed = { false, false, false, false };
 
-                   @code{
-                       private string pageClass = "main-panel bg-home";
-                       private bool IsVisible = false;
-                       private bool IsVisible2 = false;
-                       private bool IsLoading = false;
-                       private bool IsSuccess = false;
-                       private bool IsFail = false;
-                       private bool[] IsPressed = { false,false,false,false};
+        private int intTryCount = 1;
+        private int intTryLimit = 3;
+        private int MetodePembayaran = 0;
 
-                       private int intTryCount = 1;
-                       private int intTryLimit = 3;
-                       private int MetodePembayaran = 0;
+        private string strNPS1Value = string.Empty;
+        private string[] strNPS2Value = { "", "", "", "" };
+        private string[] strBtnClass = { "btn nps-button2", "btn nps-button2", "btn nps-button2", "btn nps-button2" };
 
-                       private string strNPS1Value = string.Empty;
-                       private string[] strNPS2Value = { "", "", "", "" };
-                       private string[] strBtnClass = { "btn nps-button2", "btn nps-button2", "btn nps-button2", "btn nps-button2" };
+        private int intBill = 0;
+        private int intAccBill = 0;
+        private int intMinus = 0;
 
-                       private int intBill = 0;
-                       private int intAccBill = 0;
-                       private int intMinus = 0;
+        private string strBill => (intBill / 1000).ToString() + ".000";
+        private string strAccBill => (intAccBill / 1000).ToString() + ".000";
+        private string strMinus => (intMinus / 1000).ToString() + ".000";
 
-                       private string strBill => (intBill / 1000).ToString() + ".000";
-                       private string strAccBill => (intAccBill / 1000).ToString() + ".000";
-                       private string strMinus => (intMinus / 1000).ToString() + ".000";
+        protected override async Task OnInitializedAsync()
+        {
+            MetodePembayaran = cst.intMPembayaran;
+            intBill = cst.intTagihan;
+            intAccBill = 10000;
+            intMinus = intBill - intAccBill;
+            switch (MetodePembayaran)
+            {
+                case 1:
+                    {
+                        pageClass = "main-panel bg-edc-process";
+                        break;
+                    }
+                case 3:
+                    pageClass = "main-panel bg-edc-process";
+                    break;
+            }
+        }
+        private void test(int i)
+        {
+            if (IsPressed[i])
+            {
+                IsPressed[i] = false;
+                strNPS2Value[i] = string.Empty;
+            } else
+            {
+                IsPressed[i] = true;
+                strNPS2Value[i] = i.ToString();
+            }
+        }
+        private void CheckPerso()
+        {
+            if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
+            {
+                IsLoading = true;
+            }
+            else if (IsLoading && !IsSuccess)
+            {
+                IsLoading = false;
+                if (intTryCount <= intTryLimit)
+                    intTryCount += 1;
+                else
+                    IsFail = true;
+            }
+        }
 
-                       protected override async Task OnInitializedAsync()
-                       {
-                           MetodePembayaran = cst.intMPembayaran;
-                           intBill = cst.intTagihan;
-                           intAccBill = 10000;
-                           intMinus = intBill - intAccBill;
-                           switch (MetodePembayaran)
-                           {
-                               case 1:
-                                   {
-                                       pageClass = "main-panel bg-edc-process";
-                                       break;
-                                   }
-                               case 3:
-                                   pageClass = "main-panel bg-edc-process";
-                                   break;
-                           }
-                       }
-                       private void test(int i)
-                       {
-                           if(IsPressed[i])
-                           {
-                               IsPressed[i] = false;
-                               strNPS2Value[i] = string.Empty;
-                           }else
-                           {
-                               IsPressed[i] = true;
-                               strNPS2Value[i] = i.ToString();
-                           }
-                       }
-                       private void CheckPerso()
-                       {
-                           if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
-                           {
-                               IsLoading = true;
-                           }
-                           else if (IsLoading && !IsSuccess)
-                           {
-                               IsLoading = false;
-                               if (intTryCount <= intTryLimit)
-                                   intTryCount += 1;
-                               else
-                                   IsFail = true;
-                           }
-                       }
+        private void InputNPS1(string strInput)
+        {
+            strNPS1Value = strInput;
+        }
 
-                       private void InputNPS1(string strInput)
-                       {
-                           strNPS1Value = strInput;
-                       }
-
-                       private void CheckNPS()
-                       {
-                           if (!IsVisible)
-                           {
-                               IsVisible = true;
-                           }
-                           else
-                           {
-                               strNPS1Value = string.Empty;
-                               IsVisible = false;
-                               IsVisible2 = true;
-                           }
-                       }
-                   }
+        private void CheckNPS()
+        {
+            if (!IsVisible)
+            {
+                IsVisible = true;
+            }
+            else
+            {
+                strNPS1Value = string.Empty;
+                IsVisible = false;
+                IsVisible2 = true;
+            }
+        }
+    } 
