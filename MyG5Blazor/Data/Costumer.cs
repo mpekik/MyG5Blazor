@@ -17,8 +17,9 @@ namespace MyG5Blazor.Data
         public int intTagihan = 0;
         public class Tagihan
         {
-            public string tanggalTagihan { get; set; }
-            public string jumlahTagihan { get; set; }
+            public string _tglTagihan { get; set; }
+            public string _strTagihan => (_intTagihan / 1000).ToString() + ".000";
+            public int _intTagihan { get; set; }
         }
 
             public string transactionID { get; set; }
@@ -34,15 +35,15 @@ namespace MyG5Blazor.Data
 
         private List<Tagihan> _listTagihan = new List<Tagihan>();
 
-        public void AddlistTagihan(string strDate, string strVal)
+        public void AddlistTagihan(string strDate, int intVal)
         {
             Tagihan tagihan = new Tagihan();
-            tagihan.tanggalTagihan = strDate;
-            tagihan.jumlahTagihan = strVal;
+            tagihan._tglTagihan = strDate;
+            tagihan._intTagihan = intVal;
             _listTagihan.Add(tagihan);
         }
 
-        public IReadOnlyList<Tagihan> GetlistTaggihan
+        public IReadOnlyList<Tagihan> GetlistTagihan
         {
             get
                 {
