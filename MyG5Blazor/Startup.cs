@@ -34,6 +34,7 @@ namespace MyG5Blazor
             services.AddSingleton<OurUtility>();
             services.AddTransient<BlazorTimer>();
             services.AddScoped<Ektp_Data>();
+            services.AddScoped<Transaction>();
         }
 
         // This method gets called by the runtime. Use this method to configure the HTTP request pipeline.

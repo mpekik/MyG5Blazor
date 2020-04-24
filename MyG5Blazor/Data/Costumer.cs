@@ -22,16 +22,7 @@ namespace MyG5Blazor.Data
             public int _intTagihan { get; set; }
         }
 
-            public string transactionID { get; set; }
-            public string buID { get; set; }
-            public string terminalID { get; set; }
-
-        public void SetTransaction(string strTransID, string strBUID, string strTermID)
-        {
-            transactionID = strTransID;
-            buID = strBUID;
-            terminalID = strTermID;
-        }
+            
 
         private List<Tagihan> _listTagihan = new List<Tagihan>();
 
