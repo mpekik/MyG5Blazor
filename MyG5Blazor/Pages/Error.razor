@@ -5,6 +5,7 @@
 
 @inject Costumer cst
 @inject NavigationManager NavMan
+@inject Transaction trans  
 
     <div class="container-fluid">
         <div class="card" style="text-align: center; margin-top: 18%;">
@@ -14,7 +15,7 @@
                     Silahkan hubungi customer service untuk melanjutkan layanan ini.
                 </h3>
                 <p></p>
-                <p><b>{{ Code }}</b></p>
+                <p><b>{{ @trans.errorCode }}</b></p>
                 <div class="d-flex justify-content-center">
                     <div class="p-2" style="text-align: center">
                         <button class="btn btn-block btn-lg btn-danger" @onclick="@(()=>NavigateTo(""))"> OK </button>

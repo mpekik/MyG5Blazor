@@ -177,6 +177,7 @@
             {
                 OurUtility.Write_Log("Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
                 trans.errorCode = (string)jobjResult["transaction"]["errorCode"];
+                NavMan.NavigateTo("/error");
             }
         }else
         {
