@@ -237,63 +237,74 @@
 
     private async Task MyPerso()
     {
-        await Task.Run(() => MoveToICC());
-        await CardReaderScan();
-
-        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                        "\"terminalId\" : \"" + trans.termID + "\"," +
-                        "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
-                        "\"nik\" : \"3175055212690001\"," +
-                        "\"buid\" : \"" + trans.buID + "\"," +
-                        "\"serialNumber\" : \"" + p_icc_id + "\"" +
-                        "}";
-        string strResult = await PostCallAPI(myURL, myJson);
-        if (strResult != null)
+        while (intTryCount < intTryLimit)
         {
-            try
+            await Task.Run(() => MoveToICC());
+            await CardReaderScan();
+
+            string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                            "\"terminalId\" : \"" + trans.termID + "\"," +
+                            "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                            "\"nik\" : \"1771011209620002\"," +
+                            "\"buid\" : \"" + trans.buID + "\"," +
+                            "\"serialNumber\" : \"" + p_icc_id + "\"" +
+                            "}";
+            string strResult = await PostCallAPI(myURL, myJson);
+            if (strResult != null)
             {
-                JObject jobjResult = JObject.Parse(strResult);
-                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                try
                 {
-                    if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+                    JObject jobjResult = JObject.Parse(strResult);
+                    if ((string)jobjResult["transaction"]["statusCode"] == "00")
                     {
-                        IsLoading = false;
-                        IsSuccess = true;
-                        await Task.Run(() => MoveToFrontHold());
+                        if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+                        {
+                            IsLoading = false;
+                            IsSuccess = true;
+                            await Task.Run(() => MoveToFrontHold());
+                        }
+                        else
+                        {
+                            await Task.Run(() => MoveToBin());
+                            if (intTryCount <= intTryLimit)
+                                intTryCount += 1;
+                            else
+                                IsFail = true;
+                        }
                     }
                     else
                     {
-                        await Task.Run(() => MoveToBin());
-                        if (intTryCount <= intTryLimit)
-                            intTryCount += 1;
+                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                        if ((string)jobjResult["transaction"]["errorCode"] != null)
+                        {
+                            OurUtility.Write_Log("Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                        }
                         else
-                            IsFail = true;
+                        {
+                            OurUtility.Write_Log("Status Code : " + statusDescSub + " {Error}", "step-action");
+                            trans.errorCode = statusDescSub;
+                        }
+                        IsError = true;
+                        return;
                     }
                 }
-                else
+                catch (Exception ex)
                 {
-                    OurUtility.Write_Log("Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " " +
-                        (string)jobjResult["transaction"]["statusDesc"]+" {Error}", "step-action");
-                    trans.errorCode = (string)jobjResult["transaction"]["statusCode"] + " " +
-                        (string)jobjResult["transaction"]["statusDesc"] + " " +
-                        (string)jobjResult["transaction"]["errorCode"];
+                    OurUtility.Write_Log("Status Code : " + strResult + " {Error}", "step-action");
+                    trans.errorCode = strResult;
                     IsError = true;
                     return;
                 }
             }
-            catch(Exception ex)
+            else
             {
                 OurUtility.Write_Log("Status Code : " + strResult + " {Error}", "step-action");
                 trans.errorCode = strResult;
                 IsError = true;
                 return;
             }
-        }else
-        {
-            OurUtility.Write_Log("Status Code : " + strResult + " {Error}", "step-action");
-            trans.errorCode = strResult;
-            IsError = true;
-            return;
         }
     }
 

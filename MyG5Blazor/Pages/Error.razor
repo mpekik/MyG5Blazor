@@ -7,18 +7,20 @@
 @inject NavigationManager NavMan
 @inject Transaction trans  
 
-    <div class="container-fluid">
-        <div class="card" style="text-align: center; margin-top: 18%;">
-            <div class="card-body">
-                <h2><strong>Mohon maaf, terjadi gangguan pada layanan Telkomsel </strong></h2>
-                <h3>
-                    Silahkan hubungi customer service untuk melanjutkan layanan ini.
-                </h3>
-                <p></p>
-                <p><b>{{ @trans.errorCode }}</b></p>
-                <div class="d-flex justify-content-center">
-                    <div class="p-2" style="text-align: center">
-                        <button class="btn btn-block btn-lg btn-danger" @onclick="@(()=>NavigateTo(""))"> OK </button>
+    <div class="main-panel bg-edc-process ">
+        <div class="container-fluid">
+            <div class="card" style="text-align: center; margin-top: 18%;">
+                <div class="card-body">
+                    <h2><strong>Mohon maaf, terjadi gangguan pada layanan Telkomsel </strong></h2>
+                    <h3>
+                        Silahkan hubungi customer service untuk melanjutkan layanan ini.
+                    </h3>
+                    <p></p>
+                    <h3><p><b>{{ @trans.errorCode }}</b></p></h3>
+                    <div class="d-flex justify-content-center">
+                        <div class="p-2" style="text-align: center">
+                            <button class="btn btn-block btn-lg btn-danger" @onclick="@(()=>NavigateTo(""))"> OK </button>
+                        </div>
                     </div>
                 </div>
             </div>

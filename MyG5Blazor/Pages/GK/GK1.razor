@@ -189,8 +189,8 @@
     {
         if (strURL != "")
         {
-            OurUtility.Write_Log("=== Get Phone Number", "step-action");
             cst.PhoneNumber = "62" + strNumber.Substring(1);
+            OurUtility.Write_Log("=== Get Phone Number : " + cst.PhoneNumber, "step-action");
         }
         NavMan.NavigateTo(strURL);
     }
