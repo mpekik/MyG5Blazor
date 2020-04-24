@@ -165,7 +165,7 @@
     {
         if (IsValid)
         {
-            NavigateTo("/gk/2");
+            NavigateTo("/gk/4");
         }
         else
         {
@@ -190,7 +190,7 @@
         if (strURL != "")
         {
             OurUtility.Write_Log("=== Get Phone Number", "step-action");
-            cst.PhoneNumber = strNumber;
+            cst.PhoneNumber = "62" + strNumber.Substring(1);
         }
         NavMan.NavigateTo(strURL);
     }

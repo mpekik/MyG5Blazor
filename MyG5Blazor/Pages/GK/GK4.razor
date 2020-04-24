@@ -1,8 +1,16 @@
 ﻿@page "/gk/4"
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Threading.Tasks;
 @using MyG5Blazor.Data
 @inject Card_Dispenser cds
-@inject IJSRuntime JSRuntime;
+@inject IJSRuntime JSRuntime
 @inject NavigationManager NavMan
+@inject Costumer cst
+@inject Transaction trans
 
 <div class="main-panel bg-home">
     <!-- Navbar -->
@@ -139,7 +147,7 @@
                     <button class="btn nps-button2" value="" @onclick="@(() => test(1))">Kecepatan Proses</button>
                     <button class="btn nps-button2" value="" @onclick="@(() => test(2))">Kemudahan Penggunaan</button>
                     <button class="btn nps-button2" value="" @onclick="@(() => test(3))">Kejelasan Bahasa</button>
-                    <a href=""><button class="btn btn-danger button-nps" value="">OK</button></a>
+                    <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger button-nps" value="">OK</button>
                 </div>
             </div>
         </div>
@@ -147,6 +155,7 @@
 }
 
 @code{
+    private bool IsError = false;
     private bool IsVisible = false;
     private bool IsVisible2 = false;
     private bool IsLoading = false;
@@ -175,6 +184,17 @@
     private string p_icc_id = string.Empty;
     private string mypersoexe = "C:\\Perso\\myperso.exe";
 
+    /*JSON POST
+            "transactionId" : "didapat dari init awal",
+            "terminalId" : "T0999",
+            "noHp" : "no hp yang diinput, depanya ganti 62",
+            "nik" : "nik yang didapat dari ektp reader",
+            "buid" : "buid yang didapat pas init",
+            "serialNumber" : "serial number kartu"
+            {\"terminalId\": \"T0999\"}*/
+    private static string myURL = "https://4583d26c.ngrok.io/mygrapari/ganti-kartu/v1/perso";
+    private static string myJson = string.Empty;
+
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);
@@ -184,26 +204,96 @@
     {
         OurUtility.Write_Log("== Perso Page", "step-action");
         IsLoading = true;
+
         await MyPerso();
+
+        if(IsError)
+        {
+            NavMan.NavigateTo("/error");
+        }
+    }
+
+    public static async Task<string> PostCallAPI(string url, string jsonString)
+    {
+        try
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(url, content);
+                if (response != null)
+                {
+                    var jsonStringResult = await response.Content.ReadAsStringAsync();
+                    return jsonStringResult;
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+
+        }
+        return null;
     }
 
     private async Task MyPerso()
     {
         await Task.Run(() => MoveToICC());
         await CardReaderScan();
-        if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+
+        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                        "\"terminalId\" : \"" + trans.termID + "\"," +
+                        "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                        "\"nik\" : \"3175055212690001\"," +
+                        "\"buid\" : \"" + trans.buID + "\"," +
+                        "\"serialNumber\" : \"" + p_icc_id + "\"" +
+                        "}";
+        string strResult = await PostCallAPI(myURL, myJson);
+        if (strResult != null)
         {
-            IsLoading = false;
-            IsSuccess = true;
-            await Task.Run(() => MoveToFrontHold());
-        }
-        else
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                {
+                    if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+                    {
+                        IsLoading = false;
+                        IsSuccess = true;
+                        await Task.Run(() => MoveToFrontHold());
+                    }
+                    else
+                    {
+                        await Task.Run(() => MoveToBin());
+                        if (intTryCount <= intTryLimit)
+                            intTryCount += 1;
+                        else
+                            IsFail = true;
+                    }
+                }
+                else
+                {
+                    OurUtility.Write_Log("Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " " +
+                        (string)jobjResult["transaction"]["statusDesc"]+" {Error}", "step-action");
+                    trans.errorCode = (string)jobjResult["transaction"]["statusCode"] + " " +
+                        (string)jobjResult["transaction"]["statusDesc"] + " " +
+                        (string)jobjResult["transaction"]["errorCode"];
+                    IsError = true;
+                    return;
+                }
+            }
+            catch(Exception ex)
+            {
+                OurUtility.Write_Log("Status Code : " + strResult + " {Error}", "step-action");
+                trans.errorCode = strResult;
+                IsError = true;
+                return;
+            }
+        }else
         {
-            await Task.Run(() => MoveToBin());
-            if (intTryCount <= intTryLimit)
-                intTryCount += 1;
-            else
-                IsFail = true;
+            OurUtility.Write_Log("Status Code : " + strResult + " {Error}", "step-action");
+            trans.errorCode = strResult;
+            IsError = true;
+            return;
         }
     }
 
@@ -220,6 +310,7 @@
             strNPS2Value[i] = i.ToString();
         }
     }
+
     private async Task CheckPerso()
     {
         if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)

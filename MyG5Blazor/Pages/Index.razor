@@ -106,7 +106,7 @@
 {
     private string[] hrefMenu = { "bth/1", "u4g/1", "bpp/1", "gk/1" };
     private string[] AssetsPNG = { "Menu_Bayar_Tagihan.png", "Menu_Upgrade4G.png", "Menu_Beli_Pulsa.png", "Menu_Ganti_kartu.png" };
-    private string[] apiURL = { "mygrapari/upgrade4g/v1/init", "mygrapari/upgrade4g/v1/init", "mygrapari/upgrade4g/v1/init", "mygrapari/upgrade4g/v1/init" };
+
 
     private string[] strHref = { "", "", "", "" };
     private string[] strAssets = { "", "", "", "" };
@@ -120,17 +120,16 @@
 
     private bool IsLoading = false;
 
-    private static string myURL = "https://b00f7977.ngrok.io/";
+    private static string _myURL = "https://4583d26c.ngrok.io/";
+    private string[] apiURL = { "mygrapari/upgrade4g/v1/init", "mygrapari/upgrade-4g/v1/init", "mygrapari/upgrade4g/v1/init", "mygrapari/ganti-kartu/v1/init" };
+    private string _termID = string.Empty;
 
-    //Menu[0] = Bayar Tagihan
-    //Menu[1] = Upgrade 4G
-    //Menu[2] = Beli Pulsa
-    //Menu[3] = Ganti Kartu
     private bool[] Menu = { true, true, true, true };
 
     protected override async Task OnInitializedAsync()
     {
         cst.Clear();
+        trans.ClearTransaction();
         for (int i = 0; i < 4; i++)
         {
             if (Menu[i])
@@ -161,8 +160,9 @@
 
     private async Task CheckStatus(string strURL, string strAPIURL)
     {
-        string myJson = "{\"terminalId\": \"T0999\"}";
-        myURL = myURL + strAPIURL;
+        _termID = "T0999";
+        string myJson = "{\"terminalId\": \""+_termID+"\"}";
+        string myURL = _myURL + strAPIURL;
         IsLoading = true;
         OurUtility.Write_Log("Get Status Code", "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
@@ -219,7 +219,7 @@
         }
         catch (Exception ex)
         {
-
+            OurUtility.Write_Log(ex.Message, "step-action");
         }
         return null;
     }
