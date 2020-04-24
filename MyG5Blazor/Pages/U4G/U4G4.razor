@@ -10,6 +10,7 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavMan
 @inject Costumer cst
+@inject Transaction trans  
 
 <div class="main-panel bg-home">
     <!-- Navbar -->
@@ -232,11 +233,11 @@
         await Task.Run(() => MoveToICC());
         await CardReaderScan();
 
-        string myJson = "{ \"transactionId\" : \"" + cst.transactionID+ "\"," +
-                        "\"terminalId\" : \"" + cst.terminalID + "\"," +
+        string myJson = "{ \"transactionId\" : \"" + trans.transID+ "\"," +
+                        "\"terminalId\" : \"" + trans.termID + "\"," +
                         "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                         "\"nik\" : \"3175055212690001\"," +
-                        "\"buid\" : \"" + cst.buID + "\"," +
+                        "\"buid\" : \"" + trans.buID + "\"," +
                         "\"serialNumber\" : \"" + p_icc_id + "\"" +
                         "}";
         string strResult = await PostCallAPI(myURL, myJson);
