@@ -44,19 +44,19 @@
 
                 <div class="col-md-6">
                     <div class="card-body" style="margin-top: 10%;">
-                        @if (Menu[0])
+                        @if (Menu[0]) // bayar tagihan
                         {
-                            @if (MenuCount == 0)
+                            @if (MenuCount == 0) // NavMan.NavigateTo
                             {
-                                <img @onclick="@(()=>NavMan.NavigateTo(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG height=@HeightPNG style=@strStyle[0]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG height=@HeightPNG style=@strStyle[0]>
                             }
                             else
                             {
-                                <img @onclick="@(()=>NavMan.NavigateTo(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG style=@strStyle[0]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG style=@strStyle[0]>
                             }
                             MenuCount += 1;
                         }
-                        @if (Menu[1])
+                        @if (Menu[1]) // upgrade 4G
                         {
                             @if (MenuCount == 0)
                             {
@@ -68,9 +68,9 @@
                             }
                             MenuCount += 1;
                         }
-                        @if (Menu[2])
+                        @if (Menu[2]) // bayar pulsa
                         {
-                            @if (MenuCount == 0)
+                            @if (MenuCount == 0) // CheckStatus(hrefMenu[2])
                             {
                                 <img @onclick="@(()=>CheckStatus(hrefMenu[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG height=@HeightPNG style=@strStyle[2]>
                             }
@@ -80,7 +80,7 @@
                             }
                             MenuCount += 1;
                         }
-                        @if (Menu[3])
+                        @if (Menu[3]) //Ganti Kartu
                         {
                             @if (MenuCount == 0)
                             {
@@ -118,7 +118,9 @@
 
     private bool IsLoading = false;
 
-    private static string myURL = "https://b00f7977.ngrok.io/mygrapari/upgrade4g/v1/init";
+    //private static string myURL = "https://b00f7977.ngrok.io/mygrapari/upgrade4g/v1/init";
+    //private static string myURL;
+    private static string myURL = "https://4583d26c.ngrok.io/mygrapari/isi-pulsa/v1/init";
 
     //Menu[0] = Bayar Tagihan
     //Menu[1] = Upgrade 4G
