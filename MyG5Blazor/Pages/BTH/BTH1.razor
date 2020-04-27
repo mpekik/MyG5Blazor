@@ -5,6 +5,7 @@
 @inject IJSRuntime JSRuntime;
 @inject Costumer cst;
 @inject NavigationManager NavMan
+@inject Card_Dispenser cds
 
 <div class="main-panel bg-home">
     <!-- Navbar -->
@@ -76,8 +77,8 @@
         <span class="dot">4</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Kembali</button>
-        <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
+        <button @onclick="MoveToTheFront" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="MoveToICC" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
@@ -108,6 +109,10 @@
     private bool IsVisible = false;
     private bool IsInvalid = false;
     private bool IsValid => !IsInvalid;
+
+    private string msg = string.Empty;
+    private string errorcode = string.Empty;
+    private string strCOM = "COM6";
 
     protected override async Task OnInitializedAsync()
     {
@@ -164,5 +169,42 @@
             cst.PhoneNumber = strNumber;
         }
         NavMan.NavigateTo(strURL);
+    }
+    private void MoveToTheFront()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
+        cds.MoveTo_The_Front(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+    }
+
+    private void MoveToICC()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_IC_Card", "step-action");
+        while (!cds.MoveTo_IC_Card(ref errorcode, ref msg)) { }
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
     }
 }

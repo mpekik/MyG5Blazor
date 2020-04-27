@@ -174,13 +174,7 @@
     private string errorcode = string.Empty;
     private string strCOM = "COM6";
     private string readerName = "Generic Smart Card Reader Interface 0";
-    private string strPanjang = "7dcc52aa55959352ea5566fc41110da81e1ee496a7e931a2b3d1c6211450" +
-        "ed5ab8b1e62ca1d5a89bd341aee103ad341535806ae365a0ab14a8c95cecab3dff1f8ed332ec54e25551" +
-        "5db76aff29634f3ff4341649fc7302b83c9239c373fcf9e4f882977a15b6cdaae83f14307efae1d921e4" +
-        "1c42285dd44ac82ffe9ca430876b649985729d1e41ba7294aa7ff94e2ae91c46a7dbc1ea4e45c2ddb5b8" +
-        "b8920abb3cc5567b1c3a81ecc89adf2432141df1c28ecb744e642372eae238b1f4c0168e8c97bc71d826" +
-        "2eff0b3fb09ca4f13201bc9f4d05ac9df89ec5b3c9c07a594e527e20a4df2644dd01da036ac7484571bf" +
-        "f3f3acb33abbebeeac0b1c08978641dde127922e976438d36753566ae69a118e3753150250a0cc34";
+    private string strPanjang = string.Empty;
     private string p_icc_id = string.Empty;
     private string mypersoexe = "C:\\Perso\\myperso.exe";
 
@@ -192,7 +186,9 @@
             "buid" : "buid yang didapat pas init",
             "serialNumber" : "serial number kartu"
             {\"terminalId\": \"T0999\"}*/
-    private static string myURL = "https://4583d26c.ngrok.io/mygrapari/ganti-kartu/v1/perso";
+    private static string _myURL = "https://e714fe62.ngrok.io/";
+    private static string persoURL = "mygrapari/ganti-kartu/v1/perso";
+    private static string updateURL = "mygrapari/perso/v1/update";
     private static string myJson = string.Empty;
 
     private void NavigateTo(string strURL)
@@ -215,6 +211,7 @@
 
     public static async Task<string> PostCallAPI(string url, string jsonString)
     {
+        string ret = string.Empty;
         try
         {
             using (HttpClient client = new HttpClient())
@@ -223,16 +220,23 @@
                 var response = await client.PostAsync(url, content);
                 if (response != null)
                 {
-                    var jsonStringResult = await response.Content.ReadAsStringAsync();
-                    return jsonStringResult;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonStringResult = await response.Content.ReadAsStringAsync();
+                        return jsonStringResult;
+                    }
+                    else
+                    {
+                        return response.StatusCode.ToString();
+                    }
                 }
             }
         }
         catch (Exception ex)
         {
-
+            OurUtility.Write_Log("==" + ex.Message, "step-action");
         }
-        return null;
+        return ret;
     }
 
     private async Task MyPerso()
@@ -242,6 +246,7 @@
             await Task.Run(() => MoveToICC());
             await CardReaderScan();
 
+            string myURL = _myURL + persoURL;
             string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                             "\"terminalId\" : \"" + trans.termID + "\"," +
                             "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
@@ -249,7 +254,11 @@
                             "\"buid\" : \"" + trans.buID + "\"," +
                             "\"serialNumber\" : \"" + p_icc_id + "\"" +
                             "}";
+
+            OurUtility.Write_Log("=== URL : " + myURL, "step-action");
+            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
             string strResult = await PostCallAPI(myURL, myJson);
+            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
             if (strResult != null)
             {
                 try
@@ -257,53 +266,84 @@
                     JObject jobjResult = JObject.Parse(strResult);
                     if ((string)jobjResult["transaction"]["statusCode"] == "00")
                     {
+                        strPanjang = (string)jobjResult["perso"]["message"];
+                        trans.persoID = (string)jobjResult["perso"]["persoId"];
                         if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
                         {
+                            myURL = _myURL + updateURL;
+                            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                "\"terminalId\" : \"" + trans.termID + "\"," +
+                                "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                "\"persoStatus\" : \"2\"}";
+                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                            strResult = await PostCallAPI(myURL, myJson);
+                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+
                             IsLoading = false;
                             IsSuccess = true;
-                            await Task.Run(() => MoveToFrontHold());
+                            await Task.Run(() => MoveToTheFront());
+                            break;
                         }
                         else
                         {
+                            trans.mypersoResponse = msg;
                             await Task.Run(() => MoveToBin());
                             if (intTryCount <= intTryLimit)
                                 intTryCount += 1;
                             else
                                 IsFail = true;
+                            myURL = _myURL + updateURL;
+                            myJson = "{ \"transactionId\" : \"" + trans.transID + "\","+
+                                "\"terminalId\" : \"" + trans.termID + "\","+
+                                "\"persoId\" : \"" + trans.persoID + "\" ,"+
+                                "\"persoStatus\" : \"3\"}";
+                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                            strResult = await PostCallAPI(myURL, myJson);
+                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                         }
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
-                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         if ((string)jobjResult["transaction"]["errorCode"] != null)
                         {
-                            OurUtility.Write_Log("Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                            OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
                             trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
                         }
                         else
                         {
-                            OurUtility.Write_Log("Status Code : " + statusDescSub + " {Error}", "step-action");
-                            trans.errorCode = statusDescSub;
+                            string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                            if (_statusDescSub != null)
+                            {
+                                string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                                OurUtility.Write_Log("=== Status Code : " + statusDescSub + " {Error}", "step-action");
+                                trans.errorCode = statusDescSub;
+                            }else
+                            {
+                                OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
+                                trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
+                            }
                         }
                         IsError = true;
-                        return;
+                        await Task.Run(()=>MoveToBin());
+                        break;
                     }
                 }
                 catch (Exception ex)
                 {
-                    OurUtility.Write_Log("Status Code : " + strResult + " {Error}", "step-action");
+                    OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                     trans.errorCode = strResult;
                     IsError = true;
-                    return;
+                    break ;
                 }
             }
             else
             {
-                OurUtility.Write_Log("Status Code : " + strResult + " {Error}", "step-action");
+                OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                 trans.errorCode = strResult;
                 IsError = true;
-                return;
+                break;
             }
         }
     }
@@ -386,9 +426,9 @@
         cds.Stop(ref msg);
     }
 
-    private void MoveToFrontHold()
+    private void MoveToTheFront()
     {
-        OurUtility.Write_Log("=== Card Dispenser Move To Front Hold Position", "step-action");
+        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
@@ -400,7 +440,7 @@
         OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
         OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
-        cds.MoveTo_The_Front_Hold(ref errorcode, ref msg);
+        cds.MoveTo_The_Front(ref errorcode, ref msg);
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
     }

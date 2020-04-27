@@ -27,13 +27,13 @@
                         <div class="teks-title">Beli Pulsa Prabayar</div>
                             <div id="konfirmasi-teks" class="teks-status-halo">
                                 Pada nomor <b class="teks-bold"> @cst.PhoneNumber</b> terbaca
-                                memiliki tagihan sebesar <b class="teks-bold">Rp @strTotalTagihan.</b>
+                                memiliki tagihan sebesar <b class="teks-bold">Rp @intTotalTagihan.ToString("N0").</b>
                                 dengan rincian sebagai berikut:
                             </div>
                             <div id="list-tagihan" class="teks-footer-halo">
                                 @foreach (dynamic t in cst.GetlistTagihan)
                                 {
-                                    <li>@t._tglTagihan  <b>=</b> Rp @t._strTagihan</li>
+                                    <li>@t._tglTagihan  <b>=</b> Rp @t._intTagihan.ToString("N0")</li>
                                 }
                             </div>
                     </div>
@@ -69,13 +69,13 @@
 {
     private bool IsLanjut = false;
     private int intTotalTagihan = 0;
-    private string strTotalTagihan => (intTotalTagihan / 1000).ToString() + ".000";
+    private string strTotalTagihan => intTotalTagihan.ToString();
     protected override async Task OnInitializedAsync()
     {
         cst.ClearTagihan();
-        cst.AddlistTagihan("01/01/2020 - 31/01/2020", 12000);
-        cst.AddlistTagihan("01/02/2020 - 29/02/2020", 15000);
-        cst.AddlistTagihan("01/03/2020 - 31/03/2020", 17000);
+        cst.AddlistTagihan("01/01/2020 - 31/01/2020", 300);
+        cst.AddlistTagihan("01/02/2020 - 29/02/2020", 200);
+        cst.AddlistTagihan("01/03/2020 - 31/03/2020", 500);
         TotalTagihan();
     }
 

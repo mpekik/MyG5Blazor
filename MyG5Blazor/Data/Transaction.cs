@@ -7,16 +7,19 @@ namespace MyG5Blazor.Data
 {
     public class Transaction
     {
+        public string jenisTrans { get; set; }
         public string transID { get; set; }
         public string buID { get; set; }
         public string termID { get; set; }
         public string errorCode { get; set; }
-
-        public void SetTransaction(string strTransID, string strBUID, string strTermID)
+        public string mypersoResponse { get; set; }
+        public string persoID { get; set; }
+        public void SetTransaction(string strTransID, string strBUID, string strTermID,string strJenisTrans)
         {
             transID = strTransID;
             buID = strBUID;
             termID = strTermID;
+            jenisTrans = strJenisTrans;
         }
 
         public void ClearTransaction()
@@ -24,6 +27,7 @@ namespace MyG5Blazor.Data
             transID = string.Empty;
             buID = string.Empty;
             termID = string.Empty;
+            mypersoResponse = string.Empty;
         }
     }
 }

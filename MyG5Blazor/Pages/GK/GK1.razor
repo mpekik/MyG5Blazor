@@ -139,8 +139,8 @@
 
     protected override async Task OnInitializedAsync()
     {
-        OurUtility.Write_Log("= Ganti Kartu Hilang/Rusak", "step-action");
-        OurUtility.Write_Log("== Insert Phone Number Page", "step-action");
+        OurUtility.Write_Log("== Ganti Kartu Hilang/Rusak", "step-action");
+        OurUtility.Write_Log("=== Insert Phone Number Page", "step-action");
     }
 
     private void OkOnClick(bool visiblestatus)
@@ -190,7 +190,7 @@
         if (strURL != "")
         {
             cst.PhoneNumber = "62" + strNumber.Substring(1);
-            OurUtility.Write_Log("=== Get Phone Number : " + cst.PhoneNumber, "step-action");
+            OurUtility.Write_Log("==== Get Phone Number : " + cst.PhoneNumber, "step-action");
         }
         NavMan.NavigateTo(strURL);
     }

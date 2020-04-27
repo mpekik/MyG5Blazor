@@ -16,7 +16,10 @@
                         Silahkan hubungi customer service untuk melanjutkan layanan ini.
                     </h3>
                     <p></p>
-                    <h3><p><b>{{ @trans.errorCode }}</b></p></h3>
+                    @if (trans.errorCode != string.Empty)
+                    {
+                    <h3><p><b>[[ @trans.errorCode ]]</b></p></h3>
+                    }
                     <div class="d-flex justify-content-center">
                         <div class="p-2" style="text-align: center">
                             <button class="btn btn-block btn-lg btn-danger" @onclick="@(()=>NavigateTo(""))"> OK </button>
@@ -28,6 +31,10 @@
     </div>
 
 @code{
+    protected override async Task OnInitializedAsync()
+    {
+        OurUtility.Write_Log("== Error Page", "step-action");
+    }
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo("");

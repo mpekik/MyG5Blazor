@@ -135,7 +135,7 @@ inject IJSRuntime JSRuntime;
 
     protected override async Task OnInitializedAsync()
     {
-        OurUtility.Write_Log("== Scan e-KTP Page", "step-action");
+        OurUtility.Write_Log("=== Scan e-KTP Page", "step-action");
     }
 
     private async Task CheckEKTP()
@@ -154,30 +154,30 @@ inject IJSRuntime JSRuntime;
     private async Task ScanKTP()
     {
         IsLoading = true;
-        OurUtility.Write_Log("=== Switcher.UP_eKTP", "step-action");
+        OurUtility.Write_Log("==== Switcher.UP_eKTP", "step-action");
         await Task.Run(() => Switcher.UP_eKTP("3000"));
         if (intTryCount <= intTryLimit)
         {
-            OurUtility.Write_Log("=== Scan e-KTP", "step-action");
-            OurUtility.Write_Log("==== 1. Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
+            OurUtility.Write_Log("==== Scan e-KTP", "step-action");
+            OurUtility.Write_Log("===== 1. Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
             if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)
             {
-                OurUtility.Write_Log("==== 2. Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
+                OurUtility.Write_Log("===== 2. Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
                 Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_PCID, pbPcid, pbPcid.Length);
-                OurUtility.Write_Log("==== 3. Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
+                OurUtility.Write_Log("===== 3. Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
                 Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_CONFIG, pbConf, pbConf.Length);
             }
-            OurUtility.Write_Log("==== 4. Ektp_Sdk.EktpConnect", "step-action");
+            OurUtility.Write_Log("===== 4. Ektp_Sdk.EktpConnect", "step-action");
             await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
 
             int length = 2048;
             byte[] tempBuffer = new byte[length];
             int ret = -1;
-            OurUtility.Write_Log("==== 5. Ektp_Sdk.ReadDemographic From eKTP", "step-action");
+            OurUtility.Write_Log("===== 5. Ektp_Sdk.ReadDemographic From eKTP", "step-action");
             ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer)).ConfigureAwait(false);
             if (length == 0 || ret != 0)
             {
-                OurUtility.Write_Log("==== 6. Ektp_Sdk.ReadDemographic Failed", "step-action");
+                OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Failed", "step-action");
                 IsLoading = false;
                 if (intTryCount <= intTryLimit)
                 {
@@ -195,7 +195,7 @@ inject IJSRuntime JSRuntime;
             {
                 demoGraphic[i] = tempBuffer[i];
             }
-            OurUtility.Write_Log("==== 6. Ektp_Sdk.ReadDemographic Success", "step-action");
+            OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Success", "step-action");
             ktp.demographic = demoGraphic;
             IsVisible = false;
             IsLoading = false;
@@ -207,11 +207,11 @@ inject IJSRuntime JSRuntime;
                 byte[] leftData = new byte[leftLen];
                 byte[] rightData = new byte[rightLen];
 
-                OurUtility.Write_Log("==== 7. Ektp_Sdk.ReadFingerPrints", "step-action");
+                OurUtility.Write_Log("===== 7. Ektp_Sdk.ReadFingerPrints", "step-action");
                 ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(false);
                 if (ret != 0 || leftLen == 0 || rightLen == 0)
                 {
-                    OurUtility.Write_Log("==== 8. Ektp_Sdk.ReadFingerPrints Failed", "step-action");
+                    OurUtility.Write_Log("===== 8. Ektp_Sdk.ReadFingerPrints Failed", "step-action");
 
                     //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
                     return;
@@ -221,7 +221,7 @@ inject IJSRuntime JSRuntime;
                 ktp.minu1len = leftLen;
                 ktp.minu2len = rightLen;
 
-                OurUtility.Write_Log("==== 8. Ektp_Sdk.ReadFingerPrints Success", "step-action");
+                OurUtility.Write_Log("===== 8. Ektp_Sdk.ReadFingerPrints Success", "step-action");
                 Timer.SetTimer(1000);
                 Timer.OnElapsed += TimerElapsedHandler;
             }
@@ -231,6 +231,5 @@ inject IJSRuntime JSRuntime;
     private void TimerElapsedHandler()
     {
         NavMan.NavigateTo("/gk/3");
-
     }
 }

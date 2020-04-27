@@ -6,6 +6,7 @@
 @using System;
 @using System.Threading.Tasks;
 @using MyG5Blazor.Data
+
 @inject Card_Dispenser cds
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavMan
@@ -250,7 +251,7 @@
                 {
                     IsLoading = false;
                     IsSuccess = true;
-                    await Task.Run(() => MoveToFrontHold());
+                    await Task.Run(() => MoveToTheFront());
                 }
                 else
                 {
@@ -348,21 +349,21 @@
         cds.Stop(ref msg);
     }
 
-    private void MoveToFrontHold()
+    private void MoveToTheFront()
     {
-        OurUtility.Write_Log("=== Card Dispenser Move To Front Hold Position", "step-action");
+        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
         if (!cds.Start(ref errorcode, strCOM, ref msg))
         {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " +errorcode +"message: "+msg, "step-action");
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
             return;
         }
         OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
         OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
-        cds.MoveTo_The_Front_Hold(ref errorcode, ref msg);
+        cds.MoveTo_The_Front(ref errorcode, ref msg);
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
     }

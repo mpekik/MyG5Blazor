@@ -1,10 +1,15 @@
 ﻿@page "/bth/4"
 
 @using MyG5Blazor.Data
-
+@using System.IO.Ports
+@using System.Threading
+@using System.Text
+@using System 
+ 
 @inject IJSRuntime JSRuntime
 @inject Costumer cst
 @inject NavigationManager NavMan  
+@inject EDC edc 
 
 <div class=@pageClass>
     <!-- Navbar -->
@@ -46,15 +51,49 @@
                 {
                     case 1:
                         {
-                            <div id="credit-payment" class="modal-blank-1" style="background-image: url(../image/bg-02.jpg); background-size: cover; background-position: center center;background-attachment: fixed; ">
-                                <img src="../../assets/image/debit.png" class="img-debit" id="myBtn">
-                                <div class="modal-blank-text">
-                                    <div class="text1" id="teks-temukan">Temukan mesin EDC pada <br> MyGraPARI seperti gambar di atas</div>
-                                    <div class="text2">Gesek Kartu Debit Anda dengan <br> bagian pita hitam menghadap ke <br> arah mesin EDC</div>
-                                    <div class="text3">Masukkan PIN dan tekan OK <br> <p class="green">(tombol hijau)</p></div>
+                            @if (!IsFail && !IsSuccess)
+                            {
+                                <div id="credit-payment" class="modal-blank-1" style="background-image: url(../image/bg-02.jpg); background-size: cover; background-position: center center;background-attachment: fixed; ">
+                                    <img src="../../assets/image/debit.png" class="img-debit" id="myBtn">
+                                    <div class="modal-blank-text">
+                                        <div class="text1" id="teks-temukan">Temukan mesin EDC pada <br> MyGraPARI seperti gambar di atas</div>
+                                        <div class="text2">Gesek Kartu Debit Anda dengan <br> bagian pita hitam menghadap ke <br> arah mesin EDC</div>
+                                        <div class="text3">Masukkan PIN dan tekan OK <br> <p class="green">(tombol hijau)</p></div>
+                                    </div>
                                 </div>
-                            </div>
+                            }
+                            else if (IsSuccess)
+                            {
+                                <div class="col-md-6">
+                                    <div class="teks-title">Bayar Tagihan KartuHalo</div>
+                                    <div id="status-pay" class="teks-center teks-bold">Proses Pembayaran Tagihan KartuHalo<br> <b class="green">Berhasil</b></div>
+                                </div>
 
+                                <div class="col-md-6">
+                                    <div id="image-pulsa" class="image-center2">
+                                        <img src="../../assets/image/Logo/pulsa-prabayar.png" alt="" width="450px" height="280px">
+                                    </div>
+                                </div>
+                            }
+                            else if (IsFail)
+                            {
+                                <div class="col-md-6">
+                                    <div class="teks-title">Bayar Tagihan KartuHalo</div>
+                                    <div id="status-pay" class="teks-center teks-bold">
+                                        Proses Pembayaran Tagihan KartuHalo<br> <b class="red">FAILED</b><br><br>
+                                        @if (IsVoid)
+                                        {
+                                           <span style = "font-weight: normal;">Silahkan <span style = "font-weight: bold;" > Tekan ENTER(Tombol Hijau)</span>pada Mesin EDC untuk Proses Pengembalian Uang </span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div id="image-pulsa" class="image-center2">
+                                        <img src="../../assets/image/Logo/pulsa-prabayar.png" alt="" width="450px" height="280px">
+                                    </div>
+                                </div>
+                            }
                             break;
                         }
                     case 2:
@@ -91,25 +130,25 @@
                             </div>
 
                             <div class="col-md-6" id="proses-bill">
-                                @if (!IsFail&&!IsSuccess)
+                                @if (!IsFail && !IsSuccess)
                                 {
                                     <div id="">
                                         <img class="tunai" onclick="buttonNext()" id="" src="../../assets/image/tunai.png">
                                     </div>
                                     <div>
                                         <div class="jumlah-bayar">Jumlah yang Harus Dibayar</div>
-                                        <div class="nominal-rupiah">Rp @strBill</div>
+                                        <div class="nominal-rupiah">Rp @intBill.ToString("N0")</div>
                                     </div><br>
 
                                     <div id="">
                                         <div class="jumlah-bayar">Uang yang telah Anda Masukan</div>
                                         @if (intAccBill < intBill)
                                         {
-                                            <div class="nominal-rupiah" id="nominal-kurang">Rp @strAccBill</div>
+                                            <div class="nominal-rupiah" id="nominal-kurang">Rp @intAccBill.ToString("N0")</div>
                                         }
                                         else
                                         {
-                                            <div class="nominal-rupiah" id="nominal-pas">Rp @strAccBill</div>
+                                            <div class="nominal-rupiah" id="nominal-pas">Rp @intAccBill.ToString("N0")</div>
                                         }
                                     </div><br>
                                 }
@@ -236,6 +275,8 @@
     private bool IsSuccess = false;
     private bool IsFail = false;
     private bool IsExit = false;
+    private bool IsVoid = false;
+    private bool IsVoided = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
@@ -247,9 +288,12 @@
     private int intAccBill = 0;
     private int intMinus = 0;
 
-    private string strBill => (intBill / 1000).ToString() + ".000";
-    private string strAccBill => (intAccBill / 1000).ToString() + ".000";
-    private string strMinus => (intMinus / 1000).ToString() + ".000";
+    private string strBill => intBill.ToString();
+    private string strAccBill => intAccBill.ToString();
+    private string strMinus => intMinus.ToString();
+    private string strInvoice = "1";
+    private string strBilling = "2";
+    private string strCOM = "COM11";
 
     protected override async Task OnInitializedAsync()
     {
@@ -264,6 +308,26 @@
                     pageClass = "main-panel bg-edc-process";
 
                     //TODO Integrate with EDC Debit Card
+                    await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+                    pageClass = "main-panel bg-home";
+                    if (edc.intTry < 3)
+                    {
+                        Console.WriteLine("Trace Number : " + edc.traceNumber);
+                        //ToDO Add if Void
+                        IsVoid = true;
+                        strInvoice = edc.traceNumber;
+                        Void();
+                        break;
+                        IsSuccess = true;
+                        Console.WriteLine("Payment Success");
+                        await Task.Delay(2000);
+                        IsVisible = true;
+                    }
+                    else
+                    {
+                        IsFail = true;
+                        Console.WriteLine("Payment Failed");
+                    }
                     break;
                 }
             case 2:
@@ -278,6 +342,21 @@
                     pageClass = "main-panel bg-edc-process";
 
                     //TODO Integrate with EDC Credit Card
+                    await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+                    pageClass = "main-panel bg-home";
+                    if (edc.intTry < 3)
+                    {
+                        Console.WriteLine("Trace Number : " + edc.traceNumber);
+                        IsSuccess = true;
+                        Console.WriteLine("Payment Success");
+                        await Task.Delay(2000);
+                        IsVisible = true;
+                    }
+                    else
+                    {
+                        IsFail = true;
+                        Console.WriteLine("Payment Failed");
+                    }
                     break;
                 }
         }
@@ -292,6 +371,15 @@
         while (intAccBill < intBill)
         {
             //TODO Integrate with Bill Acceptor
+        }
+    }
+
+    private async Task Void()
+    {
+        if (IsVoid)
+        {
+            IsFail = true;
+            await Void(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
         }
     }
 
@@ -323,6 +411,46 @@
             IsVisible = false;
             IsVisible2 = true;
         }
+    }
+
+    private async Task Pay(string serialPortName,string tagihan,string invoice, string billing, string mPemabayaran)
+    {
+        string _transType = "01";
+        edc.Clear();
+        edc.serialPort = new SerialPort();
+        edc.serialPort.PortName = serialPortName;
+        edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
+        do
+        {
+            await Task.Delay(5000);
+            if (edc.respondCode == "00")
+                break;
+            edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
+            edc.mre.WaitOne();
+        } while (edc.intTry<3);
+    }
+
+    private async Task Void(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
+    {
+        string _transType = "02";
+        edc.Clear();
+        edc.serialPort = new SerialPort();
+        edc.serialPort.PortName = serialPortName;
+        edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
+        do
+        {
+            await Task.Delay(5000);
+            if (edc.respondCode == "00")
+            {
+                IsVoided = true;
+                break;
+            }
+            edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
+
+            Console.WriteLine(edc.respondCode);
+        } while (!edc.mre.WaitOne());
+        await Task.Delay(10000);
+        NavigateTo("");
     }
 
     private void NavigateTo(string strURL)

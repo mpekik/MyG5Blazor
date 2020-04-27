@@ -12,13 +12,13 @@ namespace MyG5Blazor.Data
         public string EKTPNumber { get; set; }
         private string[] arrayMPembayaran = { "", "Kartu Debit (Ber Pin)", "Tunai (Uang Pas)", "Kartu Kredit (Ber Pin)" };
         public string strMPembayaran => arrayMPembayaran[intMPembayaran];
-        public string strTagihan => (intTagihan / 1000).ToString() + ".000";
+        public string strTagihan => intTagihan.ToString();
         public int intMPembayaran = 0;
         public int intTagihan = 0;
         public class Tagihan
         {
             public string _tglTagihan { get; set; }
-            public string _strTagihan => (_intTagihan / 1000).ToString() + ".000";
+            public string _strTagihan => _intTagihan.ToString();
             public int _intTagihan { get; set; }
         }
 
