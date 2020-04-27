@@ -33,6 +33,9 @@
     <Reference Include="DarrenLee.Media">
       <HintPath>wwwroot\assets\DLLs_3rd_Party\Camera\DarrenLee.Media.dll</HintPath>
     </Reference>
+    <Reference Include="ITLlib">
+      <HintPath>ITLlib.dll</HintPath>
+    </Reference>
     <Reference Include="utility2">
       <HintPath>wwwroot\assets\DLLs_3rd_Party\ReadCard\utility2.dll</HintPath>
     </Reference>

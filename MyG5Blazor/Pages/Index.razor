@@ -48,35 +48,39 @@
                         {
                             @if (MenuCount == 0) // NavMan.NavigateTo
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG height=@HeightPNG style=@strStyle[0]>
+                                <img @onclick="@(()=>NavMan.NavigateTo(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG height=@HeightPNG style=@strStyle[0]>
                             }
                             else
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG style=@strStyle[0]>
+                                <img @onclick="@(()=>NavMan.NavigateTo(hrefMenu[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG style=@strStyle[0]>
                             }
                             MenuCount += 1;
                         }
                         @if (Menu[1]) // upgrade 4G
                         {
+                            //myURL = "https://b00f7977.ngrok.io/mygrapari/upgrade4g/v1/init";
+
                             @if (MenuCount == 0)
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG height=@HeightPNG style=@strStyle[1]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[1], urlAPI_[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG height=@HeightPNG style=@strStyle[1]>
                             }
                             else
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG style=@strStyle[1]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[1], urlAPI_[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG style=@strStyle[1]>
                             }
                             MenuCount += 1;
                         }
                         @if (Menu[2]) // bayar pulsa
                         {
+                            //myURL = "https://4583d26c.ngrok.io/mygrapari/isi-pulsa/v1/init";
+
                             @if (MenuCount == 0) // CheckStatus(hrefMenu[2])
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG height=@HeightPNG style=@strStyle[2]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[2], urlAPI_[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG height=@HeightPNG style=@strStyle[2]>
                             }
                             else
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG style=@strStyle[2]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[2], urlAPI_[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG style=@strStyle[2]>
                             }
                             MenuCount += 1;
                         }
@@ -84,11 +88,11 @@
                         {
                             @if (MenuCount == 0)
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[3]))" src="../assets/image/Menu Utama/@AssetsPNG[3]" width=@WidthPNG height=@HeightPNG style=@strStyle[3]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[3], urlAPI_[3]))" src="../assets/image/Menu Utama/@AssetsPNG[3]" width=@WidthPNG height=@HeightPNG style=@strStyle[3]>
                             }
                             else
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[3]))" src="../assets/image/Menu Utama/@AssetsPNG[3]" width=@WidthPNG style=@strStyle[3]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[3], urlAPI_[3]))" src="../assets/image/Menu Utama/@AssetsPNG[3]" width=@WidthPNG style=@strStyle[3]>
                             }
                             MenuCount += 1;
                         }
@@ -119,8 +123,9 @@
     private bool IsLoading = false;
 
     //private static string myURL = "https://b00f7977.ngrok.io/mygrapari/upgrade4g/v1/init";
-    //private static string myURL;
-    private static string myURL = "https://4583d26c.ngrok.io/mygrapari/isi-pulsa/v1/init";
+    private static string myURL_ = "https://cee6b0df.ngrok.io/mygrapari/";
+    private string[] urlAPI_ = { "", "upgrade4g/v1/init", "isi-pulsa/v1/init", "" };
+    //private static string myURL = "https://4583d26c.ngrok.io/mygrapari/isi-pulsa/v1/init";
 
     //Menu[0] = Bayar Tagihan
     //Menu[1] = Upgrade 4G
@@ -159,9 +164,10 @@
         }
     }
 
-    private async Task CheckStatus(string strURL)
+    private async Task CheckStatus(string strURL, string strAPI)
     {
         string myJson = "{\"terminalId\": \"T0999\"}";
+        string myURL = myURL_ + strAPI;
         IsLoading = true;
         OurUtility.Write_Log("Get Status Code", "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
