@@ -74,13 +74,13 @@
                         {
                             //myURL = "https://4583d26c.ngrok.io/mygrapari/isi-pulsa/v1/init";
 
-                            @if (MenuCount == 0) // CheckStatus(hrefMenu[2])
+                            @if (MenuCount == 0) // CheckStatus(hrefMenu[2], urlAPI_[2]) NavMan.NavigateTo
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[2], urlAPI_[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG height=@HeightPNG style=@strStyle[2]>
+                                <img @onclick="@(()=>NavMan.NavigateTo(hrefMenu[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG height=@HeightPNG style=@strStyle[2]>
                             }
                             else
                             {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[2], urlAPI_[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG style=@strStyle[2]>
+                                <img @onclick="@(()=>NavMan.NavigateTo(hrefMenu[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG style=@strStyle[2]>
                             }
                             MenuCount += 1;
                         }
