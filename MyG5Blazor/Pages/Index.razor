@@ -10,6 +10,7 @@
 @inject NavigationManager NavMan
 @inject Costumer cst  
 @inject Transaction trans
+@inject Menu menu 
 
 <div class="main-panel bg-home">
     <!-- Navbar -->
@@ -113,12 +114,11 @@
 }
 @code
 {
+    
     private string[] hrefMenu = { "bth/1", "u4g/1", "bpp/1", "gk/1" };
     private string[] AssetsPNG = { "Menu_Bayar_Tagihan.png", "Menu_Upgrade4G.png", "Menu_Beli_Pulsa.png", "Menu_Ganti_kartu.png" };
-    private string[] arrayTrans = { "PH", "UP", "IP", "GK" };
+    private string[] arrayTrans = { "PB", "U4G", "PR", "GK" };
 
-    private string[] strHref = { "", "", "", "" };
-    private string[] strAssets = { "", "", "", "" };
     private string WidthPNG = "40%";
     private string HeightPNG = "20%";
 
@@ -129,7 +129,7 @@
 
     private bool IsLoading = false;
 
-    private static string _myURL = "https://e714fe62.ngrok.io/";
+    private static string _myURL = "https://542c61d4.ngrok.io/";
     private string[] apiURL = { "mygrapari/bayar-halo/v1/init", "mygrapari/upgrade-4g/v1/init", "mygrapari/isi-pulsa/v1/init", "mygrapari/ganti-kartu/v1/init" };
     private string _termID = string.Empty;
 
@@ -139,16 +139,7 @@
     {
         cst.Clear();
         trans.ClearTransaction();
-        for (int i = 0; i < 4; i++)
-        {
-            if (Menu[i])
-            {
-                strHref[i] = hrefMenu[i];
-                strAssets[i] = AssetsPNG[i];
-                strStyle[i] = StylePNG[intMenu];
-                intMenu += 1;
-            }
-        }
+        CheckMenuStatus();
 
         intMenu = 0;
     }
@@ -159,8 +150,6 @@
         {
             if (Menu[i])
             {
-                strHref[i] = hrefMenu[i];
-                strAssets[i] = AssetsPNG[i];
                 strStyle[i] = StylePNG[intMenu];
                 intMenu += 1;
             }
@@ -171,7 +160,7 @@
     {
         IsLoading = true;
         _termID = "T9999999";
-        /*string myJson = "{\"terminalId\": \"" + _termID + "\"}";
+        string myJson = "{\"terminalId\": \"" + _termID + "\"}";
         string myURL = _myURL + strAPIURL;
 
         OurUtility.Write_Log("= Get Menu Status Code", "step-action");
@@ -186,10 +175,10 @@
                 if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
-                    trans.SetTransaction((string)jobjResult["transaction"]["transactionId"], (string)jobjResult["config"]["apiBuid"], (string)jobjResult["terminal"]["terminalId"],strTrans);
-                    OurUtility.Write_Log(trans.transID + " " + trans.buID + " " + trans.termID + " {Success}", "step-action");*/
+                    trans.SetTransaction((string)jobjResult["config"]["apiBuid"], (string)jobjResult["terminal"]["terminalId"],strTrans);
+                    OurUtility.Write_Log("== BUID : "+trans.buID + ", Terminal ID : " + trans.termID + ", Event : "+trans.jenisTrans+" {Success}", "step-action");
                     NavMan.NavigateTo(strURL);
-                /*}
+                }
                 else
                 {
                     if ((string)jobjResult["transaction"]["errorCode"] != null)
@@ -218,7 +207,7 @@
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             NavMan.NavigateTo("/error");
-        }*/
+        }
     }
 
     public static async Task<string> PostCallAPI(string url, string jsonString)

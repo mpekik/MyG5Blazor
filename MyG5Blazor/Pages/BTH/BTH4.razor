@@ -4,12 +4,12 @@
 @using System.IO.Ports
 @using System.Threading
 @using System.Text
-@using System 
- 
+@using System
+
 @inject IJSRuntime JSRuntime
 @inject Costumer cst
-@inject NavigationManager NavMan  
-@inject EDC edc 
+@inject NavigationManager NavMan
+@inject EDC edc
 
 <div class=@pageClass>
     <!-- Navbar -->
@@ -25,11 +25,7 @@
             <form class="col-md-6">
                 <div class="input-group no-border">
                     <div class="checklist">
-                        @if (IsLoading)
-                        {
-                            <img src="../../assets/image/loader.gif" />
-                        }
-                        else if (IsSuccess)
+                        @if (IsSuccess)
                         {
                             <img src="../../assets/image/tanda_checklist.png" />
                         }
@@ -83,7 +79,7 @@
                                         Proses Pembayaran Tagihan KartuHalo<br> <b class="red">FAILED</b><br><br>
                                         @if (IsVoid)
                                         {
-                                           <span style = "font-weight: normal;">Silahkan <span style = "font-weight: bold;" > Tekan ENTER(Tombol Hijau)</span>pada Mesin EDC untuk Proses Pengembalian Uang </span>
+                                            <span style="font-weight: normal;">Silahkan <span style="font-weight: bold;"> Tekan ENTER(Tombol Hijau)</span>pada Mesin EDC untuk Proses Pengembalian Uang </span>
                                         }
                                     </div>
                                 </div>
@@ -188,10 +184,10 @@
             <span class="dot" id="dot-active">4</span>
         </div>
         <div class="footer-side2">
-            @if (MetodePembayaran == 2&&!IsFail&&!IsSuccess)
+            @if (MetodePembayaran == 2 && !IsFail && !IsSuccess)
             {
-            <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Menu Utama</button>
+                <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Kembali</button>
+                <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Menu Utama</button>
             }
             <!--<sup>Powered By </sup>Trilogi Persada -->
         </div>
@@ -199,20 +195,20 @@
 </div>
 @if (IsExit)
 {
-<div id="myModal" class="modal">
+    <div id="myModal" class="modal">
 
-    <!-- Modal content -->
-    <div class="modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>seluruh uang yang Anda masukkan dapat diambil di<br>Kasir GraPARI dengan menunjukkan struk dari<br>MyGraPARI.</p>
-                <button class="btn btn-danger modal-button" @onclick="TunaiExitFail" id="btn-lanjut">Lanjut</button>
-                <button @onclick="@(()=>IsExit = false)" class="btn btn-light modal-button">Batal</button>
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>seluruh uang yang Anda masukkan dapat diambil di<br>Kasir GraPARI dengan menunjukkan struk dari<br>MyGraPARI.</p>
+                    <button class="btn btn-danger modal-button" @onclick="TunaiExitFail" id="btn-lanjut">Lanjut</button>
+                    <button @onclick="@(()=>IsExit = false)" class="btn btn-light modal-button">Batal</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
-<!-- end modal -->
+    <!-- end modal -->
 }
 @if (IsVisible)
 {
@@ -256,13 +252,42 @@
                 <div class="modal-body">
                     <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
                     <p class="text-nps">Hal apa yang Anda rasa perlu ditingkatkan pada mesin layanan MyGraPARI? </p>
-                    <button class="btn nps-button2" value="">Tampilan/Estetika</button>
-                    <button class="btn nps-button2" value="">Kecepatan Proses</button>
-                    <button class="btn nps-button2" value="">Kemudahan Penggunaan</button>
-                    <button class="btn nps-button2" value="">Kejelasan Bahasa</button>
-                    <button @onclick="@(()=>NavMan.NavigateTo(""))" class="btn btn-danger button-nps" value="">OK</button>
+                    <div class="modal-flex">
+                        <label>
+                            <input type="checkbox">
+                            <span class="btn ">Tampilan/Estetika</span>
+                        </label>
+
+                        <label>
+                            <input type="checkbox">
+                            <span class="btn " style="margin-left: 40px;">Kecepatan Proses</span>
+                        </label>
+                    </div>
+                    <div class="modal-flex">
+                        <label>
+                            <input type="checkbox">
+                            <span class="btn ">Kemudahan Penggunaan</span>
+                        </label>
+
+                        <label>
+                            <input type="checkbox">
+                            <span class="btn" style="margin-left: 40px;">Kejelasan Bahasa</span>
+                        </label>
+                    </div>
+                    <button class="btn btn-danger button-nps" value="">OK</button>
                 </div>
             </div>
+        </div>
+    </div>
+}
+@if (IsLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" onclick="buttonLoad()" src="../../assets/image/loader.gif" id="myBtn2">
+            <p><br>Proses pembayaran tagihan kartuHalo</p>
+            <p>sedang berjalan, mohon tunggu beberapa</p>
+            <p>saat...</p>
         </div>
     </div>
 }
@@ -313,15 +338,25 @@
                     if (edc.intTry < 3)
                     {
                         Console.WriteLine("Trace Number : " + edc.traceNumber);
-                        //ToDO Add if Void
-                        IsVoid = true;
-                        strInvoice = edc.traceNumber;
-                        Void();
-                        break;
-                        IsSuccess = true;
-                        Console.WriteLine("Payment Success");
                         await Task.Delay(2000);
-                        IsVisible = true;
+                        var rng = new Random();
+                        int result = rng.Next(0, 1);
+                        if(result==0)
+                        {
+                            IsSuccess = true;
+                            Console.WriteLine("Payment Success");
+                            await Task.Delay(2000);
+                            IsVisible = true;
+                        }
+                        else
+                        {
+                            //ToDO Add if Void
+                            IsVoid = true;
+                            strInvoice = edc.traceNumber;
+                            Void();
+                        }
+                        break;
+
                     }
                     else
                     {
@@ -413,7 +448,7 @@
         }
     }
 
-    private async Task Pay(string serialPortName,string tagihan,string invoice, string billing, string mPemabayaran)
+    private async Task Pay(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
     {
         string _transType = "01";
         edc.Clear();
@@ -427,7 +462,7 @@
                 break;
             edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
             edc.mre.WaitOne();
-        } while (edc.intTry<3);
+        } while (edc.intTry < 3);
     }
 
     private async Task Void(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
@@ -445,6 +480,9 @@
                 IsVoided = true;
                 break;
             }
+            if (edc.intTry > intTryLimit)
+                break;
+
             edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
             Console.WriteLine(edc.respondCode);

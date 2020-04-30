@@ -31,11 +31,11 @@
                         {
                             <img src="../../assets/image/loader.gif" />
                         }
-                        else if (IsSuccess)
+                        else if (isSuccess)
                         {
                             <img src="../../assets/image/tanda_checklist.png" />
                         }
-                        else if (IsFail)
+                        else if (isFail)
                         {
                             <img src="../../assets/image/tanda_x.png" />
                         }
@@ -51,7 +51,7 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="teks-title">Upgrade dan Ganti Kartu 4G </div>
-                    @if (IsFail)
+                    @if (isFail)
                     {
                         <p class="teks-center" style="font-weight: bold;">
                             Proses Upgrade dan Ganti Kartu 4G <br>
@@ -63,7 +63,7 @@
                             GraPARI untuk Bantuan
                         </p>
                     }
-                    else if (IsSuccess)
+                    else if (isSuccess)
                     {
                         <p class="teks-status"><span style="font-weight: bold;">Proses Upgrade dan Ganti Kartu <span style="color: green;"> Berhasil</span></span></p>
                         <p class="teks-footer">Silakan Ambil Kartu SIM Anda dan Pastikan Melakukan Pengaturan Jaringan 4G pada Perangkat</p>
@@ -144,43 +144,54 @@
                 <div class="modal-body">
                     <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
                     <p class="text-nps">Hal apa yang Anda rasa perlu ditingkatkan pada mesin layanan MyGraPARI? </p>
-                    <button class="btn nps-button2" value="" @onclick="@(() => test(0))">Tampilan/Estetika</button>
-                    <button class="btn nps-button2" value="" @onclick="@(() => test(1))">Kecepatan Proses</button>
-                    <button class="btn nps-button2" value="" @onclick="@(() => test(2))">Kemudahan Penggunaan</button>
-                    <button class="btn nps-button2" value="" @onclick="@(() => test(3))">Kejelasan Bahasa</button>
-                    <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger button-nps" value="">OK</button>
+                    <div class="modal-flex">
+                        <label>
+                            <input type="checkbox">
+                            <span class="btn ">Tampilan/Estetika</span>
+                        </label>
+
+                        <label>
+                            <input type="checkbox">
+                            <span class="btn " style="margin-left: 40px;">Kecepatan Proses</span>
+                        </label>
+                    </div>
+                    <div class="modal-flex">
+                        <label>
+                            <input type="checkbox">
+                            <span class="btn ">Kemudahan Penggunaan</span>
+                        </label>
+
+                        <label>
+                            <input type="checkbox">
+                            <span class="btn" style="margin-left: 40px;">Kejelasan Bahasa</span>
+                        </label>
+                    </div>
+                    <button class="btn btn-danger button-nps" value="">OK</button>
                 </div>
             </div>
         </div>
     </div>
-}
+    }
 
-@code{
+    @code{
+private bool IsError = false;
     private bool IsVisible = false;
     private bool IsVisible2 = false;
     private bool IsLoading = false;
-    private bool IsSuccess = false;
-    private bool IsFail = false;
-    private bool[] IsPressed = { false, false, false, false };
+    private bool isSuccess = false;
+    private bool isFail = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
 
     private string strNPS1Value = string.Empty;
     private string[] strNPS2Value = { "", "", "", "" };
-    private string[] strBtnClass = { "btn nps-button2", "btn nps-button2", "btn nps-button2", "btn nps-button2" };
 
     private string msg = string.Empty;
     private string errorcode = string.Empty;
     private string strCOM = "COM6";
     private string readerName = "Generic Smart Card Reader Interface 0";
-    private string strPanjang = "7dcc52aa55959352ea5566fc41110da81e1ee496a7e931a2b3d1c6211450" +
-        "ed5ab8b1e62ca1d5a89bd341aee103ad341535806ae365a0ab14a8c95cecab3dff1f8ed332ec54e25551" +
-        "5db76aff29634f3ff4341649fc7302b83c9239c373fcf9e4f882977a15b6cdaae83f14307efae1d921e4" +
-        "1c42285dd44ac82ffe9ca430876b649985729d1e41ba7294aa7ff94e2ae91c46a7dbc1ea4e45c2ddb5b8" +
-        "b8920abb3cc5567b1c3a81ecc89adf2432141df1c28ecb744e642372eae238b1f4c0168e8c97bc71d826" +
-        "2eff0b3fb09ca4f13201bc9f4d05ac9df89ec5b3c9c07a594e527e20a4df2644dd01da036ac7484571bf" +
-        "f3f3acb33abbebeeac0b1c08978641dde127922e976438d36753566ae69a118e3753150250a0cc34";
+    private string strPanjang = string.Empty;
     private string p_icc_id = string.Empty;
     private string mypersoexe = "C:\\Perso\\myperso.exe";
 
@@ -192,7 +203,9 @@
             "buid" : "buid yang didapat pas init",
             "serialNumber" : "serial number kartu"
             {\"terminalId\": \"T0999\"}*/
-    private static string myURL = "https://4583d26c.ngrok.io/mygrapari/upgrade-4g/v1/perso";
+    private static string _myURL = "https://a9bea5e9.ngrok.io/";
+    private static string persoURL = "mygrapari/upgrade-4g/v1/perso";
+    private static string updateURL = "mygrapari/perso/v1/update";
     private static string myJson = string.Empty;
 
     private void NavigateTo(string strURL)
@@ -202,13 +215,20 @@
 
     protected override async Task OnInitializedAsync()
     {
-        OurUtility.Write_Log("== Perso Page", "step-action");
+        OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
         IsLoading = true;
+
         await MyPerso();
+
+        if (IsError)
+        {
+            NavMan.NavigateTo("/error");
+        }
     }
 
     public static async Task<string> PostCallAPI(string url, string jsonString)
     {
+        string ret = string.Empty;
         try
         {
             using (HttpClient client = new HttpClient())
@@ -217,103 +237,163 @@
                 var response = await client.PostAsync(url, content);
                 if (response != null)
                 {
-                    var jsonStringResult = await response.Content.ReadAsStringAsync();
-                    return jsonStringResult;
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonStringResult = await response.Content.ReadAsStringAsync();
+                        return jsonStringResult;
+                    }
+                    else
+                    {
+                        return response.StatusCode.ToString();
+                    }
                 }
             }
         }
         catch (Exception ex)
         {
-
+            OurUtility.Write_Log("==" + ex.Message, "step-action");
         }
-        return null;
+        return ret;
     }
 
     private async Task MyPerso()
     {
-        await Task.Run(() => MoveToICC());
-        await CardReaderScan();
-
-        string myJson = "{ \"transactionId\" : \"" + trans.transID+ "\"," +
-                        "\"terminalId\" : \"" + trans.termID + "\"," +
-                        "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
-                        "\"nik\" : \"3175055212690001\"," +
-                        "\"buid\" : \"" + trans.buID + "\"," +
-                        "\"serialNumber\" : \"" + p_icc_id + "\"" +
-                        "}";
-        string strResult = await PostCallAPI(myURL, myJson);
-        if (strResult != null)
+        while (intTryCount < intTryLimit)
         {
-            JObject jobjResult = JObject.Parse(strResult);
-            if ((string)jobjResult["transaction"]["statusCode"] == "00")
+            await Task.Run(() => MoveToICC());
+            await CardReaderScan();
+
+            string myURL = _myURL + persoURL;
+            //ToDO add if trans.transID != null
+            string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
+                            "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                            "\"nik\" : \"1771011209620002\"," +
+                            "\"buid\" : \"" + trans.buID + "\"," +
+                            "\"serialNumber\" : \"" + p_icc_id + "\"" +
+                            "}";
+
+            OurUtility.Write_Log("=== URL : " + myURL, "step-action");
+            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+            string strResult = await PostCallAPI(myURL, myJson);
+            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+            if (strResult != null)
             {
-                if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+                try
                 {
-                    IsLoading = false;
-                    IsSuccess = true;
-                    await Task.Run(() => MoveToTheFront());
-                }
-                else
-                {
-                    await Task.Run(() => MoveToBin());
-                    if (intTryCount <= intTryLimit)
-                        intTryCount += 1;
+                    JObject jobjResult = JObject.Parse(strResult);
+                    trans.transID = (string)jobjResult["transaction"]["transactionId"];
+                    if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                    {
+                        strPanjang = (string)jobjResult["perso"]["message"];
+                        if (strPanjang != null)
+                        {
+                            trans.persoID = (string)jobjResult["perso"]["persoId"];
+                            if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+                            {
+                                myURL = _myURL + updateURL;
+                                myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                    "\"terminalId\" : \"" + trans.termID + "\"," +
+                                    "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                    "\"persoStatus\" : \"2\"}";
+                                OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                strResult = await PostCallAPI(myURL, myJson);
+                                OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+
+                                IsLoading = false;
+                                isSuccess = true;
+                                await Task.Run(() => MoveToTheFront());
+                                break;
+                            }
+                            else
+                            {
+                                trans.mypersoResponse = msg;
+                                await Task.Run(() => MoveToBin());
+                                if (intTryCount <= intTryLimit)
+                                    intTryCount += 1;
+                                else
+                                    isFail = true;
+                                myURL = _myURL + updateURL;
+                                myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                    "\"terminalId\" : \"" + trans.termID + "\"," +
+                                    "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                    "\"persoStatus\" : \"3\"}";
+                                OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                strResult = await PostCallAPI(myURL, myJson);
+                                OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                            }
+                        }
+                        else
+                        {
+                            IsError = true;
+                            break;
+                        }
+                    }
                     else
-                        IsFail = true;
+                    {
+                        if ((string)jobjResult["transaction"]["errorCode"] != null)
+                        {
+                            OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                        }
+                        else
+                        {
+                            string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                            if (_statusDescSub != null)
+                            {
+                                string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                                OurUtility.Write_Log("=== Status Code : " + statusDescSub + " {Error}", "step-action");
+                                trans.errorCode = statusDescSub;
+                            }
+                            else
+                            {
+                                OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
+                                trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
+                            }
+                        }
+                        IsError = true;
+                        await Task.Run(() => MoveToBin());
+                        break;
+                    }
                 }
-            }else
-            {
-                NavMan.NavigateTo("/error");
+                catch (Exception ex)
+                {
+                    OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
+                    trans.errorCode = strResult;
+                    IsError = true;
+                    break;
+                }
             }
-        }else
-        {
-            NavMan.NavigateTo("/error");
-        }
-    }
-
-    private void test(int i)
-    {
-        if (IsPressed[i])
-        {
-            IsPressed[i] = false;
-            strNPS2Value[i] = string.Empty;
-        }
-        else
-        {
-            IsPressed[i] = true;
-            strNPS2Value[i] = i.ToString();
+            else
+            {
+                OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
+                trans.errorCode = strResult;
+                IsError = true;
+                break;
+            }
         }
     }
 
     private async Task CheckPerso()
     {
-        if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
+        if (!IsLoading && !isSuccess && !isFail && !IsVisible)
         {
             IsLoading = true;
         }
-        else if (IsLoading && !IsSuccess)
+        else if (IsLoading && !isSuccess)
         {
             IsLoading = false;
             if (intTryCount <= intTryLimit)
                 intTryCount += 1;
             else
-                IsFail = true;
+                isFail = true;
         }
     }
 
     private void InputNPS1(string strInput)
     {
         strNPS1Value = strInput;
-    }
-
-    private async Task CheckPerso2()
-    {
-        if (IsLoading)
-        {
-            IsLoading = false;
-            IsSuccess = true;
-            IsFail = false;
-        }
     }
 
     private async Task CheckNPS()
@@ -397,4 +477,4 @@
             cdr.DisconnectedCard();
         }
     }
-}
+    }

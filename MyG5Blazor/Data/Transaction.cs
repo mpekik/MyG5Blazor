@@ -21,6 +21,17 @@ namespace MyG5Blazor.Data
             termID = strTermID;
             jenisTrans = strJenisTrans;
         }
+        public void SetTransaction(string strTransID)
+        {
+            transID = strTransID;
+        }
+
+        public void SetTransaction(string strBUID, string strTermID, string strJenisTrans)
+        {
+            buID = strBUID;
+            termID = strTermID;
+            jenisTrans = strJenisTrans;
+        }
 
         public void ClearTransaction()
         {

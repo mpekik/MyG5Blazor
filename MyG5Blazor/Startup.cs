@@ -35,6 +35,7 @@ namespace MyG5Blazor
             services.AddTransient<BlazorTimer>();
             services.AddScoped<Ektp_Data>();
             services.AddScoped<Transaction>();
+            services.AddScoped<Menu>();
             services.AddTransient<EDC>();
         }
 
