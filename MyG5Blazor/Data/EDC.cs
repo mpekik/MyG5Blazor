@@ -225,7 +225,7 @@ namespace MyG5Blazor.Data
                         Console.WriteLine("Response Code : " + _respondCode);
                         if (_respondCode == "00")
                         {
-                            _ecr = dataSplit.Substring(0, 300);
+                            _ecr = dataSplit.Substring(3, 300);
                             Console.WriteLine("ECR Message : " + _ecr);
                             mre.Set();
                             Console.WriteLine(mre.Set());

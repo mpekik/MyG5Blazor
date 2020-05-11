@@ -29,7 +29,7 @@
                         {
                             <div id="konfirmasi-teks" class="teks-status-halo">
                                 Pada nomor <b class="teks-bold"> @cst.PhoneNumber</b> terbaca
-                                memiliki tagihan sebesar <b class="teks-bold">Rp @intTotalTagihan.ToString("N0").</b>
+                                memiliki tagihan sebesar <b class="teks-bold">Rp @cst.intTagihan.ToString("N0").</b>
                                 dengan rincian sebagai berikut:
                             </div>
                             <div id="list-tagihan" class="teks-footer-halo">
@@ -120,7 +120,6 @@
     protected override async Task OnInitializedAsync()
     {
         TotalTagihan();
-        Nominal(intTotalTagihan);
     }
 
     private void buttonOk()

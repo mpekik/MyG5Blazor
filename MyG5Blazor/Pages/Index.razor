@@ -162,7 +162,7 @@
         _termID = "T9999999";
         string myJson = "{\"terminalId\": \"" + _termID + "\"}";
         string myURL = _myURL + strAPIURL;
-
+        
         OurUtility.Write_Log("= Get Menu Status Code", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
