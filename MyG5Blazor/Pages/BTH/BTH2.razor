@@ -1,12 +1,19 @@
 ﻿@page "/bth/2"
 
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Threading.Tasks;
 @using MyG5Blazor.Data
 
 @inject Costumer cst
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavMan
 @inject Transaction trans
-
+@inject Menu menu
+ 
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -26,15 +33,24 @@
             <div class="row">
                 <div class="col-md-6">
                     <div class="teks-title">Bayar Tagihan KartuHalo</div>
-                        <div id="">
-                            <div class="teks-center"> Pilih Metode Pembayaran </div>
-                        </div>
+                    <div id="">
+                        <div class="teks-center"> Pilih Metode Pembayaran </div>
+                    </div>
                 </div>
                 <div class="col-md-6">
+                    @if (menu.edc == "1")
+                    {
                         <img @onclick="@(() => SetPaymentMethod(1))" id="" class="pembayaran" src="../../assets/image/Bayar_Debit.png">
+                    }
+                    @if (menu.cash == "1")
+                    {
                         <img @onclick="@(() => SetPaymentMethod(2))" id="" class="pembayaran" src="../../assets/image/Bayar_Tunai.png">
+                    }
+                    @if (menu.edc == "1")
+                    {
                         <img @onclick="@(() => SetPaymentMethod(3))" id="" class="pembayaran" src="../../assets/image/Bayar_Kredit.png">
-                </div>
+                    }
+                    </div>
             </div>
         </div>
     </div>
@@ -48,14 +64,7 @@
             <span class="dot">4</span>
         </div>
         <div class="footer-side2">
-            @if (IsMethod)
-            {
-                <button @onclick="@(() => IsMethod = false)" class="btn-arrow btn" value="">Kembali</button>
-            }
-            else
-            {
-            <button @onclick="@(() => NavigateTo("/bth/1"))" class="btn-arrow btn" value="">Kembali</button>
-            }
+                <button @onclick="@(() => NavigateTo("/bth/1"))" class="btn-arrow btn" value="">Kembali</button>
             <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
@@ -64,18 +73,118 @@
 
 @code
 {
-    private bool IsMethod = false;
+    private bool isLoading = false;
+    public string _myURL = "https://bea72dc0.ngrok.io/";
+    public string serviceURL = "mygrapari/bayar-halo/v1/get-bill";
+    private string _termID = string.Empty;
+    private string msg = string.Empty;
+    private string errorcode = string.Empty;
+
     private void SetPaymentMethod(int _intMPembayaran)
     {
         cst.intMPembayaran = _intMPembayaran;
         trans.intPayment = _intMPembayaran;
-        IsMethod = true;
-        NavigateTo("/bth/3");
+        GetPayment("/bth/3");
     }
 
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);
     }
-}
+
+    public static async Task<string> PostCallAPI(string url, string jsonString)
+    {
+        string ret = string.Empty;
+        try
+        {
+            using (HttpClient client = new HttpClient())
+            {
+                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                var response = await client.PostAsync(url, content);
+                if (response != null)
+                {
+                    if (response.IsSuccessStatusCode)
+                    {
+                        var jsonStringResult = await response.Content.ReadAsStringAsync();
+                        return jsonStringResult;
+                    }
+                    else
+                    {
+                        return response.StatusCode.ToString();
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OurUtility.Write_Log("==" + ex.Message, "step-action");
+        }
+        return ret;
+    }
+
+    public async Task GetPayment(string strURL)
+    {
+        isLoading = true;
+        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"," +
+            "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                                "\"paymentMethod\" : \"" + trans.paymentMethod + "\"" +
+                                "}";
+        string myURL = _myURL + serviceURL;
+
+        OurUtility.Write_Log("== Get Bill", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await PostCallAPI(myURL, myJson);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        if (strResult != null)
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                {
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    foreach(var bill in jobjResult.SelectToken("billPayment").SelectToken("bill"))
+                    {
+                        Int32.TryParse(bill.SelectToken("amount").ToString(), out int amount);
+                        cst.AddlistTagihan(bill.SelectToken("referenceNo").ToString(), amount, bill.SelectToken("custName").ToString());
+                    }
+                    if ((string)jobjResult["billPayment"]["bit61"] != null)
+                        trans.bit = (string)jobjResult["billPayment"]["bit61"];
+                    else if ((string)jobjResult["billPayment"]["bit48"] != null)
+                        trans.bit = (string)jobjResult["billPayment"]["bit48"];
+                    trans.fee = (string)jobjResult["billPayment"]["fee"];
+                    NavMan.NavigateTo(strURL);
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                {
+                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                    }
+                    else
+                    {
+                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        trans.errorCode = statusDescSub;
+                    }
+                    NavMan.NavigateTo("/error");
+                }
+            }
+            catch (Exception ex)
+            {
+                trans.errorCode = strResult;
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                NavMan.NavigateTo("/error");
+            }
+        }
+        else
+        {
+            trans.errorCode = strResult;
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            NavMan.NavigateTo("/error");
+        }
+    }
 }

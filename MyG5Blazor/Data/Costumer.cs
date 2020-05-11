@@ -23,17 +23,21 @@ namespace MyG5Blazor.Data
             public string _tglTagihan { get; set; }
             public string _strTagihan => _intTagihan.ToString();
             public int _intTagihan { get; set; }
+            public string _referenceNo { get; set; }
+            public string _custName { get; set; }
         }
 
             
 
         private List<Tagihan> _listTagihan = new List<Tagihan>();
 
-        public void AddlistTagihan(string strDate, int intVal)
+        public void AddlistTagihan(string strDate, int intVal, string strCustName)
         {
             Tagihan tagihan = new Tagihan();
             tagihan._tglTagihan = strDate;
             tagihan._intTagihan = intVal;
+            //tagihan._referenceNo = strRefNo;
+            tagihan._custName = strCustName;
             _listTagihan.Add(tagihan);
         }
 

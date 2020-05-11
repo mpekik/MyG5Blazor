@@ -84,8 +84,8 @@
         <span class="dot">4</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="MoveToTheFront" class="btn-arrow btn" value="">Kembali</button>
-        <button @onclick="MoveToICC" class="btn-arrow btn" value="">Menu Utama</button>
+        <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
@@ -134,7 +134,7 @@
     private bool IsValid => !IsInvalid && !IsMobileBanking;
     private bool isLoading = false;
 
-    public string _myURL = "https://542c61d4.ngrok.io/";
+    public string _myURL = "https://bea72dc0.ngrok.io/";
     public string serviceURL = "mygrapari/bayar-halo/v1/submit-nohp";
     private string _termID = string.Empty;
     private string msg = string.Empty;
@@ -167,18 +167,6 @@
         }
     }
 
-    /*private void CheckNumber()
-    {
-        if (IsValid)
-        {
-            NavigateTo("/bth/2");
-        }
-        else
-        {
-            IsVisible = true;
-        }
-    }*/
-
     private void InputPhoneNumber(string strInput)
     {
         strNumber += strInput;
@@ -199,43 +187,7 @@
         }
         NavMan.NavigateTo(strURL);
     }
-    private void MoveToTheFront()
-    {
-        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
-        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
-        {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
-            return;
-        }
-        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
-        cds.Initialize(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
-        cds.MoveTo_The_Front(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-    }
-
-    private void MoveToICC()
-    {
-        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
-        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
-        {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
-            return;
-        }
-        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
-        cds.Initialize(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_IC_Card", "step-action");
-        while (!cds.MoveTo_IC_Card(ref errorcode, ref msg)) { }
-        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-    }
+    
     public static async Task<string> PostCallAPI(string url, string jsonString)
     {
         string ret = string.Empty;

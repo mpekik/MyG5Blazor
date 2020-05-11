@@ -61,26 +61,35 @@
                     </div>
 
                     <div class="col-md-6">
-                            <div class="teks-nominal">
-                                <table id="tabel">
-                                    <tr>
-                                        <td>Nomor</td>
-                                        <td> &emsp;&emsp; : </td>
-                                        <td>&emsp;<span style="font-weight: bold;">@cst.PhoneNumber</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Nominal</td>
-                                        <td>&emsp;&emsp; : </td>
-                                        <td>&emsp;<span style="font-weight: bold;">Rp @cst.intTagihan.ToString("N0")</span></td>
-                                    </tr>
-                                    <tr>
-                                        <td>Metode Bayar</td>
-                                        <td>&emsp;&emsp; : </td>
-                                        <td>&emsp;<span style="font-weight: bold;">@cst.strMPembayaran</span></td>
-                                    </tr>
-                                </table>
-                                <button class="btn btn-danger btn-right" @onclick="@(()=>NavigateTo("/bth/4"))" id="btn-ok" value="">OK</button>
+                        @if (!IsLanjut)
+                        {
+                            <div id="btn-lanjut" class="teks-nominal"> Tekan <b class="teks-bold">LANJUT</b> Untuk Melanjutkan
+                                <button class="btn btn-danger btn-right" @onclick="@(() => IsLanjut = true)" id="btn-ok" value="">Lanjut</button>
                             </div>
+                        }
+                        else
+                        {
+                        <div class="teks-nominal">
+                            <table id="tabel">
+                                <tr>
+                                    <td>Nomor</td>
+                                    <td> &emsp;&emsp; : </td>
+                                    <td>&emsp;<span style="font-weight: bold;">@cst.PhoneNumber</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Nominal</td>
+                                    <td>&emsp;&emsp; : </td>
+                                    <td>&emsp;<span style="font-weight: bold;">Rp @cst.intTagihan.ToString("N0")</span></td>
+                                </tr>
+                                <tr>
+                                    <td>Metode Bayar</td>
+                                    <td>&emsp;&emsp; : </td>
+                                    <td>&emsp;<span style="font-weight: bold;">@cst.strMPembayaran</span></td>
+                                </tr>
+                            </table>
+                            <button class="btn btn-danger btn-right" @onclick="@(() => NavigateTo("/bth/4"))" id="btn-ok" value="">OK</button>
+                        </div>
+                        }
                     </div>
                 </div>
             </div>
@@ -110,10 +119,6 @@
     private string strTotalTagihan => intTotalTagihan.ToString();
     protected override async Task OnInitializedAsync()
     {
-        cst.ClearTagihan();
-        cst.AddlistTagihan("01/01/2020 - 31/01/2020", 300);
-        cst.AddlistTagihan("01/02/2020 - 29/02/2020", 200);
-        cst.AddlistTagihan("01/03/2020 - 31/03/2020", 500);
         TotalTagihan();
         Nominal(intTotalTagihan);
     }

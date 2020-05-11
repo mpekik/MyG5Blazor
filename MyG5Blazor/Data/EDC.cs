@@ -14,8 +14,10 @@ namespace MyG5Blazor.Data
         string dataRespond = string.Empty;
         private string _traceNumber = string.Empty;
         private string _respondCode = string.Empty;
+        private string _ecr = string.Empty;
         public string traceNumber => _traceNumber;
         public string respondCode => _respondCode;
+        public string ecr => _ecr;
         string strTransType = string.Empty;
         string dataSplit = string.Empty;
         public AutoResetEvent mre = new AutoResetEvent(false);
@@ -223,6 +225,8 @@ namespace MyG5Blazor.Data
                         Console.WriteLine("Response Code : " + _respondCode);
                         if (_respondCode == "00")
                         {
+                            _ecr = dataSplit.Substring(0, 300);
+                            Console.WriteLine("ECR Message : " + _ecr);
                             mre.Set();
                             Console.WriteLine(mre.Set());
                         }
