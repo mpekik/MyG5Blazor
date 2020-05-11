@@ -27,7 +27,7 @@
             <form class="col-md-6">
                 <div class="input-group no-border">
                     <div class="checklist">
-                        @if (IsLoading)
+                        @if (isLoading)
                         {
                             <img src="../../assets/image/loader.gif" />
                         }
@@ -174,307 +174,333 @@
     }
 
     @code{
-private bool IsError = false;
-    private bool IsVisible = false;
-    private bool IsVisible2 = false;
-    private bool IsLoading = false;
-    private bool isSuccess = false;
-    private bool isFail = false;
+        private bool isError = false;
+        private bool IsVisible = false;
+        private bool IsVisible2 = false;
+        private bool isLoading = false;
+        private bool isSuccess = false;
+        private bool isFail = false;
 
-    private int intTryCount = 1;
-    private int intTryLimit = 3;
+        private int intTryCount = 1;
+        private int intTryLimit = 3;
 
-    private string strNPS1Value = string.Empty;
-    private string[] strNPS2Value = { "", "", "", "" };
+        private string strNPS1Value = string.Empty;
+        private string[] strNPS2Value = { "", "", "", "" };
 
-    private string msg = string.Empty;
-    private string errorcode = string.Empty;
-    private string strCOM = "COM6";
-    private string readerName = "Generic Smart Card Reader Interface 0";
-    private string strPanjang = string.Empty;
-    private string p_icc_id = string.Empty;
-    private string mypersoexe = "C:\\Perso\\myperso.exe";
+        private string msg = string.Empty;
+        private string errorcode = string.Empty;
+        private string strCOM = "COM6";
+        private string readerName = "Generic Smart Card Reader Interface 0";
+        private string strPanjang = string.Empty;
+        private string p_icc_id = string.Empty;
+        private string mypersoexe = "C:\\Perso\\myperso.exe";
 
-    /*JSON POST
-            "transactionId" : "didapat dari init awal",
-            "terminalId" : "T0999",
-            "noHp" : "no hp yang diinput, depanya ganti 62",
-            "nik" : "nik yang didapat dari ektp reader",
-            "buid" : "buid yang didapat pas init",
-            "serialNumber" : "serial number kartu"
-            {\"terminalId\": \"T0999\"}*/
-    private static string _myURL = "https://a9bea5e9.ngrok.io/";
-    private static string persoURL = "mygrapari/upgrade-4g/v1/perso";
-    private static string updateURL = "mygrapari/perso/v1/update";
-    private static string myJson = string.Empty;
+        /*JSON POST
+                "transactionId" : "didapat dari init awal",
+                "terminalId" : "T0999",
+                "noHp" : "no hp yang diinput, depanya ganti 62",
+                "nik" : "nik yang didapat dari ektp reader",
+                "buid" : "buid yang didapat pas init",
+                "serialNumber" : "serial number kartu"
+                {\"terminalId\": \"T0999\"}*/
+        private static string _myURL = "https://8b6eff84.ngrok.io/";
+        private static string persoURL = "mygrapari/upgrade-4g/v1/perso";
+        private static string updateURL = "mygrapari/perso/v1/update";
+        private static string myJson = string.Empty;
 
-    private void NavigateTo(string strURL)
-    {
-        NavMan.NavigateTo(strURL);
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
-        IsLoading = true;
-
-        await MyPerso();
-
-        if (IsError)
+        private void NavigateTo(string strURL)
         {
-            NavMan.NavigateTo("/error");
+            NavMan.NavigateTo(strURL);
         }
-    }
 
-    public static async Task<string> PostCallAPI(string url, string jsonString)
-    {
-        string ret = string.Empty;
-        try
+        protected override async Task OnInitializedAsync()
         {
-            using (HttpClient client = new HttpClient())
+            OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
+            isLoading = true;
+            cst.EKTPNumber = "1771011209620002";
+
+            await MyPerso();
+
+            if (isError)
             {
-                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, content);
-                if (response != null)
+                NavMan.NavigateTo("/error");
+            }
+        }
+
+        public static async Task<string> PostCallAPI(string url, string jsonString)
+        {
+            string ret = string.Empty;
+            try
+            {
+                using (HttpClient client = new HttpClient())
                 {
-                    if (response.IsSuccessStatusCode)
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
                     {
-                        var jsonStringResult = await response.Content.ReadAsStringAsync();
-                        return jsonStringResult;
-                    }
-                    else
-                    {
-                        return response.StatusCode.ToString();
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
                     }
                 }
             }
-        }
-        catch (Exception ex)
-        {
-            OurUtility.Write_Log("==" + ex.Message, "step-action");
-        }
-        return ret;
-    }
-
-    private async Task MyPerso()
-    {
-        while (intTryCount < intTryLimit)
-        {
-            await Task.Run(() => MoveToICC());
-            await CardReaderScan();
-
-            string myURL = _myURL + persoURL;
-            //ToDO add if trans.transID != null
-            string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                            "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
-                            "\"nik\" : \"1771011209620002\"," +
-                            "\"buid\" : \"" + trans.buID + "\"," +
-                            "\"serialNumber\" : \"" + p_icc_id + "\"" +
-                            "}";
-
-            OurUtility.Write_Log("=== URL : " + myURL, "step-action");
-            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
-            string strResult = await PostCallAPI(myURL, myJson);
-            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-            if (strResult != null)
+            catch (Exception ex)
             {
-                try
-                {
-                    JObject jobjResult = JObject.Parse(strResult);
-                    trans.transID = (string)jobjResult["transaction"]["transactionId"];
-                    if ((string)jobjResult["transaction"]["statusCode"] == "00")
-                    {
-                        strPanjang = (string)jobjResult["perso"]["message"];
-                        if (strPanjang != null)
-                        {
-                            trans.persoID = (string)jobjResult["perso"]["persoId"];
-                            if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
-                            {
-                                myURL = _myURL + updateURL;
-                                myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                                    "\"terminalId\" : \"" + trans.termID + "\"," +
-                                    "\"persoId\" : \"" + trans.persoID + "\" ," +
-                                    "\"persoStatus\" : \"2\"}";
-                                OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
-                                strResult = await PostCallAPI(myURL, myJson);
-                                OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                OurUtility.Write_Log("==" + ex.Message, "step-action");
+            }
+            return ret;
+        }
 
-                                IsLoading = false;
-                                isSuccess = true;
-                                await Task.Run(() => MoveToTheFront());
-                                break;
-                            }
-                            else
+        private async Task MyPerso()
+        {
+            while (intTryCount < intTryLimit)
+            {
+                if (await Task.Run(() => MoveToICC()))
+                {
+                    //ToDO if Reader error
+                    if (await CardReaderScan())
+                    {
+
+                        string myURL = _myURL + persoURL;
+                        //ToDO add if trans.transID != null
+                        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                        "\"terminalId\" : \"" + trans.termID + "\"," +
+                                        "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                                        "\"nik\" : \"" + cst.EKTPNumber + "\"," +
+                                        "\"buid\" : \"" + trans.buID + "\"," +
+                                        "\"serialNumber\" : \"" + p_icc_id + "\"" +
+                                        "}";
+
+                        OurUtility.Write_Log("=== URL : " + myURL, "step-action");
+                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                        string strResult = await PostCallAPI(myURL, myJson);
+                        OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                        if (strResult != null)
+                        {
+                            try
                             {
-                                trans.mypersoResponse = msg;
-                                await Task.Run(() => MoveToBin());
-                                if (intTryCount <= intTryLimit)
-                                    intTryCount += 1;
+                                JObject jobjResult = JObject.Parse(strResult);
+                                trans.transID = (string)jobjResult["transaction"]["transactionId"];
+                                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                                {
+                                    strPanjang = (string)jobjResult["perso"]["message"];
+                                    if (strPanjang != null)
+                                    {
+                                        trans.persoID = (string)jobjResult["perso"]["persoId"];
+                                        if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+                                        {
+                                            myURL = _myURL + updateURL;
+                                            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                                "\"terminalId\" : \"" + trans.termID + "\"," +
+                                                "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                                "\"persoStatus\" : \"2\"}";
+                                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            strResult = await PostCallAPI(myURL, myJson);
+                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+
+                                            isLoading = false;
+                                            isSuccess = true;
+                                            await Task.Run(() => MoveToTheFront());
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            trans.mypersoResponse = msg;
+                                            await Task.Run(() => MoveToBin());
+                                            if (intTryCount <= intTryLimit)
+                                                intTryCount += 1;
+                                            else
+                                                isFail = true;
+                                            myURL = _myURL + updateURL;
+                                            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                                "\"terminalId\" : \"" + trans.termID + "\"," +
+                                                "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                                "\"persoStatus\" : \"3\"}";
+                                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            strResult = await PostCallAPI(myURL, myJson);
+                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                        }
+                                    }
+                                    else
+                                    {
+                                        isError = true;
+                                        break;
+                                    }
+                                }
                                 else
-                                    isFail = true;
-                                myURL = _myURL + updateURL;
-                                myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                                    "\"terminalId\" : \"" + trans.termID + "\"," +
-                                    "\"persoId\" : \"" + trans.persoID + "\" ," +
-                                    "\"persoStatus\" : \"3\"}";
-                                OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
-                                strResult = await PostCallAPI(myURL, myJson);
-                                OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                {
+                                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                                    {
+                                        OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                                    }
+                                    else
+                                    {
+                                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                                        if (_statusDescSub != null)
+                                        {
+                                            string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                                            OurUtility.Write_Log("=== Status Code : " + statusDescSub + " {Error}", "step-action");
+                                            trans.errorCode = statusDescSub;
+                                        }
+                                        else
+                                        {
+                                            OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
+                                            trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
+                                        }
+                                    }
+                                    isError = true;
+                                    await Task.Run(() => MoveToBin());
+                                    break;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
+                                trans.errorCode = strResult;
+                                isError = true;
+                                break;
                             }
                         }
                         else
                         {
-                            IsError = true;
+                            OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
+                            trans.errorCode = strResult;
+                            isError = true;
                             break;
                         }
                     }
                     else
                     {
-                        if ((string)jobjResult["transaction"]["errorCode"] != null)
-                        {
-                            OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                            trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
-                        }
-                        else
-                        {
-                            string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
-                            if (_statusDescSub != null)
-                            {
-                                string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                                OurUtility.Write_Log("=== Status Code : " + statusDescSub + " {Error}", "step-action");
-                                trans.errorCode = statusDescSub;
-                            }
-                            else
-                            {
-                                OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
-                                trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
-                            }
-                        }
-                        IsError = true;
                         await Task.Run(() => MoveToBin());
-                        break;
+                        intTryCount += 1;
                     }
-                }
-                catch (Exception ex)
+                }else
                 {
-                    OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
-                    trans.errorCode = strResult;
-                    IsError = true;
+                    OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
+                    trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
+                    NavigateTo("/error");
                     break;
                 }
             }
-            else
+        }
+
+        private async Task CheckPerso()
+        {
+            if (!isLoading && !isSuccess && !isFail && !IsVisible)
             {
-                OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
-                trans.errorCode = strResult;
-                IsError = true;
-                break;
+                isLoading = true;
+            }
+            else if (isLoading && !isSuccess)
+            {
+                isLoading = false;
+                if (intTryCount <= intTryLimit)
+                    intTryCount += 1;
+                else
+                    isFail = true;
             }
         }
-    }
 
-    private async Task CheckPerso()
-    {
-        if (!IsLoading && !isSuccess && !isFail && !IsVisible)
+        private void InputNPS1(string strInput)
         {
-            IsLoading = true;
+            strNPS1Value = strInput;
         }
-        else if (IsLoading && !isSuccess)
+
+        private async Task CheckNPS()
         {
-            IsLoading = false;
-            if (intTryCount <= intTryLimit)
-                intTryCount += 1;
+            if (!IsVisible)
+            {
+                IsVisible = true;
+            }
             else
-                isFail = true;
+            {
+                strNPS1Value = string.Empty;
+                IsVisible = false;
+                IsVisible2 = true;
+            }
         }
-    }
 
-    private void InputNPS1(string strInput)
-    {
-        strNPS1Value = strInput;
-    }
+        private bool MoveToICC()
+        {
+            OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
+            OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+            cds.Stop(ref msg);
+            OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+            if (!cds.Start(ref errorcode, strCOM, ref msg))
+            {
+                OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " + errorcode + "message: " + msg, "step-action");
+                return false;
+            }
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+            cds.Initialize(ref errorcode, ref msg);
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card", "step-action");
+            if(!cds.MoveTo_IC_Card(ref errorcode, ref msg))
+            {
+                OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card, Failed " + errorcode + " message : " + msg, "step-action");
+                return false;
+            }
+            OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+            cds.Stop(ref msg);
+            return true;
+        }
 
-    private async Task CheckNPS()
-    {
-        if (!IsVisible)
+        private void MoveToTheFront()
         {
-            IsVisible = true;
+            OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
+            OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+            cds.Stop(ref msg);
+            OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+            if (!cds.Start(ref errorcode, strCOM, ref msg))
+            {
+                OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            }
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+            cds.Initialize(ref errorcode, ref msg);
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
+            while(!cds.MoveTo_The_Front(ref errorcode, ref msg)){ };
+            OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+            cds.Stop(ref msg);
         }
-        else
-        {
-            strNPS1Value = string.Empty;
-            IsVisible = false;
-            IsVisible2 = true;
-        }
-    }
 
-    private void MoveToICC()
-    {
-        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
-        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        private void MoveToBin()
         {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " + errorcode + "message: " + msg, "step-action");
-            return;
+            OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
+            OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+            cds.Stop(ref msg);
+            OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+            if (!cds.Start(ref errorcode, strCOM, ref msg))
+            {
+                OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+                return;
+            }
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+            cds.Initialize(ref errorcode, ref msg);
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
+            cds.MoveTo_Bin(ref errorcode, ref msg);
+            OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+            cds.Stop(ref msg);
         }
-        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
-        cds.Initialize(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_IC_Card", "step-action");
-        while (!cds.MoveTo_IC_Card(ref errorcode, ref msg)) { }
-        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-    }
 
-    private void MoveToTheFront()
-    {
-        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
-        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        private async Task<bool> CardReaderScan()
         {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
-            return;
-        }
-        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
-        cds.Initialize(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
-        cds.MoveTo_The_Front(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-    }
+            bool ret = false;
 
-    private void MoveToBin()
-    {
-        OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
-        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
-        {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
-            return;
+            OurUtility.Write_Log("=== Card Reader Scan IC", "step-action");
+            Card_Reader cdr = new Card_Reader();
+            OurUtility.Write_Log("==== 1. Card_Reader.Read", "step-action");
+            if (await Task.Run(() => cdr.Read(readerName, ref p_icc_id, ref msg)).ConfigureAwait(true))
+            {
+                ret = true;
+                cdr.DisconnectedCard();
+            }
+            return ret;
         }
-        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
-        cds.Initialize(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
-        cds.MoveTo_Bin(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-    }
-
-    private async Task CardReaderScan()
-    {
-        OurUtility.Write_Log("=== Card Reader Scan IC", "step-action");
-        Card_Reader cdr = new Card_Reader();
-        OurUtility.Write_Log("==== 1. Card_Reader.Read", "step-action");
-        if (await Task.Run(() => cdr.Read(readerName, ref p_icc_id, ref msg)).ConfigureAwait(true))
-        {
-            cdr.DisconnectedCard();
-        }
-    }
     }

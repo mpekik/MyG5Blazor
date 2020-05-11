@@ -7,9 +7,12 @@ namespace MyG5Blazor.Data
 {
     public class Costumer
     {
+        public string Type { get; set; }
         public string Name { get; set; }
         public string PhoneNumber { get; set; }
         public string EKTPNumber { get; set; }
+        public string IDType { get;set; }
+        
         private string[] arrayMPembayaran = { "", "Kartu Debit (Ber Pin)", "Tunai (Uang Pas)", "Kartu Kredit (Ber Pin)" };
         public string strMPembayaran => arrayMPembayaran[intMPembayaran];
         public string strTagihan => intTagihan.ToString();
@@ -51,7 +54,13 @@ namespace MyG5Blazor.Data
             intTagihan = 0;
             _listTagihan.Clear();
         }
-
+        public void CostumerProfile(string strType, string strName, string strPhoneNumber, string strIDType)
+        {
+            Type = strType;
+            Name = strName;
+            PhoneNumber = strPhoneNumber;
+            IDType = strIDType;
+        }
         public void ClearTagihan()
         {
             _listTagihan.Clear();

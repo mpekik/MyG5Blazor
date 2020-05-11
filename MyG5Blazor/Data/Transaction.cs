@@ -14,6 +14,9 @@ namespace MyG5Blazor.Data
         public string errorCode { get; set; }
         public string mypersoResponse { get; set; }
         public string persoID { get; set; }
+        public string paymentMethod => _payment[intPayment];
+        public int intPayment { get; set; }
+        private string[] _payment = { "", "Debit", "Cash", "CC" };
         public void SetTransaction(string strTransID, string strBUID, string strTermID,string strJenisTrans)
         {
             transID = strTransID;

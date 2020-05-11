@@ -8,8 +8,8 @@
 @using System.Threading.Tasks;
 @using MyG5Blazor.Data
 
-@inject IJSRuntime JSRuntime;
-@inject Costumer cst;
+@inject IJSRuntime JSRuntime
+@inject Costumer cst
 @inject NavigationManager NavMan
 @inject Card_Dispenser cds
 @inject Transaction trans
@@ -286,8 +286,9 @@
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
                     trans.SetTransaction((string)jobjResult["transaction"]["transactionId"]);
-                    cst.PhoneNumber = (string)jobjResult["profile"]["noHp"];
+                    cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
+
                     NavMan.NavigateTo(strURL);
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
