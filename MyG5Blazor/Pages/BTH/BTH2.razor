@@ -13,7 +13,7 @@
 @inject NavigationManager NavMan
 @inject Transaction trans
 @inject Menu menu
- 
+
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -50,7 +50,7 @@
                     {
                         <img @onclick="@(() => SetPaymentMethod(3))" id="" class="pembayaran" src="../../assets/image/Bayar_Kredit.png">
                     }
-                    </div>
+                </div>
             </div>
         </div>
     </div>
@@ -64,13 +64,22 @@
             <span class="dot">4</span>
         </div>
         <div class="footer-side2">
-                <button @onclick="@(() => NavigateTo("/bth/1"))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(() => NavigateTo("/bth/1"))" class="btn-arrow btn" value="">Kembali</button>
             <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
 </div>
-
+@if (isLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
 @code
 {
     private bool isLoading = false;
@@ -125,7 +134,8 @@
     public async Task GetPayment(string strURL)
     {
         isLoading = true;
-        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+        await Task.Delay(10000);
+        /*string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
             "\"terminalId\" : \"" + trans.termID + "\"," +
             "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                                 "\"paymentMethod\" : \"" + trans.paymentMethod + "\"" +
@@ -144,7 +154,7 @@
                 if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
-                    foreach(var bill in jobjResult.SelectToken("billPayment").SelectToken("bill"))
+                    foreach (var bill in jobjResult.SelectToken("billPayment").SelectToken("bill"))
                     {
                         Int32.TryParse(bill.SelectToken("amount").ToString(), out int amount);
                         cst.AddlistTagihan(bill.SelectToken("referenceNo").ToString(), amount, bill.SelectToken("custName").ToString());
@@ -154,7 +164,7 @@
                     else if ((string)jobjResult["billPayment"]["bit48"] != null)
                         trans.bit = (string)jobjResult["billPayment"]["bit48"];
                     trans.fee = (string)jobjResult["billPayment"]["fee"];
-                    NavMan.NavigateTo(strURL);
+                    */NavMan.NavigateTo(strURL);/*
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
                 {
@@ -185,6 +195,6 @@
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             NavMan.NavigateTo("/error");
-        }
+        }*/
     }
 }

@@ -13,6 +13,7 @@
 @inject NavigationManager NavMan
 @inject Card_Dispenser cds
 @inject Transaction trans
+@inject Menu menu 
 
 <div class="main-panel bg-home">
     <!-- Navbar -->
@@ -116,22 +117,28 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                        <p class="text-body"><span style="font-weight: bold;">Nomor tidak dikenali,</span> harap masukkan nomor Telkomsel yang benar dan aktif</p>
-                        <button class="btn btn-danger modal-button" @onclick="@(() => OkOnClick(false))">OK</button>
+                    <p class="text-body"><span style="font-weight: bold;">Nomor tidak dikenali,</span> harap masukkan nomor Telkomsel yang benar dan aktif</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => OkOnClick(false))">OK</button>
                 </div>
             </div>
         </div>
 
     </div>
 }
-
+@if (isLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
 @code{
     private string strNumber = string.Empty;
     private bool IsVisible = false;
-    private bool IsVisible2 = false;
     private bool IsInvalid = false;
-    private bool IsMobileBanking = false;
-    private bool IsValid => !IsInvalid && !IsMobileBanking;
     private bool isLoading = false;
 
     public string _myURL = "https://bea72dc0.ngrok.io/";
@@ -160,10 +167,8 @@
         }
         else
         {
-            IsVisible2 = visiblestatus;
             IsVisible = visiblestatus;
             IsInvalid = visiblestatus;
-            IsMobileBanking = visiblestatus;
         }
     }
 
@@ -187,7 +192,7 @@
         }
         NavMan.NavigateTo(strURL);
     }
-    
+
     public static async Task<string> PostCallAPI(string url, string jsonString)
     {
         string ret = string.Empty;
@@ -219,12 +224,16 @@
     }
     private async Task CheckNumber(string strURL)
     {
+        IsVisible = false;
         isLoading = true;
-        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
+        await Task.Delay(10000);
+        menu.edc = "1";
+        menu.cash = "1";
+        /*string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
                                 "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"" +
                                 "}";
         string myURL = _myURL + serviceURL;
-        
+
         OurUtility.Write_Log("== Check Phone Number", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
@@ -241,7 +250,8 @@
                     cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
 
-                    NavMan.NavigateTo(strURL);
+                    */
+        NavMan.NavigateTo(strURL);/*
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
                 {
@@ -277,6 +287,6 @@
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             NavMan.NavigateTo("/error");
-        }
+        }*/
     }
 }

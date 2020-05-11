@@ -198,7 +198,23 @@ namespace MyG5Blazor.Data
 
             return p_data;
         }
+        public static string ByteArrayToString(byte[] p_bytes)
+        {
+            string result = string.Empty;
 
+            try
+            {
+                for (int i = 0; i < p_bytes.Length; i++)
+                {
+                    result = result + p_bytes[i].ToString("X02");
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+
+            return result;
+        }
         public void port_DataReceived(object sender, SerialDataReceivedEventArgs e)
         {
             dataSplit = string.Empty;
@@ -225,7 +241,8 @@ namespace MyG5Blazor.Data
                         Console.WriteLine("Response Code : " + _respondCode);
                         if (_respondCode == "00")
                         {
-                            _ecr = dataSplit.Substring(3, 300);
+                            _ecr = ByteArrayToString(Encoding.Convert(Encoding.Unicode, Encoding.ASCII, Encoding.Unicode.GetBytes(dataSplit.Substring(3, 1))));
+                            _ecr = _ecr + dataSplit.Substring(4, 299);
                             Console.WriteLine("ECR Message : " + _ecr);
                             mre.Set();
                             Console.WriteLine(mre.Set());

@@ -160,7 +160,7 @@
     {
         IsLoading = true;
         _termID = "T9999999";
-        string myJson = "{\"terminalId\": \"" + _termID + "\"}";
+        /*string myJson = "{\"terminalId\": \"" + _termID + "\"}";
         string myURL = _myURL + strAPIURL;
         
         OurUtility.Write_Log("= Get Menu Status Code", "step-action");
@@ -179,7 +179,7 @@
                     menu.Terminal((string)jobjResult["terminal"]["terminalId"], (string)jobjResult["terminal"]["terminalDesc"], (string)jobjResult["terminal"]["terminalLocation"], (string)jobjResult["terminal"]["areaCode"], (string)jobjResult["terminal"]["regionalCode"], (string)jobjResult["terminal"]["unitId"], (string)jobjResult["terminal"]["unitName"]);
                     menu.Config((string)jobjResult["config"]["menuConfigId"], (string)jobjResult["config"]["maxRetryPerso"], (string)jobjResult["config"]["tidEdc"], (string)jobjResult["config"]["midEdc"], (string)jobjResult["config"]["snEdc"], (string)jobjResult["config"]["apiBuid"], (string)jobjResult["config"]["apiUid"], (string)jobjResult["config"]["cardDispenser"], (string)jobjResult["config"]["bahasa"], (string)jobjResult["config"]["edc"], (string)jobjResult["config"]["cash"]);
                     OurUtility.Write_Log("== BUID : "+trans.buID + ", Terminal ID : " + trans.termID + ", Event : "+trans.jenisTrans+" {Success}", "step-action");
-                    NavMan.NavigateTo(strURL);
+                    */NavMan.NavigateTo(strURL);/*
                 }
                 else
                 {
@@ -209,7 +209,7 @@
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             NavMan.NavigateTo("/error");
-        }
+        }*/
     }
 
     public static async Task<string> PostCallAPI(string url, string jsonString)
