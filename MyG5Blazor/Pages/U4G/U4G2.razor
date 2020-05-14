@@ -3,6 +3,7 @@
 @inject BlazorTimer Timer
 @inject NavigationManager NavMan
 @inject Ektp_Data ktp
+@inject Costumer cst
 
 @using MyG5Blazor.Data
 
@@ -93,7 +94,7 @@
                     <div class="modal-body">
                         @if (intTryCount <= intTryLimit)
                         {
-                            <p class="text-body">Silakan pindai kembali e-Ktp Anda, pastikan alat pemindai dalam keadaan bersih.</p>
+                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> yang digunakan tidak sesuai dengan nomor yang terdaftar pada sistem MyGraPARI. Silahkan gunakan<span style="font-weight: bold;"> e-KTP </span>yang sesuai.</p>
                             <button class="btn btn-danger modal-button" @onclick="CheckEKTP">OK</button>
                         }
                         else
@@ -115,6 +116,7 @@
     private bool IsLoading = false;
     private bool IsSuccess = false;
     private bool IsFail = false;
+    private bool IsNext = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
@@ -155,7 +157,7 @@
     {
         IsLoading = true;
         OurUtility.Write_Log("=== Switcher.UP_eKTP", "step-action");
-        await Task.Run(()=>Switcher.UP_eKTP("3000"));
+        await Task.Run(() => Switcher.UP_eKTP("3000"));
         if (intTryCount <= intTryLimit)
         {
             OurUtility.Write_Log("=== Scan e-KTP", "step-action");
@@ -195,23 +197,22 @@
             {
                 demoGraphic[i] = tempBuffer[i];
             }
-            OurUtility.Write_Log("==== 6. Ektp_Sdk.ReadDemographic Success", "step-action");
+            OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Success", "step-action");
             ktp.demographic = demoGraphic;
             IsVisible = false;
-            IsLoading = false;
-            IsSuccess = true;
+            IsNext = true;
 
-            if (IsSuccess)
+            if (IsNext)
             {
                 int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
                 byte[] leftData = new byte[leftLen];
                 byte[] rightData = new byte[rightLen];
 
-                OurUtility.Write_Log("==== 7. Ektp_Sdk.ReadFingerPrints", "step-action");
+                OurUtility.Write_Log("===== 7. Ektp_Sdk.ReadFingerPrints", "step-action");
                 ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(false);
                 if (ret != 0 || leftLen == 0 || rightLen == 0)
                 {
-                    OurUtility.Write_Log("==== 8. Ektp_Sdk.ReadFingerPrints Failed", "step-action");
+                    OurUtility.Write_Log("===== 8. Ektp_Sdk.ReadFingerPrints Failed", "step-action");
 
                     //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
                     return;
@@ -221,9 +222,31 @@
                 ktp.minu1len = leftLen;
                 ktp.minu2len = rightLen;
 
-                OurUtility.Write_Log("==== 8. Ektp_Sdk.ReadFingerPrints Success", "step-action");
-                Timer.SetTimer(1000);
-                Timer.OnElapsed += TimerElapsedHandler;
+                OurUtility.Write_Log("===== 8. Ektp_Sdk.ReadFingerPrints Success", "step-action");
+
+                if (cst.EKTPNumber == ktp.Id)
+                {
+
+                    IsLoading = false;
+                    IsSuccess = true;
+                    Timer.SetTimer(1000);
+                    Timer.OnElapsed += TimerElapsedHandler;
+                }
+                else
+                {
+                    IsLoading = false;
+                    IsSuccess = false;
+                    if (intTryCount <= intTryLimit)
+                    {
+                        IsVisible = true;
+                        intTryCount += 1;
+                    }
+                    else
+                    {
+                        IsFail = true;
+                    }
+                    return;
+                }
             }
         }
     }

@@ -101,7 +101,7 @@
                 <div class="modal-body">
                     <p class="text-body">Anda akan melakukan <span style="font-weight: bold;">Ganti Kartu dan Upgrade 4G</span> untuk nomor :</p>
                     <p style="font-size: 25pt; font-weight: bold;">@strNumber</p>
-                    <button @onclick="@(()=>CheckNumber("/u4g/4"))" class="btn btn-danger modal-button">Lanjut</button>
+                    <button @onclick="@(()=>CheckNumber("/u4g/2"))" class="btn btn-danger modal-button">Lanjut</button>
                     <button class="btn btn-light modal-button" @onclick="@(() => OkOnClick(false))">Batal</button>
                 </div>
             </div>
@@ -112,7 +112,6 @@
 @if (IsInvalid)
 {
     <div id="myModal" class="modal">
-
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -122,27 +121,25 @@
                 </div>
             </div>
         </div>
-
     </div>
 }
 
 @code{
     private string strNumber = string.Empty;
     private bool IsVisible = false;
-    private bool IsVisible2 = false;
     private bool IsInvalid = false;
     private bool IsMobileBanking = false;
     private bool IsValid => !IsInvalid && !IsMobileBanking;
     private bool isLoading = false;
 
-    public string _myURL = "https://8b6eff84.ngrok.io/";
+    public string _myURL = "https://a88d0c1d.ngrok.io";
     public string serviceURL = "mygrapari/upgrade-4g/v1/submit-nohp";
     private string _termID = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         OurUtility.Write_Log("= Upgrade dan Ganti Kartu 4G", "step-action");
-        OurUtility.Write_Log("== Insert Phone Number Page", "step-action");
+        OurUtility.Write_Log("== Step 1. Insert Phone Number Page", "step-action");
     }
 
     private void OkOnClick(bool visiblestatus)
@@ -156,25 +153,11 @@
         }
         else
         {
-            IsVisible2 = visiblestatus;
             IsVisible = visiblestatus;
             IsInvalid = visiblestatus;
             IsMobileBanking = visiblestatus;
         }
     }
-
-    /*private void CheckNumber()
-    {
-        if (IsValid)
-        {
-            NavigateTo("/u4g/4");
-        }
-        else
-        {
-            IsVisible = false;
-            IsVisible2 = true;
-        }
-    }*/
 
     private void InputPhoneNumber(string strInput)
     {
@@ -234,7 +217,6 @@
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
-        OurUtility.Write_Log("=== URL : " + myURL,"step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");

@@ -65,7 +65,7 @@
         </div>
         <div class="footer-side2">
             <button @onclick="@(() => NavigateTo("/bth/1"))" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
+            <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu<br>Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
@@ -83,7 +83,7 @@
 @code
 {
     private bool isLoading = false;
-    public string _myURL = "https://bea72dc0.ngrok.io/";
+    public string _myURL = "https://a88d0c1d.ngrok.io/";
     public string serviceURL = "mygrapari/bayar-halo/v1/get-bill";
     private string _termID = string.Empty;
     private string msg = string.Empty;

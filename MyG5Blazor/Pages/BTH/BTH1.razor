@@ -77,7 +77,7 @@
     <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
 </div>
 
-<footer>
+<footer class="container-fluid">
     <div class="footer-side1">
         <span class="dot" id="dot-active">1</span>
         <span class="dot">2</span>
@@ -85,8 +85,8 @@
         <span class="dot">4</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Kembali</button>
-        <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
+                <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Kembali</button>
+                <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu<br>Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
@@ -141,12 +141,12 @@
     private bool IsInvalid = false;
     private bool isLoading = false;
 
-    public string _myURL = "https://bea72dc0.ngrok.io/";
+    public string _myURL = "https://a88d0c1d.ngrok.io/";
     public string serviceURL = "mygrapari/bayar-halo/v1/submit-nohp";
     private string _termID = string.Empty;
     private string msg = string.Empty;
     private string errorcode = string.Empty;
-    private string strCOM = "COM6";
+    private string strCOM = "COM1";
 
     protected override async Task OnInitializedAsync()
     {
@@ -229,7 +229,8 @@
         await Task.Delay(10000);
         menu.edc = "1";
         menu.cash = "1";
-        /*string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
+
+        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
                                 "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"" +
                                 "}";
         string myURL = _myURL + serviceURL;
@@ -250,8 +251,8 @@
                     cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
 
-                    */
-        NavMan.NavigateTo(strURL);/*
+
+                    NavMan.NavigateTo(strURL);
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
                 {
@@ -287,6 +288,25 @@
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             NavMan.NavigateTo("/error");
-        }*/
+        }
+
+    }
+    private void MoveToICC()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_IC_Card", "step-action");
+        cds.MoveTo_IC_Card(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
     }
 }

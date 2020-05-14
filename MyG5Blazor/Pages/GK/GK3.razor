@@ -5,7 +5,7 @@
 @inject BlazorTimer Timer
 @inject Ektp_Data ktp
 @inject NavigationManager NavMan
-@inject Costumer cst  
+@inject Costumer cst
 
 <div class="main-panel bg-home">
     <!-- Navbar -->
@@ -240,7 +240,7 @@
                             result = Ektp_Sdk.CloseReader(reader);
 
                             OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
-                            await Task.Run(() => Switcher.DOWN_eKTP("500"));
+                            //Switcher.DOWN_eKTP("500");
 
                             Timer.SetTimer(1000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -269,6 +269,9 @@
 
     private void TimerElapsedHandler()
     {
+        OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+        cst.EKTPNumber = ktp.Id;
+        OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
         NavMan.NavigateTo("/gk/4");
 
     }

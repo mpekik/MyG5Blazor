@@ -5,6 +5,7 @@
 @inject BlazorTimer Timer
 @inject Ektp_Data ktp
 @inject NavigationManager NavMan
+@inject Costumer cst
 
 <div class="main-panel bg-home">
     <!-- Navbar -->
@@ -53,15 +54,12 @@
                         </div>
                     }
                 </div>
-
                 <div class="col-md-6">
-                        <img class="ktp" id="myBtn" @onclick="CheckFinger" src="../../assets/image/Scan_Finger-01.png">
+                    <img class="ktp" id="myBtn" @onclick="CheckFinger" src="../../assets/image/Scan_Finger-01.png">
                 </div>
             </div>
         </div>
     </div>
-
-
 
     <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
     <footer>
@@ -80,7 +78,6 @@
     @if (IsVisible)
     {
         <div id="myModal" class="modal">
-
             <!-- Modal content -->
             <div class="modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -92,7 +89,7 @@
                         }
                         else
                         {
-                            <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>Anda tidak terbaca pada sistem MyGraPARI. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
+                            <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>tidak sesuai dengan eKTP yang digunakan. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
                             <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger modal-button" id="span1">OK</button>
                         }
                         <!-- <button class="btn btn-light modal-button">Tidak</button> -->
@@ -102,7 +99,6 @@
 
         </div>
     }
-
 </div>
 
 @code{
@@ -198,7 +194,8 @@
                 {
                     OurUtility.Write_Log("==== 7. Ektp_Sdk.CaptureFingerPrint Failed", "step-action");
                     //break;
-                }else
+                }
+                else
                 {
                     OurUtility.Write_Log("==== 8. -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.MatchFingerPrint", "step-action");
 
@@ -228,14 +225,16 @@
                                                         ref score, ref matched, format)).ConfigureAwait(false);
                         if (matched == 1)
                         {
-                            OurUtility.Write_Log("==== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                            OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                            cst.EKTPNumber = ktp.Id;
+                            OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
                             IsLoading = false;
                             IsSuccess = true;
 
-                            OurUtility.Write_Log("==== 10. Ektp_Sdk.CloseReader", "step-action");
+                            OurUtility.Write_Log("===== 10. Ektp_Sdk.CloseReader", "step-action");
                             result = Ektp_Sdk.CloseReader(reader);
 
-                            OurUtility.Write_Log("== Switcher.DOWN_eKTP", "step-action");
+                            OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
                             await Task.Run(() => Switcher.DOWN_eKTP("500"));
 
                             Timer.SetTimer(1000);

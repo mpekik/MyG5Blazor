@@ -102,7 +102,7 @@
                 <div class="modal-body">
                     <p class="text-body">Anda akan melakukan <span style="font-weight: bold;">Ganti Kartu Hilang/Rusak</span> untuk nomor :</p>
                     <p style="font-size: 25pt; font-weight: bold;">@strNumber</p>
-                    <button @onclick="@(()=>CheckNumber("/gk/4"))" class="btn btn-danger modal-button">Lanjut</button>
+                    <button @onclick="@(()=>CheckNumber("/gk/2"))" class="btn btn-danger modal-button">Lanjut</button>
                     <button class="btn btn-light modal-button" @onclick="@(()=>OkOnClick(false))">Batal</button>
                 </div>
             </div>
@@ -119,25 +119,34 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                        <p class="text-body"><span style="font-weight: bold;">Nomor tidak dikenali,</span> harap masukkan nomor Telkomsel yang benar dan aktif</p>
-                        <button class="btn btn-danger modal-button" @onclick="@(() => OkOnClick(false))">OK</button>
+                    <p class="text-body"><span style="font-weight: bold;">Nomor tidak dikenali,</span> harap masukkan nomor Telkomsel yang benar dan aktif</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => OkOnClick(false))">OK</button>
                 </div>
             </div>
         </div>
 
     </div>
 }
+@if (isLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
 
 @code{
     private string strNumber = string.Empty;
     private bool IsVisible = false;
-    private bool IsVisible2 = false;
     private bool IsInvalid = false;
     private bool IsMobileBanking = false;
     private bool IsValid => !IsInvalid && !IsMobileBanking;
     private bool isLoading = false;
 
-    public string _myURL = "https://8b6eff84.ngrok.io/";
+    public string _myURL = "https://a88d0c1d.ngrok.io/";
     public string serviceURL = "mygrapari/ganti-kartu/v1/submit-nohp";
     private string _termID = string.Empty;
 
@@ -159,7 +168,6 @@
         }
         else
         {
-            IsVisible2 = visiblestatus;
             IsVisible = visiblestatus;
             IsInvalid = visiblestatus;
             IsMobileBanking = visiblestatus;
@@ -250,7 +258,7 @@
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
                     trans.SetTransaction((string)jobjResult["transaction"]["transactionId"]);
                     cst.PhoneNumber = (string)jobjResult["profile"]["noHp"];
-                    OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber+" {Success}", "step-action");
+                    OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
                     NavMan.NavigateTo(strURL);
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
@@ -268,7 +276,8 @@
                         trans.errorCode = statusDescSub;
                     }
                     NavMan.NavigateTo("/error");
-                } else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                 {
                     IsVisible = false;
                     IsInvalid = true;

@@ -1,5 +1,5 @@
 ﻿@page "/gk/2"
-inject IJSRuntime JSRuntime;
+@inject IJSRuntime JSRuntime;
 @inject BlazorTimer Timer
 @inject NavigationManager NavMan
 @inject Ektp_Data ktp
@@ -136,6 +136,7 @@ inject IJSRuntime JSRuntime;
     protected override async Task OnInitializedAsync()
     {
         OurUtility.Write_Log("=== Step 2. Scan e-KTP Page", "step-action");
+        Switcher.UP_eKTP("3000");
     }
 
     private async Task CheckEKTP()
@@ -155,7 +156,7 @@ inject IJSRuntime JSRuntime;
     {
         IsLoading = true;
         OurUtility.Write_Log("==== Switcher.UP_eKTP", "step-action");
-        await Task.Run(() => Switcher.UP_eKTP("3000"));
+
         if (intTryCount <= intTryLimit)
         {
             OurUtility.Write_Log("==== Scan e-KTP", "step-action");

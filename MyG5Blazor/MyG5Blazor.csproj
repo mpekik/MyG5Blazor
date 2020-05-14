@@ -2,6 +2,9 @@
 
   <PropertyGroup>
     <TargetFramework>netcoreapp3.1</TargetFramework>
+    <OutputType>WinExe</OutputType>
+    <ApplicationIcon>favicon.ico</ApplicationIcon>
+    <StartupObject>MyG5Blazor.Program</StartupObject>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
@@ -12,6 +15,7 @@
     <PackageReference Include="Newtonsoft.Json" Version="12.0.3" />
     <PackageReference Include="runtime.native.System.IO.Ports" Version="4.7.0" />
     <PackageReference Include="System.Drawing.Common" Version="4.7.0" />
+    <PackageReference Include="System.Drawing.Primitives" Version="4.3.0" />
     <PackageReference Include="System.IO.Ports" Version="4.7.0" />
   </ItemGroup>
 
@@ -28,11 +32,17 @@
     <Reference Include="CardConnection">
       <HintPath>wwwroot\assets\DLLs_3rd_Party\ReadCard\CardConnection.dll</HintPath>
     </Reference>
+    <Reference Include="CCNET">
+      <HintPath>wwwroot\assets\DLLs_3rd_Party\BillAcceptor\CCNET.dll</HintPath>
+    </Reference>
     <Reference Include="CSL_card">
       <HintPath>wwwroot\assets\DLLs_3rd_Party\ReadCard\CSL_card.dll</HintPath>
     </Reference>
     <Reference Include="DarrenLee.Media">
       <HintPath>wwwroot\assets\DLLs_3rd_Party\Camera\DarrenLee.Media.dll</HintPath>
+    </Reference>
+    <Reference Include="ITLlib">
+      <HintPath>wwwroot\assets\DLLs_3rd_Party\BillAcceptor\ITLlib.dll</HintPath>
     </Reference>
     <Reference Include="utility2">
       <HintPath>wwwroot\assets\DLLs_3rd_Party\ReadCard\utility2.dll</HintPath>
