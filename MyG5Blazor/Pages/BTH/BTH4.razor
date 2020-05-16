@@ -654,6 +654,7 @@
                 if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    result = (string)jobjResult["transaction"]["statuscode"];
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
                 {
