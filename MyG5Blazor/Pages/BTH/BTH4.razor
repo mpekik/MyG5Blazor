@@ -14,6 +14,7 @@
 @inject Costumer cst
 @inject NavigationManager NavMan
 @inject EDC edc
+@inject BlazorTimer Timer
 @inject Transaction trans
 
 <div class=@pageClass>
@@ -307,17 +308,20 @@
     private bool IsExit = false;
     private bool IsVoid = false;
     private bool IsVoided = false;
+    private bool IsInvalid = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
     private int MetodePembayaran = 0;
 
     private string strNPS1Value = string.Empty;
+    private string strMsgError = string.Empty;
 
     private int intBill = 0;
     private int intAccBill = 0;
     private int intMinus = 0;
-    public string _myURL = "https://a88d0c1d.ngrok.io/";
+    //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
+    public string _myURL = "https://48fe5028.ngrok.io/";
     public string serviceURL = "mygrapari/bayar-halo/v1/payment";
 
     private string strBill => intBill.ToString();
@@ -325,14 +329,14 @@
     private string strMinus => intMinus.ToString();
     private string strInvoice = "1";
     private string strBilling = "2";
-    private string strCOM = "COM1";
+    private string strCOM = "COM7";
     private string result = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
         MetodePembayaran = cst.intMPembayaran;
         intBill = cst.intTagihan;
-        intAccBill = 10000;
+        //intAccBill = 10000;
         intMinus = intBill - intAccBill;
         switch (MetodePembayaran)
         {
@@ -345,7 +349,7 @@
                     pageClass = "main-panel bg-home";
                     if (edc.intTry < 3)
                     {
-                        OurUtility.Write_Log("Trace Number : " + edc.traceNumber,"step-action");
+                        OurUtility.Write_Log("Trace Number : " + edc.traceNumber, "step-action");
                         IsLoading = true;
                         await Task.Delay(2000);
                         await Payment("");
@@ -359,14 +363,24 @@
                         else
                         {
                             //ToDO Add if Void
-                            IsVoid = true;
+                            IsLoading = false;
+                            //IsVoid = true;
                             IsFail = true;
                             strInvoice = edc.traceNumber;
-                            OurUtility.Write_Log("== Void Payment Trace Number = "+strInvoice, "step-action");
-                            Void();
-                        }
-                        break;
+                            await Task.Delay(2000);
+                            if (trans.edcresp == "00")
+                            {
 
+                                IsFail = false;
+                                IsVoid = true;
+                                OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
+
+                                Void();
+                            }
+                        }
+                        Timer.SetTimer(20000);
+                        Timer.OnElapsed += TimerElapsedHandler;
+                        break;
                     }
                     else
                     {
@@ -378,24 +392,68 @@
             case 2:
                 {
                     pageClass = "main-panel bg-home";
-                    //TODO Integrate with Bill Acceptor
-                    CountMoneyBillAcceptor();
+                    await Task.Delay(2000);
+                    await MainLoop();
+                    intAccBill = Payout.total;
+                    await Payment("");
+                    Console.WriteLine("inttotal = " + inttotal);
+                    StateHasChanged();
+                    if (result == "00")
+                    {
+                        IsSuccess = true;
+                        Console.WriteLine("Payment Success");
+                        await Task.Delay(2000);
+                        IsVisible = true;
+                    }
+                    else
+                    {
+                        IsFail = true;
+                        Timer.SetTimer(20000);
+                        Timer.OnElapsed += TimerElapsedHandler;
+                    }
                     break;
                 }
             case 3:
                 {
                     pageClass = "main-panel bg-edc-process";
 
-                    //TODO Integrate with EDC Credit Card
+                    //TODO Integrate with EDC Debit Card
                     await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
                     pageClass = "main-panel bg-home";
                     if (edc.intTry < 3)
                     {
-                        Console.WriteLine("Trace Number : " + edc.traceNumber);
-                        IsSuccess = true;
-                        Console.WriteLine("Payment Success");
+                        OurUtility.Write_Log("Trace Number : " + edc.traceNumber, "step-action");
+                        IsLoading = true;
                         await Task.Delay(2000);
-                        IsVisible = true;
+                        await Payment("");
+                        if (result == "00")
+                        {
+                            IsSuccess = true;
+                            Console.WriteLine("Payment Success");
+                            await Task.Delay(2000);
+                            IsVisible = true;
+                        }
+                        else
+                        {
+                            //ToDO Add if Void
+                            IsLoading = false;
+                            //IsVoid = true;
+                            IsFail = true;
+                            strInvoice = edc.traceNumber;
+                            await Task.Delay(2000);
+                            if (trans.edcresp == "00")
+                            {
+
+                                IsFail = false;
+                                IsVoid = true;
+                                OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
+
+                                Void();
+                            }
+                        }
+                        Timer.SetTimer(20000);
+                        Timer.OnElapsed += TimerElapsedHandler;
+                        break;
                     }
                     else
                     {
@@ -413,14 +471,14 @@
     }
     private async Task CountMoneyBillAcceptor()
     {
-        while (intAccBill < intBill)
-        {
-            Task.Delay(1000);
-            await MainLoop();
-            intAccBill = Payout.total;
-            Console.WriteLine("inttotal = " + inttotal);
-            StateHasChanged();
-        }
+        StateHasChanged();
+        await Task.Delay(1000);
+        await MainLoop();
+        intAccBill = Payout.total;
+        await Payment("");
+        Console.WriteLine("inttotal = " + inttotal);
+        StateHasChanged();
+
     }
 
     private async Task Void()
@@ -470,19 +528,25 @@
         edc.serialPort = new SerialPort();
         edc.serialPort.PortName = serialPortName;
         edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
-        //do
-        //{
-        await Task.Delay(5000);
-        if (edc.respondCode == "00")
+        do
         {
-            OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
-            trans.ecr = edc.ecr;
-            return;
-        }
-        edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
-        edc.mre.WaitOne();
+            await Task.Delay(2000);
+            if (edc.respondCode == "00")
+            {
+                OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
+                trans.ecr = edc.ecr;
+                trans.edcresp = edc.respondCode;
+                IsLoading = true;
+                pageClass = "main-panel bg-home";
+                return;
+            }
+            edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
+            //edc.mre.WaitOne();
+        } while (!edc.mre.WaitOne());
         //} while (edc.intTry < 3);
         trans.ecr = edc.ecr;
+        trans.edcresp = edc.respondCode;
+        Console.WriteLine(trans.edcresp);
     }
 
     private async Task Void(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
@@ -494,7 +558,7 @@
         edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
         do
         {
-            await Task.Delay(5000);
+            await Task.Delay(2000);
             if (edc.respondCode == "00")
             {
                 IsVoided = true;
@@ -508,28 +572,32 @@
 
             Console.WriteLine(edc.respondCode);
         } while (!edc.mre.WaitOne());
-        await Task.Delay(10000);
-        NavigateTo("");
+        Timer.SetTimer(20000);
+        Timer.OnElapsed += TimerElapsedHandler;
     }
     public static async Task<string> PostCallAPI(string url, string jsonString)
     {
         string ret = string.Empty;
         try
         {
-            using (HttpClient client = new HttpClient())
+            using (var handler = new HttpClientHandler())
             {
-                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, content);
-                if (response != null)
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
                 {
-                    if (response.IsSuccessStatusCode)
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
                     {
-                        var jsonStringResult = await response.Content.ReadAsStringAsync();
-                        return jsonStringResult;
-                    }
-                    else
-                    {
-                        return response.StatusCode.ToString();
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
                     }
                 }
             }
@@ -556,7 +624,7 @@
                                     "\"fee\" : \"" + trans.fee + "\"," +
                                     "\"bit61\" : \"" + trans.bit + "\"," +
                                     "\"edc\" : {" +
-                                    "\"responseCode\" : \""+edc.respondCode+"\","+
+                                    "\"responseCode\" : \"" + edc.respondCode + "\"," +
                                     "\"ecr\" : \"" + trans.ecr + "\"}" +
                                     "}";
         }
@@ -566,7 +634,7 @@
                 "\"terminalId\" : \"" + trans.termID + "\"," +
                 "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                 "\"amount\" : \"" + cst.intTagihan + "\"," +
-                "\"submitAmount\" : \"" + strBill + "\"," +
+                "\"submitAmount\" : \"" + strAccBill + "\"," +
                                     "\"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
                                     "\"fee\" : \"" + trans.fee + "\"," +
                                     "\"bit48\" : \"" + trans.bit + "\"" +
@@ -589,7 +657,7 @@
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
                 {
-                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                    if ((string)jobjResult["transaction"]["errorCode"] != null || (string)jobjResult["transaction"]["statusDesc"] != null)
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
@@ -601,6 +669,13 @@
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                {
+                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    IsLoading = false;
+                    IsVisible = false;
+                    IsInvalid = true;
                 }
                 result = (string)jobjResult["transaction"]["statuscode"];
             }
@@ -623,14 +698,6 @@
     int reconnectionAttempts = 5;
     bool Running = false;
 
-    private async Task ReturnLoop()
-    {
-        while (inttotal < 30000)
-        {
-
-        }
-    }
-
     private async Task MainLoop()
     {
         Payout.CommandStructure.ComPort = global.ComPort;
@@ -645,9 +712,9 @@
             //Payout.ConfigureBezel(0x00, 0xFF, 0x00);
         }
 
-        while (Payout.total < 30000)
+        while (Payout.total < cst.intTagihan)
         {
-            Task.Delay(500);
+            await Task.Delay(1000);
             Console.WriteLine("2");
             if (!Payout.DoPoll())
             {
@@ -668,7 +735,7 @@
             StateHasChanged();
             // UpdateUI();
             //if(!bFormSetup)
-            //{                    
+            //{
             //}
         }
         Console.WriteLine("10");
@@ -729,6 +796,11 @@
             }
         }
         return false;
+    }
+
+    private void TimerElapsedHandler()
+    {
+        NavMan.NavigateTo("");
     }
     private void NavigateTo(string strURL)
     {

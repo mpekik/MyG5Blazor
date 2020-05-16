@@ -62,11 +62,11 @@
                         {
                             @if (MenuCount == 0)
                             {
-                                <img @onclick="@(()=>NavMan.NavigateTo("/u4g/4"))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG height=@HeightPNG style=@strStyle[1]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[1],apiURL[1],arrayTrans[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG height=@HeightPNG style=@strStyle[1]>
                             }
                             else
                             {
-                                <img @onclick="@(()=>NavMan.NavigateTo("/u4g/4"))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG style=@strStyle[1]>
+                                <img @onclick="@(()=>CheckStatus(hrefMenu[1],apiURL[1],arrayTrans[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG style=@strStyle[1]>
                             }
                             MenuCount += 1;
                         }
@@ -129,7 +129,8 @@
 
     private bool IsLoading = false;
 
-    private static string _myURL = "https://a88d0c1d.ngrok.io/";
+    //private static string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
+    public string _myURL = "https://48fe5028.ngrok.io/";
     private string[] apiURL = { "mygrapari/bayar-halo/v1/init", "mygrapari/upgrade-4g/v1/init", "mygrapari/isi-pulsa/v1/init", "mygrapari/ganti-kartu/v1/init" };
     private string _termID = string.Empty;
 
@@ -137,6 +138,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        Switcher.DOWN_eKTP("500");
+        Switcher.DOWN_Reader_1("500");
         cst.Clear();
         trans.ClearTransaction();
         CheckMenuStatus();
@@ -162,7 +165,7 @@
         _termID = "T9999999";
         string myJson = "{\"terminalId\": \"" + _termID + "\"}";
         string myURL = _myURL + strAPIURL;
-        
+
         OurUtility.Write_Log("= Get Menu Status Code", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
@@ -217,19 +220,23 @@
         string ret = string.Empty;
         try
         {
-            using (HttpClient client = new HttpClient())
+            using (var handler = new HttpClientHandler())
             {
-                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, content);
-                if (response != null)
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
                 {
-                    if (response.IsSuccessStatusCode)
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
                     {
-                        var jsonStringResult = await response.Content.ReadAsStringAsync();
-                        return jsonStringResult;
-                    }else
-                    {
-                        return response.StatusCode.ToString();
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        } else
+                        {
+                            return response.StatusCode.ToString();
+                        }
                     }
                 }
             }

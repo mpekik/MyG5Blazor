@@ -101,7 +101,7 @@
                 <div class="modal-body">
                     <p class="text-body">Anda akan melakukan <span style="font-weight: bold;">Pembayaran Tagihan kartuHalo</span> untuk nomor :</p>
                     <p style="font-size: 25pt; font-weight: bold;">@strNumber</p>
-                    <button @onclick="@(()=>CheckNumber("/bth/2"))" class="btn btn-danger modal-button">Lanjut</button>
+                    <button @onclick="@(()=>CheckNumber("/bth/2a"))" class="btn btn-danger modal-button">Lanjut</button>
                     <button class="btn btn-light modal-button" @onclick="@(() => OkOnClick(false))">Batal</button>
                 </div>
             </div>
@@ -117,7 +117,7 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body"><span style="font-weight: bold;">Nomor tidak dikenali,</span> harap masukkan nomor Telkomsel yang benar dan aktif</p>
+                    <p class="text-body">@((MarkupString)strMsgError)</p>
                     <button class="btn btn-danger modal-button" @onclick="@(() => OkOnClick(false))">OK</button>
                 </div>
             </div>
@@ -141,7 +141,10 @@
     private bool IsInvalid = false;
     private bool isLoading = false;
 
-    public string _myURL = "https://a88d0c1d.ngrok.io/";
+    private string strMsgError = string.Empty;
+    //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
+    public string _myURL = "https://48fe5028.ngrok.io/";
+
     public string serviceURL = "mygrapari/bayar-halo/v1/submit-nohp";
     private string _termID = string.Empty;
     private string msg = string.Empty;
@@ -198,20 +201,24 @@
         string ret = string.Empty;
         try
         {
-            using (HttpClient client = new HttpClient())
+            using (var handler = new HttpClientHandler())
             {
-                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, content);
-                if (response != null)
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
                 {
-                    if (response.IsSuccessStatusCode)
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
                     {
-                        var jsonStringResult = await response.Content.ReadAsStringAsync();
-                        return jsonStringResult;
-                    }
-                    else
-                    {
-                        return response.StatusCode.ToString();
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
                     }
                 }
             }
@@ -248,10 +255,11 @@
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
                     trans.SetTransaction((string)jobjResult["transaction"]["transactionId"]);
-                    cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"]);
+                    cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"], (string)jobjResult["profile"]["idNumber"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
-
-
+                    cst.intTagihan = OurUtility.ToInt32((string)jobjResult["tagihan"]);
+                    //trans.transID = "-";
+                    //cst.PhoneNumber = "62" + strNumber.Substring(1);
                     NavMan.NavigateTo(strURL);
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
@@ -272,6 +280,8 @@
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                 {
+                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    isLoading = false;
                     IsVisible = false;
                     IsInvalid = true;
                 }

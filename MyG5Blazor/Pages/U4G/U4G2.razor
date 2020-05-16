@@ -138,6 +138,7 @@
     protected override async Task OnInitializedAsync()
     {
         OurUtility.Write_Log("== Scan e-KTP Page", "step-action");
+        Switcher.UP_eKTP("3000");
     }
 
     private async Task CheckEKTP()
@@ -157,7 +158,7 @@
     {
         IsLoading = true;
         OurUtility.Write_Log("=== Switcher.UP_eKTP", "step-action");
-        await Task.Run(() => Switcher.UP_eKTP("3000"));
+
         if (intTryCount <= intTryLimit)
         {
             OurUtility.Write_Log("=== Scan e-KTP", "step-action");

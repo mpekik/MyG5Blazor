@@ -10,6 +10,7 @@
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavMan
 @inject Costumer cst
+@inject BlazorTimer Timer
 @inject Transaction trans
 
 <div class="main-panel bg-home">
@@ -101,6 +102,20 @@
     </div>
 </footer>
 
+@if (IsInvalid)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">@((MarkupString)strMsgError)</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => NavigateTo(""))">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @if (isVisible)
 {
     <!-- The Modal -->
@@ -161,6 +176,7 @@
     private bool isLoading = false;
     private bool isSuccess = false;
     private bool isFail = false;
+    private bool IsInvalid = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
@@ -168,6 +184,7 @@
     private string strNPS1Value = string.Empty;
     private string[] strNPS2Value = { "", "", "", "" };
 
+    private string strMsgError = string.Empty;
     private string msg = string.Empty;
     private string errorcode = string.Empty;
     private string strCOM = "COM1";
@@ -184,7 +201,8 @@
             "buid" : "buid yang didapat pas init",
             "serialNumber" : "serial number kartu"
             {\"terminalId\": \"T0999\"}*/
-    private static string _myURL = "https://a88d0c1d.ngrok.io/";
+    //private static string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
+    public string _myURL = "https://48fe5028.ngrok.io/";
     private static string persoURL = "mygrapari/ganti-kartu/v1/perso";
     private static string updateURL = "mygrapari/perso/v1/update";
     private static string myJson = string.Empty;
@@ -199,9 +217,8 @@
         Switcher.DOWN_eKTP("500");
         OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
         isLoading = true;
-
+        Switcher.UP_Reader_1("3000");
         await MyPerso();
-        Switcher.DOWN_Reader_1("500");
         if (isError)
         {
             NavMan.NavigateTo("/error");
@@ -213,20 +230,24 @@
         string ret = string.Empty;
         try
         {
-            using (HttpClient client = new HttpClient())
+            using (var handler = new HttpClientHandler())
             {
-                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, content);
-                if (response != null)
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
                 {
-                    if (response.IsSuccessStatusCode)
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
                     {
-                        var jsonStringResult = await response.Content.ReadAsStringAsync();
-                        return jsonStringResult;
-                    }
-                    else
-                    {
-                        return response.StatusCode.ToString();
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
                     }
                 }
             }
@@ -240,11 +261,16 @@
 
     private async Task MyPerso()
     {
-        Switcher.UP_Reader_1("3000");
-        while (intTryCount < intTryLimit)
+        while (intTryCount <= intTryLimit)
         {
             if (await Task.Run(() => MoveToICC()))
             {
+
+                if (!cds.Start(ref errorcode, strCOM, ref msg))
+                {
+                    OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
+                    return;
+                }
                 //ToDO if Reader error
                 if (await CardReaderScan())
                 {
@@ -296,10 +322,7 @@
                                     {
                                         trans.mypersoResponse = msg;
                                         await Task.Run(() => MoveToBin());
-                                        if (intTryCount <= intTryLimit)
-                                            intTryCount += 1;
-                                        else
-                                            isFail = true;
+
                                         myURL = _myURL + updateURL;
                                         myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                             "\"terminalId\" : \"" + trans.termID + "\"," +
@@ -309,15 +332,29 @@
                                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                         strResult = await PostCallAPI(myURL, myJson);
                                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                        if (intTryCount <= intTryLimit)
+                                            intTryCount += 1;
+                                        else
+                                        {
+                                            isFail = true;
+                                            break;
+                                        }
                                     }
                                 }
                                 else
                                 {
-                                    isError = true;
-                                    break;
+                                    await Task.Run(() => MoveToBin());
+                                    if (intTryCount <= intTryLimit)
+                                        intTryCount += 1;
+                                    else
+                                    {
+                                        isFail = true;
+                                        break;
+                                    }
                                 }
+
                             }
-                            else
+                            else if ((string)jobjResult["transaction"]["statusCode"] == "01")
                             {
                                 if ((string)jobjResult["transaction"]["errorCode"] != null)
                                 {
@@ -339,8 +376,22 @@
                                         trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                                     }
                                 }
-                                isError = true;
                                 await Task.Run(() => MoveToBin());
+                                if (intTryCount <= intTryLimit)
+                                    intTryCount += 1;
+                                else
+                                {
+                                    isFail = true;
+                                    break;
+                                }
+                            }
+                            else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                            {
+                                strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                                isLoading = false;
+                                //IsVisible = false;
+                                IsInvalid = true;
+                                isFail = true;
                                 break;
                             }
                         }
@@ -363,7 +414,13 @@
                 else
                 {
                     await Task.Run(() => MoveToBin());
-                    intTryCount += 1;
+                    if (intTryCount <= intTryLimit)
+                        intTryCount += 1;
+                    else
+                    {
+                        isFail = true;
+                        break;
+                    }
                 }
             }
             else
@@ -374,6 +431,8 @@
                 break;
             }
         }
+        Timer.SetTimer(20000);
+        Timer.OnElapsed += TimerElapsedHandler;
     }
 
     private async Task CheckPerso()
@@ -487,4 +546,8 @@
         }
         return ret;
     }
+    private void TimerElapsedHandler()
+    {
+        NavMan.NavigateTo("");
     }
+}

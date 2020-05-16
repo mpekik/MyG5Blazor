@@ -36,7 +36,7 @@ namespace MyG5Blazor.Data
             p_message = string.Empty;
             p_errorCode = string.Empty;
 
-            com_Serial = "COM6";
+            com_Serial = "COM1";
 
             try
             {

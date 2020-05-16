@@ -64,7 +64,7 @@
             <span class="dot">4</span>
         </div>
         <div class="footer-side2">
-            <button @onclick="@(() => NavigateTo("/bth/1"))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(() => NavigateTo("/bth/2a"))" class="btn-arrow btn" value="">Kembali</button>
             <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu<br>Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
@@ -82,12 +82,16 @@
 }
 @code
 {
+    private bool IsInvalid = false;
     private bool isLoading = false;
-    public string _myURL = "https://a88d0c1d.ngrok.io/";
+    //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
+    public string _myURL = "https://48fe5028.ngrok.io/";
+
     public string serviceURL = "mygrapari/bayar-halo/v1/get-bill";
     private string _termID = string.Empty;
     private string msg = string.Empty;
     private string errorcode = string.Empty;
+    private string strMsgError = string.Empty;
 
     private void SetPaymentMethod(int _intMPembayaran)
     {
@@ -106,20 +110,24 @@
         string ret = string.Empty;
         try
         {
-            using (HttpClient client = new HttpClient())
+            using (var handler = new HttpClientHandler())
             {
-                var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                var response = await client.PostAsync(url, content);
-                if (response != null)
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
                 {
-                    if (response.IsSuccessStatusCode)
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
                     {
-                        var jsonStringResult = await response.Content.ReadAsStringAsync();
-                        return jsonStringResult;
-                    }
-                    else
-                    {
-                        return response.StatusCode.ToString();
+                        if (response.IsSuccessStatusCode)
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
                     }
                 }
             }
@@ -135,7 +143,7 @@
     {
         isLoading = true;
         await Task.Delay(10000);
-        /*string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
             "\"terminalId\" : \"" + trans.termID + "\"," +
             "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                                 "\"paymentMethod\" : \"" + trans.paymentMethod + "\"" +
@@ -164,23 +172,33 @@
                     else if ((string)jobjResult["billPayment"]["bit48"] != null)
                         trans.bit = (string)jobjResult["billPayment"]["bit48"];
                     trans.fee = (string)jobjResult["billPayment"]["fee"];
-                    */NavMan.NavigateTo(strURL);/*
+
+                    trans.transID = (string)jobjResult["transaction"]["transactionId"];
+
+                    NavMan.NavigateTo(strURL);
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
                 {
                     if ((string)jobjResult["transaction"]["errorCode"] != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                        string _statusDescSub = ((string)jobjResult["transaction"]["statusCode"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
                     NavMan.NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                {
+                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    isLoading = false;
+                    //IsVisible = false;
+                    IsInvalid = true;
                 }
             }
             catch (Exception ex)
@@ -195,6 +213,6 @@
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             NavMan.NavigateTo("/error");
-        }*/
+        }
     }
 }

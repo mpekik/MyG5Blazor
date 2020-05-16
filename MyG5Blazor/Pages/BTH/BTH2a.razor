@@ -1,4 +1,4 @@
-﻿@page "/bth/3"
+﻿@page "/bth/2a"
 
 @using MyG5Blazor.Data 
 
@@ -30,33 +30,13 @@
                             <div id="konfirmasi-teks" class="teks-status-halo">
                                 Pada nomor <b class="teks-bold"> @cst.PhoneNumber</b> terbaca
                                 memiliki tagihan sebesar <b class="teks-bold">Rp @cst.intTagihan.ToString("N0").</b>
-                                dengan rincian sebagai berikut:
-                            </div>
-                            <div id="list-tagihan" class="teks-footer-halo">
-                                @foreach (dynamic t in cst.GetlistTagihan)
-                                {
-                                    <li>@t._tglTagihan  <b>=</b> Rp @t._intTagihan.ToString("N0")</li>
-                                }
                             </div>
                         }
                         else
                         {
-                            if (cst.intMPembayaran == 2)
-                            {
-                                <div id="teks-konfirmasi">
-                                    <div class="teks-status"> Konfirmasi Pembayaran Tagihan KartuHalo </div>
-                                </div>
-                                <div id="bayar1">
-                                    <div class="teks-center" style="text-transform: uppercase; font-weight: bold;">Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian</div>
-                                </div>
-                                <div id="info">
-                                    <div class="teks-footer2" style="font-weight: bold;">NILAI DARI KELEBIHAN PEMBAYARAN SECARA OTOMATIS AKAN MENGURANGI TAGIHAN KARTUHALO ANDA DI BULAN BERIKUTNYA.</div>
-                                </div>
-                            }
-                            else
-                            {
+                            
                                 <div id="konfirmasi-teks" class="teks-center"> Konfirmasi Pembayaran Tagihan KartuHalo</div>
-                            }
+                            
                         }
                     </div>
 
@@ -64,7 +44,7 @@
                         @if (!IsLanjut)
                         {
                             <div id="btn-lanjut" class="teks-nominal"> Tekan <b class="teks-bold">LANJUT</b> Untuk Melanjutkan
-                                <button class="btn btn-danger btn-right" @onclick="@(() => IsLanjut = true)" id="btn-ok" value="">Lanjut</button>
+                                <button class="btn btn-danger btn-right" @onclick="@(() => NavigateTo("/bth/2"))" id="btn-ok" value="">Lanjut</button>
                             </div>
                         }
                         else
@@ -87,7 +67,7 @@
                                     <td>&emsp;<span style="font-weight: bold;">@cst.strMPembayaran</span></td>
                                 </tr>
                             </table>
-                            <button class="btn btn-danger btn-right" @onclick="@(() => NavigateTo("/bth/4"))" id="btn-ok" value="">OK</button>
+                            <button class="btn btn-danger btn-right" @onclick="@(() => NavigateTo("/bth/2"))" id="btn-ok" value="">OK</button>
                         </div>
                         }
                     </div>
@@ -98,15 +78,14 @@
         <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
         <footer>
             <div class="footer-side1">
-                <span class="dot">1</span>
+                <span class="dot" id="dot-active">1</span>
                 <span class="dot">2</span>
-                <span class="dot" id="dot-active">3</span>
+                <span class="dot">3</span>
                 <span class="dot">4</span>
             </div>
             <div class="footer-side2">
-                
-                    <button @onclick="@(() => NavigateTo("/bth/2"))" class="btn-arrow btn" value="">Kembali</button>
-                
+                    <button @onclick="@(()=>NavigateTo("/bth/1"))" class="btn-arrow btn" value="">Kembali</button>
+
                 <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu<br>Utama</button>
                 <!-- <sup>Powered By </sup>Trilogi Persada -->
             </div>
@@ -120,7 +99,7 @@
     private string strTotalTagihan => intTotalTagihan.ToString();
     protected override async Task OnInitializedAsync()
     {
-        TotalTagihan();
+        //TotalTagihan();
     }
 
     private void buttonOk()
@@ -139,7 +118,7 @@
         {
             intTotalTagihan += t._intTagihan;
         }
-        cst.intTagihan = intTotalTagihan;
+        //cst.intTagihan = intTotalTagihan;
     }
 
     private void NavigateTo(string strURL)

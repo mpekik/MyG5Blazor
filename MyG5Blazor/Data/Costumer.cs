@@ -58,12 +58,13 @@ namespace MyG5Blazor.Data
             intTagihan = 0;
             _listTagihan.Clear();
         }
-        public void CostumerProfile(string strType, string strName, string strPhoneNumber, string strIDType)
+        public void CostumerProfile(string strType, string strName, string strPhoneNumber, string strIDType, string strEKTPNumber)
         {
             Type = strType;
             Name = strName;
             PhoneNumber = strPhoneNumber;
             IDType = strIDType;
+            EKTPNumber = strEKTPNumber;
         }
         public void ClearTagihan()
         {

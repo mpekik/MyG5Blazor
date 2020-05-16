@@ -7,7 +7,7 @@ namespace MyG5Blazor.Data
 {
     public class Global
     {
-        public string ComPort = "COM6";
+        public string ComPort = "COM2";
         public byte SSPAddress = 0;
     }
 }

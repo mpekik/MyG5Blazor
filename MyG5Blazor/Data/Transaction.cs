@@ -20,6 +20,7 @@ namespace MyG5Blazor.Data
         public string bit = string.Empty;
         public string fee = string.Empty;
         public string ecr = string.Empty;
+        public string edcresp = string.Empty;
         public void SetTransaction(string strTransID, string strBUID, string strTermID,string strJenisTrans)
         {
             transID = strTransID;
