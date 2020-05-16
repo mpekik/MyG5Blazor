@@ -118,7 +118,7 @@
         </div>
     </div>
 }
-@if (IsVisible)
+@if (isVisible)
 {
     <!-- The Modal -->
     <div id="myModal" class="modal">
@@ -129,7 +129,7 @@
                 </div> -->
                 <div class="modal-body">
                     <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
-                    <p class="text-nps">Seberapa besar kemungkinan Anda untuk merekomendasikan layanan MyGraPARI kepada teman atau kolega Anda? </p>
+                    <p class="text-nps">@surveys[CESno].quIndText</p>
                     <button class="btn nps-button" value="1" @onclick="@(() => InputNPS1("1"))">1</button>
                     <button class="btn nps-button" value="2" @onclick="@(() => InputNPS1("2"))">2</button>
                     <button class="btn nps-button" value="3" @onclick="@(() => InputNPS1("3"))">3</button>
@@ -140,7 +140,7 @@
                     <button class="btn nps-button" value="8" @onclick="@(() => InputNPS1("8"))">8</button>
                     <button class="btn nps-button" value="9" @onclick="@(() => InputNPS1("9"))">9</button>
                     <button class="btn nps-button" value="10" @onclick="@(() => InputNPS1("10"))">10</button>
-                    <button @onclick="CheckNPS" class="btn btn-danger button-nps">OK</button>
+                    <button @onclick="NPS" class="btn btn-danger button-nps">OK</button>
                     <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                 </div>
             </div>
@@ -148,7 +148,7 @@
     </div>
 }
 
-@if (IsVisible2)
+@if (isVisible2)
 {
     <!-- The Modal -->
     <div id="myModal" class="modal">
@@ -172,9 +172,11 @@
 }
 
 @code{
+    public List<CES> surveys = new List<CES>();
+
     private bool isError = false;
-    private bool IsVisible = false;
-    private bool IsVisible2 = false;
+    private bool isVisible = false;
+    private bool isVisible2 = false;
     private bool isLoading = false;
     private bool isSuccess = false;
     private bool isFail = false;
@@ -182,6 +184,7 @@
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
+    private int CESno =0;
 
     private string strNPS1Value = string.Empty;
     private string[] strNPS2Value = { "", "", "", "" };
@@ -207,6 +210,7 @@
     public string _myURL = "https://48fe5028.ngrok.io/";
     private static string persoURL = "mygrapari/upgrade-4g/v1/perso";
     private static string updateURL = "mygrapari/perso/v1/update";
+    private static string cesURL = "mygrapari/ces/v1/eligibility-check";
     private static string myJson = string.Empty;
 
     private void NavigateTo(string strURL)
@@ -216,16 +220,17 @@
 
     protected override async Task OnInitializedAsync()
     {
-        OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
         Switcher.DOWN_eKTP("500");
+        OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
         isLoading = true;
-        //cst.EKTPNumber = "1771011209620002";
-
         Switcher.UP_Reader_1("3000");
         await MyPerso();
         if (isError)
         {
             NavMan.NavigateTo("/error");
+        }else if(isSuccess)
+        {
+        await CheckNPS("");
         }
     }
 
@@ -393,7 +398,7 @@
                             {
                                 strMsgError = (string)jobjResult["transaction"]["statusDesc"];
                                 isLoading = false;
-                                //IsVisible = false;
+                                //isVisible = false;
                                 IsInvalid = true;
                                 isFail = true;
                                 break;
@@ -444,7 +449,7 @@
 
     private async Task CheckPerso()
     {
-        if (!isLoading && !isSuccess && !isFail && !IsVisible)
+        if (!isLoading && !isSuccess && !isFail && !isVisible)
         {
             isLoading = true;
         }
@@ -463,17 +468,92 @@
         strNPS1Value = strInput;
     }
 
-    private async Task CheckNPS()
+    private async Task NPS()
     {
-        if (!IsVisible)
+        surveys[CESno].answValue = strNPS1Value;
+        CESno += 1;
+        if (CESno >= surveys.Count())
         {
-            IsVisible = true;
+            isVisible = false;
+            StateHasChanged();
+            await Task.Delay(2000);
+            //ToDo Send Answer
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
+        }
+    }
+    private async Task CheckNPS(string strURL)
+    {
+
+        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                                "\"terminalId\" : \"" + trans.termID + "\"" +
+                                "}";
+        string myURL = _myURL + cesURL;
+
+        OurUtility.Write_Log("== Check CES", "step-action");
+        OurUtility.Write_Log("== URL API : " + myURL, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await PostCallAPI(myURL, myJson);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        if (strResult != null)
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                {
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    foreach (var question in jobjResult.SelectToken("surveys"))
+                    {
+                        CES c = new CES();
+                        c.quIndText = question.SelectToken("questionTextInd").ToString();
+                        c.quEngText = question.SelectToken("questionTextEn").ToString();
+                        c.quID = question.SelectToken("questionId").ToString();
+                        c.answID = question.SelectToken("answerId").ToString();
+                        surveys.Add(c);
+                    }
+                    isVisible = true;
+                    return;
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                {
+                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                    }
+                    else
+                    {
+                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        trans.errorCode = statusDescSub;
+                    }
+                    //                    IsLoading = false;
+                    //                  isVisible = false;
+                    //                IsInvalid = true;
+                    NavMan.NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                {
+                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    isVisible = false;
+                    IsInvalid = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                trans.errorCode = strResult;
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                NavMan.NavigateTo("/error");
+            }
         }
         else
         {
-            strNPS1Value = string.Empty;
-            IsVisible = false;
-            IsVisible2 = true;
+            trans.errorCode = strResult;
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            NavMan.NavigateTo("/error");
         }
     }
 
