@@ -306,6 +306,9 @@ namespace MyG5Blazor.Data
             byte[] data2 = StringToByteArray(data);
             byte[] data2_with_lrc = LRC(data2);
 
+            serialPort.PortName = port.PortName;
+            serialPort.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
+
             Console.WriteLine("1");
             serialPort.Open();
 

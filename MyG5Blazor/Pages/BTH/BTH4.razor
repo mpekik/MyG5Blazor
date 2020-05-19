@@ -527,22 +527,23 @@
         edc.Clear();
         edc.serialPort = new SerialPort();
         edc.serialPort.PortName = serialPortName;
-        edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
-        do
+        //edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
+        //do
+        //{
+        edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
+
+        await Task.Delay(2000);
+        if (edc.respondCode == "00")
         {
-            await Task.Delay(2000);
-            if (edc.respondCode == "00")
-            {
-                OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
-                trans.ecr = edc.ecr;
-                trans.edcresp = edc.respondCode;
-                IsLoading = true;
-                pageClass = "main-panel bg-home";
-                return;
-            }
-            edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
-            //edc.mre.WaitOne();
-        } while (!edc.mre.WaitOne());
+            OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
+            trans.ecr = edc.ecr;
+            trans.edcresp = edc.respondCode;
+            IsLoading = true;
+            pageClass = "main-panel bg-home";
+            return;
+        }
+        //edc.mre.WaitOne();
+        //} while (!edc.mre.WaitOne());
         //} while (edc.intTry < 3);
         trans.ecr = edc.ecr;
         trans.edcresp = edc.respondCode;
