@@ -7,7 +7,12 @@ namespace MyG5Blazor.Data
 {
     public class Global
     {
-        public string ComPort = "COM2";
+        public string ComPort = "COM";
         public byte SSPAddress = 0;
+        Config config = new Config();
+        public Global()
+        {
+            ComPort = ComPort + config.Read("BILL",Config.PARAM_BILL_PORT);
+        }
     }
 }

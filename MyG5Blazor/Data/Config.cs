@@ -4,6 +4,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using IniParser;
 using IniParser.Model;
+using System.IO;
 
 namespace MyG5Blazor.Data
 {
@@ -100,14 +101,18 @@ namespace MyG5Blazor.Data
         public const string PARAM_NV200_PORT = "param.nv200.port";
         public const string PARAM_NV200_BANK_STOK = "param.nv200.bank.stok";
         public const string PARAM_NV200_AMOUNT = "param.nv200.amount";
-
+        // EKTP
+        public const string PARAM_EKTP_PCID = "param.ektp.pcid";
+        public const string PARAM_EKTP_CONF = "param.ektp.conf";
         private FileIniDataParser iniFile = new FileIniDataParser();
         private IniData iniData = null;
 
         private string fileName = "MyGraPARI-config.properties";
 
         public Config()
-        { }
+        {
+            fileName= Directory.GetCurrentDirectory() + @"\" + "MyGraPARI-config.properties";
+        }
 
         public Config(string p_fileName)
         {

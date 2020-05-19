@@ -12,7 +12,7 @@
 @inject Costumer cst
 @inject NavigationManager NavMan
 @inject Transaction trans
-
+@inject Config config 
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -149,6 +149,7 @@
     private string strMsgError = string.Empty;
     protected override async Task OnInitializedAsync()
     {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         OurUtility.Write_Log("= Upgrade dan Ganti Kartu 4G", "step-action");
         OurUtility.Write_Log("== Step 1. Insert Phone Number Page", "step-action");
     }

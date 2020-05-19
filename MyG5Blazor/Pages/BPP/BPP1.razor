@@ -9,7 +9,8 @@
 @using MyG5Blazor.Data
 @using System.Drawing.Printing
 @using System.Drawing 
-
+@using System.IO
+ 
 @inject IJSRuntime JSRuntime
 @inject Costumer cst
 @inject NavigationManager NavMan
@@ -292,7 +293,7 @@
 
         PrintContent prtContent = new PrintContent();
         string msg = string.Empty;
-        string logoTsel = "C:\\Logo_MyGraPARI_mini.png";
+        string logoTsel = Directory.GetCurrentDirectory() + @"\"+"Logo_MyGraPARI_mini.png";
 
         config.terminalDesc = "GraPARI Trilogi DEV";
         config.terminalLocation = "Plaza Semanggi";

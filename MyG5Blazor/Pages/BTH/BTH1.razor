@@ -14,7 +14,7 @@
 @inject Card_Dispenser cds
 @inject Transaction trans
 @inject Menu menu 
-
+@inject Config config 
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -153,6 +153,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         cst.Clear();
         StateHasChanged();
         OurUtility.Write_Log("= Bayar Tagihan KartuHalo", "step-action");

@@ -52,7 +52,22 @@ namespace MyG5Blazor.Data
                 p_message = ex.Message;
             }
         }
-
+        public static string strIns(string strData, string strInsert)
+        {
+            int i = 0;
+            string strRet = strData;
+            try
+            {
+                for (i = strRet.Length - 2; i > 0; i -= 2)
+                {
+                    strRet = strRet.Insert(i, strInsert);
+                }
+            }
+            catch (Exception ex)
+            {
+            }
+            return strRet;
+        }
         public static string Directory_Logs()
         {
             string dir = Directory.GetCurrentDirectory() + @"\Logs";

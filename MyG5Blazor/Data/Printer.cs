@@ -89,7 +89,7 @@ namespace MyG5Blazor.Data
             float lineheight12 = font12.GetHeight() + leading;
             float lineheight14 = font14.GetHeight() + leading;
 
-            float _startX = 10;
+            float _startX = 20;
             float _startY = leading;
             float Offset = 0;
 
@@ -101,7 +101,7 @@ namespace MyG5Blazor.Data
             formatRight.Alignment = StringAlignment.Far;
             formatLeft.Alignment = StringAlignment.Near;
 
-            SizeF layoutSize = new SizeF(270 - Offset * 2, lineheight14);
+            SizeF layoutSize = new SizeF(280 - Offset * 2, lineheight14);
 
             Brush brush = Brushes.Black;
             try
@@ -109,7 +109,7 @@ namespace MyG5Blazor.Data
                 Font font = new Font(font_family, font_size);
                 float fontHeight = font.GetHeight();
 
-                Image img = Image.FromFile("C:\\Logo_MyGraPARI_mini.png");
+                Image img = Image.FromFile(logoTsel);
                 if(e!=null)
                 e.Graphics.DrawImage(img, (e.PageBounds.Width - img.Width) / 2,
                      0,
@@ -225,8 +225,8 @@ namespace MyG5Blazor.Data
             {
                 int margin_top = 5;
                 int margin_bottom = 5;
-                int margin_left = 20;
-                int margin_right = 20;
+                int margin_left = 5;
+                int margin_right = 5;
                 int height = 0;
                 Margins margin = new Margins(margin_left, margin_right, margin_top, margin_bottom);
                 PrintDocument document = Document(_header, _content, _logoTsel, _footer, ref height);

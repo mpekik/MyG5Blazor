@@ -317,6 +317,7 @@
 
     private string strNPS1Value = string.Empty;
     private string strMsgError = string.Empty;
+    private string strBillCom = string.Empty;
 
     private int intBill = 0;
     private int intAccBill = 0;
@@ -330,11 +331,13 @@
     private string strMinus => intMinus.ToString();
     private string strInvoice = "1";
     private string strBilling = "2";
-    private string strCOM = "COM11";
+    private string strCOM = "COM";
     private string resultPayment = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        strCOM = strCOM + config.Read("EDC", Config.PARAM_EDC_PORT);
         MetodePembayaran = cst.intMPembayaran;
         intBill = cst.intTagihan;
         //intAccBill = 10000;
