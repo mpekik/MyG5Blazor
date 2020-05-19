@@ -15,9 +15,11 @@ namespace MyG5Blazor.Data
         private string _traceNumber = string.Empty;
         private string _respondCode = string.Empty;
         private string _ecr = string.Empty;
+        private string _approvalCode = string.Empty;
         public string traceNumber => _traceNumber;
         public string respondCode => _respondCode;
         public string ecr => _ecr;
+        public string approvalCode => _approvalCode;
         string strTransType = string.Empty;
         string dataSplit = string.Empty;
         public AutoResetEvent mre = new AutoResetEvent(false);
@@ -27,6 +29,7 @@ namespace MyG5Blazor.Data
         {
             _traceNumber = string.Empty;
             _respondCode = string.Empty;
+            _approvalCode = string.Empty;
             dataRespond = string.Empty;
             strTransType = string.Empty;
             dataSplit = string.Empty;
@@ -220,6 +223,7 @@ namespace MyG5Blazor.Data
             dataSplit = string.Empty;
             _respondCode = string.Empty;
             _traceNumber = string.Empty;
+            _approvalCode = string.Empty;
             Console.WriteLine(dataRespond);
             if (serialPort.IsOpen)
             {
@@ -239,6 +243,7 @@ namespace MyG5Blazor.Data
                         Console.WriteLine("Trace Number : " + _traceNumber);
                         _respondCode = dataSplit.Substring(148, 2);
                         Console.WriteLine("Response Code : " + _respondCode);
+                        _approvalCode = dataSplit.Substring(142, 6);
                         if (_respondCode == "00")
                         {
                             _ecr = ByteArrayToString(Encoding.Convert(Encoding.Unicode, Encoding.ASCII, Encoding.Unicode.GetBytes(dataSplit.Substring(3, 1))));

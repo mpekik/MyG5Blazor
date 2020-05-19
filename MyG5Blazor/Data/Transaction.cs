@@ -16,11 +16,24 @@ namespace MyG5Blazor.Data
         public string persoID { get; set; }
         public string paymentMethod => _payment[intPayment];
         public int intPayment { get; set; }
+       
         private string[] _payment = { "", "cc", "cash", "cc" };
         public string bit = string.Empty;
         public string fee = string.Empty;
         public string ecr = string.Empty;
+        public string edcTrace = string.Empty;
+        public string edcApproval = string.Empty;
         public string edcresp = string.Empty;
+        public string edcTid = string.Empty;
+        public string edcMid = string.Empty;
+        public string edcBatch = string.Empty;
+        public string edcIssuer = string.Empty;
+        public string edcRefNo = string.Empty;
+        public string edcCardNo = string.Empty;
+        public string edcCardName = string.Empty;
+        public string edcDate = string.Empty;
+        public string edcTime = string.Empty;
+        public string edcStatus = "FAILED";
         public void SetTransaction(string strTransID, string strBUID, string strTermID,string strJenisTrans)
         {
             transID = strTransID;

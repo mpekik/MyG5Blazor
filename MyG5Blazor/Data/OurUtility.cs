@@ -23,7 +23,16 @@ namespace MyG5Blazor.Data
 
             Write_Log(p_str, p_prefix_fileName, ref msg);
         }
+        public static string StringToDTString(string input)
+        {
+            string result = string.Empty;
+            string Year = input.Substring(0, 2);
+            string month = input.Substring(2, 2);
+            string Day = input.Substring(4);
 
+            result = Day + "-" + month + "-20" + Year;
+            return result;
+        }
         public static void Write_Log(string p_str, string p_prefix_fileName, ref string p_message)
         {
             p_message = string.Empty;

@@ -7,12 +7,15 @@
 @using System;
 @using System.Threading.Tasks;
 @using MyG5Blazor.Data
+@using System.Drawing.Printing
+@using System.Drawing 
 
 @inject IJSRuntime JSRuntime
 @inject Costumer cst
 @inject NavigationManager NavMan
 @inject Transaction trans 
-
+@inject Config config
+ 
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -83,7 +86,7 @@
         <span class="dot">4</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="Print" class="btn-arrow btn" value="">Kembali</button>
         <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
@@ -282,5 +285,38 @@
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             NavMan.NavigateTo("/error");
         }
+    }
+    private async Task Print()
+    {
+        int height = 0;
+
+        PrintContent prtContent = new PrintContent();
+        string msg = string.Empty;
+        string logoTsel = "C:\\Logo_MyGraPARI_mini.png";
+
+        config.terminalDesc = "GraPARI Trilogi DEV";
+        config.terminalLocation = "Plaza Semanggi";
+        trans.ecr = "0110916771000100210309167000012DA SINARMAS 3  000233000099D000001000000000001000000639687******3094   CHIP NASIONAL INST PV     200519151121369453000000000002330000000000000000000000000000                   000000                                                                                        ";
+        trans.edcresp = trans.ecr.Substring(140, 2);
+        trans.edcApproval = trans.ecr.Substring(140, 6);
+        trans.edcTid = trans.ecr.Substring(2, 8);
+        trans.edcMid = trans.ecr.Substring(10, 15);
+        trans.edcBatch = trans.ecr.Substring(25, 6);
+        trans.edcIssuer = trans.ecr.Substring(31, 15);
+        trans.edcTrace = trans.ecr.Substring(52, 6);
+        trans.edcRefNo = trans.ecr.Substring(46, 6);
+        trans.edcCardNo = trans.ecr.Substring(83, 19);
+        trans.edcCardName = trans.ecr.Substring(102, 26);
+        trans.edcDate = trans.ecr.Substring(128, 6);
+        trans.edcTime = trans.ecr.Substring(134, 6);
+        cst.intMPembayaran = 3;
+        cst.intTagihan = 10000;
+        cst.intTagihanTerbayar = 10000;
+        trans.edcStatus = "SUCCESS";
+        trans.edcDate = OurUtility.StringToDTString(trans.edcDate);
+        string content = prtContent.BTH(trans, cst, config);
+        string header = prtContent.Header(trans, cst, config);
+        string footer = prtContent.FOOTER(trans, cst, config);
+        bool result = Printer.Print(config, header, content, logoTsel,footer, ref msg);
     }
 }

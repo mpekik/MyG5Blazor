@@ -36,6 +36,7 @@ namespace MyG5Blazor
             services.AddScoped<Ektp_Data>();
             services.AddScoped<Transaction>();
             services.AddScoped<Menu>();
+            services.AddScoped<Config>();
             services.AddTransient<EDC>();
         }
 

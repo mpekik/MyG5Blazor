@@ -18,6 +18,8 @@ namespace MyG5Blazor.Data
         public string strTagihan => intTagihan.ToString();
         public int intMPembayaran = 0;
         public int intTagihan = 0;
+        public int intTagihanTerbayar = 0;
+        public string tagihanTerbayar => intTagihan.ToString();
         public class Tagihan
         {
             public string _tglTagihan { get; set; }

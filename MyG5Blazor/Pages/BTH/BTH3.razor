@@ -35,7 +35,7 @@
                             <div id="list-tagihan" class="teks-footer-halo">
                                 @foreach (dynamic t in cst.GetlistTagihan)
                                 {
-                                    <li>@t._tglTagihan  <b>=</b> Rp @t._intTagihan.ToString("N0")</li>
+                                    <li>@t._intTagihan.ToString("N0")</li>
                                 }
                             </div>
                         }
