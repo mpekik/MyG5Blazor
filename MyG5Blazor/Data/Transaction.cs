@@ -17,7 +17,7 @@ namespace MyG5Blazor.Data
         public string paymentMethod => _payment[intPayment];
         public int intPayment { get; set; }
        
-        private string[] _payment = { "", "cc", "cash", "cc" };
+        private string[] _payment = { "", "cc", "CASH", "cc" };
         public string bit = string.Empty;
         public string fee = string.Empty;
         public string ecr = string.Empty;

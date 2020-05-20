@@ -145,13 +145,13 @@
 
                                     <div id="">
                                         <div class="jumlah-bayar">Uang yang telah Anda Masukan</div>
-                                        @if (intAccBill < intBill)
+                                        @if (inttotal < intBill)
                                         {
-                                            <div class="nominal-rupiah" id="nominal-kurang">Rp @intAccBill.ToString("N0")</div>
+                                            <div class="nominal-rupiah" id="nominal-kurang">Rp @inttotal.ToString("N0")</div>
                                         }
                                         else
                                         {
-                                            <div class="nominal-rupiah" id="nominal-pas">Rp @intAccBill.ToString("N0")</div>
+                                            <div class="nominal-rupiah" id="nominal-pas">Rp @inttotal.ToString("N0")</div>
                                         }
                                     </div><br>
                                 }
@@ -359,6 +359,8 @@
                         await Payment("");
                         if (resultPayment == "00")
                         {
+                            trans.edcStatus = "SUCCESS";
+                            IsLoading = false;
                             IsSuccess = true;
                             Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
@@ -406,6 +408,8 @@
                     StateHasChanged();
                     if (resultPayment == "00")
                     {
+                        trans.edcStatus = "SUCCESS";
+                        IsLoading = false;
                         IsSuccess = true;
                         Console.WriteLine("Payment Success");
                         await Task.Delay(2000);
@@ -413,6 +417,7 @@
                     }
                     else
                     {
+                        IsLoading = false;
                         IsFail = true;
 
                     }
@@ -436,6 +441,8 @@
                         await Payment("");
                         if (resultPayment == "00")
                         {
+                            trans.edcStatus = "SUCCESS";
+                            IsLoading = false;
                             IsSuccess = true;
                             Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
@@ -533,6 +540,7 @@
     {
         OurUtility.Write_Log("== Payment Via EDC", "step-action");
         string _transType = "01";
+        cst.intTagihanTerbayar = intBill;
         edc.Clear();
         edc.serialPort = new SerialPort();
         edc.serialPort.PortName = serialPortName;
@@ -549,7 +557,6 @@
                 trans.edcresp = edc.respondCode;
                 IsLoading = true;
                 pageClass = "main-panel bg-home";
-                trans.edcStatus = "SUCCESS";
                 return;
             }
             //edc.mre.WaitOne();
@@ -595,7 +602,6 @@
 
             Console.WriteLine(edc.respondCode);
         } while (!edc.mre.WaitOne());
-        await Print();
         Timer.SetTimer(20000);
         Timer.OnElapsed += TimerElapsedHandler;
     }
