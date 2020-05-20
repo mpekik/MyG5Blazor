@@ -17,7 +17,7 @@
 @inject BlazorTimer Timer
 @inject Transaction trans
 @inject Config config
-  
+
 <div class=@pageClass>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -228,18 +228,18 @@
                 </div> -->
                 <div class="modal-body">
                     <p class="text-header">Beri Penilaian Layanan MyGrapari</p>
-                    <p class="text-nps">Seberapa besar kemungkinan Anda untuk merekomendasikan layanan MyGraPARI kepada teman atau kolega Anda? </p>
-                    <button class="btn nps-button" value="1" @onclick="@(() => strNPS1Value = "1")">1</button>
-                    <button class="btn nps-button" value="2" @onclick="@(() => strNPS1Value = "2")">2</button>
-                    <button class="btn nps-button" value="3" @onclick="@(() => strNPS1Value = "3")">3</button>
-                    <button class="btn nps-button" value="4" @onclick="@(() => strNPS1Value = "4")">4</button>
-                    <button class="btn nps-button" value="5" @onclick="@(() => strNPS1Value = "5")">5</button>
-                    <button class="btn nps-button" value="6" @onclick="@(() => strNPS1Value = "6")">6</button>
-                    <button class="btn nps-button" value="7" @onclick="@(() => strNPS1Value = "7")">7</button>
-                    <button class="btn nps-button" value="8" @onclick="@(() => strNPS1Value = "8")">8</button>
-                    <button class="btn nps-button" value="9" @onclick="@(() => strNPS1Value = "9")">9</button>
-                    <button class="btn nps-button" value="10" @onclick="@(() => strNPS1Value = "10")">10</button>
-                    <button @onclick="CheckNPS" class="btn btn-danger button-nps">OK</button>
+                    <p class="text-nps">@surveys[CESno].quIndText</p>
+                    <button class="btn nps-button" value="1" @onclick="@(() => InputNPS1("1"))">1</button>
+                    <button class="btn nps-button" value="2" @onclick="@(() => InputNPS1("2"))">2</button>
+                    <button class="btn nps-button" value="3" @onclick="@(() => InputNPS1("3"))">3</button>
+                    <button class="btn nps-button" value="4" @onclick="@(() => InputNPS1("4"))">4</button>
+                    <button class="btn nps-button" value="5" @onclick="@(() => InputNPS1("5"))">5</button>
+                    <button class="btn nps-button" value="6" @onclick="@(() => InputNPS1("6"))">6</button>
+                    <button class="btn nps-button" value="7" @onclick="@(() => InputNPS1("7"))">7</button>
+                    <button class="btn nps-button" value="8" @onclick="@(() => InputNPS1("8"))">8</button>
+                    <button class="btn nps-button" value="9" @onclick="@(() => InputNPS1("9"))">9</button>
+                    <button class="btn nps-button" value="10" @onclick="@(() => InputNPS1("10"))">10</button>
+                    <button @onclick="NPS" class="btn btn-danger button-nps">OK</button>
                     <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                 </div>
             </div>
@@ -300,6 +300,8 @@
 }
 @code
 {
+    public List<CES> surveys = new List<CES>();
+
     private string pageClass = "main-panel bg-edc-process";
     private bool IsVisible = false;
     private bool IsVisible2 = false;
@@ -314,6 +316,8 @@
     private int intTryCount = 1;
     private int intTryLimit = 3;
     private int MetodePembayaran = 0;
+    private int CESno = 0;
+
 
     private string strNPS1Value = string.Empty;
     private string strMsgError = string.Empty;
@@ -325,6 +329,19 @@
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = "https://843dcbe7.ngrok.io/";
     public string serviceURL = "mygrapari/bayar-halo/v1/payment";
+    private static string cesURL = "mygrapari/ces/v1/eligibility-check";
+
+    private string qu1IndText = string.Empty;
+    private string qu1ID = string.Empty;
+    private string qu2IndText = string.Empty;
+    private string qu2ID = string.Empty;
+
+    private string qu1EngText = string.Empty;
+    private string qu2EngText = string.Empty;
+
+    private string quIndText = string.Empty;
+    private string quID = string.Empty;
+    private string quEngText = string.Empty;
 
     private string strBill => intBill.ToString();
     private string strAccBill => intAccBill.ToString();
@@ -364,7 +381,12 @@
                             IsSuccess = true;
                             Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
-                            IsVisible = true;
+
+                            await Print();
+                            //await CheckNPS("");
+                            Timer.SetTimer(20000);
+                            Timer.OnElapsed += TimerElapsedHandler;
+                            break;
                         }
                         else
                         {
@@ -383,10 +405,12 @@
 
                                 Void();
                             }
+                            await Print();
+
+                            Timer.SetTimer(20000);
+                            Timer.OnElapsed += TimerElapsedHandler;
+                            break;
                         }
-                        await Print();
-                        Timer.SetTimer(20000);
-                        Timer.OnElapsed += TimerElapsedHandler;
                         break;
                     }
                     else
@@ -413,18 +437,19 @@
                         IsSuccess = true;
                         Console.WriteLine("Payment Success");
                         await Task.Delay(2000);
-                        IsVisible = true;
+                        await Print();
+                        await CheckNPS("");
+                        break;
                     }
                     else
                     {
                         IsLoading = false;
                         IsFail = true;
-
+                        await Print();
+                        Timer.SetTimer(20000);
+                        Timer.OnElapsed += TimerElapsedHandler;
+                        break;
                     }
-                    await Print();
-                    Timer.SetTimer(20000);
-                    Timer.OnElapsed += TimerElapsedHandler;
-                    break;
                 }
             case 3:
                 {
@@ -446,7 +471,11 @@
                             IsSuccess = true;
                             Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
-                            IsVisible = true;
+                            await Print();
+                            //await CheckNPS("");
+                            Timer.SetTimer(20000);
+                            Timer.OnElapsed += TimerElapsedHandler;
+                            break;
                         }
                         else
                         {
@@ -465,10 +494,12 @@
 
                                 Void();
                             }
+                            await Print();
+
+                            Timer.SetTimer(20000);
+                            Timer.OnElapsed += TimerElapsedHandler;
+                            break;
                         }
-                        await Print();
-                        Timer.SetTimer(20000);
-                        Timer.OnElapsed += TimerElapsedHandler;
                         break;
                     }
                     else
@@ -522,20 +553,99 @@
         }
     }
 
-    private void CheckNPS()
+
+    private void InputNPS1(string strInput)
     {
-        if (!IsVisible)
+        strNPS1Value = strInput;
+    }
+    private async Task NPS()
+    {
+        surveys[CESno].answValue = strNPS1Value;
+        CESno += 1;
+        if (CESno >= surveys.Count())
         {
-            IsVisible = true;
+            IsVisible = false;
+            StateHasChanged();
+            await Task.Delay(2000);
+            //ToDo Send Answer
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
+        }
+    }
+    private async Task CheckNPS(string strURL)
+    {
+
+        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                                "\"terminalId\" : \"" + trans.termID + "\"" +
+                                "}";
+        string myURL = _myURL + cesURL;
+
+        OurUtility.Write_Log("== Check CES", "step-action");
+        OurUtility.Write_Log("== URL API : " + myURL, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await PostCallAPI(myURL, myJson);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        if (strResult != null)
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                {
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    foreach (var question in jobjResult.SelectToken("surveys"))
+                    {
+                        CES c = new CES();
+                        c.quIndText = question.SelectToken("questionTextInd").ToString();
+                        c.quEngText = question.SelectToken("questionTextEn").ToString();
+                        c.quID = question.SelectToken("questionId").ToString();
+                        c.answID = question.SelectToken("answerId").ToString();
+                        surveys.Add(c);
+                    }
+                    IsVisible = true;
+                    return;
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                {
+                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                    }
+                    else
+                    {
+                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        trans.errorCode = statusDescSub;
+                    }
+                    //                    IsLoading = false;
+                    //                  IsVisible = false;
+                    //                IsInvalid = true;
+                    //NavMan.NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                {
+                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    IsVisible = false;
+                    IsInvalid = true;
+                }
+            }
+            catch (Exception ex)
+            {
+                trans.errorCode = strResult;
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                NavMan.NavigateTo("/error");
+            }
         }
         else
         {
-            strNPS1Value = string.Empty;
-            IsVisible = false;
-            IsVisible2 = true;
+            trans.errorCode = strResult;
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            NavMan.NavigateTo("/error");
         }
     }
-
     private async Task Pay(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
     {
         OurUtility.Write_Log("== Payment Via EDC", "step-action");
@@ -602,8 +712,6 @@
 
             Console.WriteLine(edc.respondCode);
         } while (!edc.mre.WaitOne());
-        Timer.SetTimer(20000);
-        Timer.OnElapsed += TimerElapsedHandler;
     }
     public static async Task<string> PostCallAPI(string url, string jsonString)
     {
