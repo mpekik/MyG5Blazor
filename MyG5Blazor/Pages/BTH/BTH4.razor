@@ -74,7 +74,7 @@
 
                                 <div class="col-md-6">
                                     <div id="image-pulsa" class="image-center2">
-                                        <img src="../../assets/image/Logo/pulsa-prabayar.png" alt="" width="450px" height="280px">
+                                        <img src="../../assets/image/Logo/00_logo_KartuHalo.png" alt="" width="450px" height="280px">
                                     </div>
                                 </div>
                             }
@@ -93,7 +93,7 @@
 
                                 <div class="col-md-6">
                                     <div id="image-pulsa" class="image-center2">
-                                        <img src="../../assets/image/Logo/pulsa-prabayar.png" alt="" width="450px" height="280px">
+                                        <img src="../../assets/image/Logo/00_logo_KartuHalo.png" alt="" width="450px" height="280px">
                                     </div>
                                 </div>
                             }
@@ -130,6 +130,12 @@
                                     <div id="status-pay" class="teks-status2">Proses Pembayaran Tagihan KartuHalo <br><b class="red">Tidak Berhasil</b></div>
                                     <div id="nominal-pay" class="teks-center"> Silakan Ambil Struk Transaksi dan <br> Hubungi Kasir GraPARI untuk Bantuan</div>
                                 }
+                                else if (IsSuccess)
+                                {
+                                    <div class="teks-title">Bayar Tagihan KartuHalo</div>
+                                    <div id="status-pay" class="teks-center teks-bold">Proses Pembayaran Tagihan KartuHalo<br> <b class="green">Berhasil</b></div>
+
+                                }
                             </div>
 
                             <div class="col-md-6" id="proses-bill">
@@ -158,7 +164,7 @@
                                 else
                                 {
                                     <div id="image-pulsa" class="image-center2">
-                                        <img src="../../assets/image/Logo/pulsa-prabayar.png" alt="" width="450px" height="280px">
+                                        <img src="../../assets/image/Logo/00_logo_KartuHalo.png" alt="" width="450px" height="280px">
                                     </div>
                                 }
                             </div>
@@ -166,15 +172,50 @@
                         }
                     case 3:
                         {
-                            <div id="credit-payment" class="modal-blank-2">
-                                <img src="../../assets/image/credit.png" alt="" width="100%" height="380px" style="padding-top:70px;" id="myBtn">
-                                <div class="modal-blank-text">
-                                    <div class="text-1">Temukan mesin EDC pada <br> MyGraPARI seperti gambar di atas</div>
-                                    <div class="text-2">Masukkan Kartu Kredit Anda<br> melalui bagian bawah mesin<br> EDC dengan bagian Chip terlebih <br> dahulu</div>
-                                    <div class="text-3">Masukkan PIN dan tekan OK <br> <b class="green">(tombol hijau)</b></div>
-                                    <div class="text-4">Cabut Kartu Kredit Anda dari <br> Mesin EDC</div>
+                            @if (!IsSuccess && !IsFail)
+                            {
+                                <div id="credit-payment" class="modal-blank-2">
+                                    <img src="../../assets/image/credit.png" alt="" width="100%" height="380px" style="padding-top:70px;" id="myBtn">
+                                    <div class="modal-blank-text">
+                                        <div class="text-1">Temukan mesin EDC pada <br> MyGraPARI seperti gambar di atas</div>
+                                        <div class="text-2">Masukkan Kartu Kredit Anda<br> melalui bagian bawah mesin<br> EDC dengan bagian Chip terlebih <br> dahulu</div>
+                                        <div class="text-3">Masukkan PIN dan tekan OK <br> <b class="green">(tombol hijau)</b></div>
+                                        <div class="text-4">Cabut Kartu Kredit Anda dari <br> Mesin EDC</div>
+                                    </div>
                                 </div>
-                            </div>
+                            }
+                            else if (IsSuccess)
+                            {
+                                <div class="col-md-6">
+                                    <div class="teks-title">Bayar Tagihan KartuHalo</div>
+                                    <div id="status-pay" class="teks-center teks-bold">Proses Pembayaran Tagihan KartuHalo<br> <b class="green">Berhasil</b></div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div id="image-pulsa" class="image-center2">
+                                        <img src="../../assets/image/Logo/00_logo_KartuHalo.png" alt="" width="450px" height="280px">
+                                    </div>
+                                </div>
+                            }
+                            else if (IsFail)
+                            {
+                                <div class="col-md-6">
+                                    <div class="teks-title">Bayar Tagihan KartuHalo</div>
+                                    <div id="status-pay" class="teks-center teks-bold">
+                                        Proses Pembayaran Tagihan KartuHalo<br> <b class="red">FAILED</b><br><br>
+                                        @if (IsVoid)
+                                        {
+                                            <span style="font-weight: normal;">Silahkan <span style="font-weight: bold;"> Tekan ENTER(Tombol Hijau)</span>pada Mesin EDC untuk Proses Pengembalian Uang </span>
+                                        }
+                                    </div>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <div id="image-pulsa" class="image-center2">
+                                        <img src="../../assets/image/Logo/00_logo_KartuHalo.png" alt="" width="450px" height="280px">
+                                    </div>
+                                </div>
+                            }
                             break;
                         }
                 }
@@ -438,7 +479,10 @@
                         Console.WriteLine("Payment Success");
                         await Task.Delay(2000);
                         await Print();
-                        await CheckNPS("");
+                        //await CheckNPS("");
+                        Timer.SetTimer(20000);
+                        Timer.OnElapsed += TimerElapsedHandler;
+
                         break;
                     }
                     else
