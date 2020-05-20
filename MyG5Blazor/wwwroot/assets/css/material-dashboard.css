@@ -9704,6 +9704,12 @@ button.bg-dark:focus {
 .text-primary {
     color: #2196f3 !important;
 }
+    .text-primary input::placeholder {
+        color: #acacac;
+        font-size: 0.7em;
+        line-height: 1.3em;
+        font-weight: 100;
+    }
 
 a.text-primary:hover,
 a.text-primary:focus {
