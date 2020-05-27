@@ -555,10 +555,11 @@
                 }
         }
     }
-    private void TunaiExitFail()
+    private async Task TunaiExitFail()
     {
         IsExit = false;
         IsFail = true;
+        await Print();
     }
     private async Task CountMoneyBillAcceptor()
     {
