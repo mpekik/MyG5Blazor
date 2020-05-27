@@ -238,9 +238,13 @@
         menu.edc = "1";
         menu.cash = "1";
 
+        byte[] image = OurUtility.CaptureImage();
+        var imageBytesStr = Convert.ToBase64String(image);
+
         string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                                "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"" +
-                                "}";
+                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
+                            "\"image\" : \"" + imageBytesStr + "\"" +
+                            "}";
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");

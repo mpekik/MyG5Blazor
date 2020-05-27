@@ -17,11 +17,76 @@ namespace MyG5Blazor.Data
 {
     public class OurUtility
     {
+        private static Config config = new Config();
+
         public static void Write_Log(string p_str, string p_prefix_fileName)
         {
             string msg = string.Empty;
 
             Write_Log(p_str, p_prefix_fileName, ref msg);
+        }
+        private static byte[] ReadFully(Stream input)
+        {
+            try
+            {
+                int bytesBuffer = 1024;
+                byte[] buffer = new byte[bytesBuffer];
+                using (MemoryStream ms = new MemoryStream())
+                {
+                    int readBytes;
+                    while ((readBytes = input.Read(buffer, 0, buffer.Length)) > 0)
+                    {
+                        ms.Write(buffer, 0, readBytes);
+                    }
+                    return ms.ToArray();
+                }
+            }
+            catch (Exception ex)
+            {
+                // Exception handling here:  Response.Write("Ex.: " + ex.Message);
+                Console.WriteLine("Exception " + ex.Message);
+            }
+
+            return null;
+        }
+        public static byte[] CaptureImage()
+        {
+            Bitmap bm;
+            string msg = string.Empty;
+            byte[] result = null;
+            string ipCamURL = config.Read("IP_Camera", Config.PARAM_DEVICE_CAMERA_IP_URL);
+            string ipCamUser = config.Read("IP_Camera", Config.PARAM_DEVICE_CAMERA_IP_USER);
+            string ipCamPass = config.Read("IP_Camera", Config.PARAM_DEVICE_CAMERA_IP_PASSWORD);
+            try
+            {
+                Uri myUri = new Uri(ipCamURL);
+                WebRequest myWebRequest = HttpWebRequest.Create(myUri);
+
+                HttpWebRequest myHttpWebRequest = (HttpWebRequest)myWebRequest;
+
+                NetworkCredential myNetworkCredential = new NetworkCredential(ipCamUser, ipCamPass);
+
+                CredentialCache myCredentialCache = new CredentialCache();
+                myCredentialCache.Add(myUri, "Digest", myNetworkCredential);
+
+                myHttpWebRequest.PreAuthenticate = true;
+                myHttpWebRequest.Credentials = myCredentialCache;
+
+                var response = (HttpWebResponse)myHttpWebRequest.GetResponse();
+                Console.WriteLine(response.StatusCode);
+                result = ReadFully(response.GetResponseStream());
+                MemoryStream mStream = new MemoryStream();
+                byte[] pData = result;
+                mStream.Write(pData, 0, Convert.ToInt32(pData.Length));
+                bm = new Bitmap(mStream, false);
+                Write_Image(bm, ref msg);
+                var imageBytesStr = Convert.ToBase64String(pData);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.ToString());
+            }
+            return result;
         }
         public static string StringToDTString(string input)
         {
@@ -32,6 +97,23 @@ namespace MyG5Blazor.Data
 
             result = Day + "-" + month + "-20" + Year;
             return result;
+        }
+        public static void Write_Image(Bitmap bmp, ref string p_message)
+        {
+            p_message = string.Empty;
+
+            try
+            {
+                string dir = Directory_Images() + @"\" + DateTime.Now.ToString("yyyyMM");
+                CreateDirectory(dir);
+
+                string msg = string.Empty;
+                bmp.Save(DateTime.Now.ToString("yyyyMMdd HH:mm:ss-fff") + ".jpg", System.Drawing.Imaging.ImageFormat.Jpeg);
+            }
+            catch (Exception ex)
+            {
+                p_message = ex.Message;
+            }
         }
         public static void Write_Log(string p_str, string p_prefix_fileName, ref string p_message)
         {
@@ -71,6 +153,14 @@ namespace MyG5Blazor.Data
         public static string Directory_Logs()
         {
             string dir = Directory.GetCurrentDirectory() + @"\Logs";
+
+            CreateDirectory(dir);
+
+            return dir;
+        }
+        public static string Directory_Images()
+        {
+            string dir = Directory.GetCurrentDirectory() + @"\Images";
 
             CreateDirectory(dir);
 
