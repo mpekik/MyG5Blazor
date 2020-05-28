@@ -225,10 +225,15 @@
     //<span style="font-weight: bold;">Nomor tidak dikenali,</span> harap masukkan nomor Telkomsel yang benar dan aktif
     private async Task CheckNumber(string strURL)
     {
-        IsLoading = true;
+        IsLoading = true; 
+        byte[] image = OurUtility.CaptureImage();
+        var imageBytesStr = Convert.ToBase64String(image);
+
         string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                                "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"" +
-                                "}";
+                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
+                            "\"image\" : \"" + imageBytesStr + "\"" +
+                            "}";
+
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
