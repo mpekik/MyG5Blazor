@@ -425,7 +425,7 @@
                             await Task.Delay(2000);
 
                             await Print();
-                            //await CheckNPS("");
+                            await CheckNPS("");
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
@@ -482,7 +482,7 @@
                             Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
                             await Print();
-                            //await CheckNPS("");
+                            await CheckNPS("");
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
 
@@ -521,7 +521,7 @@
                             Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
                             await Print();
-                            //await CheckNPS("");
+                            await CheckNPS("");
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
@@ -693,14 +693,14 @@
             {
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
-                NavMan.NavigateTo("/error");
+                //NavMan.NavigateTo("/error");
             }
         }
         else
         {
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            NavMan.NavigateTo("/error");
+            //NavMan.NavigateTo("/error");
         }
     }
     private async Task Pay(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)

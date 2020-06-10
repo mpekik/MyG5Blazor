@@ -537,7 +537,7 @@
                     //                    IsLoading = false;
                     //                  isVisible = false;
                     //                IsInvalid = true;
-                    NavMan.NavigateTo("/error");
+                    //NavMan.NavigateTo("/error");
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                 {
@@ -550,14 +550,14 @@
             {
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
-                NavMan.NavigateTo("/error");
+                //NavMan.NavigateTo("/error");
             }
         }
         else
         {
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            NavMan.NavigateTo("/error");
+            //NavMan.NavigateTo("/error");
         }
     }
 
