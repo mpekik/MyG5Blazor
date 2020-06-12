@@ -211,7 +211,7 @@
                     var response = await client.PostAsync(url, content);
                     if (response != null)
                     {
-                        if (response.IsSuccessStatusCode)
+                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "400" || response.StatusCode.ToString()=="500")
                         {
                             var jsonStringResult = await response.Content.ReadAsStringAsync();
                             return jsonStringResult;

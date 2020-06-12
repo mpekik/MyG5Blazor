@@ -224,38 +224,38 @@ namespace MyG5Blazor.Data
             _respondCode = string.Empty;
             _traceNumber = string.Empty;
             _approvalCode = string.Empty;
-            Console.WriteLine(dataRespond);
+            //Console.WriteLine(dataRespond);
             if (serialPort.IsOpen)
             {
                 string dataCurrent = serialPort.ReadExisting();
                 dataRespond += dataCurrent;
-                Console.WriteLine("Data Current: " + dataCurrent);
-                Console.WriteLine("Data Respond: "+ dataRespond);
+                //Console.WriteLine("Data Current: " + dataCurrent);
+                //Console.WriteLine("Data Respond: "+ dataRespond);
                 if (dataRespond.Contains("\x06"))
                 {
                     if (dataRespond.Length > 10)
                     {
                         serialPort.Close();
-                        Console.WriteLine("EDC ACK");
+                        //Console.WriteLine("EDC ACK");
                         dataSplit = dataRespond.Substring(dataRespond.IndexOf("BNI"));
-                        Console.WriteLine("Data Split: " + dataSplit);
+                        //Console.WriteLine("Data Split: " + dataSplit);
                         _traceNumber = dataSplit.Substring(54, 6);
-                        Console.WriteLine("Trace Number : " + _traceNumber);
+                        //Console.WriteLine("Trace Number : " + _traceNumber);
                         _respondCode = dataSplit.Substring(148, 2);
-                        Console.WriteLine("Response Code : " + _respondCode);
+                        //Console.WriteLine("Response Code : " + _respondCode);
                         _approvalCode = dataSplit.Substring(142, 6);
                         if (_respondCode == "00")
                         {
                             _ecr = ByteArrayToString(Encoding.Convert(Encoding.Unicode, Encoding.ASCII, Encoding.Unicode.GetBytes(dataSplit.Substring(3, 1))));
                             _ecr = _ecr + dataSplit.Substring(4, 299);
-                            Console.WriteLine("ECR Message : " + _ecr);
+                            //Console.WriteLine("ECR Message : " + _ecr);
                             mre.Set();
-                            Console.WriteLine(mre.Set());
+                            //Console.WriteLine(mre.Set());
                         }
                         else
                         {
                             intTry += 1;
-                            Console.WriteLine("Repeat : "+intTry);
+                            //Console.WriteLine("Repeat : "+intTry);
                                 mre.Set();
                         }
                     }
@@ -263,7 +263,7 @@ namespace MyG5Blazor.Data
                 else if (dataRespond.Contains("\x15"))
                 {
                     serialPort.Close();
-                    Console.WriteLine("EDC NAK");
+                    //Console.WriteLine("EDC NAK");
                     mre.Set();
                     intTry = 4;
                 }
