@@ -16,6 +16,8 @@ namespace MyG5Blazor.Data
         public string persoID { get; set; }
         public string paymentMethod => _payment[intPayment];
         public int intPayment { get; set; }
+        public TimeSpan startTime { get; set; }
+        public TimeSpan endTime { get; set; }
        
         private string[] _payment = { "", "cc", "CASH", "cc" };
         public string bit = string.Empty;
@@ -58,7 +60,46 @@ namespace MyG5Blazor.Data
             transID = string.Empty;
             buID = string.Empty;
             termID = string.Empty;
+            jenisTrans = string.Empty;
             mypersoResponse = string.Empty;
+            errorCode = string.Empty;
+            mypersoResponse = string.Empty;
+            persoID = string.Empty;
+            bit = string.Empty;
+            fee = string.Empty;
+            ecr = string.Empty;
+            edcTrace = string.Empty;
+            edcApproval = string.Empty;
+            edcresp = string.Empty;
+            edcTid = string.Empty;
+            edcMid = string.Empty;
+            edcBatch = string.Empty;
+            edcIssuer = string.Empty;
+            edcRefNo = string.Empty;
+            edcCardNo = string.Empty;
+            edcCardName = string.Empty;
+            edcDate = string.Empty;
+            edcTime = string.Empty;
+            edcStatus = "FAILED";
+            _auditTrail.Clear();
+        }
+
+        public class AuditTrail
+        {
+            public string _action { get; set; }
+            public string _data { get; set; }
+            public string _result { get; set; }
+        }
+
+        private List<AuditTrail> _auditTrail = new List<AuditTrail>();
+
+        public void AddTrail(string strAction, string strData, string strResult)
+        {
+            AuditTrail at = new AuditTrail();
+            at._action = strAction;
+            at._data = strData;
+            at._result = strResult;
+            _auditTrail.Add(at);
         }
     }
 }

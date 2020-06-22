@@ -130,17 +130,17 @@
 
     private bool IsLoading = false;
     //private static string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
-    public string _myURL = "https://843dcbe7.ngrok.io/";
+    public string _myURL = string.Empty;
     private string[] apiURL = { "mygrapari/bayar-halo/v1/init", "mygrapari/upgrade-4g/v1/init", "mygrapari/isi-pulsa/v1/init", "mygrapari/ganti-kartu/v1/init" };
     private string _termID = string.Empty;
 
-    private bool[] Menu = { true, true, true, true };
+    private bool[] Menu = { false, true, false, true };
 
     protected override async Task OnInitializedAsync()
     {
         _termID = config.Read("Terminal", Config.PARAM_MACHINE);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        //Console.WriteLine(_termID);
+        Console.WriteLine(_myURL);
         Switcher.DOWN_eKTP("500");
         Switcher.DOWN_Reader_1("500");
         cst.Clear();
@@ -168,7 +168,7 @@
         IsLoading = true;
         string myJson = "{\"terminalId\": \"" + _termID + "\"}";
         string myURL = _myURL + strAPIURL;
-
+        Console.WriteLine(myURL);
         OurUtility.Write_Log("= Get Menu Status Code", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
@@ -231,9 +231,11 @@
                 {
                     var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
                     var response = await client.PostAsync(url, content);
+                    Console.WriteLine(response.StatusCode.ToString());
                     if (response != null)
                     {
-                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "400" || response.StatusCode.ToString()=="500")
+
+                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
                         {
                             var jsonStringResult = await response.Content.ReadAsStringAsync();
                             return jsonStringResult;
@@ -245,10 +247,10 @@
                 }
             }
         }
-        catch (Exception ex)
+        catch (HttpRequestException e)
         {
-            OurUtility.Write_Log("==" + ex.Message, "step-action");
+            Console.WriteLine(e.InnerException.Message);
         }
         return ret;
-    }
+        }
 }

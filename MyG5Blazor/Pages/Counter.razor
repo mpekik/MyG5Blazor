@@ -1,16 +1,76 @@
 ﻿@page "/counter"
+@inject IJSRuntime JSRuntime;
+@inject BlazorTimer Timer
+@inject NavigationManager NavMan
+@inject Ektp_Data ktp
+@inject Costumer cst
+@inject Config config
+@using MyG5Blazor.Data
 
 <h1>Counter</h1>
 
-<p>Current count: @currentCount</p>
-
-<button class="btn btn-primary" @onclick="IncrementCount">Click me</button>
+<p>Id: @ktp.Id</p>
+<p>Nama: @ktp.Name</p>
+<p>Card SN : @p_icc_id</p>
+<button class="btn btn-primary" @onclick="TesReader">Click me</button>
 
 @code {
     private int currentCount = 0;
+    private IntPtr hContext = IntPtr.Zero;
+    private string readerName = string.Empty;
+    private string p_icc_id = string.Empty;
+    private string msg = string.Empty;
 
+    byte[] pbPcid;
+
+    byte[] pbConf;
+
+    protected override async Task OnInitializedAsync()
+    {
+        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
+        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
+        readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER_1);
+    }
+
+    private async Task TesReader()
+    {
+        Card_Reader cdr = new Card_Reader();
+        if (await Task.Run(() => cdr.Read(readerName, ref p_icc_id, ref msg)).ConfigureAwait(true))
+        {
+            cdr.DisconnectedCard();
+        }
+        Console.WriteLine("SN : " + p_icc_id);
+    }
     private void IncrementCount()
     {
         currentCount++;
+    }
+
+    private async Task ScanKTP()
+    {
+        if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)
+        {
+            Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_PCID, pbPcid, pbPcid.Length);
+            Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_CONFIG, pbConf, pbConf.Length);
+        }
+        await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
+
+        int length = 2048;
+        byte[] tempBuffer = new byte[length];
+        int ret = -1;
+        ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer)).ConfigureAwait(false);
+        if (length == 0 || ret != 0)
+        {
+            Console.WriteLine("1");
+            return;
+        }
+        byte[] demoGraphic = new byte[length];
+        for (int i = 0; i < length; i++)
+        {
+            demoGraphic[i] = tempBuffer[i];
+        }
+        ktp.demographic = demoGraphic;
+
+        StateHasChanged();
     }
 }
