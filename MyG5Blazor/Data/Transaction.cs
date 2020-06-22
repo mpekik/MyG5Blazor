@@ -16,8 +16,8 @@ namespace MyG5Blazor.Data
         public string persoID { get; set; }
         public string paymentMethod => _payment[intPayment];
         public int intPayment { get; set; }
-        public TimeSpan startTime { get; set; }
-        public TimeSpan endTime { get; set; }
+        public long startTime { get; set; }
+        public long endTime { get; set; }
        
         private string[] _payment = { "", "cc", "CASH", "cc" };
         public string bit = string.Empty;
@@ -36,6 +36,7 @@ namespace MyG5Blazor.Data
         public string edcDate = string.Empty;
         public string edcTime = string.Empty;
         public string edcStatus = "FAILED";
+        public string status = string.Empty;
         public void SetTransaction(string strTransID, string strBUID, string strTermID,string strJenisTrans)
         {
             transID = strTransID;
@@ -81,6 +82,7 @@ namespace MyG5Blazor.Data
             edcDate = string.Empty;
             edcTime = string.Empty;
             edcStatus = "FAILED";
+            status = string.Empty;
             _auditTrail.Clear();
         }
 
@@ -91,7 +93,7 @@ namespace MyG5Blazor.Data
             public string _result { get; set; }
         }
 
-        private List<AuditTrail> _auditTrail = new List<AuditTrail>();
+        public List<AuditTrail> _auditTrail = new List<AuditTrail>();
 
         public void AddTrail(string strAction, string strData, string strResult)
         {

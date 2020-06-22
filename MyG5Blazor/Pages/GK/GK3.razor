@@ -1,12 +1,15 @@
 ﻿@page "/gk/3"
 @using MyG5Blazor.Data
 @using System.Threading
+@using System.Net.Http;
+@using System.Text;
 @inject IJSRuntime JSRuntime;
 @inject BlazorTimer Timer
 @inject Ektp_Data ktp
 @inject NavigationManager NavMan
 @inject Costumer cst
-@inject Config config 
+@inject Config config
+@inject Transaction trans 
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent fixed-top ">
@@ -72,8 +75,8 @@
             <span class="dot">4</span>
         </div>
         <div class="footer-side2">
-            <button @onclick="@(()=>NavigateTo("/gk/2"))" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu Utama</button>
+            <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="MenuUtama" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
@@ -93,7 +96,7 @@
                         else
                         {
                             <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>tidak sesuai dengan eKTP yang digunakan. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
-                            <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger modal-button" id="span1">OK</button>
+                            <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
                         }
                         <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                     </div>
@@ -120,7 +123,83 @@
     byte[] pbPcid;
 
     byte[] pbConf;
+    public string _myURL = "";
+    public string saveURL = "mygrapari/log/v1/save";
+    public static async Task<string> PostCallAPI(string url, string jsonString)
+    {
+        string ret = string.Empty;
+        try
+        {
+            using (var handler = new HttpClientHandler())
+            {
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
+                    {
+                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OurUtility.Write_Log("==" + ex.Message, "step-action");
+        }
+        return ret;
+    }
+    private async Task AuditTrail()
+    {
+        trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        string auditTrail = string.Empty;
+        int stepTrail = 1;
+        foreach (dynamic at in trans._auditTrail)
+        {
+            auditTrail = "[ " +
+                "{ \"step\" : \"" + stepTrail + "\"," +
+                "\"action\" : \"" + at._action + "\"," +
+                "\"data\" : \"" + at._data + "\"," +
+                "\"result\" : \"" + at._result + "\"" +
+                "}" +
+                "],";
+            stepTrail += 1;
+        }
+        auditTrail = auditTrail.Remove(auditTrail.Length - 1);
 
+        string myJson2 = "{ \"transaction\" : " +
+            "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"," +
+            "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
+                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
+                "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
+                "\"status\" : \""+trans.status+"\"," +
+                "\"description\" : \"" + trans.errorCode + "\"" +
+                "}, \"auditTrail\" : " + auditTrail + "}";
+        string myURL2 = _myURL + saveURL;
+
+        string strResult2 = await PostCallAPI(myURL2, myJson2);
+    }
+    private async Task MenuUtama()
+    {
+        trans.status = "GAGAL";
+        await AuditTrail();
+        NavigateTo("");
+    }
+    private async Task Back()
+    {
+        NavigateTo("/gk/2");
+    }
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);
@@ -229,6 +308,7 @@
                                                         ref score, ref matched, format)).ConfigureAwait(false);
                         if (matched == 1)
                         {
+                            trans.AddTrail("FINGERPRINT", "MATCH", "SUCCESS");
                             OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                             cst.EKTPNumber = ktp.Id;
                             OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
@@ -247,6 +327,7 @@
                         }
                         else
                         {
+                            trans.AddTrail("FINGERPRINT", "NOT-MATCH", "FAILED");
                             OurUtility.Write_Log("===== 9. -- Try " + intTryCount.ToString() + ", Failed", "step-action");
 
                             OurUtility.Write_Log("===== 10. Ektp_Sdk.CloseReader", "step-action");
@@ -273,5 +354,35 @@
         OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
         NavMan.NavigateTo("/gk/4");
 
+    }
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
+
+    private bool timer = false;
+    protected override void OnAfterRender(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            timer = true;
+            theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
+
+            this.StateHasChanged();
+        }
+    }
+
+    [Microsoft.JSInterop.JSInvokable]
+
+    public void theIdleTimeoutFired()
+    {
+        if (timer)
+        {
+            timer = false;
+            NavMan.NavigateTo(" ");
+        }
     }
 }

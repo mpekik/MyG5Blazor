@@ -7,6 +7,21 @@ namespace MyG5Blazor.Data
 {
     public class PrintContent
     {
+        public string GK(Transaction trans,Costumer cst,Config config)
+        {
+            DateTime datetimenow = DateTime.Now;
+
+            string contents = "----------------------------------------\n"+
+                "TRANSACTION ID     : "+trans.transID+"\n"+
+                "TERMINAL ID        : "+trans.termID+"\n"+
+                "TANGGAL WAKTU      : "+ datetimenow.ToString("dd-MM-yyyy") + " " + datetimenow.ToString("HH:mm:ss") + "\n" +
+                "NOMOR PONSEL       : "+cst.PhoneNumber+"\n"+
+                "\n"+
+                "ANDA TELAH BERHASIL GANTI KARTU HILANG/RUSAK\n"+
+                "----------------------------------------\n";
+
+            return contents;
+        }
         public string BTH(Transaction trans, Costumer cst, Config config)
         {
             DateTime datetimenow = DateTime.Now;
@@ -87,6 +102,18 @@ namespace MyG5Blazor.Data
             string contents = config.terminalDesc + "\n" +
                 config.terminalLocation;
 
+            return contents;
+        }
+        public string HeaderGK(Transaction trans, Costumer cst, Config config)
+        {
+            string contents = "GANTI KARTU HILANG/RUSAK";
+                
+            return contents;
+        }
+        public string FooterGK(Transaction trans, Costumer cst, Config config)
+        {
+            string contents = "TERIMA KASIH TELAH MENGGUNAKAN\nLAYANAN JASA MYGRAPARI TELKOMSEL";
+            
             return contents;
         }
     }

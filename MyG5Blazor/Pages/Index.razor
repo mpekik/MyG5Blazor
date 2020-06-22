@@ -140,7 +140,7 @@
     {
         _termID = config.Read("Terminal", Config.PARAM_MACHINE);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        Console.WriteLine(_myURL);
+        //Console.WriteLine(_myURL);
         Switcher.DOWN_eKTP("500");
         Switcher.DOWN_Reader_1("500");
         cst.Clear();
@@ -168,7 +168,7 @@
         IsLoading = true;
         string myJson = "{\"terminalId\": \"" + _termID + "\"}";
         string myURL = _myURL + strAPIURL;
-        Console.WriteLine(myURL);
+        //Console.WriteLine(myURL);
         OurUtility.Write_Log("= Get Menu Status Code", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
@@ -182,8 +182,8 @@
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
                     trans.SetTransaction((string)jobjResult["config"]["apiBuid"], (string)jobjResult["terminal"]["terminalId"],strTrans);
-                    config.Terminal((string)jobjResult["terminal"]["terminalId"], (string)jobjResult["terminal"]["terminalDesc"], (string)jobjResult["terminal"]["terminalLocation"], (string)jobjResult["terminal"]["areaCode"], (string)jobjResult["terminal"]["regionalCode"], (string)jobjResult["terminal"]["unitId"], (string)jobjResult["terminal"]["unitName"]);
-                    config.ConfigIn((string)jobjResult["config"]["menuConfigId"], (string)jobjResult["config"]["maxRetryPerso"], (string)jobjResult["config"]["tidEdc"], (string)jobjResult["config"]["midEdc"], (string)jobjResult["config"]["snEdc"], (string)jobjResult["config"]["apiBuid"], (string)jobjResult["config"]["apiUid"], (string)jobjResult["config"]["cardDispenser"], (string)jobjResult["config"]["bahasa"], (string)jobjResult["config"]["edc"], (string)jobjResult["config"]["cash"]);
+                    config.Terminal((string)jobjResult["terminal"]["terminalId"], (string)jobjResult["terminal"]["terminalDesc"], (string)jobjResult["terminal"]["terminalLocation"], (string)jobjResult["terminal"]["area"], (string)jobjResult["terminal"]["regional"], (string)jobjResult["terminal"]["unitId"], (string)jobjResult["terminal"]["unitName"]);
+                    config.ConfigIn((string)jobjResult["config"]["menuConfigId"], (string)jobjResult["config"]["maxRetryPerso"], (string)jobjResult["config"]["tidEdc"], (string)jobjResult["config"]["midEdc"], (string)jobjResult["config"]["snEdc"], (string)jobjResult["config"]["apiBuid"], (string)jobjResult["config"]["apiUid"], (string)jobjResult["config"]["cardDispenser"], (string)jobjResult["config"]["bahasa"], (string)jobjResult["config"]["edcStatus"], (string)jobjResult["config"]["cashStatus"]);
                     OurUtility.Write_Log("== BUID : "+trans.buID + ", Terminal ID : " + trans.termID + ", Event : "+trans.jenisTrans+" {Success}", "step-action");
 
                     NavMan.NavigateTo(strURL);
@@ -231,7 +231,7 @@
                 {
                     var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
                     var response = await client.PostAsync(url, content);
-                    Console.WriteLine(response.StatusCode.ToString());
+                    //Console.WriteLine(response.StatusCode.ToString());
                     if (response != null)
                     {
 

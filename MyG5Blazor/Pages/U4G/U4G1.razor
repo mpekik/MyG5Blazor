@@ -145,6 +145,7 @@
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
     public string serviceURL = "mygrapari/upgrade-4g/v1/submit-nohp";
+    public string saveURL = "mygrapari/log/v1/save";
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
     protected override async Task OnInitializedAsync()
@@ -227,10 +228,15 @@
     }
     private async Task CheckNumber(string strURL)
     {
+        trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         IsLoading = true;
+        byte[] image = OurUtility.CaptureImage();
+        var imageBytesStr = Convert.ToBase64String(image);
+
         string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                                "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"" +
-                                "}";
+                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
+                            "\"image\" : \"" + imageBytesStr + "\"" +
+                            "}";
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
@@ -248,6 +254,7 @@
                     trans.SetTransaction((string)jobjResult["transaction"]["transactionId"]);
                     cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"], (string)jobjResult["profile"]["idNumber"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "SUCCESS");
                     NavMan.NavigateTo(strURL);
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
@@ -264,6 +271,10 @@
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
+                    trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
+                    trans.status = "GAGAL";
+                    await AuditTrail();
                     //                    IsLoading = false;
                     //                  IsVisible = false;
                     //                IsInvalid = true;
@@ -289,6 +300,67 @@
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             NavMan.NavigateTo("/error");
+        }
+    }
+    private async Task AuditTrail()
+    {
+        string auditTrail = string.Empty;
+        int stepTrail = 1;
+        foreach (dynamic at in trans._auditTrail)
+        {
+            auditTrail = "[ " +
+                "{ \"step\" : \"" + stepTrail + "\"," +
+                "\"action\" : \"" + at._action + "\"," +
+                "\"data\" : \"" + at._data + "\"," +
+                "\"result\" : \"" + at._result + "\"" +
+                "}" +
+                "],";
+            stepTrail += 1;
+        }
+        auditTrail = auditTrail.Remove(auditTrail.Length - 1);
+
+        string myJson2 = "{ \"transaction\" : " +
+            "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"," +
+            "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
+                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
+                "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
+                "\"status\" : \"" + trans.status + "\"," +
+                "\"description\" : \"" + trans.errorCode + "\"" +
+                "}, \"auditTrail\" : " + auditTrail + "}";
+        string myURL2 = _myURL + saveURL;
+
+        string strResult2 = await PostCallAPI(myURL2, myJson2);
+    }
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
+
+    private bool timer = false;
+    protected override void OnAfterRender(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            timer = true;
+            theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
+
+            this.StateHasChanged();
+        }
+    }
+
+    [Microsoft.JSInterop.JSInvokable]
+
+    public void theIdleTimeoutFired()
+    {
+        if (timer)
+        {
+            timer = false;
+            NavMan.NavigateTo(" ");
         }
     }
 }
