@@ -274,4 +274,34 @@
         NavMan.NavigateTo("/gk/4");
 
     }
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
+
+    private bool timer = false;
+    protected override void OnAfterRender(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            timer = true;
+            theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
+
+            this.StateHasChanged();
+        }
+    }
+
+    [Microsoft.JSInterop.JSInvokable]
+
+    public void theIdleTimeoutFired()
+    {
+        if (timer)
+        {
+            timer = false;
+            NavMan.NavigateTo(" ");
+        }
+    }
 }
