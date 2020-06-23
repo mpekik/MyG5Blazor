@@ -413,7 +413,7 @@
                                         else
                                         {
                                             isFail = true;
-                                            break;
+                                            return;
                                         }
                                     }
                                 }
@@ -426,7 +426,7 @@
                                     else
                                     {
                                         isFail = true;
-                                        break;
+                                        return;
                                     }
                                 }
 
@@ -460,7 +460,7 @@
                                 else
                                 {
                                     isFail = true;
-                                    break;
+                                    return;
                                 }
                             }
                             else if ((string)jobjResult["transaction"]["statusCode"] == "02")
@@ -471,7 +471,7 @@
                                 //IsVisible = false;
                                 IsInvalid = true;
                                 isFail = true;
-                                break;
+                                return;
                             }
                         }
                         catch (Exception ex)
@@ -480,7 +480,7 @@
                             OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                             trans.errorCode = strResult;
                             isError = true;
-                            break;
+                            return;
                         }
                     }
                     else
@@ -489,7 +489,7 @@
                         OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                         trans.errorCode = strResult;
                         isError = true;
-                        break;
+                        return;
                     }
                 }
                 else
@@ -501,7 +501,7 @@
                     else
                     {
                         isFail = true;
-                        break;
+                        return;
                     }
                 }
             }
