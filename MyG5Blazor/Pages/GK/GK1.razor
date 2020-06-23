@@ -237,18 +237,18 @@
     {
         trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         IsLoading = true;
-        //byte[] image = OurUtility.CaptureImage();
-        //var imageBytesStr = Convert.ToBase64String(image);
+        byte[] image = OurUtility.CaptureImage();
+        var imageBytesStr = Convert.ToBase64String(image);
         cst.PhoneNumber = "62" + strNumber.Substring(1);
 
-        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"" +
-                            "}";
-
         /*string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
+                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"" +
+                            "}";*/
+
+        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
                             "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
                             "\"image\" : \"" + imageBytesStr + "\"" +
-                            "}";*/
+                            "}";
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
@@ -365,7 +365,7 @@
         {
             //Console.WriteLine("GK 1");
             timer = false;
-            NavMan.NavigateTo(" ");
+            //NavMan.NavigateTo(" ");
         }
     }
 }

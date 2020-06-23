@@ -304,6 +304,7 @@
                                                         ref score, ref matched, format)).ConfigureAwait(false);
                         if (matched == 1)
                         {
+                            trans.AddTrail("FINGERPRINT", "MATCH", "SUCCESS");
                             OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                             cst.EKTPNumber = ktp.Id;
                             OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
@@ -322,6 +323,7 @@
                         }
                         else
                         {
+                            trans.AddTrail("FINGERPRINT", "NOT-MATCH", "FAILED");
                             OurUtility.Write_Log("==== 9. -- Try " + intTryCount.ToString() + ", Failed", "step-action");
 
                             OurUtility.Write_Log("==== 10. Ektp_Sdk.CloseReader", "step-action");
@@ -373,7 +375,7 @@
         if (timer)
         {
             timer = false;
-            NavMan.NavigateTo(" ");
+            //NavMan.NavigateTo(" ");
         }
     }
 }

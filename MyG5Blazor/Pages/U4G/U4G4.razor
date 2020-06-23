@@ -212,6 +212,8 @@
     private static string updateURL = "mygrapari/perso/v1/update";
     private static string cesURL = "mygrapari/ces/v1/eligibility-check";
     private static string myJson = string.Empty;
+    public string saveURL = "mygrapari/log/v1/save";
+
 
     private void NavigateTo(string strURL)
     {
@@ -231,13 +233,55 @@
         await MyPerso();
         if (isError)
         {
+            trans.status = "GAGAL";
+            await AuditTrail();
             NavMan.NavigateTo("/error");
-        }else if(isSuccess)
+        }
+        else if (isSuccess)
         {
+            trans.status = "BERHASIL";
+            await AuditTrail();
+            await Print();
             await CheckNPS("");
         }
+        else if (isFail)
+        {
+            trans.status = "GAGAL";
+            await AuditTrail();
+        }
     }
+    private async Task AuditTrail()
+    {
+        trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        string auditTrail = string.Empty;
+        int stepTrail = 1;
+        foreach (dynamic at in trans._auditTrail)
+        {
+            auditTrail = "[ " +
+                "{ \"step\" : \"" + stepTrail + "\"," +
+                "\"action\" : \"" + at._action + "\"," +
+                "\"data\" : \"" + at._data + "\"," +
+                "\"result\" : \"" + at._result + "\"" +
+                "}" +
+                "],";
+            stepTrail += 1;
+        }
+        auditTrail = auditTrail.Remove(auditTrail.Length - 1);
 
+        string myJson2 = "{ \"transaction\" : " +
+            "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"," +
+            "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
+                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
+                "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
+                "\"status\" : \"" + trans.status + "\"," +
+                "\"description\" : \"" + trans.errorCode + "\"" +
+                "}, \"auditTrail\" : " + auditTrail + "}";
+        string myURL2 = _myURL + saveURL;
+
+        string strResult2 = await PostCallAPI(myURL2, myJson2);
+    }
     public static async Task<string> PostCallAPI(string url, string jsonString)
     {
         string ret = string.Empty;
@@ -287,7 +331,7 @@
                 //ToDO if Reader error
                 if (await CardReaderScan())
                 {
-
+                    trans.AddTrail("GET SN", p_icc_id, "SUCCESS");
                     string myURL = _myURL + persoURL;
                     //ToDO add if trans.transID != null
                     string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
@@ -314,18 +358,20 @@
                                 if (strPanjang != null)
                                 {
                                     trans.persoID = (string)jobjResult["perso"]["persoId"];
+                                    trans.AddTrail("GET STRING PANJANG", trans.persoID, "SUCCESS");
                                     if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
                                     {
                                         myURL = _myURL + updateURL;
+                                        trans.AddTrail("PERSO", trans.persoID, "SUCCESS");
                                         myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                                            "\"terminalId\" : \"" + trans.termID + "\"," +
-                                            "\"persoId\" : \"" + trans.persoID + "\" ," +
-                                            "\"persoStatus\" : \"2\"}";
+                                        "\"terminalId\" : \"" + trans.termID + "\"," +
+                                        "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                        "\"persoStatus\" : \"2\"}";
                                         OurUtility.Write_Log("=== Update Perso Status", "step-action");
                                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                         strResult = await PostCallAPI(myURL, myJson);
                                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-
+                                        trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "SUCCESS");
                                         isLoading = false;
                                         isSuccess = true;
                                         await Task.Run(() => MoveToTheFront());
@@ -333,6 +379,7 @@
                                     }
                                     else
                                     {
+                                        trans.AddTrail("PERSO", trans.persoID, "FAILED");
                                         trans.mypersoResponse = msg;
                                         await Task.Run(() => MoveToBin());
 
@@ -344,6 +391,7 @@
                                         OurUtility.Write_Log("=== Update Perso Status", "step-action");
                                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                         strResult = await PostCallAPI(myURL, myJson);
+                                        trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "SUCCESS");
                                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                         if (intTryCount <= intTryLimit)
                                             intTryCount += 1;
@@ -356,6 +404,7 @@
                                 }
                                 else
                                 {
+                                    trans.AddTrail("GET STRING PANJANG", " ", "FAILED");
                                     await Task.Run(() => MoveToBin());
                                     if (intTryCount <= intTryLimit)
                                         intTryCount += 1;
@@ -389,6 +438,7 @@
                                         trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                                     }
                                 }
+                                trans.AddTrail("GET STRING PANJANG", "", "FAILED");
                                 await Task.Run(() => MoveToBin());
                                 if (intTryCount <= intTryLimit)
                                     intTryCount += 1;
@@ -400,9 +450,10 @@
                             }
                             else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                             {
+                                trans.AddTrail("GET STRING PANJANG", "", "FAILED");
                                 strMsgError = (string)jobjResult["transaction"]["statusDesc"];
                                 isLoading = false;
-                                //isVisible = false;
+                                //IsVisible = false;
                                 IsInvalid = true;
                                 isFail = true;
                                 break;
@@ -410,6 +461,7 @@
                         }
                         catch (Exception ex)
                         {
+                            trans.AddTrail("PERSO", trans.persoID, "FAILED");
                             OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                             trans.errorCode = strResult;
                             isError = true;
@@ -418,6 +470,7 @@
                     }
                     else
                     {
+                        trans.AddTrail("PERSO", trans.persoID, "FAILED");
                         OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                         trans.errorCode = strResult;
                         isError = true;
@@ -426,6 +479,7 @@
                 }
                 else
                 {
+                    trans.AddTrail("GET SN", "", "FAILED");
                     await Task.Run(() => MoveToBin());
                     if (intTryCount <= intTryLimit)
                         intTryCount += 1;
@@ -438,16 +492,12 @@
             }
             else
             {
+                trans.AddTrail("GET SN", "", "FAILED");
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
                 NavigateTo("/error");
                 break;
             }
-        }
-        if (!IsInvalid)
-        {
-            Timer.SetTimer(20000);
-            Timer.OnElapsed += TimerElapsedHandler;
         }
     }
 
@@ -599,7 +649,13 @@
         OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
         OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
-        while (!cds.MoveTo_The_Front(ref errorcode, ref msg)) { };
+        if (!cds.MoveTo_The_Front(ref errorcode, ref msg))
+        {
+            trans.AddTrail("MOVE TO FRONT", "", "FAILED");
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed", "step-action");
+            return;
+        }
+        trans.AddTrail("MOVE TO FRONT", "", "SUCCESS");
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
     }
@@ -636,6 +692,20 @@
             cdr.DisconnectedCard();
         }
         return ret;
+    }
+
+    private async Task Print()
+    {
+        int height = 0;
+
+        PrintContent prtContent = new PrintContent();
+        string msg = string.Empty;
+        string logoTsel = "C:\\MyGApps\\wwwroot\\assets\\image\\Logo\\Logo_MyGraPARI_mini.png";
+
+        string content = prtContent.U4G(trans, cst, config);
+        string header = prtContent.HeaderU4G(trans, cst, config);
+        string footer = prtContent.FooterU4G(trans, cst, config);
+        bool result = Printer.Print(config, header, content, logoTsel, footer, ref msg);
     }
 
     private void TimerElapsedHandler()

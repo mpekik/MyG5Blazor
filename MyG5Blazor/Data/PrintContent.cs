@@ -22,6 +22,21 @@ namespace MyG5Blazor.Data
 
             return contents;
         }
+        public string U4G(Transaction trans, Costumer cst, Config config)
+        {
+            DateTime datetimenow = DateTime.Now;
+
+            string contents = "----------------------------------------\n" +
+                "TRANSACTION ID     : " + trans.transID + "\n" +
+                "TERMINAL ID        : " + trans.termID + "\n" +
+                "TANGGAL WAKTU      : " + datetimenow.ToString("dd-MM-yyyy") + " " + datetimenow.ToString("HH:mm:ss") + "\n" +
+                "NOMOR PONSEL       : " + cst.PhoneNumber + "\n" +
+                "\n" +
+                "ANDA TELAH BERHASIL UPGRADE 4G\n" +
+                "----------------------------------------\n";
+
+            return contents;
+        }
         public string BTH(Transaction trans, Costumer cst, Config config)
         {
             DateTime datetimenow = DateTime.Now;
@@ -114,6 +129,18 @@ namespace MyG5Blazor.Data
         {
             string contents = "TERIMA KASIH TELAH MENGGUNAKAN\nLAYANAN JASA MYGRAPARI TELKOMSEL";
             
+            return contents;
+        }
+        public string HeaderU4G(Transaction trans, Costumer cst, Config config)
+        {
+            string contents = "UPGRADE 4G";
+
+            return contents;
+        }
+        public string FooterU4G(Transaction trans, Costumer cst, Config config)
+        {
+            string contents = "TERIMA KASIH TELAH MENGGUNAKAN\nLAYANAN JASA MYGRAPARI TELKOMSEL";
+
             return contents;
         }
     }

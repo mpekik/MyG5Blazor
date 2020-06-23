@@ -308,7 +308,7 @@
 
                 if (cst.EKTPNumber == ktp.Id)
                 {
-
+                    trans.AddTrail("SCAN EKTP", ktp.Id, "SUCCESS");
                     IsLoading = false;
                     IsSuccess = true;
                     Timer.SetTimer(1000);
@@ -316,6 +316,7 @@
                 }
                 else
                 {
+                    trans.AddTrail("SCAN EKTP", "NIK SALAH", "FAILED");
                     IsLoading = false;
                     IsSuccess = false;
                     if (intTryCount <= intTryLimit)
@@ -364,7 +365,7 @@
         if (timer)
         {
             timer = false;
-            NavMan.NavigateTo(" ");
+            //NavMan.NavigateTo(" ");
         }
     }
 }
