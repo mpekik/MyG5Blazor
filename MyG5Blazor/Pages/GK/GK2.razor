@@ -103,7 +103,7 @@
                         else
                         {
                             <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
-                            <button @onclick="@MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
+                            <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
                         }
                         <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                     </div>
@@ -126,7 +126,7 @@
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
-
+    
     private IntPtr hContext = IntPtr.Zero;
 
     byte[] pbPcid;
@@ -170,15 +170,15 @@
         trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         string auditTrail = string.Empty;
         int stepTrail = 1;
+        auditTrail = auditTrail + "[ ";
         foreach (dynamic at in trans._auditTrail)
         {
-            auditTrail = "[ " +
+            auditTrail = auditTrail +
                 "{ \"step\" : \"" + stepTrail + "\"," +
                 "\"action\" : \"" + at._action + "\"," +
                 "\"data\" : \"" + at._data + "\"," +
                 "\"result\" : \"" + at._result + "\"" +
-                "}" +
-                "],";
+                "},";
             stepTrail += 1;
         }
         auditTrail = auditTrail.Remove(auditTrail.Length - 1);
@@ -190,9 +190,9 @@
                 "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                 "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
                 "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
-                "\"status\" : \""+trans.status+"\"," +
+                "\"status\" : \"" + trans.status + "\"," +
                 "\"description\" : \"" + trans.errorCode + "\"" +
-                "}, \"auditTrail\" : " + auditTrail + "}";
+                "}, \"auditTrail\" : " + auditTrail + "]}";
         string myURL2 = _myURL + saveURL;
 
         string strResult2 = await PostCallAPI(myURL2, myJson2);
@@ -200,12 +200,14 @@
     private async Task MenuUtama()
     {
         trans.status = "GAGAL";
+        trans.errorCode = "EKTP";
         await AuditTrail();
         NavigateTo("");
     }
     private async Task Back()
     {
         trans.status = "GAGAL";
+        trans.errorCode = "EKTP";
         await AuditTrail();
         NavigateTo("/gk/1");
     }
@@ -262,6 +264,7 @@
             ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer)).ConfigureAwait(false);
             if (length == 0 || ret != 0)
             {
+                trans.AddTrail("SCAN EKTP", "NOT EKTP", "FAILED");
                 OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Failed", "step-action");
                 IsLoading = false;
                 if (intTryCount <= intTryLimit)

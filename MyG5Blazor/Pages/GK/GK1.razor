@@ -319,15 +319,15 @@
         trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         string auditTrail = string.Empty;
         int stepTrail = 1;
+        auditTrail = auditTrail + "[ ";
         foreach (dynamic at in trans._auditTrail)
         {
-            auditTrail = "[ " +
+            auditTrail = auditTrail +
                 "{ \"step\" : \"" + stepTrail + "\"," +
                 "\"action\" : \"" + at._action + "\"," +
                 "\"data\" : \"" + at._data + "\"," +
                 "\"result\" : \"" + at._result + "\"" +
-                "}" +
-                "],";
+                "},";
             stepTrail += 1;
         }
         auditTrail = auditTrail.Remove(auditTrail.Length - 1);
@@ -339,9 +339,9 @@
                 "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                 "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
                 "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
-                "\"status\" : \""+trans.status+"\"," +
+                "\"status\" : \"" + trans.status + "\"," +
                 "\"description\" : \"" + trans.errorCode + "\"" +
-                "}, \"auditTrail\" : " + auditTrail + "}";
+                "}, \"auditTrail\" : " + auditTrail + "]}";
         string myURL2 = _myURL + saveURL;
 
         string strResult2 = await PostCallAPI(myURL2, myJson2);

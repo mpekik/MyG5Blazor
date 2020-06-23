@@ -168,7 +168,7 @@
         IsLoading = true;
         string myJson = "{\"terminalId\": \"" + _termID + "\"}";
         string myURL = _myURL + strAPIURL;
-        //Console.WriteLine(myURL);
+        Console.WriteLine(myURL);
         OurUtility.Write_Log("= Get Menu Status Code", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);

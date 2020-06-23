@@ -256,9 +256,10 @@
         }else if(isSuccess)
         {
             trans.status = "BERHASIL";
+            trans.errorCode = "BERHASIL GANTI KARTU HILANG/RUSAK";
             await AuditTrail();
             await Print();
-            await CheckNPS("");
+            //await CheckNPS("");
         }else if(isFail)
         {
             trans.status = "GAGAL";
@@ -270,15 +271,15 @@
         trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         string auditTrail = string.Empty;
         int stepTrail = 1;
+        auditTrail = auditTrail + "[ ";
         foreach (dynamic at in trans._auditTrail)
         {
-            auditTrail = "[ " +
+            auditTrail = auditTrail +
                 "{ \"step\" : \"" + stepTrail + "\"," +
                 "\"action\" : \"" + at._action + "\"," +
                 "\"data\" : \"" + at._data + "\"," +
                 "\"result\" : \"" + at._result + "\"" +
-                "}" +
-                "],";
+                "},";
             stepTrail += 1;
         }
         auditTrail = auditTrail.Remove(auditTrail.Length - 1);
@@ -290,9 +291,9 @@
                 "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                 "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
                 "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
-                "\"status\" : \""+trans.status+"\"," +
+                "\"status\" : \"" + trans.status + "\"," +
                 "\"description\" : \"" + trans.errorCode + "\"" +
-                "}, \"auditTrail\" : " + auditTrail + "}";
+                "}, \"auditTrail\" : " + auditTrail + "]}";
         string myURL2 = _myURL + saveURL;
 
         string strResult2 = await PostCallAPI(myURL2, myJson2);
@@ -353,7 +354,7 @@
                                     "\"terminalId\" : \"" + trans.termID + "\"," +
                                     "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                                     "\"nik\" : \"" + cst.EKTPNumber + "\"," +
-                                    "\"buid\" : \"" + trans.buID + "\"," +
+                                    "\"buid\" : \"" + "" + "\"," +
                                     "\"serialNumber\" : \"" + p_icc_id + "\"" +
                                     "}";
 
@@ -408,7 +409,7 @@
                                         strResult = await PostCallAPI(myURL, myJson);
                                         trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "SUCCESS");
                                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                                        if (intTryCount <= intTryLimit)
+                                        if (intTryCount < intTryLimit)
                                             intTryCount += 1;
                                         else
                                         {
@@ -421,7 +422,7 @@
                                 {
                                     trans.AddTrail("GET STRING PANJANG", "" , "FAILED");
                                     await Task.Run(() => MoveToBin());
-                                    if (intTryCount <= intTryLimit)
+                                    if (intTryCount < intTryLimit)
                                         intTryCount += 1;
                                     else
                                     {
@@ -455,8 +456,8 @@
                                 }
                                 trans.AddTrail("GET STRING PANJANG", "", "FAILED");
                                 await Task.Run(() => MoveToBin());
-                                if (intTryCount <= intTryLimit)
-                                    intTryCount += 1;
+                                if (intTryCount < intTryLimit)
+                                                      intTryCount += 1;
                                 else
                                 {
                                     isFail = true;
@@ -500,6 +501,7 @@
                         intTryCount += 1;
                     else
                     {
+                        trans.errorCode = "FAILED GET SN";
                         isFail = true;
                         return;
                     }
@@ -508,6 +510,9 @@
             else
             {
                 trans.AddTrail("GET SN", "", "FAILED");
+                trans.status = "GAGAL";
+                trans.errorCode = "KARTU HABIS";
+                await AuditTrail();
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
                 NavigateTo("/error");
