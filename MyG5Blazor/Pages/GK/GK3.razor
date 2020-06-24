@@ -64,8 +64,6 @@
         </div>
     </div>
 
-
-
     <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
     <footer>
         <div class="footer-side1">
@@ -83,7 +81,6 @@
     @if (IsVisible)
     {
         <div id="myModal" class="modal">
-
             <!-- Modal content -->
             <div class="modal-dialog-centered" role="document">
                 <div class="modal-content">
@@ -105,7 +102,6 @@
 
         </div>
     }
-
 </div>
 
 @code{
@@ -320,7 +316,7 @@
                             OurUtility.Write_Log("===== 10. Ektp_Sdk.CloseReader", "step-action");
                             result = Ektp_Sdk.CloseReader(reader);
 
-                            OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
+                            //OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
                             //Switcher.DOWN_eKTP("500");
 
                             Timer.SetTimer(1000);
@@ -355,7 +351,6 @@
         cst.EKTPNumber = ktp.Id;
         OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
         NavMan.NavigateTo("/gk/4");
-
     }
     [Microsoft.AspNetCore.Components.Inject]
 

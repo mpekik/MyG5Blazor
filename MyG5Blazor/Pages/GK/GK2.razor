@@ -126,7 +126,7 @@
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
-    
+
     private IntPtr hContext = IntPtr.Zero;
 
     byte[] pbPcid;
@@ -170,15 +170,15 @@
         trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         string auditTrail = string.Empty;
         int stepTrail = 1;
-        auditTrail = auditTrail + "[ ";
         foreach (dynamic at in trans._auditTrail)
         {
-            auditTrail = auditTrail +
+            auditTrail = "[ " +
                 "{ \"step\" : \"" + stepTrail + "\"," +
                 "\"action\" : \"" + at._action + "\"," +
                 "\"data\" : \"" + at._data + "\"," +
                 "\"result\" : \"" + at._result + "\"" +
-                "},";
+                "}" +
+                "],";
             stepTrail += 1;
         }
         auditTrail = auditTrail.Remove(auditTrail.Length - 1);
@@ -192,7 +192,7 @@
                 "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
                 "\"status\" : \"" + trans.status + "\"," +
                 "\"description\" : \"" + trans.errorCode + "\"" +
-                "}, \"auditTrail\" : " + auditTrail + "]}";
+                "}, \"auditTrail\" : " + auditTrail + "}";
         string myURL2 = _myURL + saveURL;
 
         string strResult2 = await PostCallAPI(myURL2, myJson2);
@@ -229,6 +229,7 @@
     {
         if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
         {
+            IsLoading = true;
             await ScanKTP();
         }
         else if (IsVisible)
@@ -240,7 +241,6 @@
     //FIXME: Create as Service
     private async Task ScanKTP()
     {
-        IsLoading = true;
         OurUtility.Write_Log("==== Switcher.UP_eKTP", "step-action");
 
         if (intTryCount <= intTryLimit)

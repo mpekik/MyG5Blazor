@@ -184,7 +184,7 @@
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
-    private int CESno =0;
+    private int CESno = 0;
 
     private string strNPS1Value = string.Empty;
     private string[] strNPS2Value = { "", "", "", "" };
@@ -198,6 +198,17 @@
     private string p_icc_id = string.Empty;
     private string mypersoexe = string.Empty;
 
+    private string qu1IndText = string.Empty;
+    private string qu1ID = string.Empty;
+    private string qu2IndText = string.Empty;
+    private string qu2ID = string.Empty;
+
+    private string qu1EngText = string.Empty;
+    private string qu2EngText = string.Empty;
+
+    private string quIndText = string.Empty;
+    private string quID = string.Empty;
+    private string quEngText = string.Empty;
     /*JSON POST
             "transactionId" : "didapat dari init awal",
             "terminalId" : "T0999",
@@ -211,10 +222,16 @@
     private static string persoURL = "mygrapari/upgrade-4g/v1/perso";
     private static string updateURL = "mygrapari/perso/v1/update";
     private static string cesURL = "mygrapari/ces/v1/eligibility-check";
-    private static string myJson = string.Empty;
     public string saveURL = "mygrapari/log/v1/save";
 
+    private static string myJson = string.Empty;
 
+    private async Task MenuUtama()
+    {
+        trans.status = "GAGAL";
+        await AuditTrail();
+        NavigateTo("");
+    }
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);
@@ -233,21 +250,30 @@
         await MyPerso();
         if (isError)
         {
+            isLoading = false;
             trans.status = "GAGAL";
             await AuditTrail();
             NavMan.NavigateTo("/error");
-        }
-        else if (isSuccess)
+        }else if (isSuccess)
         {
+            isLoading = false;
             trans.status = "BERHASIL";
+            trans.errorCode = "BERHASIL UPGRADE 4G";
             await AuditTrail();
             await Print();
-            await CheckNPS("");
+
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
+            //await CheckNPS("");
         }
         else if (isFail)
         {
+            isLoading = false;
             trans.status = "GAGAL";
             await AuditTrail();
+
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
         }
     }
     private async Task AuditTrail()
@@ -255,15 +281,15 @@
         trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         string auditTrail = string.Empty;
         int stepTrail = 1;
+        auditTrail = auditTrail + "[ ";
         foreach (dynamic at in trans._auditTrail)
         {
-            auditTrail = "[ " +
+            auditTrail = auditTrail +
                 "{ \"step\" : \"" + stepTrail + "\"," +
                 "\"action\" : \"" + at._action + "\"," +
                 "\"data\" : \"" + at._data + "\"," +
                 "\"result\" : \"" + at._result + "\"" +
-                "}" +
-                "],";
+                "},";
             stepTrail += 1;
         }
         auditTrail = auditTrail.Remove(auditTrail.Length - 1);
@@ -277,7 +303,7 @@
                 "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
                 "\"status\" : \"" + trans.status + "\"," +
                 "\"description\" : \"" + trans.errorCode + "\"" +
-                "}, \"auditTrail\" : " + auditTrail + "}";
+                "}, \"auditTrail\" : " + auditTrail + "]}";
         string myURL2 = _myURL + saveURL;
 
         string strResult2 = await PostCallAPI(myURL2, myJson2);
@@ -393,25 +419,25 @@
                                         strResult = await PostCallAPI(myURL, myJson);
                                         trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "SUCCESS");
                                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                                        if (intTryCount <= intTryLimit)
+                                        if (intTryCount < intTryLimit)
                                             intTryCount += 1;
                                         else
                                         {
                                             isFail = true;
-                                            break;
+                                            return;
                                         }
                                     }
                                 }
                                 else
                                 {
-                                    trans.AddTrail("GET STRING PANJANG", " ", "FAILED");
+                                    trans.AddTrail("GET STRING PANJANG", "", "FAILED");
                                     await Task.Run(() => MoveToBin());
-                                    if (intTryCount <= intTryLimit)
+                                    if (intTryCount < intTryLimit)
                                         intTryCount += 1;
                                     else
                                     {
                                         isFail = true;
-                                        break;
+                                        return;
                                     }
                                 }
 
@@ -440,12 +466,12 @@
                                 }
                                 trans.AddTrail("GET STRING PANJANG", "", "FAILED");
                                 await Task.Run(() => MoveToBin());
-                                if (intTryCount <= intTryLimit)
+                                if (intTryCount < intTryLimit)
                                     intTryCount += 1;
                                 else
                                 {
                                     isFail = true;
-                                    break;
+                                    return;
                                 }
                             }
                             else if ((string)jobjResult["transaction"]["statusCode"] == "02")
@@ -456,7 +482,7 @@
                                 //IsVisible = false;
                                 IsInvalid = true;
                                 isFail = true;
-                                break;
+                                return;
                             }
                         }
                         catch (Exception ex)
@@ -465,7 +491,7 @@
                             OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                             trans.errorCode = strResult;
                             isError = true;
-                            break;
+                            return;
                         }
                     }
                     else
@@ -474,25 +500,29 @@
                         OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                         trans.errorCode = strResult;
                         isError = true;
-                        break;
+                        return;
                     }
                 }
                 else
                 {
                     trans.AddTrail("GET SN", "", "FAILED");
                     await Task.Run(() => MoveToBin());
-                    if (intTryCount <= intTryLimit)
+                    if (intTryCount < intTryLimit)
                         intTryCount += 1;
                     else
                     {
+                        trans.errorCode = "FAILED GET SN";
                         isFail = true;
-                        break;
+                        return;
                     }
                 }
             }
             else
             {
                 trans.AddTrail("GET SN", "", "FAILED");
+                trans.status = "GAGAL";
+                trans.errorCode = "KARTU HABIS";
+                await AuditTrail();
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
                 NavigateTo("/error");
@@ -656,6 +686,7 @@
             return;
         }
         trans.AddTrail("MOVE TO FRONT", "", "SUCCESS");
+        
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
     }

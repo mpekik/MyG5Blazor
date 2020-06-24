@@ -250,20 +250,30 @@
         await MyPerso();
         if (isError)
         {
+            isLoading = false;
             trans.status = "GAGAL";
             await AuditTrail();
             NavMan.NavigateTo("/error");
         }else if(isSuccess)
         {
+            isLoading = false;
             trans.status = "BERHASIL";
             trans.errorCode = "BERHASIL GANTI KARTU HILANG/RUSAK";
             await AuditTrail();
             await Print();
+
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
             //await CheckNPS("");
-        }else if(isFail)
+        }
+        else if(isFail)
         {
+            isLoading = false;
             trans.status = "GAGAL";
             await AuditTrail();
+
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
         }
     }
     private async Task AuditTrail()
@@ -354,7 +364,7 @@
                                     "\"terminalId\" : \"" + trans.termID + "\"," +
                                     "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                                     "\"nik\" : \"" + cst.EKTPNumber + "\"," +
-                                    "\"buid\" : \"" + "" + "\"," +
+                                    "\"buid\" : \"" + trans.buID + "\"," +
                                     "\"serialNumber\" : \"" + p_icc_id + "\"" +
                                     "}";
 
@@ -457,7 +467,7 @@
                                 trans.AddTrail("GET STRING PANJANG", "", "FAILED");
                                 await Task.Run(() => MoveToBin());
                                 if (intTryCount < intTryLimit)
-                                                      intTryCount += 1;
+                                    intTryCount += 1;
                                 else
                                 {
                                     isFail = true;
@@ -497,7 +507,7 @@
                 {
                     trans.AddTrail("GET SN", "", "FAILED");
                     await Task.Run(() => MoveToBin());
-                    if (intTryCount <= intTryLimit)
+                    if (intTryCount < intTryLimit)
                         intTryCount += 1;
                     else
                     {
@@ -541,6 +551,7 @@
     {
         strNPS1Value = strInput;
     }
+
     private async Task NPS()
     {
         surveys[CESno].answValue = strNPS1Value;

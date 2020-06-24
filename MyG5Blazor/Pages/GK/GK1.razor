@@ -46,11 +46,11 @@
                 <div class="col-md-6">
                     @if (strNumber == string.Empty)
                     {
-                        <input type="text" name="number" placeholder="0811 1234 5678" class="num-field">
+                        <input type="text" name="number" placeholder="0811 1234 5678" class="num-field" readonly>
                     }
                     else
                     {
-                        <input type="text" name="number" class="num-field" @bind="strNumber" />
+                        <input type="text" name="number" class="num-field" @bind="strNumber" readonly/>
                     }
                     <div class="num-button">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
@@ -135,15 +135,6 @@
 }
 
 @code{
-    [Microsoft.AspNetCore.Components.Inject]
-
-    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
-
-    [Microsoft.AspNetCore.Components.Inject]
-
-    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
-
-    private bool timer = false;
     private string strNumber = string.Empty;
     private bool IsVisible = false;
     private bool IsInvalid = false;
@@ -232,7 +223,6 @@
         }
         return ret;
     }
-    //<span style="font-weight: bold;">Nomor tidak dikenali,</span> harap masukkan nomor Telkomsel yang benar dan aktif
     private async Task CheckNumber(string strURL)
     {
         trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -240,11 +230,6 @@
         byte[] image = OurUtility.CaptureImage();
         var imageBytesStr = Convert.ToBase64String(image);
         cst.PhoneNumber = "62" + strNumber.Substring(1);
-
-        /*string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"" +
-                            "}";*/
-
         string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
                             "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
                             "\"image\" : \"" + imageBytesStr + "\"" +
@@ -279,7 +264,7 @@
                     else
                     {
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
-                        string statusDescSub = _statusDescSub.Substring(0, 9);
+                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
@@ -346,6 +331,15 @@
 
         string strResult2 = await PostCallAPI(myURL2, myJson2);
     }
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
+
+    private bool timer = false;
     protected override void OnAfterRender(bool bFirstRender)
     {
         if (bFirstRender)
@@ -363,7 +357,6 @@
     {
         if (timer)
         {
-            //Console.WriteLine("GK 1");
             timer = false;
             //NavMan.NavigateTo(" ");
         }

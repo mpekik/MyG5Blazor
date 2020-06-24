@@ -9,6 +9,7 @@
 @inject Config config
 @inject Transaction trans
 @using MyG5Blazor.Data
+
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -128,7 +129,6 @@
 
     private IntPtr hContext = IntPtr.Zero;
 
-    /* FIXME: change to the right PCID & CONFIGFILE  */
     byte[] pbPcid;
 
     byte[] pbConf;
@@ -200,12 +200,14 @@
     private async Task MenuUtama()
     {
         trans.status = "GAGAL";
+        trans.errorCode = "EKTP";
         await AuditTrail();
         NavigateTo("");
     }
     private async Task Back()
     {
         trans.status = "GAGAL";
+        trans.errorCode = "EKTP";
         await AuditTrail();
         NavigateTo("/u4g/1");
     }
@@ -216,6 +218,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
         OurUtility.Write_Log("== Scan e-KTP Page", "step-action");
@@ -226,6 +229,7 @@
     {
         if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
         {
+            IsLoading = true;
             await ScanKTP();
         }
         else if (IsVisible)
@@ -237,7 +241,6 @@
     //FIXME: Create as Service
     private async Task ScanKTP()
     {
-        IsLoading = true;
         OurUtility.Write_Log("=== Switcher.UP_eKTP", "step-action");
 
         if (intTryCount <= intTryLimit)
@@ -261,6 +264,7 @@
             ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer)).ConfigureAwait(false);
             if (length == 0 || ret != 0)
             {
+                trans.AddTrail("SCAN EKTP", "NOT EKTP", "FAILED");
                 OurUtility.Write_Log("==== 6. Ektp_Sdk.ReadDemographic Failed", "step-action");
                 IsLoading = false;
                 if (intTryCount <= intTryLimit)
@@ -338,6 +342,7 @@
     {
         NavMan.NavigateTo("/u4g/3");
     }
+
     [Microsoft.AspNetCore.Components.Inject]
 
     protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }

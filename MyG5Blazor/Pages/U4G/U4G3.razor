@@ -159,15 +159,15 @@
         trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         string auditTrail = string.Empty;
         int stepTrail = 1;
+        auditTrail = auditTrail + "[ ";
         foreach (dynamic at in trans._auditTrail)
         {
-            auditTrail = "[ " +
+            auditTrail = auditTrail +
                 "{ \"step\" : \"" + stepTrail + "\"," +
                 "\"action\" : \"" + at._action + "\"," +
                 "\"data\" : \"" + at._data + "\"," +
                 "\"result\" : \"" + at._result + "\"" +
-                "}" +
-                "],";
+                "},";
             stepTrail += 1;
         }
         auditTrail = auditTrail.Remove(auditTrail.Length - 1);
@@ -181,7 +181,7 @@
                 "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
                 "\"status\" : \"" + trans.status + "\"," +
                 "\"description\" : \"" + trans.errorCode + "\"" +
-                "}, \"auditTrail\" : " + auditTrail + "}";
+                "}, \"auditTrail\" : " + auditTrail + "]}";
         string myURL2 = _myURL + saveURL;
 
         string strResult2 = await PostCallAPI(myURL2, myJson2);
@@ -189,6 +189,7 @@
     private async Task MenuUtama()
     {
         trans.status = "GAGAL";
+        trans.errorCode = "FINGER PRINT";
         await AuditTrail();
         NavigateTo("");
     }
@@ -215,6 +216,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
         OurUtility.Write_Log("== Finger Print Scan Page", "step-action");
@@ -314,8 +316,8 @@
                             OurUtility.Write_Log("===== 10. Ektp_Sdk.CloseReader", "step-action");
                             result = Ektp_Sdk.CloseReader(reader);
 
-                            OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
-                            await Task.Run(() => Switcher.DOWN_eKTP("500"));
+                            //OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
+                            //await Task.Run(() => Switcher.DOWN_eKTP("500"));
 
                             Timer.SetTimer(1000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -345,8 +347,10 @@
 
     private void TimerElapsedHandler()
     {
-        NavMan.NavigateTo("/u4g/4");
-
+        OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+        cst.EKTPNumber = ktp.Id;
+        OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+        NavMan.NavigateTo("/gk/4");
     }
     [Microsoft.AspNetCore.Components.Inject]
 

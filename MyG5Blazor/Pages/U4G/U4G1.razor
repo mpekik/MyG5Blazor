@@ -46,11 +46,11 @@
                 <div class="col-md-6">
                     @if (strNumber == string.Empty)
                     {
-                        <input type="text" name="number" placeholder="0811 1234 5678" class="num-field">
+                        <input type="text" name="number" placeholder="0811 1234 5678" class="num-field" readonly>
                     }
                     else
                     {
-                        <input type="text" name="number" class="num-field" @bind="strNumber" />
+                        <input type="text" name="number" class="num-field" @bind="strNumber" readonly/>
                     }
                     <div class="num-button">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
@@ -138,8 +138,6 @@
     private string strNumber = string.Empty;
     private bool IsVisible = false;
     private bool IsInvalid = false;
-    private bool IsMobileBanking = false;
-    private bool IsValid => !IsInvalid && !IsMobileBanking;
     private bool IsLoading = false;
 
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
@@ -148,6 +146,7 @@
     public string saveURL = "mygrapari/log/v1/save";
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
+
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -168,7 +167,6 @@
         {
             IsVisible = visiblestatus;
             IsInvalid = visiblestatus;
-            IsMobileBanking = visiblestatus;
         }
     }
 
@@ -187,8 +185,8 @@
     {
         if (strURL != "")
         {
-            OurUtility.Write_Log("=== Get Phone Number", "step-action");
             cst.PhoneNumber = "62" + strNumber.Substring(1);
+            OurUtility.Write_Log("=== Get Phone Number", "step-action");
         }
         NavMan.NavigateTo(strURL);
     }
@@ -208,7 +206,6 @@
                     {
                         if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
                         {
-                            Console.WriteLine(response.StatusCode.ToString());
                             var jsonStringResult = await response.Content.ReadAsStringAsync();
                             return jsonStringResult;
                         }
@@ -232,26 +229,26 @@
         IsLoading = true;
         byte[] image = OurUtility.CaptureImage();
         var imageBytesStr = Convert.ToBase64String(image);
-
+        cst.PhoneNumber = "62" + strNumber.Substring(1);
         string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
-                            "\"image\" : \"" + imageBytesStr + "\"" +
-                            "}";
+                        "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
+                        "\"image\" : \"" + imageBytesStr + "\"" +
+                        "}";
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try
             {
                 JObject jobjResult = JObject.Parse(strResult);
+                trans.SetTransaction((string)jobjResult["transaction"]["transactionId"]);
                 if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
-                    trans.SetTransaction((string)jobjResult["transaction"]["transactionId"]);
                     cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"], (string)jobjResult["profile"]["idNumber"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
                     trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "SUCCESS");
@@ -271,7 +268,6 @@
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
-                    trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                     trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
                     trans.status = "GAGAL";
                     await AuditTrail();
@@ -302,19 +298,21 @@
             NavMan.NavigateTo("/error");
         }
     }
+
     private async Task AuditTrail()
     {
+        trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
         string auditTrail = string.Empty;
         int stepTrail = 1;
+        auditTrail = auditTrail + "[ ";
         foreach (dynamic at in trans._auditTrail)
         {
-            auditTrail = "[ " +
+            auditTrail = auditTrail +
                 "{ \"step\" : \"" + stepTrail + "\"," +
                 "\"action\" : \"" + at._action + "\"," +
                 "\"data\" : \"" + at._data + "\"," +
                 "\"result\" : \"" + at._result + "\"" +
-                "}" +
-                "],";
+                "},";
             stepTrail += 1;
         }
         auditTrail = auditTrail.Remove(auditTrail.Length - 1);
@@ -328,7 +326,7 @@
                 "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
                 "\"status\" : \"" + trans.status + "\"," +
                 "\"description\" : \"" + trans.errorCode + "\"" +
-                "}, \"auditTrail\" : " + auditTrail + "}";
+                "}, \"auditTrail\" : " + auditTrail + "]}";
         string myURL2 = _myURL + saveURL;
 
         string strResult2 = await PostCallAPI(myURL2, myJson2);
