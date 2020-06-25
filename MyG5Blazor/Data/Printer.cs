@@ -32,14 +32,14 @@ namespace MyG5Blazor.Data
                 p_height = Process_Document(null);
 
                 result = new PrintDocument();
-                result.DefaultPageSettings = GetPrinterPageInfo("BT-T080(U) 1");
+                result.DefaultPageSettings.PaperSize = new PaperSize("Custom", 320, p_height);
                 //result.DefaultPageSettings.PaperSize = new PaperSize("Custom", 320, p_height);
                 result.PrintPage += new PrintPageEventHandler(PrintPage_Handler);
 
                 try
                 {
                     PrinterSettings settings = new PrinterSettings();
-                    result.PrinterSettings.PrinterName = "BT-T080(U) 1"; // get DefaultPrinter from Windows
+                    result.PrinterSettings.PrinterName = settings.PrinterName; // get DefaultPrinter from Windows
                 }
                 catch { }
             }

@@ -5,6 +5,7 @@
 @inject Ektp_Data ktp
 @inject Costumer cst
 @inject Config config
+@inject Transaction trans 
 @using MyG5Blazor.Data
 
 <h1>Counter</h1>
@@ -12,7 +13,7 @@
 <p>Id: @ktp.Id</p>
 <p>Nama: @ktp.Name</p>
 <p>Card SN : @p_icc_id</p>
-<button class="btn btn-primary" @onclick="TesReader">Click me</button>
+<button class="btn btn-primary" @onclick="Print">Click me</button>
 
 @code {
     private int currentCount = 0;
@@ -72,5 +73,18 @@
         ktp.demographic = demoGraphic;
 
         StateHasChanged();
+    }
+    private async Task Print()
+    {
+        int height = 0;
+
+        PrintContent prtContent = new PrintContent();
+        string msg = string.Empty;
+        string logoTsel = "C:\\MyGApps\\wwwroot\\assets\\image\\Logo\\Logo_MyGraPARI_mini.png";
+
+        string content = prtContent.GK(trans, cst, config);
+        string header = prtContent.HeaderGK(trans, cst, config);
+        string footer = prtContent.FooterGK(trans, cst, config);
+        bool result = Printer.Print(config, header, content, logoTsel, footer, ref msg);
     }
 }
