@@ -11,14 +11,12 @@ namespace MyG5Blazor.Data
         {
             DateTime datetimenow = DateTime.Now;
 
-            string contents = "----------------------------------------\n"+
-                "TRANSACTION ID     : "+trans.transID+"\n"+
+            string contents = "TRANSACTION ID     : "+trans.transID+"\n"+
                 "TERMINAL ID        : "+trans.termID+"\n"+
                 "TANGGAL WAKTU      : "+ datetimenow.ToString("dd-MM-yyyy") + " " + datetimenow.ToString("HH:mm:ss") + "\n" +
                 "NOMOR PONSEL       : "+cst.PhoneNumber+"\n"+
                 "\n"+
-                "ANDA TELAH BERHASIL GANTI KARTU HILANG/RUSAK\n"+
-                "----------------------------------------\n";
+                "ANDA TELAH BERHASIL GANTI KARTU HILANG/RUSAK\n";
 
             return contents;
         }
@@ -26,14 +24,12 @@ namespace MyG5Blazor.Data
         {
             DateTime datetimenow = DateTime.Now;
 
-            string contents = "----------------------------------------\n" +
-                "TRANSACTION ID     : " + trans.transID + "\n" +
+            string contents = "TRANSACTION ID     : " + trans.transID + "\n" +
                 "TERMINAL ID        : " + trans.termID + "\n" +
                 "TANGGAL WAKTU      : " + datetimenow.ToString("dd-MM-yyyy") + " " + datetimenow.ToString("HH:mm:ss") + "\n" +
                 "NOMOR PONSEL       : " + cst.PhoneNumber + "\n" +
                 "\n" +
-                "ANDA TELAH BERHASIL UPGRADE 4G\n" +
-                "----------------------------------------\n";
+                "ANDA TELAH BERHASIL UPGRADE 4G\n" ;
 
             return contents;
         }

@@ -31,14 +31,14 @@ namespace MyG5Blazor.Data
                 footer = _footer;
                 p_height = Process_Document(null);
 
+                PrinterSettings settings = new PrinterSettings();
                 result = new PrintDocument();
-                result.DefaultPageSettings.PaperSize = new PaperSize("Custom", 320, p_height);
+                result.DefaultPageSettings = GetPrinterPageInfo(settings.PrinterName);
                 //result.DefaultPageSettings.PaperSize = new PaperSize("Custom", 320, p_height);
                 result.PrintPage += new PrintPageEventHandler(PrintPage_Handler);
 
                 try
                 {
-                    PrinterSettings settings = new PrinterSettings();
                     result.PrinterSettings.PrinterName = settings.PrinterName; // get DefaultPrinter from Windows
                 }
                 catch { }
