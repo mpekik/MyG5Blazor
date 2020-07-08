@@ -1,0 +1,84 @@
+﻿@page "/login"
+@inject IJSRuntime JSRuntime;
+
+@using MyG5Blazor.Data
+@using System.Net.Http;
+@using System.Text;
+@using System;
+
+@inject Costumer cst
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Config config
+
+<div class="bg-login">
+        <div class="wrapper">
+            <div class="main-panel">
+                <!-- Navbar -->
+                <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+                    <div class="container-fluid">
+                        <div class="navbar-wrapper">
+                            <div class="logo">
+                                <img src="../assets/image/Logo/Logo_MyGraPARI.png" />
+                            </div>
+                            <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+                        </div>
+                    </div>
+                </nav>
+                <!-- End Navbar -->
+
+                <div class="content">
+                    <div class="container-fluid">
+                        <div class="row" style="margin-top: 5%;">
+                            <div class="col-md-12" style="text-align: left;">
+                                <div class="form-group3">
+                                    <label class="teks-data">Terminal ID</label>
+                                    <input type="text" class="form-control2" placeholder="terminal id" @bind="terminalId">
+                                </div>
+                            </div>
+                            <div class="col-md-12" style="text-align: left;">
+                                <div class="form-group3">
+                                    <label class="teks-data">Username</label>
+                                    <input type="text" class="form-control2" placeholder="username" @bind="userName">
+                                </div>
+                            </div>
+                            <div class="col-md-12" style="text-align: left;">
+                                <div class="form-group3">
+                                    <label class="teks-data">Password</label>
+                                    <input type="text" class="form-control2" placeholder="password" @bind="password">
+                                </div>
+                            </div>
+                            <div class="col-md-12">
+                                <div class="form-group3">
+                                    <button class="btn btn-danger button-nps" style="bottom: 5%;" @onclick="loginCheck">Login</button>
+                                </div>
+                            </div>
+                            <label class="teks-data">@terminalId</label>
+                            <label class="teks-data">@userName</label>
+                            <label class="teks-data">@password</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+</div>
+
+        @code{
+            private string terminalId = string.Empty;
+            private string userName = string.Empty;
+            private string password = string.Empty;
+
+            protected override async Task OnInitializedAsync()
+            {
+                OurUtility.Write_Log("== Error Page", "step-action");
+            }
+            private void NavigateTo(string strURL)
+            {
+                NavMan.NavigateTo("");
+            }
+
+            private void loginCheck()
+            {
+
+            }
+        }

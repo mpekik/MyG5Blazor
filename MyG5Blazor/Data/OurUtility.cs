@@ -12,13 +12,46 @@ using System.Threading;
 using System.Drawing;
 using System.Security.Cryptography;
 using System.Text;
+using Newtonsoft.Json.Linq;
+using System.Net.Http;
 
 namespace MyG5Blazor.Data
 {
     public class OurUtility
     {
         private static Config config = new Config();
+        public static string RandomString(int stringLength)
+        {
+            Random rd = new Random();
+            const string allowedChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789";
+            char[] chars = new char[stringLength];
 
+            for (int i = 0; i < stringLength; i++)
+            {
+                chars[i] = allowedChars[rd.Next(0, allowedChars.Length)];
+            }
+
+            return new string(chars);
+        }
+
+        public static string CreateMD5(string input)
+        {
+            // Use input string to calculate MD5 hash
+            using (System.Security.Cryptography.MD5 md5 = System.Security.Cryptography.MD5.Create())
+            {
+                byte[] inputBytes = System.Text.Encoding.ASCII.GetBytes(input);
+                byte[] hashBytes = md5.ComputeHash(inputBytes);
+
+                // Convert the byte array to hexadecimal string
+                StringBuilder sb = new StringBuilder();
+                for (int i = 0; i < hashBytes.Length; i++)
+                {
+                    sb.Append(hashBytes[i].ToString("X2"));
+                }
+                return sb.ToString();
+            }
+        }
+        
         public static void Write_Log(string p_str, string p_prefix_fileName)
         {
             string msg = string.Empty;
@@ -254,6 +287,88 @@ namespace MyG5Blazor.Data
             return result;
         }
 
+        public static async Task AuditTrail(Transaction trans, Menu menu, Costumer cst)
+        {
+            string _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+            string saveURL = "mygrapari/log/v1/save";
+            
+            trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            string auditTrail = string.Empty;
+            int stepTrail = 1;
+            auditTrail = auditTrail + "[ ";
+            foreach (dynamic at in trans._auditTrail)
+            {
+                auditTrail = auditTrail +
+                    "{ \"step\" : \"" + stepTrail + "\"," +
+                    "\"action\" : \"" + at._action + "\"," +
+                    "\"data\" : \"" + at._data + "\"," +
+                    "\"result\" : \"" + at._result + "\"" +
+                    "},";
+                stepTrail += 1;
+            }
+            auditTrail = auditTrail.Remove(auditTrail.Length - 1);
+
+            string myJson2 = "{ \"transaction\" : " +
+                "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                "\"terminalId\" : \"" + trans.termID + "\"," +
+                "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
+                    "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                    "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
+                    "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
+                    "\"status\" : \"" + trans.status + "\"," +
+                    "\"description\" : \"" + trans.errorCode + "\"" +
+                    "}, \"auditTrail\" : " + auditTrail + "]}";
+            string myURL2 = _myURL + saveURL;
+
+            string strResult2 = await OurUtility.PostCallAPI(myURL2, myJson2,menu);
+        }
+        public static async Task<string> PostCallAPI(string url, string jsonString, Menu menu)
+        {
+            string secret = OurUtility.RandomString(10);
+            long unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            string unixtimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString().Substring(0, 10);
+            string md5Input = menu.terminalId + secret + menu.tokenId + unixtimestamp;
+            string signature = OurUtility.CreateMD5(md5Input);
+
+            string ret = string.Empty;
+            signature = signature.ToLower();
+            try
+            {
+                using (var handler = new HttpClientHandler())
+                {
+                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                    using (HttpClient client = new HttpClient(handler))
+                    {
+                        var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                        //                    client.DefaultRequestHeaders.Add("signature-key", signature);
+                        //                  client.DefaultRequestHeaders.Add("secret-key", secret);
+                        content.Headers.Add("signature-key", signature);
+                        content.Headers.Add("secret-key", secret);
+                        var response = await client.PostAsync(url, content);
+                        //Console.WriteLine(response.StatusCode.ToString());
+                        if (response != null)
+                        {
+
+                            if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
+                            {
+                                var jsonStringResult = await response.Content.ReadAsStringAsync();
+                                return jsonStringResult;
+                            }
+                            else
+                            {
+                                return response.StatusCode.ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                Console.WriteLine(e.InnerException.Message);
+            }
+            return ret;
+        }
         private static string p_delay_UP = "3000";
         private static string p_delay_DOWN = "500";
 

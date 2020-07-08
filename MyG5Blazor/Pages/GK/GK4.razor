@@ -8,6 +8,7 @@
 @using MyG5Blazor.Data
 @using System.Timers;
 
+@inject Menu menu  
 @inject Card_Dispenser cds
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavMan
@@ -229,7 +230,7 @@
     private async Task MenuUtama()
     {
         trans.status = "GAGAL";
-        await AuditTrail();
+        await OurUtility.AuditTrail(trans,menu,cst);
         NavigateTo("");
     }
     private void NavigateTo(string strURL)
@@ -252,14 +253,14 @@
         {
             isLoading = false;
             trans.status = "GAGAL";
-            await AuditTrail();
+            await OurUtility.AuditTrail(trans,menu,cst);
             NavMan.NavigateTo("/error");
         }else if(isSuccess)
         {
             isLoading = false;
             trans.status = "BERHASIL";
             trans.errorCode = "BERHASIL GANTI KARTU HILANG/RUSAK";
-            await AuditTrail();
+            await OurUtility.AuditTrail(trans,menu,cst);
             await Print();
 
             Timer.SetTimer(20000);
@@ -270,44 +271,13 @@
         {
             isLoading = false;
             trans.status = "GAGAL";
-            await AuditTrail();
+            await OurUtility.AuditTrail(trans,menu,cst);
 
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
     }
-    private async Task AuditTrail()
-    {
-        trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        string auditTrail = string.Empty;
-        int stepTrail = 1;
-        auditTrail = auditTrail + "[ ";
-        foreach (dynamic at in trans._auditTrail)
-        {
-            auditTrail = auditTrail +
-                "{ \"step\" : \"" + stepTrail + "\"," +
-                "\"action\" : \"" + at._action + "\"," +
-                "\"data\" : \"" + at._data + "\"," +
-                "\"result\" : \"" + at._result + "\"" +
-                "},";
-            stepTrail += 1;
-        }
-        auditTrail = auditTrail.Remove(auditTrail.Length - 1);
-
-        string myJson2 = "{ \"transaction\" : " +
-            "{ \"transactionId\" : \"" + trans.transID + "\"," +
-            "\"terminalId\" : \"" + trans.termID + "\"," +
-            "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
-                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
-                "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
-                "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
-                "\"status\" : \"" + trans.status + "\"," +
-                "\"description\" : \"" + trans.errorCode + "\"" +
-                "}, \"auditTrail\" : " + auditTrail + "]}";
-        string myURL2 = _myURL + saveURL;
-
-        string strResult2 = await PostCallAPI(myURL2, myJson2);
-    }
+    
     public static async Task<string> PostCallAPI(string url, string jsonString)
     {
         string ret = string.Empty;
@@ -522,7 +492,7 @@
                 trans.AddTrail("GET SN", "", "FAILED");
                 trans.status = "GAGAL";
                 trans.errorCode = "KARTU HABIS";
-                await AuditTrail();
+                await OurUtility.AuditTrail(trans,menu,cst);
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
                 NavigateTo("/error");

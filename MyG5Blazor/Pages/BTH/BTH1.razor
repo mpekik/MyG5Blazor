@@ -232,24 +232,30 @@
     }
     private async Task CheckNumber(string strURL)
     {
+        trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        
         IsVisible = false;
         isLoading = true;
-        await Task.Delay(10000);
+        
         menu.edc = "1";
         menu.cash = "1";
 
         byte[] image = OurUtility.CaptureImage();
         var imageBytesStr = Convert.ToBase64String(image);
+        cst.PhoneNumber = "62" + strNumber.Substring(1);
 
-        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
-                            "\"image\" : \"" + imageBytesStr + "\"" +
-                            "}";
+        //Set HTTP Request Body
+        string myJsonForLog = "{ \"terminalId\" : \"" + trans.termID + "\"," +
+                    "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\",";
+
+        string myJson = myJsonForLog +
+                        "\"image\" : \"" + imageBytesStr + "\"" +
+                        "}";
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-        string strResult = await PostCallAPI(myURL, myJson);
+        OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
@@ -263,6 +269,10 @@
                     cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"], (string)jobjResult["profile"]["idNumber"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
                     cst.intTagihan = OurUtility.ToInt32((string)jobjResult["tagihan"]);
+
+                    //Add Step To Audit Trail List
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "SUCCESS");
+
                     //trans.transID = "-";
                     //cst.PhoneNumber = "62" + strNumber.Substring(1);
                     NavMan.NavigateTo(strURL);
@@ -281,6 +291,10 @@
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
+                    trans.status = "GAGAL";
+                    await OurUtility.AuditTrail(trans, menu, cst);
+
                     NavMan.NavigateTo("/error");
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")
