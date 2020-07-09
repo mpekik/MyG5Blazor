@@ -11,7 +11,7 @@
 @inject Transaction trans
 @inject Config config
 
-<div class="bg-login">
+    <div class="bg-login">
         <div class="wrapper">
             <div class="main-panel">
                 <!-- Navbar -->
@@ -61,24 +61,63 @@
                 </div>
             </div>
         </div>
-</div>
+        
+        @if (isAuthorized)
+        {
+            <div id="myModal" class="modal">
+                <!-- Modal content -->
+                <div class="modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <p class="text-body">Selamat Datang <span style="font-weight: bold;">@userName</span> silahkan pilih menu :</p>
+                            <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger modal-button">Menu Utama</button>
+                            <button class="btn btn-light modal-button">Menu Setting</button>
+                            <button @onclick="@OkOnClick" class="btn btn-danger modal-button">Batal</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        }
+    </div>
 
         @code{
             private string terminalId = string.Empty;
             private string userName = string.Empty;
             private string password = string.Empty;
+            private bool isAuthorized = false;
 
             protected override async Task OnInitializedAsync()
             {
-                OurUtility.Write_Log("== Error Page", "step-action");
+                OurUtility.Write_Log("Login Page", "step-action");
             }
             private void NavigateTo(string strURL)
             {
-                NavMan.NavigateTo("");
+                NavMan.NavigateTo(strURL);
             }
 
             private void loginCheck()
             {
+                if(userName=="trilogi")
+                {
+                    Trilogi();
+                }
+                else
+                {
+                    //ToDo Non Trilogi Technician Login
+                }
+            }
 
+            private void OkOnClick()
+            {
+                if (isAuthorized)
+                    isAuthorized = false;
+            }
+            private void Trilogi()
+            {
+                string pass_check = "trilogi" + DateTime.Now.ToString("yyyyMMdd");
+                if(password==pass_check)
+                {
+                    isAuthorized=true;
+                }
             }
         }

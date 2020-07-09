@@ -197,39 +197,6 @@
         NavMan.NavigateTo(strURL);
     }
 
-    public static async Task<string> PostCallAPI(string url, string jsonString)
-    {
-        string ret = string.Empty;
-        try
-        {
-            using (var handler = new HttpClientHandler())
-            {
-                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-                using (HttpClient client = new HttpClient(handler))
-                {
-                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                    var response = await client.PostAsync(url, content);
-                    if (response != null)
-                    {
-                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
-                        {
-                            var jsonStringResult = await response.Content.ReadAsStringAsync();
-                            return jsonStringResult;
-                        }
-                        else
-                        {
-                            return response.StatusCode.ToString();
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            OurUtility.Write_Log("==" + ex.Message, "step-action");
-        }
-        return ret;
-    }
     private async Task CheckNumber(string strURL)
     {
         trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -319,23 +286,5 @@
             NavMan.NavigateTo("/error");
         }
 
-    }
-    private void MoveToICC()
-    {
-        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
-        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
-        {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
-            return;
-        }
-        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
-        cds.Initialize(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_IC_Card", "step-action");
-        cds.MoveTo_IC_Card(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
     }
 }
