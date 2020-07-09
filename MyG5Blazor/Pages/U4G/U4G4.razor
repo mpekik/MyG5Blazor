@@ -736,7 +736,7 @@
         string content = prtContent.U4G(trans, cst, config);
         string header = prtContent.HeaderU4G(trans, cst, config);
         string footer = prtContent.FooterU4G(trans, cst, config);
-        bool result = Printer.Print(config, header, content, logoTsel, footer, ref msg);
+        bool result = Printer.Print2(config, header, content, logoTsel, footer, ref msg);
     }
 
     private void TimerElapsedHandler()

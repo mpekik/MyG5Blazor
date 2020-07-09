@@ -426,5 +426,45 @@ namespace MyG5Blazor.Data
 
             return result;
         }
+        public static bool Print2(Config p_config, string _header, string _content, string _logoTsel, string _footer, ref string p_message)
+        {
+            bool result = false;
+
+            p_message = string.Empty;
+            font_family = "Arial";
+            font_size = 8;
+
+            try
+            {
+                int margin_top = 5;
+                int margin_bottom = 5;
+                int margin_left = 5;
+                int margin_right = 5;
+                int height = 0;
+                Margins margin = new Margins(margin_left, margin_right, margin_top, margin_bottom);
+                PrintDocument document = Document2(_header, _content, _logoTsel, _footer, ref height);
+
+                document.Print();
+
+                int printed_height = (int)(height * PIXEL_TO_MM) + margin_top + margin_bottom;
+
+                // Case khusus
+                if (printed_height < 85)
+                {
+                    printed_height = 85;
+                }
+
+                // Stop Paper berkurang
+                Paper.Decrease(printed_height, ref p_config);
+
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                p_message = ex.Message;
+            }
+
+            return result;
+        }
     }
 }
