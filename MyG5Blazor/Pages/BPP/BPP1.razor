@@ -138,11 +138,13 @@
     private bool IsValid => !IsInvalid;
     private bool isLoading = false;
 
-    public string _myURL = "https://542c61d4.ngrok.io/";
+    public string _myURL = string.Empty;
     public string serviceURL = "mygrapari/isi-pulsa/v1/submit-nohp";
     private string _termID = string.Empty;
     protected override async Task OnInitializedAsync()
     {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        cst.Clear();
         OurUtility.Write_Log("= Beli Pulsa Prabayar", "step-action");
         OurUtility.Write_Log("== Insert Phone Number Page", "step-action");
     }
