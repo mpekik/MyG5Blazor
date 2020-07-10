@@ -11,6 +11,7 @@ namespace MyG5Blazor.Data
     public class Config
     {
         public const string PARAM_DEFAULT_URL = "param.system.default.url";
+        public const string PARAM_REG_URL = "param.system.reg.url";
         public const string PARAM_SIGN_URL = "param.system.kiosk.sign.url";
         public const string PARAM_MONITORING_URL = "param.MyGrapari.monitoring.url";
 
@@ -30,6 +31,13 @@ namespace MyG5Blazor.Data
         public const string PARAM_ERR_MSG_1_EN = "system.param.err.msg1.en";
         public const string PARAM_ERR_MSG_2_ID = "system.param.err.msg2.id";
         public const string PARAM_ERR_MSG_2_EN = "system.param.err.msg2.en";
+
+        public const string PARAM_KAFKA_ADDRESS = "sys.param.kafka.addr";            // bootstrap.servers
+        public const string PARAM_KAFKA_GROUP_ID = "sys.param.kafka.group_id";        // group.id
+        public const string PARAM_KAFKA_COMMIT_INTERVAL = "sys.param.kafka.commit_interval"; // auto.commit.interval.ms
+        public const string PARAM_KAFKA_OFFSET_RESET = "sys.param.kafka.offset_reset";    // auto.offset.reset
+        public const string PARAM_KAFKA_LOG_DATA = "sys.param.kafka.log_data";
+        public const string PARAM_KAFKA_LOG_ERROR = "sys.param.kafka.log_error";
 
         public const string PARAM_FACE_PHOTO_SIZE = "param.max.face.photo.size.kb";
         public const string PARAM_FACE_PHOTO_HISTORY = "param.sys.photo.hist.month";
@@ -96,12 +104,6 @@ namespace MyG5Blazor.Data
         // EKTP
         public const string PARAM_EKTP_PCID = "param.ektp.pcid";
         public const string PARAM_EKTP_CONF = "param.ektp.conf";
-        // Menu
-        public const string PARAM_MENU_PULSA = "param.menu.pp";
-        public const string PARAM_MENU_HALO = "param.menu.th";
-        public const string PARAM_MENU_GK = "param.menu.gk";
-        public const string PARAM_MENU_U4G = "param.menu.u4g";
-        public const string PARAM_MENU_PSB = "param.menu.psb";
         private FileIniDataParser iniFile = new FileIniDataParser();
         private IniData iniData = null;
 

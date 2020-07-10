@@ -109,6 +109,39 @@
         NavMan.NavigateTo(strURL);
     }
 
+    public static async Task<string> PostCallAPI(string url, string jsonString)
+    {
+        string ret = string.Empty;
+        try
+        {
+            using (var handler = new HttpClientHandler())
+            {
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
+                    {
+                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OurUtility.Write_Log("==" + ex.Message, "step-action");
+        }
+        return ret;
+    }
 
     public async Task GetPayment(string strURL)
     {
@@ -123,7 +156,7 @@
 
         OurUtility.Write_Log("== Get Bill", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
+        string strResult = await PostCallAPI(myURL, myJson);
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
@@ -144,8 +177,6 @@
                         trans.bit = (string)jobjResult["billPayment"]["bit48"];
                     trans.fee = (string)jobjResult["billPayment"]["fee"];
 
-                    trans.AddTrail("GET BILL", cst.PhoneNumber, "SUCCESS");
-
                     //trans.transID = (string)jobjResult["transaction"]["transactionId"];
 
                     NavMan.NavigateTo(strURL);
@@ -164,10 +195,6 @@
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
-                    trans.AddTrail("GET BILL", cst.PhoneNumber, "FAILED");
-                    trans.status = "GAGAL";
-                    await OurUtility.AuditTrail(trans, menu, cst);
-
                     NavMan.NavigateTo("/error");
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")

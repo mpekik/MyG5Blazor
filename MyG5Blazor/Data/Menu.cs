@@ -26,19 +26,13 @@ namespace MyG5Blazor.Data
         public string bahasa = string.Empty;
         public string edc = string.Empty;
         public string cash = string.Empty;
-        public string tokenId = string.Empty;
+
         public string href = string.Empty;
         public string asssetPNG = string.Empty;
         public string eventType = string.Empty;
         public string wPNG = string.Empty;
         public string hPNG = string.Empty;
         public bool active = false;
-
-        public string pp = string.Empty;
-        public string th = string.Empty;
-        public string gk = string.Empty;
-        public string u4g = string.Empty;
-        public string psb = string.Empty;
 
         public void Terminal(string _termID, string _termDesc, string _termLoc, string _areaCode, string _regionCode,string _unitId, string _unitName)
         {

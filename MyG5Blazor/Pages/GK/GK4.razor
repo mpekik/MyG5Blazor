@@ -8,7 +8,6 @@
 @using MyG5Blazor.Data
 @using System.Timers;
 
-@inject Menu menu  
 @inject Card_Dispenser cds
 @inject IJSRuntime JSRuntime
 @inject NavigationManager NavMan
@@ -230,7 +229,7 @@
     private async Task MenuUtama()
     {
         trans.status = "GAGAL";
-        await OurUtility.AuditTrail(trans,menu,cst);
+        await AuditTrail();
         NavigateTo("");
     }
     private void NavigateTo(string strURL)
@@ -253,14 +252,14 @@
         {
             isLoading = false;
             trans.status = "GAGAL";
-            await OurUtility.AuditTrail(trans,menu,cst);
+            await AuditTrail();
             NavMan.NavigateTo("/error");
         }else if(isSuccess)
         {
             isLoading = false;
             trans.status = "BERHASIL";
             trans.errorCode = "BERHASIL GANTI KARTU HILANG/RUSAK";
-            await OurUtility.AuditTrail(trans,menu,cst);
+            await AuditTrail();
             await Print();
 
             Timer.SetTimer(20000);
@@ -271,13 +270,78 @@
         {
             isLoading = false;
             trans.status = "GAGAL";
-            await OurUtility.AuditTrail(trans,menu,cst);
+            await AuditTrail();
 
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
     }
-    
+    private async Task AuditTrail()
+    {
+        trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        string auditTrail = string.Empty;
+        int stepTrail = 1;
+        auditTrail = auditTrail + "[ ";
+        foreach (dynamic at in trans._auditTrail)
+        {
+            auditTrail = auditTrail +
+                "{ \"step\" : \"" + stepTrail + "\"," +
+                "\"action\" : \"" + at._action + "\"," +
+                "\"data\" : \"" + at._data + "\"," +
+                "\"result\" : \"" + at._result + "\"" +
+                "},";
+            stepTrail += 1;
+        }
+        auditTrail = auditTrail.Remove(auditTrail.Length - 1);
+
+        string myJson2 = "{ \"transaction\" : " +
+            "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"," +
+            "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
+                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
+                "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
+                "\"status\" : \"" + trans.status + "\"," +
+                "\"description\" : \"" + trans.errorCode + "\"" +
+                "}, \"auditTrail\" : " + auditTrail + "]}";
+        string myURL2 = _myURL + saveURL;
+
+        string strResult2 = await PostCallAPI(myURL2, myJson2);
+    }
+    public static async Task<string> PostCallAPI(string url, string jsonString)
+    {
+        string ret = string.Empty;
+        try
+        {
+            using (var handler = new HttpClientHandler())
+            {
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
+                    {
+                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OurUtility.Write_Log("==" + ex.Message, "step-action");
+        }
+        return ret;
+    }
+
     private async Task MyPerso()
     {
         while (intTryCount <= intTryLimit)
@@ -306,7 +370,7 @@
 
                     OurUtility.Write_Log("=== URL : " + myURL, "step-action");
                     OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
-                    string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
+                    string strResult = await PostCallAPI(myURL, myJson);
                     OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                     if (strResult != null)
                     {
@@ -331,7 +395,7 @@
                                         "\"persoStatus\" : \"2\"}";
                                         OurUtility.Write_Log("=== Update Perso Status", "step-action");
                                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
-                                        strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
+                                        strResult = await PostCallAPI(myURL, myJson);
                                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                         trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "SUCCESS");
                                         isLoading = false;
@@ -352,7 +416,7 @@
                                             "\"persoStatus\" : \"3\"}";
                                         OurUtility.Write_Log("=== Update Perso Status", "step-action");
                                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
-                                        strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
+                                        strResult = await PostCallAPI(myURL, myJson);
                                         trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "SUCCESS");
                                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                         if (intTryCount < intTryLimit)
@@ -458,7 +522,7 @@
                 trans.AddTrail("GET SN", "", "FAILED");
                 trans.status = "GAGAL";
                 trans.errorCode = "KARTU HABIS";
-                await OurUtility.AuditTrail(trans,menu,cst);
+                await AuditTrail();
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
                 NavigateTo("/error");
@@ -514,7 +578,7 @@
         OurUtility.Write_Log("== Check CES", "step-action");
         OurUtility.Write_Log("== URL API : " + myURL, "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
+        string strResult = await PostCallAPI(myURL, myJson);
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {

@@ -619,18 +619,8 @@ footer {
     margin-top: 25%;
 }
 
-/*.button-nps {
-    width: 95%;
-    height: 70px;
-    border-radius: 8px;
-    font-size: 21pt;
-    font-weight: bold;
-    margin-top: 5px;
-    margin-bottom: 20px;
-}*/
-
 .button-nps {
-    width: 100%;
+    width: 95%;
     height: 70px;
     border-radius: 8px;
     font-size: 21pt;

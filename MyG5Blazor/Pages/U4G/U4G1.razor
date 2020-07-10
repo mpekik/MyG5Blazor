@@ -9,7 +9,6 @@
 @using System.Threading.Tasks;
 @using MyG5Blazor.Data
 
-@inject Menu menu
 @inject Costumer cst
 @inject NavigationManager NavMan
 @inject Transaction trans
@@ -151,7 +150,6 @@
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        cst.Clear();
         OurUtility.Write_Log("= Upgrade dan Ganti Kartu 4G", "step-action");
         OurUtility.Write_Log("== Step 1. Insert Phone Number Page", "step-action");
     }
@@ -192,65 +190,70 @@
         }
         NavMan.NavigateTo(strURL);
     }
-
+    public static async Task<string> PostCallAPI(string url, string jsonString)
+    {
+        string ret = string.Empty;
+        try
+        {
+            using (var handler = new HttpClientHandler())
+            {
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
+                    {
+                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OurUtility.Write_Log("==" + ex.Message, "step-action");
+        }
+        return ret;
+    }
     private async Task CheckNumber(string strURL)
     {
-        //Get Start Time For Audit Trail And Transaction Log
         trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
-        //Set UI Loading
         IsLoading = true;
-
-        //Capture Image From IP CAM
         byte[] image = OurUtility.CaptureImage();
         var imageBytesStr = Convert.ToBase64String(image);
         cst.PhoneNumber = "62" + strNumber.Substring(1);
-
-        //Set HTTP Request Body
-        string myJsonForLog = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                        "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\",";
-
-        string myJson = myJsonForLog +
+        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
+                        "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
                         "\"image\" : \"" + imageBytesStr + "\"" +
                         "}";
-
-        //Set HTTP Request URL
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
-
-        //Call HTTP Request
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await PostCallAPI(myURL, myJson);
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try
             {
-                //Parse HTTP Request Result to JObject
                 JObject jobjResult = JObject.Parse(strResult);
-
-                //Set transactionID
                 trans.SetTransaction((string)jobjResult["transaction"]["transactionId"]);
-
-                //Check If statusCode == 00 (Success)
                 if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
-
-                    //Set Costumer Profile
                     cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"], (string)jobjResult["profile"]["idNumber"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
-
-                    //Add Step to Audit Trail List
                     trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "SUCCESS");
-
-                    //Navigate to Next Page
                     NavMan.NavigateTo(strURL);
                 }
-
-                //Check If statusCode == 01 (Error Page)
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
                 {
                     if ((string)jobjResult["transaction"]["errorCode"] != null)
@@ -267,11 +270,12 @@
                     }
                     trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
                     trans.status = "GAGAL";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await AuditTrail();
+                    //                    IsLoading = false;
+                    //                  IsVisible = false;
+                    //                IsInvalid = true;
                     NavMan.NavigateTo("/error");
                 }
-
-                //Check If statusCode == 02 (Error Modal)
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                 {
                     strMsgError = (string)jobjResult["transaction"]["statusDesc"];
@@ -295,6 +299,38 @@
         }
     }
 
+    private async Task AuditTrail()
+    {
+        trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        string auditTrail = string.Empty;
+        int stepTrail = 1;
+        auditTrail = auditTrail + "[ ";
+        foreach (dynamic at in trans._auditTrail)
+        {
+            auditTrail = auditTrail +
+                "{ \"step\" : \"" + stepTrail + "\"," +
+                "\"action\" : \"" + at._action + "\"," +
+                "\"data\" : \"" + at._data + "\"," +
+                "\"result\" : \"" + at._result + "\"" +
+                "},";
+            stepTrail += 1;
+        }
+        auditTrail = auditTrail.Remove(auditTrail.Length - 1);
+
+        string myJson2 = "{ \"transaction\" : " +
+            "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"," +
+            "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
+                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
+                "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
+                "\"status\" : \"" + trans.status + "\"," +
+                "\"description\" : \"" + trans.errorCode + "\"" +
+                "}, \"auditTrail\" : " + auditTrail + "]}";
+        string myURL2 = _myURL + saveURL;
+
+        string strResult2 = await PostCallAPI(myURL2, myJson2);
+    }
     [Microsoft.AspNetCore.Components.Inject]
 
     protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }

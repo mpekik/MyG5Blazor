@@ -794,10 +794,10 @@ namespace MyG5Blazor.Data
                         if (m_cmd.ResponseData[i + 1] > 0)
                         {
                             GetDataByChannel(response[i + 1], ref data);
-                            OurUtility.Write_Log("Uang Yang Dimasukkan : " + CHelper.FormatToCurrency(data.Value),"step-action");
+                            Console.WriteLine("Uang Yang Dimasukkan : " + CHelper.FormatToCurrency(data.Value));
                             if ((data.Value / 100) < 10000)
                             {
-                                OurUtility.Write_Log("Uang Dikembalikan","step-action");
+                                Console.WriteLine("Uang Dikembalikan");
                                 ReturnNote();
                             }
                             // log.AppendText("Nilai " + nilai_value+ "\r\n");
@@ -810,11 +810,11 @@ namespace MyG5Blazor.Data
                     // A credit event has been detected, this is when the validator has accepted a note as legal currency.
                     case CCommands.SSP_POLL_CREDIT_NOTE:
                         GetDataByChannel(response[i + 1], ref data);
-                        OurUtility.Write_Log("Uang Yang Diterima: " + CHelper.FormatToCurrency(data.Value),"step-action");
+                        Console.WriteLine("Uang Yang Diterima: " + CHelper.FormatToCurrency(data.Value));
                         UangMasukSekarang = data.Value / 100;
                         total += UangMasukSekarang;
-                        OurUtility.Write_Log("Total Uang Yang Diterima : " + total,"step-action");
-                        OurUtility.Write_Log("UangMasukSekarang : " + UangMasukSekarang,"step-action");
+                        Console.WriteLine("Total Uang Yang Diterima : " + total);
+                        Console.WriteLine("UangMasukSekarang : " + UangMasukSekarang);
                         UpdateData();
                         i++;
                         return true;
@@ -994,7 +994,7 @@ namespace MyG5Blazor.Data
             byte i;
             for (i = 0; i < responseLength; ++i)
             {
-                //Console.WriteLine(response[i]);
+                Console.WriteLine(response[i]);
             }
         }
 

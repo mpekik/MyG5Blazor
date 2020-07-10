@@ -3,7 +3,6 @@
 @using System.Threading
 @using System.Net.Http;
 @using System.Text;
-@inject Menu menu 
 @inject IJSRuntime JSRuntime;
 @inject BlazorTimer Timer
 @inject Ektp_Data ktp
@@ -155,11 +154,43 @@
         }
         return ret;
     }
+    private async Task AuditTrail()
+    {
+        trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+        string auditTrail = string.Empty;
+        int stepTrail = 1;
+        auditTrail = auditTrail + "[ ";
+        foreach (dynamic at in trans._auditTrail)
+        {
+            auditTrail = auditTrail +
+                "{ \"step\" : \"" + stepTrail + "\"," +
+                "\"action\" : \"" + at._action + "\"," +
+                "\"data\" : \"" + at._data + "\"," +
+                "\"result\" : \"" + at._result + "\"" +
+                "}," ;
+            stepTrail += 1;
+        }
+        auditTrail = auditTrail.Remove(auditTrail.Length - 1);
+
+        string myJson2 = "{ \"transaction\" : " +
+            "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"," +
+            "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
+                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
+                "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
+                "\"status\" : \""+trans.status+"\"," +
+                "\"description\" : \"" + trans.errorCode + "\"" +
+                "}, \"auditTrail\" : " + auditTrail + "]}";
+        string myURL2 = _myURL + saveURL;
+
+        string strResult2 = await PostCallAPI(myURL2, myJson2);
+    }
     private async Task MenuUtama()
     {
         trans.status = "GAGAL";
         trans.errorCode = "FINGER PRINT";
-        await OurUtility.AuditTrail(trans,menu,cst);
+        await AuditTrail();
         NavigateTo("");
     }
     private async Task Back()

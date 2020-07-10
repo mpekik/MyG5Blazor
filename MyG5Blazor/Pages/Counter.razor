@@ -13,7 +13,7 @@
 <p>Id: @ktp.Id</p>
 <p>Nama: @ktp.Name</p>
 <p>Card SN : @p_icc_id</p>
-<button class="btn btn-primary" @onclick="TestString">Click me</button>
+<button class="btn btn-primary" @onclick="Print">Click me</button>
 
 @code {
     private int currentCount = 0;
@@ -46,25 +46,7 @@
     {
         currentCount++;
     }
-    private async Task TestString()
-    {
-        string tes = RandomString(10);
-        Console.WriteLine(tes);
-    }
 
-    public static string RandomString(int stringLength)
-    {
-        Random rd = new Random();
-        const string allowedChars = "ABCDEFGHJKLMNOPQRSTUVWXYZabcdefghijkmnopqrstuvwxyz0123456789";
-        char[] chars = new char[stringLength];
-
-        for (int i = 0; i < stringLength; i++)
-        {
-            chars[i] = allowedChars[rd.Next(0, allowedChars.Length)];
-        }
-
-        return new string(chars);
-    }
     private async Task ScanKTP()
     {
         if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)

@@ -197,32 +197,59 @@
         NavMan.NavigateTo(strURL);
     }
 
+    public static async Task<string> PostCallAPI(string url, string jsonString)
+    {
+        string ret = string.Empty;
+        try
+        {
+            using (var handler = new HttpClientHandler())
+            {
+                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                using (HttpClient client = new HttpClient(handler))
+                {
+                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                    var response = await client.PostAsync(url, content);
+                    if (response != null)
+                    {
+                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
+                        {
+                            var jsonStringResult = await response.Content.ReadAsStringAsync();
+                            return jsonStringResult;
+                        }
+                        else
+                        {
+                            return response.StatusCode.ToString();
+                        }
+                    }
+                }
+            }
+        }
+        catch (Exception ex)
+        {
+            OurUtility.Write_Log("==" + ex.Message, "step-action");
+        }
+        return ret;
+    }
     private async Task CheckNumber(string strURL)
     {
-        trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        
         IsVisible = false;
         isLoading = true;
-        
+        await Task.Delay(10000);
         menu.edc = "1";
         menu.cash = "1";
 
         byte[] image = OurUtility.CaptureImage();
         var imageBytesStr = Convert.ToBase64String(image);
-        cst.PhoneNumber = "62" + strNumber.Substring(1);
 
-        //Set HTTP Request Body
-        string myJsonForLog = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                    "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\",";
-
-        string myJson = myJsonForLog +
-                        "\"image\" : \"" + imageBytesStr + "\"" +
-                        "}";
+        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"," +
+                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\"," +
+                            "\"image\" : \"" + imageBytesStr + "\"" +
+                            "}";
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await PostCallAPI(myURL, myJson);
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
@@ -236,10 +263,6 @@
                     cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"], (string)jobjResult["profile"]["idNumber"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
                     cst.intTagihan = OurUtility.ToInt32((string)jobjResult["tagihan"]);
-
-                    //Add Step To Audit Trail List
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "SUCCESS");
-
                     //trans.transID = "-";
                     //cst.PhoneNumber = "62" + strNumber.Substring(1);
                     NavMan.NavigateTo(strURL);
@@ -258,10 +281,6 @@
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
-                    trans.status = "GAGAL";
-                    await OurUtility.AuditTrail(trans, menu, cst);
-
                     NavMan.NavigateTo("/error");
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")
@@ -286,5 +305,23 @@
             NavMan.NavigateTo("/error");
         }
 
+    }
+    private void MoveToICC()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_IC_Card", "step-action");
+        cds.MoveTo_IC_Card(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
     }
 }
