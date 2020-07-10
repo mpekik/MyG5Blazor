@@ -38,15 +38,15 @@
                     </div>
                 </div>
                 <div class="col-md-6" style="text-align: center;">
-                    @if (menu.edc == "1")
+                    @if (config.edc == "1")
                     {
                         <img @onclick="@(() => SetPaymentMethod(1))" id="" class="pembayaran" src="../../assets/image/Bayar_Debit.png">
                     }
-                    @if (menu.cash == "1")
+                    @if (config.cash == "1")
                     {
                         <img @onclick="@(() => SetPaymentMethod(2))" id="" class="pembayaran" src="../../assets/image/Bayar_Tunai.png">
                     }
-                    @if (menu.edc == "1")
+                    @if (config.edc == "1")
                     {
                         <img @onclick="@(() => SetPaymentMethod(3))" id="" class="pembayaran" src="../../assets/image/Bayar_Kredit.png">
                     }

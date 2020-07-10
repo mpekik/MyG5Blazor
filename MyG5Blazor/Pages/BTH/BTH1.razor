@@ -200,10 +200,10 @@
     private async Task CheckNumber(string strURL)
     {
         trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-        
+
         IsVisible = false;
         isLoading = true;
-        
+
         menu.edc = "1";
         menu.cash = "1";
 
@@ -270,6 +270,9 @@
                     isLoading = false;
                     IsVisible = false;
                     IsInvalid = true;
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "Tidak Memiliki Tagihan");
+                    trans.status = "GAGAL";
+                    await OurUtility.AuditTrail(trans, menu, cst);
                 }
             }
             catch (Exception ex)
