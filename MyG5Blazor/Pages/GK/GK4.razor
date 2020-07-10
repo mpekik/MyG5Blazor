@@ -346,10 +346,10 @@
     {
         while (intTryCount <= intTryLimit)
         {
-            if (true)
+            if (await Task.Run(() => MoveToICC()))
             {
 
-                if (false)
+                if (!cds.Start(ref errorcode, strCOM, ref msg))
                 {
                     OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
                     return;
@@ -736,7 +736,7 @@
         string content = prtContent.GK(trans, cst, config);
         string header = prtContent.HeaderGK(trans, cst, config);
         string footer = prtContent.FooterGK(trans, cst, config);
-        bool result = Printer.Print2(config, header, content, logoTsel, footer, ref msg);
+        bool result = Printer.Print(config, header, content, logoTsel, footer, ref msg);
     }
 
     private void TimerElapsedHandler()
