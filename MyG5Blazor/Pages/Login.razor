@@ -2,122 +2,185 @@
 @inject IJSRuntime JSRuntime;
 
 @using MyG5Blazor.Data
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
 @using System.Net.Http;
 @using System.Text;
 @using System;
+@using System.Threading.Tasks;
 
 @inject Costumer cst
 @inject NavigationManager NavMan
 @inject Transaction trans
 @inject Config config
-
-    <div class="bg-login">
-        <div class="wrapper">
-            <div class="main-panel">
-                <!-- Navbar -->
-                <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-                    <div class="container-fluid">
-                        <div class="navbar-wrapper">
-                            <div class="logo">
-                                <img src="../assets/image/Logo/Logo_MyGraPARI.png" />
-                            </div>
-                            <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+@inject Menu menu
+<div class="bg-login">
+    <div class="wrapper">
+        <div class="main-panel">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+                <div class="container-fluid">
+                    <div class="navbar-wrapper">
+                        <div class="logo">
+                            <img src="../assets/image/Logo/Logo_MyGraPARI.png" />
                         </div>
+                        <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
                     </div>
-                </nav>
-                <!-- End Navbar -->
+                </div>
+            </nav>
+            <!-- End Navbar -->
 
-                <div class="content">
-                    <div class="container-fluid">
-                        <div class="row" style="margin-top: 5%;">
-                            <div class="col-md-12" style="text-align: left;">
-                                <div class="form-group3">
-                                    <label class="teks-data">Terminal ID</label>
-                                    <input type="text" class="form-control2" placeholder="terminal id" @bind="terminalId">
-                                </div>
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="row" style="margin-top: 5%;">
+                        <div class="col-md-12" style="text-align: left;">
+                            <div class="form-group3">
+                                <label class="teks-data">Terminal ID</label>
+                                <input type="text" class="form-control2" placeholder="terminal id" @bind="terminalId">
                             </div>
-                            <div class="col-md-12" style="text-align: left;">
-                                <div class="form-group3">
-                                    <label class="teks-data">Username</label>
-                                    <input type="text" class="form-control2" placeholder="username" @bind="userName">
-                                </div>
-                            </div>
-                            <div class="col-md-12" style="text-align: left;">
-                                <div class="form-group3">
-                                    <label class="teks-data">Password</label>
-                                    <input type="text" class="form-control2" placeholder="password" @bind="password">
-                                </div>
-                            </div>
-                            <div class="col-md-12">
-                                <div class="form-group3">
-                                    <button class="btn btn-danger button-nps" style="bottom: 5%;" @onclick="loginCheck">Login</button>
-                                </div>
-                            </div>
-                            <label class="teks-data">@terminalId</label>
-                            <label class="teks-data">@userName</label>
-                            <label class="teks-data">@password</label>
                         </div>
+                        <div class="col-md-12" style="text-align: left;">
+                            <div class="form-group3">
+                                <label class="teks-data">Username</label>
+                                <input type="text" class="form-control2" placeholder="username" @bind="userName">
+                            </div>
+                        </div>
+                        <div class="col-md-12" style="text-align: left;">
+                            <div class="form-group3">
+                                <label class="teks-data">Password</label>
+                                <input type="text" class="form-control2" placeholder="password" @bind="password">
+                            </div>
+                        </div>
+                        <div class="col-md-12">
+                            <div class="form-group3">
+                                <button class="btn btn-danger button-nps" style="bottom: 5%;" @onclick="loginCheck">Login</button>
+                            </div>
+                        </div>
+                        <label class="teks-data">@terminalId</label>
+                        <label class="teks-data">@userName</label>
+                        <label class="teks-data">@password</label>
                     </div>
                 </div>
             </div>
         </div>
-        
-        @if (isAuthorized)
-        {
-            <div id="myModal" class="modal">
-                <!-- Modal content -->
-                <div class="modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <p class="text-body">Selamat Datang <span style="font-weight: bold;">@userName</span> silahkan pilih menu :</p>
-                            <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger modal-button">Menu Utama</button>
-                            <button class="btn btn-light modal-button">Menu Setting</button>
-                            <button @onclick="@OkOnClick" class="btn btn-danger modal-button">Batal</button>
-                        </div>
+    </div>
+
+    @if (isAuthorized)
+    {
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-body">Selamat Datang <span style="font-weight: bold;">@userName</span> silahkan pilih menu :</p>
+                        <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger modal-button">Menu Utama</button>
+                        <button class="btn btn-light modal-button">Menu Setting</button>
+                        <button @onclick="@OkOnClick" class="btn btn-danger modal-button">Batal</button>
                     </div>
                 </div>
             </div>
+        </div>
+    }
+</div>
+
+@code{
+    private string terminalId = string.Empty;
+    private string userName = string.Empty;
+    private string password = string.Empty;
+    
+    private bool isAuthorized = false;
+    private bool isLoading = false;
+
+    private string _myURL = string.Empty;
+    private string apiURL = "terminal/login";
+    protected override async Task OnInitializedAsync()
+    {
+        OurUtility.Write_Log("Login Page", "step-action");
+        menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
+
+    }
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+
+    private void loginCheck()
+    {
+        if (userName == "trilogi")
+        {
+            Trilogi();
         }
-    </div>
+        else
+        {
+            //ToDo Non Trilogi Technician Login
+        }
+    }
 
-        @code{
-            private string terminalId = string.Empty;
-            private string userName = string.Empty;
-            private string password = string.Empty;
-            private bool isAuthorized = false;
-
-            protected override async Task OnInitializedAsync()
+    private void OkOnClick()
+    {
+        if (isAuthorized)
+            isAuthorized = false;
+    }
+    private void Trilogi()
+    {
+        string pass_check = "trilogi" + DateTime.Now.ToString("yyyyMMdd");
+        if (password == pass_check)
+        {
+            isAuthorized = true;
+        }
+    }
+    private async Task NonTrilogi()
+    {
+        isLoading = true;
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"password\": \"" + menu.tokenId + "\"," +
+                "}";
+        string myURL = _myURL + apiURL;
+        OurUtility.Write_Log("= Login Status Code", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        if (strResult != null)
+        {
+            try
             {
-                OurUtility.Write_Log("Login Page", "step-action");
-            }
-            private void NavigateTo(string strURL)
-            {
-                NavMan.NavigateTo(strURL);
-            }
-
-            private void loginCheck()
-            {
-                if(userName=="trilogi")
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
-                    Trilogi();
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    NavMan.NavigateTo("/main");
                 }
                 else
                 {
-                    //ToDo Non Trilogi Technician Login
+                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                    }
+                    else
+                    {
+                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        trans.errorCode = statusDescSub;
+                    }
+                    NavMan.NavigateTo("/error");
                 }
             }
-
-            private void OkOnClick()
+            catch (Exception ex)
             {
-                if (isAuthorized)
-                    isAuthorized = false;
-            }
-            private void Trilogi()
-            {
-                string pass_check = "trilogi" + DateTime.Now.ToString("yyyyMMdd");
-                if(password==pass_check)
-                {
-                    isAuthorized=true;
-                }
+                trans.errorCode = strResult;
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                NavMan.NavigateTo("/error");
             }
         }
+        else
+        {
+            trans.errorCode = strResult;
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            NavMan.NavigateTo("/error");
+        }
+    }
+}
