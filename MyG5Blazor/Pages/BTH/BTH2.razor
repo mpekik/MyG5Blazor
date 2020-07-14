@@ -65,7 +65,7 @@
         </div>
         <div class="footer-side2">
             <button @onclick="@(() => NavigateTo("/bth/2a"))" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu<br>Utama</button>
+            <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu<br>Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
@@ -92,7 +92,7 @@
     private string msg = string.Empty;
     private string errorcode = string.Empty;
     private string strMsgError = string.Empty;
-
+    private int intTotalTagihan = 0;
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -101,14 +101,20 @@
     {
         cst.intMPembayaran = _intMPembayaran;
         trans.intPayment = _intMPembayaran;
+        trans.AddTrail("PAYMENT METHOD", cst.strMPembayaran, "SUCCESS");
         GetPayment("/bth/3");
     }
-
+    private async Task MainMenu()
+    {
+        trans.AddTrail("PAYMENT METHOD", "BACK TO MAIN MENU", "CANCELED BY USER");
+        trans.status = "GAGAL";
+        await OurUtility.AuditTrail(trans, menu, cst);
+        NavMan.NavigateTo("");
+    }
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);
     }
-
 
     public async Task GetPayment(string strURL)
     {
@@ -144,7 +150,8 @@
                         trans.bit = (string)jobjResult["billPayment"]["bit48"];
                     trans.fee = (string)jobjResult["billPayment"]["fee"];
 
-                    trans.AddTrail("GET BILL", cst.PhoneNumber, "SUCCESS");
+                    TotalTagihan();
+                    trans.AddTrail("GET BILL", cst.intTagihan.ToString(), "SUCCESS");
 
                     //trans.transID = (string)jobjResult["transaction"]["transactionId"];
 
@@ -164,7 +171,7 @@
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
-                    trans.AddTrail("GET BILL", cst.PhoneNumber, "FAILED");
+                    trans.AddTrail("GET BILL", cst.strMPembayaran, "FAILED 01");
                     trans.status = "GAGAL";
                     await OurUtility.AuditTrail(trans, menu, cst);
 
@@ -176,12 +183,21 @@
                     isLoading = false;
                     //IsVisible = false;
                     IsInvalid = true;
+
+                    trans.AddTrail("GET BILL", cst.strMPembayaran, "FAILED 02");
+                    trans.status = "GAGAL";
+                    await OurUtility.AuditTrail(trans, menu, cst);
+
                 }
             }
             catch (Exception ex)
             {
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                trans.AddTrail("GET BILL", cst.strMPembayaran, "FAILED EX");
+                trans.status = "GAGAL";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
                 NavMan.NavigateTo("/error");
             }
         }
@@ -191,5 +207,13 @@
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             NavMan.NavigateTo("/error");
         }
+    }
+    private void TotalTagihan()
+    {
+        foreach (dynamic t in cst.GetlistTagihan)
+        {
+            intTotalTagihan += t._intTagihan;
+        }
+        cst.intTagihan = intTotalTagihan;
     }
 }

@@ -2,9 +2,11 @@
 
 @using MyG5Blazor.Data 
 
-@inject IJSRuntime JSRuntime;
-@inject Costumer cst; 
-@inject NavigationManager Navmanager; 
+@inject IJSRuntime JSRuntime
+@inject Costumer cst
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Menu menu
 
     <div class="main-panel bg-home">
         <!-- Navbar -->
@@ -107,7 +109,7 @@
                 
                     <button @onclick="@(() => NavigateTo("/bth/2"))" class="btn-arrow btn" value="">Kembali</button>
                 
-                <button @onclick="@(()=>NavigateTo(""))" class="btn-arrow btn" value="">Menu<br>Utama</button>
+                <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu<br>Utama</button>
                 <!-- <sup>Powered By </sup>Trilogi Persada -->
             </div>
         </footer>
@@ -120,7 +122,7 @@
     private string strTotalTagihan => intTotalTagihan.ToString();
     protected override async Task OnInitializedAsync()
     {
-        TotalTagihan();
+        //TotalTagihan();
     }
 
     private void buttonOk()
@@ -135,15 +137,21 @@
 
     private void TotalTagihan()
     {
-        foreach(dynamic t in cst.GetlistTagihan)
+        foreach (dynamic t in cst.GetlistTagihan)
         {
             intTotalTagihan += t._intTagihan;
         }
         cst.intTagihan = intTotalTagihan;
     }
-
-    private void NavigateTo(string strURL)
+    private async Task MainMenu()
     {
-        Navmanager.NavigateTo(strURL);
+        trans.AddTrail("GET BILL", "BACK TO MAIN MENU", "CANCELED BY USER");
+        trans.status = "GAGAL";
+        await OurUtility.AuditTrail(trans, menu, cst);
+        NavMan.NavigateTo("");
     }
+        private void NavigateTo(string strURL)
+        {
+            NavMan.NavigateTo(strURL);
+        }
 }
