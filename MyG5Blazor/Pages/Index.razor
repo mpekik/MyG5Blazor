@@ -1,4 +1,4 @@
-﻿@page "/"
+﻿@page "/main"
 @using Newtonsoft.Json;
 @using Newtonsoft.Json.Linq; 
 @using System.Net.Http;
@@ -47,7 +47,7 @@
 
                 <div class="col-md-6">
                     <div class="card-body" style="margin-top: 10%;">
-                        @if (Menu[0])
+                        @if (stringMenu[0]=="0")
                         {
                             @if (MenuCount == 0)
                             {
@@ -59,7 +59,7 @@
                             }
                             MenuCount += 1;
                         }
-                        @if (Menu[1])
+                        @if (stringMenu[1]=="0")
                         {
                             @if (MenuCount == 0)
                             {
@@ -71,7 +71,7 @@
                             }
                             MenuCount += 1;
                         }
-                        @if (Menu[2])
+                        @if (stringMenu[2]=="0")
                         {
                             @if (MenuCount == 0)
                             {
@@ -83,7 +83,7 @@
                             }
                             MenuCount += 1;
                         }
-                        @if (Menu[3])
+                        @if (stringMenu[3]=="0")
                         {
                             @if (MenuCount == 0)
                             {
@@ -148,7 +148,9 @@
         menu.gk = config.Read("Terminal", Config.PARAM_MENU_GK);
         menu.u4g = config.Read("Terminal", Config.PARAM_MENU_U4G);
         menu.psb = config.Read("Terminal", Config.PARAM_MENU_PSB);
-        string[] stringMenu = {menu.th,menu.u4g,menu.pp,menu.gk,"0"};
+
+        string[] tempMenu = {menu.th,menu.u4g,menu.pp,menu.gk};
+        Array.Copy(tempMenu, stringMenu, 4);
         //Console.WriteLine(_myURL);
         Switcher.DOWN_eKTP("500");
         Switcher.DOWN_Reader_1("500");
@@ -163,7 +165,7 @@
     {
         for (int i = 0; i < 4; i++)
         {
-            if (Menu[i])
+            if (stringMenu[i]=="0")
             {
                 //Menu[i] = true;
                 strStyle[i] = StylePNG[intMenu];

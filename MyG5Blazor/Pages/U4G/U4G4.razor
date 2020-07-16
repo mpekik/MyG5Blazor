@@ -113,7 +113,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="text-body">@((MarkupString)strMsgError)</p>
-                    <button class="btn btn-danger modal-button" @onclick="@(() => NavigateTo(""))">OK</button>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => NavigateTo("/main"))">OK</button>
                 </div>
             </div>
         </div>
@@ -165,7 +165,7 @@
                     <button class="btn nps-button2">Kecepatan Proses</button>
                     <button class="btn nps-button2">Kemudahan Penggunaan</button>
                     <button class="btn nps-button2">Kejelasan Bahasa</button>
-                    <button @onclick="@(()=>NavigateTo(""))" class="btn btn-danger button-nps" value="">OK</button>
+                    <button @onclick="@(()=>NavigateTo("/main"))" class="btn btn-danger button-nps" value="">OK</button>
                 </div>
             </div>
         </div>
@@ -231,7 +231,7 @@
     {
         trans.status = "GAGAL";
         await OurUtility.AuditTrail(trans,menu,cst);
-        NavigateTo("");
+        NavigateTo("/main");
     }
     private void NavigateTo(string strURL)
     {
@@ -701,6 +701,6 @@
 
     private void TimerElapsedHandler()
     {
-        NavMan.NavigateTo("");
+        NavMan.NavigateTo("/main");
     }
 }

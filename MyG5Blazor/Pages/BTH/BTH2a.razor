@@ -135,7 +135,7 @@
         trans.AddTrail("CEK TAGIHAN", "BACK TO MAIN MENU", "CANCELED BY USER");
         trans.status = "GAGAL";
         await OurUtility.AuditTrail(trans, menu, cst);
-        NavMan.NavigateTo("");
+        NavMan.NavigateTo("/main");
     }
     private async Task Back()
     {

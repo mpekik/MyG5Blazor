@@ -109,7 +109,7 @@
         trans.AddTrail("PAYMENT METHOD", "BACK TO MAIN MENU", "CANCELED BY USER");
         trans.status = "GAGAL";
         await OurUtility.AuditTrail(trans, menu, cst);
-        NavMan.NavigateTo("");
+        NavMan.NavigateTo("/main");
     }
     private void NavigateTo(string strURL)
     {
