@@ -18,6 +18,20 @@
     font-size: 15pt;
     color: #ff1919;
 }
+.input_box {
+    display: inline-block;
+    margin: 0 auto;
+    padding: 5px 15px 10px;
+    font-size: 28px;
+    width: 100%;
+}
+
+    .input_box::-webkit-input-placeholder {
+        color: #cccccc;
+        opacity: 1;
+        font-size: 15px;
+        font-style: italic;
+    }
 
 .form-control2 {
     display: block;

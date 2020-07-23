@@ -37,6 +37,7 @@ namespace MyG5Blazor.Data
         public string edcTime = string.Empty;
         public string edcStatus = "FAILED";
         public string status = string.Empty;
+        public int jumlah_kartu = 0;
         public void SetTransaction(string strTransID, string strBUID, string strTermID,string strJenisTrans)
         {
             transID = strTransID;
@@ -83,6 +84,7 @@ namespace MyG5Blazor.Data
             edcTime = string.Empty;
             edcStatus = "FAILED";
             status = string.Empty;
+            jumlah_kartu = 0;
             _auditTrail.Clear();
         }
 

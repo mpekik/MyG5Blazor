@@ -475,18 +475,19 @@
                     await Task.Delay(2000);
                     await MainLoop();
                     intAccBill = Payout.total;
+                    cst.intUangCount = Payout.uangCount;
                     cst.intTagihanTerbayar = Payout.total;
                     if (!IsTunaiExit)
                     {
                         await Payment("");
-                        Console.WriteLine("inttotal = " + inttotal);
+                        //Console.WriteLine("inttotal = " + inttotal);
                         StateHasChanged();
                         if (resultPayment == "00")
                         {
                             trans.edcStatus = "SUCCESS";
                             IsLoading = false;
                             IsSuccess = true;
-                            Console.WriteLine("Payment Success");
+                            //Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
                             await Print();
                             await CheckNPS("");

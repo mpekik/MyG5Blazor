@@ -45,10 +45,9 @@ namespace MyG5Blazor.Data
         // A list of dataset data, sorted by value. Holds the info on channel number, value, currency,
         // level and whether it is being recycled.
         List<ChannelData> m_UnitDataList;
-        int UangMasukSekarang = 0; //nominal uang setial masuk bezel
-        int[] uang_ = null;
-        int[] index_ = null;
-        public int total = 0;
+        int UangMasukSekarang = 0; //nominal uang setiap masuk bezel
+        public int total = 0; //total nominal uang yang diterima
+        public int uangCount = 0;
         public CPayout()
         {
             m_eSSP = new SSPComms();
@@ -756,6 +755,7 @@ namespace MyG5Blazor.Data
         public bool DoPoll()
         {
             byte i;
+            uangCount = 0;
             // If a not is to be held in escrow, send hold commands, as poll releases note.
             if (m_HoldCount > 0)
             {
@@ -813,6 +813,7 @@ namespace MyG5Blazor.Data
                         OurUtility.Write_Log("Uang Yang Diterima: " + CHelper.FormatToCurrency(data.Value),"step-action");
                         UangMasukSekarang = data.Value / 100;
                         total += UangMasukSekarang;
+                        uangCount += 1;
                         OurUtility.Write_Log("Total Uang Yang Diterima : " + total,"step-action");
                         OurUtility.Write_Log("UangMasukSekarang : " + UangMasukSekarang,"step-action");
                         UpdateData();

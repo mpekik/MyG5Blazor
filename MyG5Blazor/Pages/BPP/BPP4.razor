@@ -231,8 +231,8 @@
         <div class="footer-side2">
             @if (MetodePembayaran == 2 && !IsFail && !IsSuccess)
             {
-                <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Kembali</button>
-                <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Menu Utama</button>
+                <button @onclick="@(() => IsExit = true)" class="btn-arrow btn" value="">Kembali</button>
+                <button @onclick="@(() => IsExit = true)" class="btn-arrow btn" value="">Menu Utama</button>
             }
             <!--<sup>Powered By </sup>Trilogi Persada -->
         </div>
@@ -248,7 +248,7 @@
                 <div class="modal-body">
                     <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>seluruh uang yang Anda masukkan dapat diambil di<br>Kasir GraPARI dengan menunjukkan struk dari<br>MyGraPARI.</p>
                     <button class="btn btn-danger modal-button" @onclick="TunaiExitFail" id="btn-lanjut">Lanjut</button>
-                    <button @onclick="@(()=>IsExit = false)" class="btn btn-light modal-button">Batal</button>
+                    <button @onclick="@(() => IsExit = false)" class="btn btn-light modal-button">Batal</button>
                 </div>
             </div>
         </div>
@@ -405,7 +405,7 @@
                     pageClass = "main-panel bg-edc-process";
 
                     //TODO Integrate with EDC Debit Card
-                    await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+                    /*await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
                     pageClass = "main-panel bg-home";
                     if (edc.intTry < 3)
                     {
@@ -456,13 +456,13 @@
                     {
                         IsFail = true;
                         Console.WriteLine("Payment Failed");
-                    }
+                    }*/
                     break;
                 }
             case 2:
                 {
                     pageClass = "main-panel bg-home";
-                    await Task.Delay(2000);
+                    /*await Task.Delay(2000);
                     await MainLoop();
                     intAccBill = Payout.total;
                     cst.intTagihanTerbayar = Payout.total;
@@ -495,14 +495,15 @@
                             break;
                         }
                     }
-                    else { break; }
+                    else { break; }*/
+                    break;
                 }
             case 3:
                 {
                     pageClass = "main-panel bg-edc-process";
 
                     //TODO Integrate with EDC Debit Card
-                    await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+                    /*await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
                     pageClass = "main-panel bg-home";
                     if (edc.intTry < 3)
                     {
@@ -552,7 +553,7 @@
                     {
                         IsFail = true;
                         Console.WriteLine("Payment Failed");
-                    }
+                    }*/
                     break;
                 }
         }

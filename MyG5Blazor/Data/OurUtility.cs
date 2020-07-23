@@ -318,6 +318,8 @@ namespace MyG5Blazor.Data
                     "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
                     "\"status\" : \"" + trans.status + "\"," +
                     "\"description\" : \"" + trans.errorCode + "\"" +
+                    "\"lembar_uang\" : \"" + cst.intUangCount + "\"," +
+                    "\"jumlah_kartu\" : \"" + trans.jumlah_kartu + "\"," +
                     "}, \"auditTrail\" : " + auditTrail + "]}";
             string myURL2 = _myURL + saveURL;
 

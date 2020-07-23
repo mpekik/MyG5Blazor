@@ -19,6 +19,7 @@ namespace MyG5Blazor.Data
         public int intMPembayaran = 0;
         public int intTagihan = 0;
         public int intTagihanTerbayar = 0;
+        public int intUangCount = 0;
         public string tagihanTerbayar => intTagihan.ToString();
         public class Tagihan
         {
@@ -58,6 +59,8 @@ namespace MyG5Blazor.Data
             EKTPNumber = string.Empty;
             intMPembayaran = 0;
             intTagihan = 0;
+            intTagihanTerbayar = 0;
+            intUangCount = 0;
             _listTagihan.Clear();
         }
         public void CostumerProfile(string strType, string strName, string strPhoneNumber, string strIDType, string strEKTPNumber)
