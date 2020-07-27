@@ -928,6 +928,182 @@ namespace MyG5Blazor.Data
             } //end of response[i]
             return true;
         }
+        public bool DoPoll(int totalTagihan)
+        {
+            byte i;
+            uangCount = 0;
+            // If a not is to be held in escrow, send hold commands, as poll releases note.
+            if (m_HoldCount > 0)
+            {
+                m_NoteHeld = true;
+                m_HoldCount--;
+                m_cmd.CommandData[0] = CCommands.SSP_CMD_HOLD;
+                m_cmd.CommandDataLength = 1;
+                if (!SendCommand()) return false;
+                return true;
+            }
+            //send poll
+            m_cmd.CommandData[0] = CCommands.SSP_CMD_POLL;
+            m_cmd.CommandDataLength = 1;
+            if (!SendCommand()) return false;
+
+            // store response locally so data can't get corrupted by other use of the cmd variable
+            byte[] response = new byte[255];
+            m_cmd.ResponseData.CopyTo(response, 0);
+            byte responseLength = m_cmd.ResponseDataLength;
+
+            //parse poll response
+            ChannelData data = new ChannelData();
+            for (i = 1; i < responseLength; ++i)
+            {
+                switch (response[i])
+                {
+                    // This response indicates that the unit was reset and this is the first time a poll
+                    // has been called since the reset.
+                    case CCommands.SSP_POLL_SLAVE_RESET:
+                        UpdateData();
+                        break;
+                    // A note is currently being read by the validator sensors. The second byte of this response
+                    // is zero until the note's type has been determined, it then changes to the channel of the 
+                    // scanned note.
+                    case CCommands.SSP_POLL_READ_NOTE:
+                        if (m_cmd.ResponseData[i + 1] > 0)
+                        {
+                            GetDataByChannel(response[i + 1], ref data);
+                            OurUtility.Write_Log("Uang Yang Dimasukkan : " + CHelper.FormatToCurrency(data.Value), "step-action");
+                            if ((data.Value / 100) < 10000)
+                            {
+                                OurUtility.Write_Log("Uang Dikembalikan", "step-action");
+                                ReturnNote();
+                            }
+                            // log.AppendText("Nilai " + nilai_value+ "\r\n");
+                            // log.AppendText("Uang masuk - uang harus bayar : " + CHelpers.FormatToCurrency(data.Value) + " - " + jmlBayar + "\r\n") ;
+                            m_HoldCount = m_HoldNumber;
+                        }
+                        else
+                            i++;
+                        break;
+                    // A credit event has been detected, this is when the validator has accepted a note as legal currency.
+                    case CCommands.SSP_POLL_CREDIT_NOTE:
+                        GetDataByChannel(response[i + 1], ref data);
+                        OurUtility.Write_Log("Uang Yang Diterima: " + CHelper.FormatToCurrency(data.Value), "step-action");
+                        UangMasukSekarang = data.Value / 100;
+                        total += UangMasukSekarang;
+                        uangCount += 1;
+                        OurUtility.Write_Log("Total Uang Yang Diterima : " + total, "step-action");
+                        OurUtility.Write_Log("UangMasukSekarang : " + UangMasukSekarang, "step-action");
+                        UpdateData();
+                        i++;
+                        return true;
+                        break;
+                    // A note is being rejected from the validator. This will carry on polling while the note is in transit.
+                    case CCommands.SSP_POLL_NOTE_REJECTING:
+                        break;
+                    // A note has been rejected from the validator, the note will be resting in the bezel. This response only
+                    // appears once.
+                    case CCommands.SSP_POLL_NOTE_REJECTED:
+                        QueryRejection();
+                        break;
+                    // A note is in transit to the cashbox.
+                    case CCommands.SSP_POLL_NOTE_STACKING:
+                        break;
+                    // A note has reached the cashbox.
+                    case CCommands.SSP_POLL_NOTE_STACKED:
+                        break;
+                    // A safe jam has been detected. This is where the user has inserted a note and the note
+                    // is jammed somewhere that the user cannot reach.
+                    case CCommands.SSP_POLL_SAFE_NOTE_JAM:
+                        break;
+                    // An unsafe jam has been detected. This is where a user has inserted a note and the note
+                    // is jammed somewhere that the user can potentially recover the note from.
+                    case CCommands.SSP_POLL_UNSAFE_NOTE_JAM:
+                        break;
+                    // The validator is disabled, it will not execute any commands or do any actions until enabled.
+                    case CCommands.SSP_POLL_DISABLED:
+                        break;
+                    // A fraud attempt has been detected. 
+                    case CCommands.SSP_POLL_FRAUD_ATTEMPT:
+                        i += (byte)((response[i + 1] * 7) + 1);
+                        break;
+                    // The stacker (cashbox) is full.
+                    case CCommands.SSP_POLL_STACKER_FULL:
+                        break;
+                    // A note was detected somewhere inside the validator on startup and was rejected from the front of the
+                    // unit.
+                    case CCommands.SSP_POLL_NOTE_CLEARED_FROM_FRONT:
+                        i++;
+                        break;
+                    // A note was detected somewhere inside the validator on startup and was cleared into the cashbox.
+                    case CCommands.SSP_POLL_NOTE_CLEARED_TO_CASHBOX:
+                        i++;
+                        break;
+                    // A note has been detected in the validator on startup and moved to the payout device 
+                    case CCommands.SSP_POLL_NOTE_PAID_INTO_STORE_AT_POWER_UP:
+                        i += 7;
+                        break;
+                    // A note has been detected in the validator on startup and moved to the cashbox
+                    case CCommands.SSP_POLL_NOTE_PAID_INTO_STACKER_AT_POWER_UP:
+                        i += 7;
+                        break;
+                    // The cashbox has been removed from the unit. This will continue to poll until the cashbox is replaced.
+                    case CCommands.SSP_POLL_CASHBOX_REMOVED:
+                        break;
+                    // The cashbox has been replaced, this will only display on a poll once.
+                    case CCommands.SSP_POLL_CASHBOX_REPLACED:
+                        break;
+                    // The payout device is in the process of emptying all its stored notes to the cashbox. This
+                    // will continue to poll until the device is empty.
+                    case CCommands.SSP_POLL_EMPTYING:
+                        break;
+                    // This single poll response indicates that the payout device has finished emptying.
+                    case CCommands.SSP_POLL_EMPTIED:
+                        UpdateData();
+                        EnableValidator();
+                        break;
+                    // The payout device has encountered a jam. This will not clear until the jam has been removed and the unit
+                    // reset.
+                    case CCommands.SSP_POLL_JAMMED:
+                        i += (byte)((response[i + 1] * 7) + 1);
+                        break;
+                    // This is reported when the payout has been halted by a host command. This will report the value of
+                    // currency dispensed upto the point it was halted. 
+                    case CCommands.SSP_POLL_HALTED:
+                        i += (byte)((response[i + 1] * 7) + 1);
+                        break;
+                    // This is reported when the payout was powered down during a payout operation. It reports the original amount
+                    // requested and the amount paid out up to this point for each currency.
+                    case CCommands.SSP_POLL_INCOMPLETE_PAYOUT:
+                        i += (byte)((response[i + 1] * 11) + 1);
+                        break;
+                    // This is reported when the payout was powered down during a float operation. It reports the original amount
+                    // requested and the amount paid out up to this point for each currency.
+                    case CCommands.SSP_POLL_INCOMPLETE_FLOAT:
+                        i += (byte)((response[i + 1] * 11) + 1);
+                        break;
+                    // A note has been transferred from the payout unit to the stacker.
+                    // Typo as in SSP protocol manual.
+                    case CCommands.SSP_POLL_NOTE_TRANSFERED_TO_STACKER:
+                        i += 7;
+                        break;
+                    // A note is resting in the bezel waiting to be removed by the user.
+                    case CCommands.SSP_POLL_NOTE_HELD_IN_BEZEL:
+                        i += 7;
+                        break;
+                    // The payout has gone out of service, the host can attempt to re-enable the payout by sending the enable payout
+                    // command.
+                    case CCommands.SSP_POLL_PAYOUT_OUT_OF_SERVICE:
+                        break;
+                    // The unit has timed out while searching for a note to payout. It reports the value dispensed before the timeout
+                    // event.
+                    case CCommands.SSP_POLL_TIME_OUT:
+                        i += (byte)((response[i + 1] * 7) + 1);
+                        break;
+                    default:
+                        break;
+                }
+            } //end of response[i]
+            return true;
+        }
 
         public bool SendCommand()
         {

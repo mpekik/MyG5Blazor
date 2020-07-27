@@ -71,7 +71,9 @@
                         <div class="modal-body">
                             <p class="text-body">Selamat Datang <span style="font-weight: bold;">@userName</span> silahkan pilih menu :</p>
                             <button @onclick="@(()=>NavigateTo(""))" class="btn btn-light modal-button">Menu Utama</button>
-                            <button class="btn btn-light modal-button">Menu Setting</button>
+                            <button class="btn btn-light modal-button">Cash Management</button>
+                            <button @onclick="@(()=>NavigateTo("/cardm"))"class="btn btn-light modal-button">Card Management</button>
+                            <button class="btn btn-light modal-button">Configuration</button>
                             <button @onclick="@OkOnClick" class="btn btn-danger modal-button">Batal</button>
                         </div>
                     </div>

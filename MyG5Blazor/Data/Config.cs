@@ -15,7 +15,14 @@ namespace MyG5Blazor.Data
         public const string PARAM_MONITORING_URL = "param.MyGrapari.monitoring.url";
 
         public const string PARAM_MACHINE = "param.system.machine";
+        // Menu
+        public const string PARAM_MENU_PULSA = "param.menu.pp";
+        public const string PARAM_MENU_HALO = "param.menu.th";
+        public const string PARAM_MENU_GK = "param.menu.gk";
+        public const string PARAM_MENU_U4G = "param.menu.u4g";
+        public const string PARAM_MENU_PSB = "param.menu.psb";
         public const string PARAM_TOKEN = "param.system.token";
+
         public const string PARAM_MYGRAPARI_VER = "param.system.MyGrapariUI.vers";
         public const string PARAM_DEVICE_MONITORING_VER = "param.system.MyGrapariDeviceMonitoring.vers";
         public const string PARAM_WATCHDOG_VER = "param.system.watchdog.vers";
@@ -25,17 +32,6 @@ namespace MyG5Blazor.Data
 
         public const string PARAM_ADMIN_IDENTIFICATION = "param.admin.indetification";
         public const string PARAM_ADMIN_RELEASE = "param.admin.release";
-
-        public const string PARAM_ERR_MSG_1_ID = "system.param.err.msg1.id";
-        public const string PARAM_ERR_MSG_1_EN = "system.param.err.msg1.en";
-        public const string PARAM_ERR_MSG_2_ID = "system.param.err.msg2.id";
-        public const string PARAM_ERR_MSG_2_EN = "system.param.err.msg2.en";
-
-        public const string PARAM_FACE_PHOTO_SIZE = "param.max.face.photo.size.kb";
-        public const string PARAM_FACE_PHOTO_HISTORY = "param.sys.photo.hist.month";
-
-        public const string PARAM_SCAN_PHOTO_SIZE = "param.max.scan.photo.size.kb";
-        public const string PARAM_SCAN_PHOTO_HISTORY = "param.sys.scan.hist.month";
 
         public const string PARAM_MONITORING_INTERVAL = "param.monitoring.interval";
         public const string PARAM_MAX_RETRY_LOAD_DISPENSER = "param.maks.retry.load.dispenser";
@@ -50,16 +46,13 @@ namespace MyG5Blazor.Data
         public const string FILE_NAME_UPDATER = "updatePatch_setting.properties";
 
         public const string PARAM_DEVICE_DISPENSER_1 = "param.device.dispenser_1";
-        public const string PARAM_DEVICE_DISPENSER_2 = "param.device.dispenser_2";
         public const string PARAM_DEVICE_CARD_READER_1 = "param.device.card_reader_1";
-        public const string PARAM_DEVICE_CARD_READER_2 = "param.device.card_reader_2";
         public const string PARAM_DEVICE_CAMERA_IP_URL = "param.device.ip_camera.url";
         public const string PARAM_DEVICE_CAMERA_IP_TYPE = "param.device.ip_camera.type";
         public const string PARAM_DEVICE_CAMERA_IP_USER = "param.device.ip_camera.user";
         public const string PARAM_DEVICE_CAMERA_IP_PASSWORD = "param.device.ip_camera.password";
 
         public const string PARAM_STOCK_DISPENSER_1 = "param.tr.card.disp1.stock";
-        public const string PARAM_STOCK_DISPENSER_2 = "param.tr.card.disp2.stock";
 
         public const string PARAM_PERSO_EXE = "param.perso.exe";
 
@@ -96,12 +89,7 @@ namespace MyG5Blazor.Data
         // EKTP
         public const string PARAM_EKTP_PCID = "param.ektp.pcid";
         public const string PARAM_EKTP_CONF = "param.ektp.conf";
-        // Menu
-        public const string PARAM_MENU_PULSA = "param.menu.pp";
-        public const string PARAM_MENU_HALO = "param.menu.th";
-        public const string PARAM_MENU_GK = "param.menu.gk";
-        public const string PARAM_MENU_U4G = "param.menu.u4g";
-        public const string PARAM_MENU_PSB = "param.menu.psb";
+        
         private FileIniDataParser iniFile = new FileIniDataParser();
         private IniData iniData = null;
 

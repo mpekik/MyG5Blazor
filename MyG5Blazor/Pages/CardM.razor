@@ -1,0 +1,247 @@
+﻿@page "/cardm"
+@inject IJSRuntime JSRuntime;
+
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Threading.Tasks;
+@using MyG5Blazor.Data
+
+@inject Menu menu
+@inject Costumer cst
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Config config
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+
+            <form class="navbar-form">
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="teks-title">Card Management</p>
+                    <div class="teks-top">
+                        <p>Masukkan jumlah kartu yang terdapat pada Card Dispenser</p> <br>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    @if (strNumber == string.Empty)
+                    {
+                        <input type="text" name="card" placeholder="masukkan jumlah kartu yang terdapat pada card dispenser" class="num-field" readonly>
+                    }
+                    else
+                    {
+                        <input type="text" name="number" class="num-field" @bind="strNumber" readonly />
+                    }
+                    <div class="num-button">
+                        <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
+                        <button class="key-num btn" value="2" @onclick="@(() => InputPhoneNumber("2"))">2</button>
+                        <button class="key-num btn" value="3" @onclick="@(() => InputPhoneNumber("3"))">3</button>
+                        <button class="key-num btn" value="4" @onclick="@(() => InputPhoneNumber("4"))">4</button>
+                        <button class="key-num btn" value="5" @onclick="@(() => InputPhoneNumber("5"))">5</button>
+                        <button class="key-num btn" value="6" @onclick="@(() => InputPhoneNumber("6"))">6</button>
+                        <button class="key-num btn" value="7" @onclick="@(() => InputPhoneNumber("7"))">7</button>
+                        <button class="key-num btn" value="8" @onclick="@(() => InputPhoneNumber("8"))">8</button>
+                        <button class="key-num btn" value="9" @onclick="@(() => InputPhoneNumber("9"))">9</button>
+                        <button class="key-num btn btn-hapus" value="Hapus" @onclick="RemovePhoneNumber">Hapus</button>
+                        <button class="key-num btn" value="0" id="myBtnUndefine" @onclick="@(() => InputPhoneNumber("0"))">0</button>
+                        <button class="key-num btn btn-hapus" id="myBtn" value="ok" @onclick="@(()=>IsVisible=true)">Ok</button>
+                    </div>
+                    <div class="button-down">
+                        <!-- <button class="btn-arrow" value="">Kembali</button>
+                        <button class="btn-arrow" value="">Menu Utama</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+</div>
+
+<footer>
+    <div class="footer-side2">
+        <button @onclick="@(()=>isVisible2=true)" class="btn-arrow btn" value="">Kembali</button>
+        <!-- <sup>Powered By </sup>Trilogi Persada -->
+    </div>
+</footer>
+
+<!-- The Modal -->
+@if (IsVisible)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Anda akan memasukkan jumlah kartu yang tersedia pada card dispenser sebanyak :</p>
+                    <p style="font-size: 25pt; font-weight: bold;">@strNumber</p>
+                    <button @onclick="Save" class="btn btn-danger modal-button">Lanjut</button>
+                    <button class="btn btn-light modal-button" @onclick="@(() => IsVisible=false)">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (isVisible2)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Apakah Anda Ingin Kembali Ke Halaman Login?</p>
+                    <button @onclick="@(()=>NavigateTo("/login"))" class="btn btn-danger modal-button">Lanjut</button>
+                    <button class="btn btn-light modal-button" @onclick="@(() => isVisible2=false)">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code{
+    private string strNumber = string.Empty;
+    private bool IsVisible = false;
+    private bool isVisible2 = false;
+    private bool IsLoading = false;
+
+    //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
+    public string _myURL = string.Empty;
+    public string serviceURL = "mygrapari/upgrade-4g/v1/submit-nohp";
+    private string _termID = string.Empty;
+    private string strMsgError = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        cst.Clear();
+        OurUtility.Write_Log("= Card Dispenser", "step-action");
+    }
+
+    private void InputPhoneNumber(string strInput)
+    {
+        strNumber += strInput;
+    }
+
+    private void RemovePhoneNumber()
+    {
+        if (strNumber.Length > 0)
+            strNumber = strNumber.Substring(0, strNumber.Length - 1);
+    }
+
+    private void NavigateTo(string strURL)
+    {
+        if (strURL != "")
+        {
+            OurUtility.Write_Log("=== Get Phone Number", "step-action");
+        }
+        NavMan.NavigateTo(strURL);
+    }
+    private async Task Save()
+    {
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, strNumber);
+        IsVisible = false;
+    }
+    private async Task CheckNumber(string strURL)
+    {
+
+        //Set HTTP Request Body
+        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"" +
+                        "}";
+
+        //Set HTTP Request URL
+        string myURL = _myURL + serviceURL;
+
+        OurUtility.Write_Log("== Check Phone Number", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+
+        //Call HTTP Request
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+
+        if (strResult != null)
+        {
+            try
+            {
+                //Parse HTTP Request Result to JObject
+                JObject jobjResult = JObject.Parse(strResult);
+
+                //Check If statusCode == 00 (Success)
+                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                {
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                }
+
+                //Check If statusCode == 01 (Error Page)
+                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                {
+                    NavMan.NavigateTo("/error");
+                }
+
+                //Check If statusCode == 02 (Error Modal)
+                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                NavMan.NavigateTo("/error");
+            }
+        }
+        else
+        {
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            NavMan.NavigateTo("/error");
+        }
+    }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
+
+    private bool timer = false;
+    protected override void OnAfterRender(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            timer = true;
+            theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
+
+            this.StateHasChanged();
+        }
+    }
+
+    [Microsoft.JSInterop.JSInvokable]
+
+    public void theIdleTimeoutFired()
+    {
+        if (timer)
+        {
+            timer = false;
+            //NavMan.NavigateTo(" ");
+        }
+    }
+}
