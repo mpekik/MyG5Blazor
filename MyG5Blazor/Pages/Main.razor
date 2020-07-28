@@ -166,11 +166,13 @@
         menu.u4g = config.Read("Terminal", Config.PARAM_MENU_U4G);
         menu.psb = config.Read("Terminal", Config.PARAM_MENU_PSB);
 
+        config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB);
+        config.usbCardReader = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER_USB);
         string[] tempMenu = { menu.th, menu.u4g, menu.pp, menu.gk };
         Array.Copy(tempMenu, stringMenu, 4);
         //Console.WriteLine(_myURL);
-        Switcher.DOWN_eKTP("500");
-        Switcher.DOWN_Reader_1("500");
+        Switcher.DOWN("500",config.usbEKTP);
+        Switcher.DOWN("500",config.usbCardReader);
         cst.Clear();
         trans.ClearTransaction();
         CheckMenuStatus();

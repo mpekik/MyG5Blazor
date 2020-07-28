@@ -45,8 +45,9 @@ namespace MyG5Blazor.Data
         public const string FILE_NAME_MyGraPARI = "MyGraPARI-config.properties";
         public const string FILE_NAME_UPDATER = "updatePatch_setting.properties";
 
-        public const string PARAM_DEVICE_DISPENSER_1 = "param.device.dispenser_1";
-        public const string PARAM_DEVICE_CARD_READER_1 = "param.device.card_reader_1";
+        public const string PARAM_DEVICE_DISPENSER = "param.device.dispenser";
+        public const string PARAM_DEVICE_CARD_READER = "param.device.card_reader";
+        public const string PARAM_DEVICE_CARD_READER_USB = "param.device.card_reader.usb";
         public const string PARAM_DEVICE_CAMERA_IP_URL = "param.device.ip_camera.url";
         public const string PARAM_DEVICE_CAMERA_IP_TYPE = "param.device.ip_camera.type";
         public const string PARAM_DEVICE_CAMERA_IP_USER = "param.device.ip_camera.user";
@@ -89,6 +90,7 @@ namespace MyG5Blazor.Data
         // EKTP
         public const string PARAM_EKTP_PCID = "param.ektp.pcid";
         public const string PARAM_EKTP_CONF = "param.ektp.conf";
+        public const string PARAM_EKTP_USB = "param.ektp.usb";
         
         private FileIniDataParser iniFile = new FileIniDataParser();
         private IniData iniData = null;
@@ -181,6 +183,8 @@ namespace MyG5Blazor.Data
         public string hPNG = string.Empty;
         public bool active = false;
 
+        public string usbEKTP = string.Empty;
+        public string usbCardReader = string.Empty;
         public void Terminal(string _termID, string _termDesc, string _termLoc, string _areaCode, string _regionCode, string _unitId, string _unitName)
         {
             terminalId = _termID;

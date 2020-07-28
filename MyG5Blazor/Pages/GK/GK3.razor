@@ -286,7 +286,7 @@
                             result = Ektp_Sdk.CloseReader(reader);
 
                             //OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
-                            //Switcher.DOWN_eKTP("500");
+                            //Switcher.DOWN("500",config.usbEKTP);
 
                             Timer.SetTimer(1000);
                             Timer.OnElapsed += TimerElapsedHandler;

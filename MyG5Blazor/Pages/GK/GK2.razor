@@ -159,7 +159,7 @@
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
         OurUtility.Write_Log("=== Step 2. Scan e-KTP Page", "step-action");
-        Switcher.UP_eKTP("3000");
+        Switcher.UP("3000",config.usbEKTP);
     }
 
     private async Task CheckEKTP()

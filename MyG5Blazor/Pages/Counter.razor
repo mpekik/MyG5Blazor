@@ -30,7 +30,7 @@
     {
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
-        readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER_1);
+        readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
     }
 
     private async Task TesReader()

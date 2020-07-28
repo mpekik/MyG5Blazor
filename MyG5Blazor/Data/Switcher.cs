@@ -43,7 +43,44 @@ namespace MyG5Blazor.Data
             }
             catch { }
         }
+        public static void UP(string p_delay,string _port)
+        {
+            int delay = OurUtility.ToInt32(p_delay);
 
+            OurUtility.Write_Log("ykushcmd.exe UP untuk ekTP [delay : " + delay.ToString() + "]", "step-action");
+
+            try
+            {
+                Process process = new Process();
+
+                process.StartInfo.FileName = "ykushcmd.exe";
+                process.StartInfo.Arguments = "-u "+_port;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+                process.Start();
+
+                Thread.Sleep(delay);
+            }
+            catch { }
+        }
+        public static void DOWN(string p_delay,string _port)
+        {
+            int delay = OurUtility.ToInt32(p_delay);
+
+            OurUtility.Write_Log("ykushcmd.exe DOWN untuk ekTP [delay : " + delay.ToString() + "]", "step-action");
+
+            try
+            {
+                Process process = new Process();
+
+                process.StartInfo.FileName = "ykushcmd.exe";
+                process.StartInfo.Arguments = "-d " + _port;
+                process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
+                process.Start();
+
+                Thread.Sleep(delay);
+            }
+            catch { }
+        }
         public static void DOWN_eKTP(string p_delay)
         {
             int delay = OurUtility.ToInt32(p_delay);

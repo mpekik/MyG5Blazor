@@ -241,13 +241,13 @@
     protected override async Task OnInitializedAsync()
     {
         mypersoexe = config.Read("Dispenser", Config.PARAM_PERSO_EXE);
-        strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER_1);
-        readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER_1);
+        strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
+        readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        Switcher.DOWN_eKTP("500");
+        Switcher.DOWN("500",config.usbEKTP);
         OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
         isLoading = true;
-        Switcher.UP_Reader_1("3000");
+        Switcher.UP("3000",config.usbCardReader);
         await MyPerso();
         if (isError)
         {
