@@ -16,11 +16,10 @@
     var pluginName = "jkeyboard",
         defaults = {
             layout: "english",
-            selectable: ['english'],
             input: $('#input'),
             customLayouts: {
                 selectable: []
-            },
+            }
         };
 
 
@@ -53,7 +52,7 @@
             }
         },
         character_switch: {
-            text: 'abc',
+            text: 'ABC',
             command: function () {
                 this.createKeyboard(layout);
                 this.events();
@@ -70,43 +69,48 @@
 
 
     var layouts = {
+        selectable: ['azeri', 'english', 'russian'],
+        azeri: [
+            ['q', 'ü', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p', 'ö', 'ğ'],
+            ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l', 'ı', 'ə'],
+            ['shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'ç', 'ş', 'backspace'],
+            ['numeric_switch', 'layout_switch', 'space', 'return']
+        ],
         english: [
             ['q', 'w', 'e', 'r', 't', 'y', 'u', 'i', 'o', 'p',],
             ['a', 's', 'd', 'f', 'g', 'h', 'j', 'k', 'l',],
             ['shift', 'z', 'x', 'c', 'v', 'b', 'n', 'm', 'backspace'],
-            ['numeric_switch', 'space']
+            ['numeric_switch', 'layout_switch', 'space', 'return']
         ],
-
-        shift: [
-            ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P',],
-            ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L',],
-            ['Z', 'X', 'C', 'V', 'B', 'N', 'M', '.'],
-            ['numeric_switch','space', '-', 'backspace']
-            ],
-
+        russian: [
+            ['й', 'ц', 'у', 'к', 'е', 'н', 'г', 'ш', 'щ', 'з', 'х'],
+            ['ф', 'ы', 'в', 'а', 'п', 'р', 'о', 'л', 'д', 'ж', 'э'],
+            ['shift', 'я', 'ч', 'с', 'м', 'и', 'т', 'ь', 'б', 'ю', 'backspace'],
+            ['numeric_switch', 'layout_switch', 'space', 'return']
+        ],
         numeric: [
             ['1', '2', '3', '4', '5', '6', '7', '8', '9', '0'],
-            ['-', '/', ':', ';', '(', ')', '$', '&', '@'],
-            [ '.', ',', '?', '!', "'", '"', 'backspace'],
-            ['character_switch', 'space'],
+            ['-', '/', ':', ';', '(', ')', '$', '&', '@', '"'],
+            ['symbol_switch', '.', ',', '?', '!', "'", 'backspace'],
+            ['character_switch', 'layout_switch', 'space', 'return'],
         ],
         numbers_only: [
             ['1', '2', '3',],
             ['4', '5', '6',],
             ['7', '8', '9',],
             ['0', 'return', 'backspace'],
-        ]
-        // symbolic: [
-        //     ['[', ']', '{', '}', '#', '%', '^', '*', '+', '='],
-        //     ['_', '\\', '|', '~', '<', '>'],
-        //     ['numeric_switch', '.', ',', '?', '!', "'", 'backspace'],
-        //     ['character_switch', 'layout_switch', 'space', 'return'],
+        ],
+        symbolic: [
+            ['[', ']', '{', '}', '#', '%', '^', '*', '+', '='],
+            ['_', '\\', '|', '~', '<', '>'],
+            ['numeric_switch', '.', ',', '?', '!', "'", 'backspace'],
+            ['character_switch', 'layout_switch', 'space', 'return'],
 
-        // ]
+        ]
     }
 
     var shift = false, capslock = false, layout = 'english', layout_id = 0;
-    
+
     // The actual plugin constructor
     function Plugin(element, options) {
         this.element = element;
@@ -118,7 +122,7 @@
         // Extend & Merge the cusom layouts
         layouts = $.extend(true, {}, this.settings.customLayouts, layouts);
         if (Array.isArray(this.settings.customLayouts.selectable)) {
-            $.merge(this.settings.selectable, this.settings.customLayouts.selectable);
+            $.merge(layouts.selectable, this.settings.customLayouts.selectable);
         }
         this._defaults = defaults;
         this._name = pluginName;
@@ -130,10 +134,6 @@
             layout = this.settings.layout;
             this.createKeyboard(layout);
             this.events();
-        },
-
-        setInput: function (newInputField) {
-            this.settings.input = newInputField;
         },
 
         createKeyboard: function (layout) {
@@ -201,20 +201,18 @@
             });
 
             shift_key.on('click', function () {
-                if (shift) {
+                if (capslock) {
                     me.toggleShiftOff();
+                    capslock = false;
                 } else {
                     me.toggleShiftOn();
                 }
             }).on('dblclick', function () {
-                me.toggleShiftOn(true);
+                capslock = true;
             });
 
 
-            $(fkeys).on('click', function (e) {
-                //prevent bubbling to avoid side effects when used as floating keyboard which closes on click outside of keyboard container
-                e.stopPropagation();
-                
+            $(fkeys).on('click', function () {
                 var command = function_keys[$(this).data('command')].command;
                 if (!command) return;
 
@@ -251,31 +249,17 @@
 
         backspace: function () {
             var input = this.settings.input,
-                input_node = input.get(0),
-                start = input_node.selectionStart,
-                val = input.val();    
+                val = input.val();
 
-            if (start > 0) {
-                input.val(val.substring(0, start - 1) + val.substring(start));
-                input.trigger('focus');
-                input_node.setSelectionRange(start - 1, start - 1);
-            }
-            else {
-                input.trigger('focus');
-                input_node.setSelectionRange(0, 0);
-            }
-	    },
+            input.val(val.substr(0, val.length - 1));
+        },
 
-        toggleShiftOn: function (lock) {
+        toggleShiftOn: function () {
             var letters = $(this.element).find('.letter'),
                 shift_key = $(this.element).find('.shift');
 
             letters.addClass('uppercase');
-            shift_key.addClass('active');
-            if (typeof lock !== 'undefined' && lock) {
-                shift_key.addClass('lock');
-                capslock = true;
-            }
+            shift_key.addClass('active')
             shift = true;
         },
 
@@ -284,13 +268,13 @@
                 shift_key = $(this.element).find('.shift');
 
             letters.removeClass('uppercase');
-            shift_key.removeClass('active lock');
-            shift = capslock = false;
+            shift_key.removeClass('active');
+            shift = false;
         },
 
         toggleLayout: function () {
             layout_id = layout_id || 0;
-            var plain_layouts = this.settings.selectable;
+            var plain_layouts = layouts.selectable;
             layout_id++;
 
             var current_id = layout_id % plain_layouts.length;
@@ -302,36 +286,14 @@
         }
     };
 
-
-    var methods = {
-        init: function(options) {
-            if (!this.data("plugin_" + pluginName)) {
-                this.data("plugin_" + pluginName, new Plugin(this, options));
+    // A really lightweight plugin wrapper around the constructor,
+    // preventing against multiple instantiations
+    $.fn[pluginName] = function (options) {
+        return this.each(function () {
+            if (!$.data(this, "plugin_" + pluginName)) {
+                $.data(this, "plugin_" + pluginName, new Plugin(this, options));
             }
-        },
-        setInput: function(content) {
-            this.data("plugin_" + pluginName).setInput($(content));
-        },
-        setLayout: function(layoutname) {
-            // change layout if it is not match current
-            object = this.data("plugin_" + pluginName);
-            if (typeof(layouts[layoutname]) !== 'undefined' && object.settings.layout != layoutname) {
-                object.settings.layout = layoutname;
-                object.createKeyboard(layoutname);
-                object.events();
-            };
-        },
-    };
-
-    $.fn[pluginName] = function (methodOrOptions) {
-        if (methods[methodOrOptions]) {
-            return methods[methodOrOptions].apply(this.first(), Array.prototype.slice.call( arguments, 1));
-        } else if (typeof methodOrOptions === 'object' || ! methodOrOptions) {
-            // Default to "init"
-            return methods.init.apply(this.first(), arguments);
-        } else {
-            $.error('Method ' +  methodOrOptions + ' does not exist on jQuery.jkeyboard');
-        }
+        });
     };
 
 })(jQuery, window, document);

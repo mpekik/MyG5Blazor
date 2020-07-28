@@ -14,6 +14,8 @@
     <title>MyG5Blazor</title>
     <base href="~/" />
     <meta content='width=device-width, initial-scale=1.0, shrink-to-fit=no' name='viewport' />
+    <link rel="stylesheet" href="../assets/css/jkeyboard2.css">
+    <link rel="stylesheet" href="../assets/lib2/css/jkeyboard.css">
     <!--     Fonts and icons     -->
     <link rel="stylesheet" type="text/css" href="https://fonts.googleapis.com/css?family=Roboto:300,400,500,700|Roboto+Slab:400,700|Material+Icons" />
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
@@ -72,6 +74,39 @@
     <script src="../../assets/js/material-dashboard.js?v=2.1.2" type="text/javascript"></script>
     <!-- Material Dashboard DEMO methods, don't include it in your project! -->
     <script src="../../assets/demo/demo.js"></script>
+    <script src="../assets/lib2/js/jkeyboard.js"></script>
+    <script>
+        window.callKeyboard = () => {
+            $('#keyboard').jkeyboard({
+                layout: "english",
+                input: $('#input_field_1')
+            });
+
+            $(".input_box").focus(function () {
+                $('#keyboard').jkeyboard("setInput", this);
+            });
+        };
+
+        window.setFocus = (id) => {
+            $(".input_box").focus(function () {
+                $('#keyboard').jkeyboard("setInput", id);
+            });
+        }
+    </script>
+    <script type="text/JavaScript">
+        //courtesy of BoogieJack.com
+        function killCopy(e) {
+            return false
+        }
+        function reEnable() {
+            return true
+        }
+        document.onselectstart = new Function("return false")
+        if (window.sidebar) {
+            document.onmousedown = killCopy
+            document.onclick = reEnable
+        }
+    </script>
 </body>
 </html>
 

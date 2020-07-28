@@ -11,3 +11,15 @@ $('#hide').click(function()
     $('#data').hide();
     $('#show').show();
 });
+
+function Keyboard() {
+    $('#keyboard').jkeyboard({
+        layout: "english",
+        input: $('#input_field_1')
+    });
+
+
+    $(".input_box").focus(function () {
+        $('#keyboard').jkeyboard("setInput", this);
+    });
+}

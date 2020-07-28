@@ -20,6 +20,7 @@ namespace MyG5Blazor.Data
         public int intTagihan = 0;
         public int intTagihanTerbayar = 0;
         public int intUangCount = 0;
+        public string accountId { get; set; }
         public string tagihanTerbayar => intTagihan.ToString();
         public class Tagihan
         {
@@ -61,15 +62,25 @@ namespace MyG5Blazor.Data
             intTagihan = 0;
             intTagihanTerbayar = 0;
             intUangCount = 0;
+            accountId = string.Empty;
             _listTagihan.Clear();
         }
-        public void CostumerProfile(string strType, string strName, string strPhoneNumber, string strIDType, string strEKTPNumber)
+        public void CostumerProfile(string _type, string _name, string _phoneNumber, string _idType, string _ektpNumber)
         {
-            Type = strType;
-            Name = strName;
-            PhoneNumber = strPhoneNumber;
-            IDType = strIDType;
-            EKTPNumber = strEKTPNumber;
+            Type = _type;
+            Name = _name;
+            PhoneNumber = _phoneNumber;
+            IDType = _idType;
+            EKTPNumber = _ektpNumber;
+        }
+        public void CostumerProfile(string _type, string _name, string _phoneNumber, string _idType, string _ektpNumber,string _accId)
+        {
+            Type = _type;
+            Name = _name;
+            PhoneNumber = _phoneNumber;
+            IDType = _idType;
+            EKTPNumber = _ektpNumber;
+            accountId = _accId;
         }
         public void ClearTagihan()
         {

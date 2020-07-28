@@ -106,7 +106,7 @@
     }
 
     var shift = false, capslock = false, layout = 'english', layout_id = 0;
-    
+
     // The actual plugin constructor
     function Plugin(element, options) {
         this.element = element;

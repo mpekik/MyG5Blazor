@@ -1,0 +1,314 @@
+﻿@page "/config"
+@inject IJSRuntime JSRuntime;
+
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Threading.Tasks;
+@using MyG5Blazor.Data
+
+@inject Menu menu
+@inject Costumer cst
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Config config
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+
+            <form class="navbar-form">
+                
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6" style="text-align: left;">
+                    <table class="table-responsive">
+                        <tr>
+                            <td>Terminal id</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Default URL</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Kiosk Sign URL</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Monitoring URL</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Token</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>MyGRAPARI UI Vers</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>USB Up</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>USB Down</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>EKTP Reader USB Slot</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>EKTP Reader PCID</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>EKTP Reader CONF</td>
+                            <td><input type="text"></td>
+                        </tr>
+                    </table>
+                </div>
+                <div class="col-md-6" style="text-align: left;">
+                    <table class="table-responsive">
+                        <tr>
+                            <td>Card Dispenser Port</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Card Reader Type</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Card Reader USB Slot</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Perso EXE</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>IP Cam URL</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>IP Cam User</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>IP Cam Password</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>IP Cam Type</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>EDC Port</td>
+                            <td><input type="text"></td>
+                        </tr>
+                        <tr>
+                            <td>Bill Acceptor Port</td>
+                            <td><input type="text"></td>
+                        </tr>
+                    </table>
+                    <button @onclick="@(()=>isVisible2=true)" class="btn-arrow btn" value="">Kembali</button>
+                    <button @onclick="@(()=>isVisible2=true)" class="btn-arrow-red btn" value="">Save</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+</div>
+
+<footer>
+    <div class="footer-side-left">
+        <span class="dot-trans"></span>
+        <span class="dot-trans"></span>
+        <span class="dot-trans"></span>
+        <span class="dot-trans"></span>
+    </div>
+    <div class="footer-side-right">
+        <!-- <sup>Powered By </sup>Trilogi Persada -->
+    </div>
+</footer>
+
+<!-- The Modal -->
+@if (IsVisible)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Anda akan memasukkan jumlah kartu yang tersedia pada card dispenser sebanyak :</p>
+                    <p style="font-size: 25pt; font-weight: bold;">@userName</p>
+                    <button @onclick="Save" class="btn btn-danger modal-button">Lanjut</button>
+                    <button class="btn btn-light modal-button" @onclick="@(() => IsVisible=false)">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (isVisible2)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Apakah Anda Ingin Kembali Ke Halaman Login?</p>
+                    <button @onclick="@(()=>NavigateTo("/login"))" class="btn btn-danger modal-button">Lanjut</button>
+                    <button class="btn btn-light modal-button" @onclick="@(() => isVisible2=false)">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code{
+    private string userName = string.Empty;
+    private string password = string.Empty;
+    private string passcode = string.Empty;
+    private bool IsVisible = false;
+    private bool isVisible2 = false;
+    private bool IsLoading = false;
+
+    //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
+    public string _myURL = string.Empty;
+    public string serviceURL = "mygrapari/upgrade-4g/v1/submit-nohp";
+    private string _termID = string.Empty;
+    private string strMsgError = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        cst.Clear();
+        OurUtility.Write_Log("= Card Dispenser", "step-action");
+    }
+
+    private void InputPhoneNumber(string strInput)
+    {
+        userName += strInput;
+    }
+
+    private void RemovePhoneNumber()
+    {
+        if (userName.Length > 0)
+            userName = userName.Substring(0, userName.Length - 1);
+    }
+
+    private void NavigateTo(string strURL)
+    {
+        if (strURL != "")
+        {
+            OurUtility.Write_Log("=== Get Phone Number", "step-action");
+        }
+        NavMan.NavigateTo(strURL);
+    }
+    private async Task Save()
+    {
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, userName);
+        IsVisible = false;
+    }
+    private async Task CheckNumber(string strURL)
+    {
+
+        //Set HTTP Request Body
+        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"" +
+                        "}";
+
+        //Set HTTP Request URL
+        string myURL = _myURL + serviceURL;
+
+        OurUtility.Write_Log("== Check Phone Number", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+
+        //Call HTTP Request
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+
+        if (strResult != null)
+        {
+            try
+            {
+                //Parse HTTP Request Result to JObject
+                JObject jobjResult = JObject.Parse(strResult);
+
+                //Check If statusCode == 00 (Success)
+                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                {
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                }
+
+                //Check If statusCode == 01 (Error Page)
+                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                {
+                    NavMan.NavigateTo("/error");
+                }
+
+                //Check If statusCode == 02 (Error Modal)
+                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                {
+
+                }
+            }
+            catch (Exception ex)
+            {
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                NavMan.NavigateTo("/error");
+            }
+        }
+        else
+        {
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            NavMan.NavigateTo("/error");
+        }
+    }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
+
+    private bool timer = false;
+    protected override void OnAfterRender(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            timer = true;
+            theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
+
+            this.StateHasChanged();
+        }
+    }
+
+    [Microsoft.JSInterop.JSInvokable]
+
+    public void theIdleTimeoutFired()
+    {
+        if (timer)
+        {
+            timer = false;
+            //NavMan.NavigateTo(" ");
+        }
+    }
+}

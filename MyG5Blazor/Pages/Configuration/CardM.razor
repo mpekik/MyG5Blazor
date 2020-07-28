@@ -43,14 +43,7 @@
                 </div>
 
                 <div class="col-md-6">
-                    @if (strNumber == string.Empty)
-                    {
-                        <input type="text" name="card" placeholder="masukkan jumlah kartu yang terdapat pada card dispenser" class="num-field" readonly>
-                    }
-                    else
-                    {
-                        <input type="text" name="number" class="num-field" @bind="strNumber" readonly />
-                    }
+                        <input type="text" name="number" placeholder="Jumlah Kartu Pada Dispenser" class="num-field2" @bind="strNumber" readonly />
                     <div class="num-button">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
                         <button class="key-num btn" value="2" @onclick="@(() => InputPhoneNumber("2"))">2</button>
@@ -77,8 +70,14 @@
 </div>
 
 <footer>
-    <div class="footer-side2">
-        <button @onclick="@(()=>isVisible2=true)" class="btn-arrow btn" value="">Kembali</button>
+    <div class="footer-side-left">
+        <span class="dot-trans"></span>
+        <span class="dot-trans"></span>
+        <span class="dot-trans"></span>
+        <span class="dot-trans"></span>
+    </div>
+    <div class="footer-side-right">
+        <button @onclick="@(()=>isVisible2=true)" class="btn-single-white btn" value="">Kembali</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
@@ -137,7 +136,10 @@
 
     private void InputPhoneNumber(string strInput)
     {
-        strNumber += strInput;
+        if (strNumber.Length == 0 && strInput == "0")
+        { }
+        else strNumber += strInput;
+
     }
 
     private void RemovePhoneNumber()

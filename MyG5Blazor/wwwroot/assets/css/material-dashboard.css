@@ -18,6 +18,31 @@
     font-size: 15pt;
     color: #ff1919;
 }
+.teks-data3 {
+    font-weight: bold;
+    font-size: 15pt;
+    color: #ff1919;
+    margin-top: .5rem;
+}
+.teks-data2 {
+    font-weight: bold;
+    font-size: 18pt;
+    color: whitesmoke;
+    margin-top: .5rem;
+}
+
+.hiddenbutton,
+.hiddenbutton:hover,
+.hiddenbutton:focus {
+    background-color: transparent;
+    background-repeat: no-repeat;
+    border: none;
+    cursor: pointer;
+    overflow: hidden;
+    outline: none;
+    width: 70px;
+    height: 70px;
+}
 .input_box {
     display: inline-block;
     margin: 0 auto;
@@ -204,7 +229,7 @@ div.logo > img {
     font-weight: bold;
 }
 
-.teks-footer-halo {
+.teks-conhalo {
     position: absolute;
     margin-top: 35%;
     margin-left: -1%;
@@ -10643,6 +10668,18 @@ a.text-dark:focus {
         .btn.btn-white:hover {
             background-color: #fff;
             color: #ff0000;
+        }
+
+        .btn.btn-trans,
+        .btn.btn-trans:focus,
+        .btn.btn-trans:hover {
+            background-color: transparent;
+            color: transparent;
+            background-repeat: no-repeat;
+            border: none;
+            cursor: pointer;
+            overflow: hidden;
+            outline: none;
         }
 
             .btn.btn-white.btn-link {

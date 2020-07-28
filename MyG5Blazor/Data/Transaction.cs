@@ -19,7 +19,7 @@ namespace MyG5Blazor.Data
         public long startTime { get; set; }
         public long endTime { get; set; }
        
-        private string[] _payment = { "", "cc", "CASH", "cc" };
+        private string[] _payment = { "", "DEBIT", "CASH", "CC" };
         public string bit = string.Empty;
         public string fee = string.Empty;
         public string ecr = string.Empty;
