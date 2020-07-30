@@ -131,13 +131,13 @@
 @code
 {
     private bool[] Menu = { true, true, false, true };
-    private string[] stringMenu = { "0", "0", "0", "0", "0" };
+    private string[] stringMenu = { "1", "1", "1", "1", "1" };
     private List<string> listMenu = new List<string>();
 
     //@(()=>CheckStatus(hrefMenu[1],apiURL[1],arrayTrans[1]))
-    private string[] hrefMenu = { "bth/1", "u4g/1", "bpp/1", "gk/1" };
-    private string[] AssetsPNG = { "Menu_Bayar_Tagihan.png", "Menu_Upgrade4G.png", "Menu_Beli_Pulsa.png", "Menu_Ganti_kartu.png" };
-    private string[] arrayTrans = { "PB", "U4G", "PR", "GK" };
+    private string[] hrefMenu = { "", "", "", "","" };
+    private string[] AssetsPNG = { "", "", "", "", "" };
+    private string[] arrayTrans = { "", "", "", "", "" };
 
     private string WidthPNG = "40%";
     private string HeightPNG = "20%";
@@ -150,7 +150,7 @@
     private bool IsLoading = false;
     //private static string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
-    private string[] apiURL = { "mygrapari/bayar-halo/v1/init", "mygrapari/upgrade-4g/v1/init", "mygrapari/isi-pulsa/v1/init", "mygrapari/ganti-kartu/v1/init" };
+    private string[] apiURL = { "", "", "", "", "" };
     private string _termID = string.Empty;
 
     private int logutCount = 0;
@@ -160,17 +160,17 @@
         menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
-        menu.pp = config.Read("Terminal", Config.PARAM_MENU_PULSA);
-        menu.th = config.Read("Terminal", Config.PARAM_MENU_HALO);
-        menu.gk = config.Read("Terminal", Config.PARAM_MENU_GK);
-        menu.u4g = config.Read("Terminal", Config.PARAM_MENU_U4G);
-        menu.psb = config.Read("Terminal", Config.PARAM_MENU_PSB);
-
         config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB);
         config.usbCardReader = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER_USB);
-        string[] tempMenu = { menu.th, menu.u4g, menu.pp, menu.gk };
-        Array.Copy(tempMenu, stringMenu, 4);
         //Console.WriteLine(_myURL);
+        for(int i=0;i<menu._mainMenu.Count();i++)
+        {
+            hrefMenu[i] = menu._mainMenu[i]._href;
+            AssetsPNG[i] = menu._mainMenu[i]._icon;
+            arrayTrans[i] = menu._mainMenu[i]._code;
+            apiURL[i] = menu._mainMenu[i]._url;
+            stringMenu[i] = "0";
+        }
         Switcher.DOWN("500",config.usbEKTP);
         Switcher.DOWN("500",config.usbCardReader);
         cst.Clear();

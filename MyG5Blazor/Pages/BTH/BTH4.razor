@@ -1,4 +1,4 @@
-﻿@page "/bth/4"
+﻿@page "/PB/4"
 
 @using MyG5Blazor.Data
 @using System.IO.Ports
@@ -371,8 +371,8 @@
     private int intMinus = 0;
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
-    public string serviceURL = "mygrapari/bayar-halo/v1/payment";
-    private static string cesURL = "mygrapari/ces/v1/eligibility-check";
+    public string serviceURL = "bayar-halo/v1/payment";
+    private static string cesURL = "ces/v1/eligibility-check";
 
     private string qu1IndText = string.Empty;
     private string qu1ID = string.Empty;
@@ -584,7 +584,7 @@
         IsTunaiExit = true;
         IsFail = true;
         await Print();
-        trans.AddTrail("PAYMENT CASH", "Padi Ammount:"+intAccBill.ToString(), "CANCELED BY USER");
+        trans.AddTrail("PAYMENT CASH", "Paid Ammount:"+intAccBill.ToString(), "CANCELED BY USER");
         Payout.DisableValidator();
         Payout.SSPComms.CloseComPort();
         OurUtility.AuditTrail(trans, menu, cst);
@@ -730,46 +730,53 @@
     }
     private async Task Pay(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
     {
-        OurUtility.Write_Log("== Payment Via EDC", "step-action");
-        string _transType = "01";
-        cst.intTagihanTerbayar = intBill;
-        edc.Clear();
-        edc.serialPort = new SerialPort();
-        edc.serialPort.PortName = serialPortName;
-        //edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
-        do
+        try
         {
-            edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
-
-            await Task.Delay(2000);
-            if (edc.respondCode == "00")
+            OurUtility.Write_Log("== Payment Via EDC", "step-action");
+            string _transType = "01";
+            cst.intTagihanTerbayar = intBill;
+            edc.Clear();
+            edc.serialPort = new SerialPort();
+            edc.serialPort.PortName = serialPortName;
+            //edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
+            do
             {
-                OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
-                trans.AddTrail("PAYMENT EDC", edc.respondCode, "SUCCESS");
+                edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
-                trans.ecr = edc.ecr;
-                trans.edcresp = edc.respondCode;
-                IsLoading = true;
-                pageClass = "main-panel bg-home";
-                return;
-            }
-            //edc.mre.WaitOne();
-        } while (!edc.mre.WaitOne());
-        //} while (edc.intTry < 3);
-        trans.ecr = edc.ecr;
-        trans.edcresp = edc.respondCode;
-        trans.edcApproval = trans.ecr.Substring(140, 6);
-        trans.edcTid = trans.ecr.Substring(2, 8);
-        trans.edcMid = trans.ecr.Substring(10, 15);
-        trans.edcBatch = trans.ecr.Substring(25, 6);
-        trans.edcIssuer = trans.ecr.Substring(31, 15);
-        trans.edcTrace = trans.ecr.Substring(52, 6);
-        trans.edcRefNo = trans.ecr.Substring(46, 6);
-        trans.edcCardNo = trans.ecr.Substring(83, 19);
-        trans.edcCardName = trans.ecr.Substring(102, 26);
-        trans.edcDate = trans.ecr.Substring(128, 6);
-        trans.edcTime = trans.ecr.Substring(134, 6);
-        Console.WriteLine(trans.edcresp);
+                await Task.Delay(2000);
+                if (edc.respondCode == "00")
+                {
+                    OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
+                    trans.AddTrail("PAYMENT EDC", edc.respondCode, "SUCCESS");
+
+                    trans.ecr = edc.ecr;
+                    trans.edcresp = edc.respondCode;
+                    IsLoading = true;
+                    pageClass = "main-panel bg-home";
+                    return;
+                }
+                //edc.mre.WaitOne();
+            } while (!edc.mre.WaitOne());
+            //} while (edc.intTry < 3);
+            trans.ecr = edc.ecr;
+            trans.edcresp = edc.respondCode;
+            trans.edcApproval = trans.ecr.Substring(140, 6);
+            trans.edcTid = trans.ecr.Substring(2, 8);
+            trans.edcMid = trans.ecr.Substring(10, 15);
+            trans.edcBatch = trans.ecr.Substring(25, 6);
+            trans.edcIssuer = trans.ecr.Substring(31, 15);
+            trans.edcTrace = trans.ecr.Substring(52, 6);
+            trans.edcRefNo = trans.ecr.Substring(46, 6);
+            trans.edcCardNo = trans.ecr.Substring(83, 19);
+            trans.edcCardName = trans.ecr.Substring(102, 26);
+            trans.edcDate = trans.ecr.Substring(128, 6);
+            trans.edcTime = trans.ecr.Substring(134, 6);
+            Console.WriteLine(trans.edcresp);
+        }
+        catch(Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
 
     private async Task Void(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
@@ -829,6 +836,7 @@
                 "\"amount\" : \"" + cst.intTagihan + "\"," +
                 "\"accountId\" : \"" + cst.accountId + "\"," +
                 "\"submitAmount\" : \"" + strAccBill + "\"," +
+                "\"lembar_uang\" : \"" + cst.intUangCount + "\"," +
                                     "\"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
                                     "\"fee\" : \"" + trans.fee + "\"," +
                                     "\"bit48\" : \"" + trans.bit + "\"" +

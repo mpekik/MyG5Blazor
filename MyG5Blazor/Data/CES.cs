@@ -12,6 +12,5 @@ namespace MyG5Blazor.Data
         public string quEngText = string.Empty;
         public string answID = string.Empty;
         public string answValue = string.Empty;
-        
     }
 }

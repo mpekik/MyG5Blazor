@@ -1,4 +1,4 @@
-﻿@page "/u4g/3"
+﻿@page "/UP/3"
 @using MyG5Blazor.Data
 @using System.Threading
 @using System.Net.Http;
@@ -121,7 +121,7 @@
 
     byte[] pbConf;
     public string _myURL = "";
-    public string saveURL = "mygrapari/log/v1/save";
+    public string saveURL = "log/v1/save";
 
     private async Task MenuUtama()
     {
@@ -132,7 +132,7 @@
     }
     private async Task Back()
     {
-        NavigateTo("/u4g/2");
+        NavigateTo("/UP/2");
     }
     private void NavigateTo(string strURL)
     {
@@ -287,7 +287,7 @@
         OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
         cst.EKTPNumber = ktp.Id;
         OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
-        NavMan.NavigateTo("/u4g/4");
+        NavMan.NavigateTo("/UP/4");
     }
     [Microsoft.AspNetCore.Components.Inject]
 

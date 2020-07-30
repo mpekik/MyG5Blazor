@@ -1,4 +1,4 @@
-﻿@page "/bpp/1"
+﻿@page "/IP/1"
 
 @using Newtonsoft.Json;
 @using Newtonsoft.Json.Linq;
@@ -105,7 +105,7 @@
                 <div class="modal-body">
                     <p class="text-body">Anda akan melakukan <span style="font-weight: bold;">Pengisian Pulsa Prabayar</span> untuk nomor :</p>
                     <p style="font-size: 25pt; font-weight: bold;">@strNumber</p>
-                    <button @onclick="@(()=>CheckNumber("/bpp/2"))" class="btn btn-danger modal-button">Lanjut</button>
+                    <button @onclick="@(()=>CheckNumber("/IP/2"))" class="btn btn-danger modal-button">Lanjut</button>
                     <button class="btn btn-light modal-button" @onclick="@(()=>OkOnClick(false))">Batal</button>
                 </div>
             </div>
@@ -149,7 +149,7 @@
     private bool isLoading = false;
 
     public string _myURL = string.Empty;
-    public string serviceURL = "mygrapari/isi-pulsa/v1/submit-nohp";
+    public string serviceURL = "isi-pulsa/v1/submit-nohp";
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
 
@@ -190,10 +190,10 @@
 
     private void NavigateTo(string strURL)
     {
-        if (strURL != "")
+        if (strURL != "/main")
         {
             OurUtility.Write_Log("=== Get Phone Number", "step-action");
-            cst.PhoneNumber = strNumber;
+            cst.PhoneNumber = "62" + strNumber.Substring(1);
         }
         NavMan.NavigateTo(strURL);
     }

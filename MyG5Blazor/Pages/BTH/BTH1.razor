@@ -1,4 +1,4 @@
-﻿@page "/bth/1"
+﻿@page "/PB/1"
 
 @using Newtonsoft.Json;
 @using Newtonsoft.Json.Linq;
@@ -102,7 +102,7 @@
                 <div class="modal-body">
                     <p class="text-body">Anda akan melakukan <span style="font-weight: bold;">Pembayaran Tagihan kartuHalo</span> untuk nomor :</p>
                     <p style="font-size: 25pt; font-weight: bold;">@strNumber</p>
-                    <button @onclick="@(()=>CheckNumber("/bth/2a"))" class="btn btn-danger modal-button">Lanjut</button>
+                    <button @onclick="@(()=>CheckNumber("/PB/2a"))" class="btn btn-danger modal-button">Lanjut</button>
                     <button class="btn btn-light modal-button" @onclick="@(() => OkOnClick(false))">Batal</button>
                 </div>
             </div>
@@ -146,7 +146,7 @@
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
 
-    public string serviceURL = "mygrapari/bayar-halo/v1/submit-nohp";
+    public string serviceURL = "bayar-halo/v1/submit-nohp";
     private string _termID = string.Empty;
     private string msg = string.Empty;
     private string errorcode = string.Empty;
@@ -190,10 +190,10 @@
 
     private void NavigateTo(string strURL)
     {
-        if (strURL != "")
+        if (strURL != "/main")
         {
             OurUtility.Write_Log("=== Get Phone Number", "step-action");
-            cst.PhoneNumber = strNumber;
+            cst.PhoneNumber = "62" + strNumber.Substring(1);
         }
         NavMan.NavigateTo(strURL);
     }
@@ -208,8 +208,9 @@
         menu.edc = "1";
         menu.cash = "1";
 
-        byte[] image = OurUtility.CaptureImage();
-        var imageBytesStr = Convert.ToBase64String(image);
+        //byte[] image = OurUtility.CaptureImage();
+        //var imageBytesStr = Convert.ToBase64String(image);
+        string imageBytesStr = "";
         cst.PhoneNumber = "62" + strNumber.Substring(1);
 
         //Set HTTP Request Body

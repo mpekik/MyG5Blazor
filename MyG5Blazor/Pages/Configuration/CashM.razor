@@ -35,11 +35,159 @@
     <div class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="col-md-6">
+                <div style="padding-left:10px;" class="col-md-6">
                     <p class="teks-title">Cash Management</p>
                     <div class="teks-top">
                         <p>Anda akan melakukan Cash Collect</p>
-                        <p>Silahkan masukkan Credential Anda untuk Validasi</p> <br>
+                        <p style="margin-bottom: 80px;">Silahkan masukkan Credential Anda untuk Validasi</p> <br>
+                                                                                    @if (!isNumeric && !isUpper)
+                                                                                    {
+
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" value="q" @onclick="@(() => InsertCharField("q"))">q</button>
+                                                                                                <button class="block" value="w" @onclick="@(() => InsertCharField("w"))">w</button>
+                                                                                                <button class="block" value="e" @onclick="@(() => InsertCharField("e"))">e</button>
+                                                                                                <button class="block" value="r" @onclick="@(() => InsertCharField("r"))">r</button>
+                                                                                                <button class="block" value="t" @onclick="@(() => InsertCharField("t"))">t</button>
+                                                                                                <button class="block" value="y" @onclick="@(() => InsertCharField("y"))">y</button>
+                                                                                                <button class="block" value="u" @onclick="@(() => InsertCharField("u"))">u</button>
+                                                                                                <button class="block" value="i" @onclick="@(() => InsertCharField("i"))">i</button>
+                                                                                                <button class="block" value="o" @onclick="@(() => InsertCharField("o"))">o</button>
+                                                                                                <button class="block" value="p" @onclick="@(() => InsertCharField("p"))">p</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" value="a" @onclick="@(() => InsertCharField("a"))">a</button>
+                                                                                                <button class="block" value="s" @onclick="@(() => InsertCharField("s"))">s</button>
+                                                                                                <button class="block" value="d" @onclick="@(() => InsertCharField("d"))">d</button>
+                                                                                                <button class="block" value="f" @onclick="@(() => InsertCharField("f"))">f</button>
+                                                                                                <button class="block" value="g" @onclick="@(() => InsertCharField("g"))">g</button>
+                                                                                                <button class="block" value="h" @onclick="@(() => InsertCharField("h"))">h</button>
+                                                                                                <button class="block" value="j" @onclick="@(() => InsertCharField("j"))">j</button>
+                                                                                                <button class="block" value="k" @onclick="@(() => InsertCharField("k"))">k</button>
+                                                                                                <button class="block" value="l" @onclick="@(() => InsertCharField("l"))">l</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" shift="" value="shift" @onclick="UpperToggle">Shift</button>
+                                                                                                <button class="block" value="z" @onclick="@(() => InsertCharField("z"))">z</button>
+                                                                                                <button class="block" value="x" @onclick="@(() => InsertCharField("x"))">x</button>
+                                                                                                <button class="block" value="c" @onclick="@(() => InsertCharField("c"))">c</button>
+                                                                                                <button class="block" value="v" @onclick="@(() => InsertCharField("v"))">v</button>
+                                                                                                <button class="block" value="b" @onclick="@(() => InsertCharField("b"))">b</button>
+                                                                                                <button class="block" value="n" @onclick="@(() => InsertCharField("n"))">n</button>
+                                                                                                <button class="block" value="m" @onclick="@(() => InsertCharField("m"))">m</button>
+                                                                                                <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" num="" value="num" @onclick="NumericToggle">123</button>
+                                                                                                <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    }
+                                                                                    else if (isUpper)
+                                                                                    {
+
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" value="q" @onclick="@(() => InsertCharField("Q"))">Q</button>
+                                                                                                <button class="block" value="w" @onclick="@(() => InsertCharField("W"))">W</button>
+                                                                                                <button class="block" value="e" @onclick="@(() => InsertCharField("E"))">E</button>
+                                                                                                <button class="block" value="r" @onclick="@(() => InsertCharField("R"))">R</button>
+                                                                                                <button class="block" value="t" @onclick="@(() => InsertCharField("T"))">T</button>
+                                                                                                <button class="block" value="y" @onclick="@(() => InsertCharField("Y"))">Y</button>
+                                                                                                <button class="block" value="u" @onclick="@(() => InsertCharField("U"))">U</button>
+                                                                                                <button class="block" value="i" @onclick="@(() => InsertCharField("I"))">I</button>
+                                                                                                <button class="block" value="o" @onclick="@(() => InsertCharField("O"))">O</button>
+                                                                                                <button class="block" value="p" @onclick="@(() => InsertCharField("P"))">P</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" value="a" @onclick="@(() => InsertCharField("A"))">A</button>
+                                                                                                <button class="block" value="s" @onclick="@(() => InsertCharField("S"))">S</button>
+                                                                                                <button class="block" value="d" @onclick="@(() => InsertCharField("D"))">D</button>
+                                                                                                <button class="block" value="f" @onclick="@(() => InsertCharField("F"))">F</button>
+                                                                                                <button class="block" value="g" @onclick="@(() => InsertCharField("G"))">G</button>
+                                                                                                <button class="block" value="h" @onclick="@(() => InsertCharField("H"))">H</button>
+                                                                                                <button class="block" value="j" @onclick="@(() => InsertCharField("J"))">J</button>
+                                                                                                <button class="block" value="k" @onclick="@(() => InsertCharField("K"))">K</button>
+                                                                                                <button class="block" value="l" @onclick="@(() => InsertCharField("L"))">L</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" shift="" value="shift" @onclick="UpperToggle">Shift</button>
+                                                                                                <button class="block" value="z" @onclick="@(() => InsertCharField("Z"))">Z</button>
+                                                                                                <button class="block" value="x" @onclick="@(() => InsertCharField("X"))">X</button>
+                                                                                                <button class="block" value="c" @onclick="@(() => InsertCharField("C"))">C</button>
+                                                                                                <button class="block" value="v" @onclick="@(() => InsertCharField("V"))">V</button>
+                                                                                                <button class="block" value="b" @onclick="@(() => InsertCharField("B"))">B</button>
+                                                                                                <button class="block" value="n" @onclick="@(() => InsertCharField("N"))">N</button>
+                                                                                                <button class="block" value="m" @onclick="@(() => InsertCharField("M"))">M</button>
+                                                                                                <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" num="" value="num" @onclick="NumericToggle">123</button>
+                                                                                                <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                    }
+                                                                                    else if (isNumeric)
+                                                                                    {
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" value="q" @onclick="@(() => InsertCharField("1"))">1</button>
+                                                                                                <button class="block" value="w" @onclick="@(() => InsertCharField("2"))">2</button>
+                                                                                                <button class="block" value="e" @onclick="@(() => InsertCharField("3"))">3</button>
+                                                                                                <button class="block" value="r" @onclick="@(() => InsertCharField("4"))">4</button>
+                                                                                                <button class="block" value="t" @onclick="@(() => InsertCharField("5"))">5</button>
+                                                                                                <button class="block" value="y" @onclick="@(() => InsertCharField("6"))">6</button>
+                                                                                                <button class="block" value="u" @onclick="@(() => InsertCharField("7"))">7</button>
+                                                                                                <button class="block" value="i" @onclick="@(() => InsertCharField("8"))">8</button>
+                                                                                                <button class="block" value="o" @onclick="@(() => InsertCharField("9"))">9</button>
+                                                                                                <button class="block" value="p" @onclick="@(() => InsertCharField("0"))">0</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" value="a" @onclick="@(() => InsertCharField("-"))">-</button>
+                                                                                                <button class="block" value="s" @onclick="@(() => InsertCharField("/"))">/</button>
+                                                                                                <button class="block" value="d" @onclick="@(() => InsertCharField(":"))">:</button>
+                                                                                                <button class="block" value="f" @onclick="@(() => InsertCharField(";"))">;</button>
+                                                                                                <button class="block" value="g" @onclick="@(() => InsertCharField("("))">)</button>
+                                                                                                <button class="block" value="h" @onclick="@(() => InsertCharField(")"))">)</button>
+                                                                                                <button class="block" value="j" @onclick="@(() => InsertCharField("$"))">$</button>
+                                                                                                <button class="block" value="k" @onclick="@(() => InsertCharField("&"))">&#38</button>
+                                                                                                <button class="block" value="l" @onclick="@(() => InsertCharField("@"))">&#64</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" value="x" @onclick="@(() => InsertCharField("."))">.</button>
+                                                                                                <button class="block" value="c" @onclick="@(() => InsertCharField(","))">,</button>
+                                                                                                <button class="block" value="v" @onclick="@(() => InsertCharField("?"))">?</button>
+                                                                                                <button class="block" value="b" @onclick="@(() => InsertCharField("!"))">!</button>
+                                                                                                <button class="block" value="n" @onclick="@(() => InsertCharField("'"))">'</button>
+                                                                                                <button class="block" value="m" @onclick="@(() => InsertCharField("\""))">"</button>
+                                                                                                <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
+                                                                                            </div>
+                                                                                        </div>
+                                                                                        <div class="row">
+                                                                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                                                                <button class="block" num="" value="num" @onclick="NumericToggle">abc</button>
+                                                                                                <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
+                                                                                            </div>
+                                                                                        </div>
+
+                                                                                    }
                     </div>
                 </div>
                 <div class="col-md-6" style="text-align: center;">
@@ -48,160 +196,11 @@
                     <label class="teks-data2">Password</label>
                     <input type="text" name="number" class="num-field2" @onclick="Inputfield2" placeholder="input your password" @bind="password">
                     <label class="teks-data2">Passcode</label>
-                    <input type="password" name="number" class="num-field2" @onclick="Inputfield3" placeholder="input your passcode" @bind="passcode">
-                    <button class="btn-single-red btn" style="margin-top:10px;" @onclick="Save">Collect</button>
-                    <div class="col-md-12" style="margin-top:4%">
-                        @if (!isNumeric && !isUpper)
-                        {
-                            <container>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" value="q" @onclick="@(() => InsertCharField("q"))">q</button>
-                                        <button class="block" value="w" @onclick="@(() => InsertCharField("w"))">w</button>
-                                        <button class="block" value="e" @onclick="@(() => InsertCharField("e"))">e</button>
-                                        <button class="block" value="r" @onclick="@(() => InsertCharField("r"))">r</button>
-                                        <button class="block" value="t" @onclick="@(() => InsertCharField("t"))">t</button>
-                                        <button class="block" value="y" @onclick="@(() => InsertCharField("y"))">y</button>
-                                        <button class="block" value="u" @onclick="@(() => InsertCharField("u"))">u</button>
-                                        <button class="block" value="i" @onclick="@(() => InsertCharField("i"))">i</button>
-                                        <button class="block" value="o" @onclick="@(() => InsertCharField("o"))">o</button>
-                                        <button class="block" value="p" @onclick="@(() => InsertCharField("p"))">p</button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" value="a" @onclick="@(() => InsertCharField("a"))">a</button>
-                                        <button class="block" value="s" @onclick="@(() => InsertCharField("s"))">s</button>
-                                        <button class="block" value="d" @onclick="@(() => InsertCharField("d"))">d</button>
-                                        <button class="block" value="f" @onclick="@(() => InsertCharField("f"))">f</button>
-                                        <button class="block" value="g" @onclick="@(() => InsertCharField("g"))">g</button>
-                                        <button class="block" value="h" @onclick="@(() => InsertCharField("h"))">h</button>
-                                        <button class="block" value="j" @onclick="@(() => InsertCharField("j"))">j</button>
-                                        <button class="block" value="k" @onclick="@(() => InsertCharField("k"))">k</button>
-                                        <button class="block" value="l" @onclick="@(() => InsertCharField("l"))">l</button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" shift="" value="shift" @onclick="UpperToggle">Shift</button>
-                                        <button class="block" value="z" @onclick="@(() => InsertCharField("z"))">z</button>
-                                        <button class="block" value="x" @onclick="@(() => InsertCharField("x"))">x</button>
-                                        <button class="block" value="c" @onclick="@(() => InsertCharField("c"))">c</button>
-                                        <button class="block" value="v" @onclick="@(() => InsertCharField("v"))">v</button>
-                                        <button class="block" value="b" @onclick="@(() => InsertCharField("b"))">b</button>
-                                        <button class="block" value="n" @onclick="@(() => InsertCharField("n"))">n</button>
-                                        <button class="block" value="m" @onclick="@(() => InsertCharField("m"))">m</button>
-                                        <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" num="" value="num" @onclick="NumericToggle">123</button>
-                                        <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
-                                    </div>
-                                </div>
-                            </container>
-                        }
-                        else if (isUpper)
-                        {
-                            <container>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" value="q" @onclick="@(() => InsertCharField("Q"))">Q</button>
-                                        <button class="block" value="w" @onclick="@(() => InsertCharField("W"))">W</button>
-                                        <button class="block" value="e" @onclick="@(() => InsertCharField("E"))">E</button>
-                                        <button class="block" value="r" @onclick="@(() => InsertCharField("R"))">R</button>
-                                        <button class="block" value="t" @onclick="@(() => InsertCharField("T"))">T</button>
-                                        <button class="block" value="y" @onclick="@(() => InsertCharField("Y"))">Y</button>
-                                        <button class="block" value="u" @onclick="@(() => InsertCharField("U"))">U</button>
-                                        <button class="block" value="i" @onclick="@(() => InsertCharField("I"))">I</button>
-                                        <button class="block" value="o" @onclick="@(() => InsertCharField("O"))">O</button>
-                                        <button class="block" value="p" @onclick="@(() => InsertCharField("P"))">P</button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" value="a" @onclick="@(() => InsertCharField("A"))">A</button>
-                                        <button class="block" value="s" @onclick="@(() => InsertCharField("S"))">S</button>
-                                        <button class="block" value="d" @onclick="@(() => InsertCharField("D"))">D</button>
-                                        <button class="block" value="f" @onclick="@(() => InsertCharField("F"))">F</button>
-                                        <button class="block" value="g" @onclick="@(() => InsertCharField("G"))">G</button>
-                                        <button class="block" value="h" @onclick="@(() => InsertCharField("H"))">H</button>
-                                        <button class="block" value="j" @onclick="@(() => InsertCharField("J"))">J</button>
-                                        <button class="block" value="k" @onclick="@(() => InsertCharField("K"))">K</button>
-                                        <button class="block" value="l" @onclick="@(() => InsertCharField("L"))">L</button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" shift="" value="shift" @onclick="UpperToggle">Shift</button>
-                                        <button class="block" value="z" @onclick="@(() => InsertCharField("Z"))">Z</button>
-                                        <button class="block" value="x" @onclick="@(() => InsertCharField("X"))">X</button>
-                                        <button class="block" value="c" @onclick="@(() => InsertCharField("C"))">C</button>
-                                        <button class="block" value="v" @onclick="@(() => InsertCharField("V"))">V</button>
-                                        <button class="block" value="b" @onclick="@(() => InsertCharField("B"))">B</button>
-                                        <button class="block" value="n" @onclick="@(() => InsertCharField("N"))">N</button>
-                                        <button class="block" value="m" @onclick="@(() => InsertCharField("M"))">M</button>
-                                        <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" num="" value="num" @onclick="NumericToggle">123</button>
-                                        <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
-                                    </div>
-                                </div>
-                            </container>
-                        }
-                        else if (isNumeric)
-                        {
-                            <container>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" value="q" @onclick="@(() => InsertCharField("1"))">1</button>
-                                        <button class="block" value="w" @onclick="@(() => InsertCharField("2"))">2</button>
-                                        <button class="block" value="e" @onclick="@(() => InsertCharField("3"))">3</button>
-                                        <button class="block" value="r" @onclick="@(() => InsertCharField("4"))">4</button>
-                                        <button class="block" value="t" @onclick="@(() => InsertCharField("5"))">5</button>
-                                        <button class="block" value="y" @onclick="@(() => InsertCharField("6"))">6</button>
-                                        <button class="block" value="u" @onclick="@(() => InsertCharField("7"))">7</button>
-                                        <button class="block" value="i" @onclick="@(() => InsertCharField("8"))">8</button>
-                                        <button class="block" value="o" @onclick="@(() => InsertCharField("9"))">9</button>
-                                        <button class="block" value="p" @onclick="@(() => InsertCharField("0"))">0</button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" value="a" @onclick="@(() => InsertCharField("-"))">-</button>
-                                        <button class="block" value="s" @onclick="@(() => InsertCharField("/"))">/</button>
-                                        <button class="block" value="d" @onclick="@(() => InsertCharField(":"))">:</button>
-                                        <button class="block" value="f" @onclick="@(() => InsertCharField(";"))">;</button>
-                                        <button class="block" value="g" @onclick="@(() => InsertCharField("("))">)</button>
-                                        <button class="block" value="h" @onclick="@(() => InsertCharField(")"))">)</button>
-                                        <button class="block" value="j" @onclick="@(() => InsertCharField("$"))">$</button>
-                                        <button class="block" value="k" @onclick="@(() => InsertCharField("&"))">&#38</button>
-                                        <button class="block" value="l" @onclick="@(() => InsertCharField("@"))">&#64</button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" value="x" @onclick="@(() => InsertCharField("."))">.</button>
-                                        <button class="block" value="c" @onclick="@(() => InsertCharField(","))">,</button>
-                                        <button class="block" value="v" @onclick="@(() => InsertCharField("?"))">?</button>
-                                        <button class="block" value="b" @onclick="@(() => InsertCharField("!"))">!</button>
-                                        <button class="block" value="n" @onclick="@(() => InsertCharField("'"))">'</button>
-                                        <button class="block" value="m" @onclick="@(() => InsertCharField("\""))">"</button>
-                                        <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
-                                    </div>
-                                </div>
-                                <div class="row">
-                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                        <button class="block" num="" value="num" @onclick="NumericToggle">abc</button>
-                                        <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
-                                    </div>
-                                </div>
-                            </container>
-                        }
+                    <input style="margin-bottom:15px;" type="password" name="number" class="num-field2" @onclick="Inputfield3" placeholder="input your passcode" @bind="passcode">
+                    <button @onclick="@(()=>isVisible2=true)" class="btn-arrow btn" value="">Kembali</button>
+                    <button class="btn-arrow-red btn" style="margin-top:10px;" @onclick="@(()=>IsVisible=true)">Collect</button>
+                    <div class="col-md-12" style="margin-top:0%">
+
                     </div>
                 </div>
             </div>
@@ -217,8 +216,7 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Anda akan memasukkan jumlah kartu yang tersedia pada card dispenser sebanyak :</p>
-                    <p style="font-size: 25pt; font-weight: bold;">@userName</p>
+                    <p class="text-body">Anda akan melakukan pengambilan uang dari Cash Box</p>
                     <button @onclick="Save" class="btn btn-danger modal-button">Lanjut</button>
                     <button class="btn btn-light modal-button" @onclick="@(() => IsVisible=false)">Batal</button>
                 </div>
@@ -241,18 +239,6 @@
         </div>
     </div>
 }
-<footer>
-    <div class="footer-side-left">
-        <span class="dot-trans"></span>
-        <span class="dot-trans"></span>
-        <span class="dot-trans"></span>
-        <span class="dot-trans"></span>
-    </div>
-    <div class="footer-side-right">
-        <button @onclick="@(()=>isVisible2=true)" class="btn-single-white btn" value="">Kembali</button>
-        <!-- <sup>Powered By </sup>Trilogi Persada -->
-    </div>
-</footer>
 
 @code{
     private string userName = string.Empty;
@@ -268,7 +254,7 @@
 
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
-    public string serviceURL = "mygrapari/upgrade-4g/v1/submit-nohp";
+    public string serviceURL = "upgrade-4g/v1/submit-nohp";
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
     private void DeleteCharField()

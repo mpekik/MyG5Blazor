@@ -52,159 +52,159 @@
                             </div>
                             <div class="col-md-12">
                                 <div class="form-group3">
-                                    <button class="btn btn-danger button-nps" @onclick="loginCheck">Login</button>
+                                    <button style="margin-bottom:0;" class="btn btn-danger button-nps" @onclick="loginCheck">Login</button>
                                 </div>
-                                @if (!isNumeric && !isUpper)
-                                {
-                                    <container>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" value="q" @onclick="@(() => InsertCharField("q"))">q</button>
-                                                <button class="block" value="w" @onclick="@(() => InsertCharField("w"))">w</button>
-                                                <button class="block" value="e" @onclick="@(() => InsertCharField("e"))">e</button>
-                                                <button class="block" value="r" @onclick="@(() => InsertCharField("r"))">r</button>
-                                                <button class="block" value="t" @onclick="@(() => InsertCharField("t"))">t</button>
-                                                <button class="block" value="y" @onclick="@(() => InsertCharField("y"))">y</button>
-                                                <button class="block" value="u" @onclick="@(() => InsertCharField("u"))">u</button>
-                                                <button class="block" value="i" @onclick="@(() => InsertCharField("i"))">i</button>
-                                                <button class="block" value="o" @onclick="@(() => InsertCharField("o"))">o</button>
-                                                <button class="block" value="p" @onclick="@(() => InsertCharField("p"))">p</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" value="a" @onclick="@(() => InsertCharField("a"))">a</button>
-                                                <button class="block" value="s" @onclick="@(() => InsertCharField("s"))">s</button>
-                                                <button class="block" value="d" @onclick="@(() => InsertCharField("d"))">d</button>
-                                                <button class="block" value="f" @onclick="@(() => InsertCharField("f"))">f</button>
-                                                <button class="block" value="g" @onclick="@(() => InsertCharField("g"))">g</button>
-                                                <button class="block" value="h" @onclick="@(() => InsertCharField("h"))">h</button>
-                                                <button class="block" value="j" @onclick="@(() => InsertCharField("j"))">j</button>
-                                                <button class="block" value="k" @onclick="@(() => InsertCharField("k"))">k</button>
-                                                <button class="block" value="l" @onclick="@(() => InsertCharField("l"))">l</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" shift="" value="shift" @onclick="UpperToggle">Shift</button>
-                                                <button class="block" value="z" @onclick="@(() => InsertCharField("z"))">z</button>
-                                                <button class="block" value="x" @onclick="@(() => InsertCharField("x"))">x</button>
-                                                <button class="block" value="c" @onclick="@(() => InsertCharField("c"))">c</button>
-                                                <button class="block" value="v" @onclick="@(() => InsertCharField("v"))">v</button>
-                                                <button class="block" value="b" @onclick="@(() => InsertCharField("b"))">b</button>
-                                                <button class="block" value="n" @onclick="@(() => InsertCharField("n"))">n</button>
-                                                <button class="block" value="m" @onclick="@(() => InsertCharField("m"))">m</button>
-                                                <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" num="" value="num" @onclick="NumericToggle">123</button>
-                                                <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
-                                            </div>
-                                        </div>
-                                    </container>
-                                }
-                                else if (isUpper)
-                                {
-                                    <container>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" value="q" @onclick="@(() => InsertCharField("Q"))">Q</button>
-                                                <button class="block" value="w" @onclick="@(() => InsertCharField("W"))">W</button>
-                                                <button class="block" value="e" @onclick="@(() => InsertCharField("E"))">E</button>
-                                                <button class="block" value="r" @onclick="@(() => InsertCharField("R"))">R</button>
-                                                <button class="block" value="t" @onclick="@(() => InsertCharField("T"))">T</button>
-                                                <button class="block" value="y" @onclick="@(() => InsertCharField("Y"))">Y</button>
-                                                <button class="block" value="u" @onclick="@(() => InsertCharField("U"))">U</button>
-                                                <button class="block" value="i" @onclick="@(() => InsertCharField("I"))">I</button>
-                                                <button class="block" value="o" @onclick="@(() => InsertCharField("O"))">O</button>
-                                                <button class="block" value="p" @onclick="@(() => InsertCharField("P"))">P</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" value="a" @onclick="@(() => InsertCharField("A"))">A</button>
-                                                <button class="block" value="s" @onclick="@(() => InsertCharField("S"))">S</button>
-                                                <button class="block" value="d" @onclick="@(() => InsertCharField("D"))">D</button>
-                                                <button class="block" value="f" @onclick="@(() => InsertCharField("F"))">F</button>
-                                                <button class="block" value="g" @onclick="@(() => InsertCharField("G"))">G</button>
-                                                <button class="block" value="h" @onclick="@(() => InsertCharField("H"))">H</button>
-                                                <button class="block" value="j" @onclick="@(() => InsertCharField("J"))">J</button>
-                                                <button class="block" value="k" @onclick="@(() => InsertCharField("K"))">K</button>
-                                                <button class="block" value="l" @onclick="@(() => InsertCharField("L"))">L</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" shift="" value="shift" @onclick="UpperToggle">Shift</button>
-                                                <button class="block" value="z" @onclick="@(() => InsertCharField("Z"))">Z</button>
-                                                <button class="block" value="x" @onclick="@(() => InsertCharField("X"))">X</button>
-                                                <button class="block" value="c" @onclick="@(() => InsertCharField("C"))">C</button>
-                                                <button class="block" value="v" @onclick="@(() => InsertCharField("V"))">V</button>
-                                                <button class="block" value="b" @onclick="@(() => InsertCharField("B"))">B</button>
-                                                <button class="block" value="n" @onclick="@(() => InsertCharField("N"))">N</button>
-                                                <button class="block" value="m" @onclick="@(() => InsertCharField("M"))">M</button>
-                                                <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" num="" value="num" @onclick="NumericToggle">123</button>
-                                                <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
-                                            </div>
-                                        </div>
-                                    </container>
-                                }
-                                else if (isNumeric)
-                                {
-                                    <container>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" value="q" @onclick="@(() => InsertCharField("1"))">1</button>
-                                                <button class="block" value="w" @onclick="@(() => InsertCharField("2"))">2</button>
-                                                <button class="block" value="e" @onclick="@(() => InsertCharField("3"))">3</button>
-                                                <button class="block" value="r" @onclick="@(() => InsertCharField("4"))">4</button>
-                                                <button class="block" value="t" @onclick="@(() => InsertCharField("5"))">5</button>
-                                                <button class="block" value="y" @onclick="@(() => InsertCharField("6"))">6</button>
-                                                <button class="block" value="u" @onclick="@(() => InsertCharField("7"))">7</button>
-                                                <button class="block" value="i" @onclick="@(() => InsertCharField("8"))">8</button>
-                                                <button class="block" value="o" @onclick="@(() => InsertCharField("9"))">9</button>
-                                                <button class="block" value="p" @onclick="@(() => InsertCharField("0"))">0</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" value="a" @onclick="@(() => InsertCharField("-"))">-</button>
-                                                <button class="block" value="s" @onclick="@(() => InsertCharField("/"))">/</button>
-                                                <button class="block" value="d" @onclick="@(() => InsertCharField(":"))">:</button>
-                                                <button class="block" value="f" @onclick="@(() => InsertCharField(";"))">;</button>
-                                                <button class="block" value="g" @onclick="@(() => InsertCharField("("))">)</button>
-                                                <button class="block" value="h" @onclick="@(() => InsertCharField(")"))">)</button>
-                                                <button class="block" value="j" @onclick="@(() => InsertCharField("$"))">$</button>
-                                                <button class="block" value="k" @onclick="@(() => InsertCharField("&"))">&#38</button>
-                                                <button class="block" value="l" @onclick="@(() => InsertCharField("@"))">&#64</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" value="x" @onclick="@(() => InsertCharField("."))">.</button>
-                                                <button class="block" value="c" @onclick="@(() => InsertCharField(","))">,</button>
-                                                <button class="block" value="v" @onclick="@(() => InsertCharField("?"))">?</button>
-                                                <button class="block" value="b" @onclick="@(() => InsertCharField("!"))">!</button>
-                                                <button class="block" value="n" @onclick="@(() => InsertCharField("'"))">'</button>
-                                                <button class="block" value="m" @onclick="@(() => InsertCharField("\""))">"</button>
-                                                <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
-                                            </div>
-                                        </div>
-                                        <div class="row">
-                                            <div class="text-center" style="margin-left: auto; margin-right: auto;">
-                                                <button class="block" num="" value="num" @onclick="NumericToggle">abc</button>
-                                                <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
-                                            </div>
-                                        </div>
-                                    </container>
-                                }
+
+                                <div style="padding-left: 265px; padding-right: 285px; ">
+                                    <div class="card" style="position: fixed; background-color: rgb(243, 243, 243); padding: 1rem; width: 54%; margin-left: auto; margin-right: auto; margin-top:0;">
+                                            @if (!isNumeric && !isUpper)
+                                            {
+
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" value="q" @onclick="@(() => InsertCharField("q"))">q</button>
+                                                        <button class="block" value="w" @onclick="@(() => InsertCharField("w"))">w</button>
+                                                        <button class="block" value="e" @onclick="@(() => InsertCharField("e"))">e</button>
+                                                        <button class="block" value="r" @onclick="@(() => InsertCharField("r"))">r</button>
+                                                        <button class="block" value="t" @onclick="@(() => InsertCharField("t"))">t</button>
+                                                        <button class="block" value="y" @onclick="@(() => InsertCharField("y"))">y</button>
+                                                        <button class="block" value="u" @onclick="@(() => InsertCharField("u"))">u</button>
+                                                        <button class="block" value="i" @onclick="@(() => InsertCharField("i"))">i</button>
+                                                        <button class="block" value="o" @onclick="@(() => InsertCharField("o"))">o</button>
+                                                        <button class="block" value="p" @onclick="@(() => InsertCharField("p"))">p</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" value="a" @onclick="@(() => InsertCharField("a"))">a</button>
+                                                        <button class="block" value="s" @onclick="@(() => InsertCharField("s"))">s</button>
+                                                        <button class="block" value="d" @onclick="@(() => InsertCharField("d"))">d</button>
+                                                        <button class="block" value="f" @onclick="@(() => InsertCharField("f"))">f</button>
+                                                        <button class="block" value="g" @onclick="@(() => InsertCharField("g"))">g</button>
+                                                        <button class="block" value="h" @onclick="@(() => InsertCharField("h"))">h</button>
+                                                        <button class="block" value="j" @onclick="@(() => InsertCharField("j"))">j</button>
+                                                        <button class="block" value="k" @onclick="@(() => InsertCharField("k"))">k</button>
+                                                        <button class="block" value="l" @onclick="@(() => InsertCharField("l"))">l</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" shift="" value="shift" @onclick="UpperToggle">Shift</button>
+                                                        <button class="block" value="z" @onclick="@(() => InsertCharField("z"))">z</button>
+                                                        <button class="block" value="x" @onclick="@(() => InsertCharField("x"))">x</button>
+                                                        <button class="block" value="c" @onclick="@(() => InsertCharField("c"))">c</button>
+                                                        <button class="block" value="v" @onclick="@(() => InsertCharField("v"))">v</button>
+                                                        <button class="block" value="b" @onclick="@(() => InsertCharField("b"))">b</button>
+                                                        <button class="block" value="n" @onclick="@(() => InsertCharField("n"))">n</button>
+                                                        <button class="block" value="m" @onclick="@(() => InsertCharField("m"))">m</button>
+                                                        <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" num="" value="num" @onclick="NumericToggle">123</button>
+                                                        <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else if (isUpper)
+                                            {
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" value="q" @onclick="@(() => InsertCharField("Q"))">Q</button>
+                                                        <button class="block" value="w" @onclick="@(() => InsertCharField("W"))">W</button>
+                                                        <button class="block" value="e" @onclick="@(() => InsertCharField("E"))">E</button>
+                                                        <button class="block" value="r" @onclick="@(() => InsertCharField("R"))">R</button>
+                                                        <button class="block" value="t" @onclick="@(() => InsertCharField("T"))">T</button>
+                                                        <button class="block" value="y" @onclick="@(() => InsertCharField("Y"))">Y</button>
+                                                        <button class="block" value="u" @onclick="@(() => InsertCharField("U"))">U</button>
+                                                        <button class="block" value="i" @onclick="@(() => InsertCharField("I"))">I</button>
+                                                        <button class="block" value="o" @onclick="@(() => InsertCharField("O"))">O</button>
+                                                        <button class="block" value="p" @onclick="@(() => InsertCharField("P"))">P</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" value="a" @onclick="@(() => InsertCharField("A"))">A</button>
+                                                        <button class="block" value="s" @onclick="@(() => InsertCharField("S"))">S</button>
+                                                        <button class="block" value="d" @onclick="@(() => InsertCharField("D"))">D</button>
+                                                        <button class="block" value="f" @onclick="@(() => InsertCharField("F"))">F</button>
+                                                        <button class="block" value="g" @onclick="@(() => InsertCharField("G"))">G</button>
+                                                        <button class="block" value="h" @onclick="@(() => InsertCharField("H"))">H</button>
+                                                        <button class="block" value="j" @onclick="@(() => InsertCharField("J"))">J</button>
+                                                        <button class="block" value="k" @onclick="@(() => InsertCharField("K"))">K</button>
+                                                        <button class="block" value="l" @onclick="@(() => InsertCharField("L"))">L</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" shift="" value="shift" @onclick="UpperToggle">Shift</button>
+                                                        <button class="block" value="z" @onclick="@(() => InsertCharField("Z"))">Z</button>
+                                                        <button class="block" value="x" @onclick="@(() => InsertCharField("X"))">X</button>
+                                                        <button class="block" value="c" @onclick="@(() => InsertCharField("C"))">C</button>
+                                                        <button class="block" value="v" @onclick="@(() => InsertCharField("V"))">V</button>
+                                                        <button class="block" value="b" @onclick="@(() => InsertCharField("B"))">B</button>
+                                                        <button class="block" value="n" @onclick="@(() => InsertCharField("N"))">N</button>
+                                                        <button class="block" value="m" @onclick="@(() => InsertCharField("M"))">M</button>
+                                                        <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" num="" value="num" @onclick="NumericToggle">123</button>
+                                                        <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
+                                                    </div>
+                                                </div>
+                                            }
+                                            else if (isNumeric)
+                                            {
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" value="q" @onclick="@(() => InsertCharField("1"))">1</button>
+                                                        <button class="block" value="w" @onclick="@(() => InsertCharField("2"))">2</button>
+                                                        <button class="block" value="e" @onclick="@(() => InsertCharField("3"))">3</button>
+                                                        <button class="block" value="r" @onclick="@(() => InsertCharField("4"))">4</button>
+                                                        <button class="block" value="t" @onclick="@(() => InsertCharField("5"))">5</button>
+                                                        <button class="block" value="y" @onclick="@(() => InsertCharField("6"))">6</button>
+                                                        <button class="block" value="u" @onclick="@(() => InsertCharField("7"))">7</button>
+                                                        <button class="block" value="i" @onclick="@(() => InsertCharField("8"))">8</button>
+                                                        <button class="block" value="o" @onclick="@(() => InsertCharField("9"))">9</button>
+                                                        <button class="block" value="p" @onclick="@(() => InsertCharField("0"))">0</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" value="a" @onclick="@(() => InsertCharField("-"))">-</button>
+                                                        <button class="block" value="s" @onclick="@(() => InsertCharField("/"))">/</button>
+                                                        <button class="block" value="d" @onclick="@(() => InsertCharField(":"))">:</button>
+                                                        <button class="block" value="f" @onclick="@(() => InsertCharField(";"))">;</button>
+                                                        <button class="block" value="g" @onclick="@(() => InsertCharField("("))">)</button>
+                                                        <button class="block" value="h" @onclick="@(() => InsertCharField(")"))">)</button>
+                                                        <button class="block" value="j" @onclick="@(() => InsertCharField("$"))">$</button>
+                                                        <button class="block" value="k" @onclick="@(() => InsertCharField("&"))">&#38</button>
+                                                        <button class="block" value="l" @onclick="@(() => InsertCharField("@"))">&#64</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" value="x" @onclick="@(() => InsertCharField("."))">.</button>
+                                                        <button class="block" value="c" @onclick="@(() => InsertCharField(","))">,</button>
+                                                        <button class="block" value="v" @onclick="@(() => InsertCharField("?"))">?</button>
+                                                        <button class="block" value="b" @onclick="@(() => InsertCharField("!"))">!</button>
+                                                        <button class="block" value="n" @onclick="@(() => InsertCharField("'"))">'</button>
+                                                        <button class="block" value="m" @onclick="@(() => InsertCharField("\""))">"</button>
+                                                        <button class="block" del="" value="del" @onclick="DeleteCharField">Delete</button>
+                                                    </div>
+                                                </div>
+                                                <div class="row">
+                                                    <div class="text-center" style="margin-left: auto; margin-right: auto;">
+                                                        <button class="block" num="" value="num" @onclick="NumericToggle">abc</button>
+                                                        <button class="block" space="" value="spasi" @onclick="@(() => InsertCharField("spasi"))">Spasi</button>
+                                                    </div>
+                                                </div>
+                                            }
+                                    </div>
+                                </div>
                             </div>
                     </div>
                 </div>
@@ -219,10 +219,16 @@
                     <div class="modal-content">
                         <div class="modal-body">
                             <p class="text-body">Selamat Datang <span style="font-weight: bold;">@userName</span> silahkan pilih menu :</p>
-                            <button @onclick="@(()=>NavigateTo("/main"))" class="btn btn-light modal-button">Menu Utama</button>
-                            <button @onclick="@(()=>NavigateTo("/cashm"))" class="btn btn-light modal-button">Cash Management</button>
-                            <button @onclick="@(()=>NavigateTo("/cardm"))" class="btn btn-light modal-button">Card Management</button>
+                            <button @onclick="MainMenu" class="btn btn-light modal-button">Menu Utama</button>
+                            @if (authorizedLevel == "1" || authorizedLevel == "2")
+                            {
+                            <button @onclick="@(() => NavigateTo("/cashm"))" class="btn btn-light modal-button">Cash Management</button>
+                            <button @onclick="@(() => NavigateTo("/cardm"))" class="btn btn-light modal-button">Card Management</button>
+                            }
+                            @if (authorizedLevel == "3"|| authorizedLevel == "1")
+                            {
                             <button class="btn btn-light modal-button">Configuration</button>
+                            }
                             <button @onclick="@OkOnClick" class="btn btn-danger modal-button">Batal</button>
                         </div>
                     </div>
@@ -254,7 +260,6 @@
                 </div>
             </div>
         }
-
     </div>
 
 
@@ -265,6 +270,7 @@
         private string password = string.Empty;
         private string isTextfield = "1";
 
+        private string authorizedLevel = string.Empty;
         private bool isAuthorized = false;
         private bool isLoading = false;
         private bool isNotAuthorized = false;
@@ -272,10 +278,9 @@
         private bool isUpper = false;
 
         private string _myURL = string.Empty;
-        private string apiURL = "terminal/login";
 
         private void DeleteCharField()
-        { 
+        {
             switch(isTextfield)
             {
                 case "1":
@@ -359,7 +364,7 @@
             NavMan.NavigateTo(strURL);
         }
 
-        private void loginCheck()
+        private async Task loginCheck()
         {
             OurUtility.Write_Log("= Login Page", "step-action");
             if (userName == "trilogi")
@@ -369,7 +374,7 @@
             else
             {
                 //ToDo Non Trilogi Technician Login
-                NonTrilogi();
+                await NonTrilogi();
             }
         }
 
@@ -387,8 +392,10 @@
             if (password == pass_check)
             {
                 OurUtility.Write_Log("== Login Berhasil", "step-action");
+                menu.userName = userName;
                 isNotAuthorized = false;
                 isAuthorized = true;
+                authorizedLevel = "1";
             }
             else
             {
@@ -401,10 +408,12 @@
         private async Task NonTrilogi()
         {
             isLoading = true;
-            string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
-                "\"password\": \"" + menu.tokenId + "\"," +
+            string loginURL = "auth/v1/login";
+            string myJson = "{ \"terminalId\": \"" + terminalId + "\"," +
+                "\"username\": \"" + userName + "\"," +
+                "\"password\": \"" + password + "\"" +
                     "}";
-            string myURL = _myURL + apiURL;
+            string myURL = _myURL + loginURL;
             OurUtility.Write_Log("== Login Non-Trilogi", "step-action");
             OurUtility.Write_Log("== Request API : " + myJson, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
@@ -418,8 +427,13 @@
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
                         OurUtility.Write_Log("== Login Berhasil", "step-action");
+
+                        menu.userName = userName;
+                        authorizedLevel = (string)jobjResult["userLevel"];
+                        isLoading = false;
                         isNotAuthorized = false;
                         isAuthorized = true;
+                        return;
                     }
                     else
                     {
@@ -436,8 +450,67 @@
                             trans.errorCode = statusDescSub;
                         }
                         OurUtility.Write_Log("== Login Gagal", "step-action");
+                        isLoading = false;
                         isAuthorized = false;
                         isNotAuthorized = true;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    trans.errorCode = strResult;
+                    OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
+                    NavMan.NavigateTo("/errorlogin");
+                }
+            }
+            else
+            {
+                trans.errorCode = strResult;
+                OurUtility.Write_Log("== Login Error : Hit WebService {Error}", "step-action");
+                NavMan.NavigateTo("/errorlogin");
+            }
+        }
+        private async Task MainMenu()
+        {
+            isLoading = true;
+            string menuURL = "menu/v1/get-menu";
+            string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"" +
+                    "}";
+            string myURL = _myURL + menuURL;
+            OurUtility.Write_Log("== Login Non-Trilogi", "step-action");
+            OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+            string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+            if (strResult != null)
+            {
+                try
+                {
+                    JObject jobjResult = JObject.Parse(strResult);
+                    if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                        OurUtility.Write_Log("== Login Berhasil", "step-action");
+                        foreach (var mm in jobjResult.SelectToken("menu"))
+                        {
+                            menu.AddMainMenu(mm.SelectToken("namaMenu").ToString(), mm.SelectToken("url").ToString(), mm.SelectToken("icon").ToString(), mm.SelectToken("menuCode").ToString());
+                        }
+                        NavigateTo("/main");
+                        return;
+                    }
+                    else
+                    {
+                        if ((string)jobjResult["transaction"]["errorCode"] != null)
+                        {
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                        }
+                        else
+                        {
+                            string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                            string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                            OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                            trans.errorCode = statusDescSub;
+                        }
+                        OurUtility.Write_Log("== Login Gagal", "step-action");
                     }
                 }
                 catch (Exception ex)

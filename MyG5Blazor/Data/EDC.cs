@@ -248,7 +248,7 @@ namespace MyG5Blazor.Data
                         {
                             _ecr = ByteArrayToString(Encoding.Convert(Encoding.Unicode, Encoding.ASCII, Encoding.Unicode.GetBytes(dataSplit.Substring(3, 1))));
                             _ecr = _ecr + dataSplit.Substring(4, 299);
-                            //Console.WriteLine("ECR Message : " + _ecr);
+                            Console.WriteLine("ECR Message : " + _ecr);
                             mre.Set();
                             //Console.WriteLine(mre.Set());
                         }
@@ -319,7 +319,7 @@ namespace MyG5Blazor.Data
 
             serialPort.Write(data2_with_lrc, 0, data2_with_lrc.Length);
             Console.WriteLine("2");
-
+   
             //serialPort.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
         }
     }

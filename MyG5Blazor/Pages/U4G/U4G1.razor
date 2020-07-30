@@ -1,4 +1,4 @@
-﻿@page "/u4g/1"
+﻿@page "/UP/1"
 @inject IJSRuntime JSRuntime;
 
 @using Newtonsoft.Json;
@@ -102,7 +102,7 @@
                 <div class="modal-body">
                     <p class="text-body">Anda akan melakukan <span style="font-weight: bold;">Ganti Kartu dan Upgrade 4G</span> untuk nomor :</p>
                     <p style="font-size: 25pt; font-weight: bold;">@strNumber</p>
-                    <button @onclick="@(()=>CheckNumber("/u4g/2"))" class="btn btn-danger modal-button">Lanjut</button>
+                    <button @onclick="@(()=>CheckNumber("/UP/2"))" class="btn btn-danger modal-button">Lanjut</button>
                     <button class="btn btn-light modal-button" @onclick="@(() => OkOnClick(false))">Batal</button>
                 </div>
             </div>
@@ -143,8 +143,8 @@
 
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
-    public string serviceURL = "mygrapari/upgrade-4g/v1/submit-nohp";
-    public string saveURL = "mygrapari/log/v1/save";
+    public string serviceURL = "upgrade-4g/v1/submit-nohp";
+    public string saveURL = "log/v1/save";
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
 
@@ -185,7 +185,7 @@
 
     private void NavigateTo(string strURL)
     {
-        if (strURL != "")
+        if (strURL != "/main")
         {
             cst.PhoneNumber = "62" + strNumber.Substring(1);
             OurUtility.Write_Log("=== Get Phone Number", "step-action");

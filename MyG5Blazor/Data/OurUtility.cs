@@ -290,7 +290,7 @@ namespace MyG5Blazor.Data
         public static async Task AuditTrail(Transaction trans, Menu menu, Costumer cst)
         {
             string _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-            string saveURL = "mygrapari/log/v1/save";
+            string saveURL = "log/v1/save";
             
             trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
@@ -317,13 +317,14 @@ namespace MyG5Blazor.Data
                     "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
                     "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
                     "\"status\" : \"" + trans.status + "\"," +
-                    "\"description\" : \"" + trans.errorCode + "\"" +
-                    "\"lembar_uang\" : \"" + cst.intUangCount + "\"," +
+                    "\"description\" : \"" + trans.errorCode + "\"," +
                     "\"jumlah_kartu\" : \"" + trans.jumlah_kartu + "\"," +
                     "}, \"auditTrail\" : " + auditTrail + "]}";
             string myURL2 = _myURL + saveURL;
 
+            OurUtility.Write_Log("== Request API : " + myJson2, "step-action");
             string strResult2 = await OurUtility.PostCallAPI(myURL2, myJson2,menu);
+            OurUtility.Write_Log("== Response API : " + strResult2, "step-action");
         }
         public static async Task<string> PostCallAPI(string url, string jsonString, Menu menu)
         {
@@ -348,8 +349,6 @@ namespace MyG5Blazor.Data
                         //                  client.DefaultRequestHeaders.Add("secret-key", secret);
                         content.Headers.Add("signature-key", signature);
                         content.Headers.Add("secret-key", secret);
-                        Console.WriteLine(signature);
-                        Console.WriteLine(secret);
                         await Task.Delay(2000);
                         var response = await client.PostAsync(url, content);
                         //Console.WriteLine(response.StatusCode.ToString());

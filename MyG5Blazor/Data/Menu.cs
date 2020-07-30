@@ -1,4 +1,5 @@
-﻿using System;
+﻿using MyG5Blazor.Pages;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
@@ -14,7 +15,7 @@ namespace MyG5Blazor.Data
         public string regionalCode = string.Empty;
         public string unitId = string.Empty;
         public string unitName = string.Empty;
-
+        public string userName = string.Empty;
         public string menuConfigId = string.Empty;
         public string maxRetryPerso = string.Empty;
         public string tidEdc = string.Empty;
@@ -34,11 +35,31 @@ namespace MyG5Blazor.Data
         public string hPNG = string.Empty;
         public bool active = false;
 
-        public string pp = string.Empty;
-        public string th = string.Empty;
-        public string gk = string.Empty;
-        public string u4g = string.Empty;
-        public string psb = string.Empty;
+        public string[] AssetsPNG = { "Menu_Bayar_Tagihan.png", "Menu_Upgrade4G.png", "Menu_Beli_Pulsa.png", "Menu_Ganti_kartu.png" };
+        public string[] apiURL = { "bayar-halo/v1/init", "upgrade-4g/v1/init", "isi-pulsa/v1/init", "ganti-kartu/v1/init" };
+        public string[] stringMenu = { "1", "1", "1", "1", "1" };
+
+        public class MainMenu
+        {
+            public string _namaMenu { get; set; }
+            public string _url { get; set; }
+            public string _icon { get; set; }
+            public string _code { get; set; }
+            public string _href { get; set; }
+        }
+
+        public List<MainMenu> _mainMenu = new List<MainMenu>();
+
+        public void AddMainMenu (string namamenu, string url, string icon,string code)
+        {
+            MainMenu mainmenu = new MainMenu();
+            mainmenu._namaMenu = namamenu;
+            mainmenu._url = url;
+            mainmenu._icon = icon;
+            mainmenu._code = code;
+            mainmenu._href = code+"/1";
+            _mainMenu.Add(mainmenu);
+        }
 
         public void Terminal(string _termID, string _termDesc, string _termLoc, string _areaCode, string _regionCode,string _unitId, string _unitName)
         {

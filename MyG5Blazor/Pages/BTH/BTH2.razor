@@ -1,4 +1,4 @@
-﻿@page "/bth/2"
+﻿@page "/PB/2"
 
 @using Newtonsoft.Json;
 @using Newtonsoft.Json.Linq;
@@ -64,7 +64,7 @@
             <span class="dot">4</span>
         </div>
         <div class="footer-side2">
-            <button @onclick="@(() => NavigateTo("/bth/2a"))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(() => NavigateTo("/PB/2a"))" class="btn-arrow btn" value="">Kembali</button>
             <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu<br>Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
@@ -87,7 +87,7 @@
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
 
-    public string serviceURL = "mygrapari/bayar-halo/v1/get-bill";
+    public string serviceURL = "bayar-halo/v1/get-bill";
     private string _termID = string.Empty;
     private string msg = string.Empty;
     private string errorcode = string.Empty;
@@ -102,7 +102,7 @@
         cst.intMPembayaran = _intMPembayaran;
         trans.intPayment = _intMPembayaran;
         trans.AddTrail("PAYMENT METHOD", cst.strMPembayaran, "SUCCESS");
-        GetPayment("/bth/3");
+        GetPayment("/PB/3");
     }
     private async Task MainMenu()
     {

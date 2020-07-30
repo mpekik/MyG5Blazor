@@ -43,7 +43,7 @@
                 </div>
 
                 <div class="col-md-6">
-                        <input type="text" name="number" placeholder="Jumlah Kartu Pada Dispenser" class="num-field2" @bind="strNumber" readonly />
+                    <input type="text" name="number" placeholder="Jumlah Kartu Pada Dispenser" class="num-field2" @bind="strNumber" readonly />
                     <div class="num-button">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
                         <button class="key-num btn" value="2" @onclick="@(() => InputPhoneNumber("2"))">2</button>
@@ -115,6 +115,17 @@
     </div>
 }
 
+@if (IsLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
+
 @code{
     private string strNumber = string.Empty;
     private bool IsVisible = false;
@@ -123,7 +134,7 @@
 
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
-    public string serviceURL = "mygrapari/upgrade-4g/v1/submit-nohp";
+    public string serviceURL = "card/v1/update-stock";
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
 
@@ -159,14 +170,17 @@
     private async Task Save()
     {
         config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, strNumber);
+        await CheckNumber();
         IsVisible = false;
     }
-    private async Task CheckNumber(string strURL)
+    private async Task CheckNumber()
     {
-
+        IsLoading = true;
         //Set HTTP Request Body
-        string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"" +
-                        "}";
+        string myJson = "{ \"terminalId\" : \"" + menu.terminalId + "\"," +
+            "\"username\" : \"" + menu.userName + "\"," +
+            "\"jumlah\" : \"" + strNumber + "\"" +
+            "}";
 
         //Set HTTP Request URL
         string myURL = _myURL + serviceURL;
@@ -182,6 +196,7 @@
         {
             try
             {
+                IsLoading = false;
                 //Parse HTTP Request Result to JObject
                 JObject jobjResult = JObject.Parse(strResult);
 

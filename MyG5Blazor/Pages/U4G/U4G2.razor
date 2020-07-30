@@ -1,4 +1,4 @@
-﻿@page "/u4g/2"
+﻿@page "/UP/2"
 @using System.Net.Http;
 @using System.Text;
 @inject IJSRuntime JSRuntime;
@@ -123,7 +123,7 @@
     private bool IsNext = false;
 
     public string _myURL = "";
-    public string saveURL = "mygrapari/log/v1/save";
+    public string saveURL = "log/v1/save";
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
@@ -146,7 +146,7 @@
         trans.status = "GAGAL";
         trans.errorCode = "EKTP";
         await OurUtility.AuditTrail(trans,menu,cst);
-        NavigateTo("/u4g/1");
+        NavigateTo("/UP/1");
     }
     private void NavigateTo(string strURL)
     {
@@ -288,7 +288,7 @@
 
     private void TimerElapsedHandler()
     {
-        NavMan.NavigateTo("/u4g/3");
+        NavMan.NavigateTo("/UP/3");
     }
 
     [Microsoft.AspNetCore.Components.Inject]

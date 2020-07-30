@@ -1,4 +1,4 @@
-﻿@page "/bpp/2"
+﻿@page "/IP/2"
 
 @using MyG5Blazor.Data
 
@@ -93,7 +93,7 @@
     {
         cst.intTagihan = intNominal;
         trans.AddTrail("CHOOSE NOMINAL", cst.intTagihan.ToString(), "SUCCESS");
-        NavMan.NavigateTo("/bpp/3");
+        NavMan.NavigateTo("/IP/3");
     }
 
     private void NavigateTo(string strURL)
@@ -112,6 +112,6 @@
         trans.AddTrail("CHOOSE NOMINAL", "BACK TO INPUT NUMBER", "CANCELED BY USER");
         trans.status = "GAGAL";
         await OurUtility.AuditTrail(trans, menu, cst);
-        NavMan.NavigateTo("/bpp/1");
+        NavMan.NavigateTo("/IP/1");
     }
 }

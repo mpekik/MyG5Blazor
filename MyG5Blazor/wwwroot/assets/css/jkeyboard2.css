@@ -8,11 +8,11 @@
   .block:hover,
   .block:focus{
       display: inline-block;
-      width: 60px;
+      width: 55px;
       height: 45px;
       padding: 0.1rem;
       font-weight: 600;
-      font-size: 28px;
+      font-size: 26px;
       color: #000000;
       margin: 5px;
       background: white;
@@ -39,7 +39,7 @@
       .block[shift] {
         width: 85px;
         font-size: 25px;
-        padding: 0.8rem;
+        padding: 0.5rem;
         background-color: #d6d6d6;
         color: white;
     }

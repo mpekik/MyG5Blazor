@@ -1,4 +1,4 @@
-﻿@page "/bth/2a"
+﻿@page "/PB/2a"
 
 @using MyG5Blazor.Data
 @using System
@@ -142,11 +142,11 @@
         trans.AddTrail("CEK TAGIHAN", "BACK TO INPUT NUMBER", "CANCELED BY USER");
         trans.status = "GAGAL";
         await OurUtility.AuditTrail(trans, menu, cst);
-        NavMan.NavigateTo("/bth/1");
+        NavMan.NavigateTo("/PB/1");
     }
     private async Task Next()
     {
         trans.AddTrail("CEK TAGIHAN", cst.intTagihan.ToString(), "SUCCESS");
-        NavMan.NavigateTo("/bth/2");
+        NavMan.NavigateTo("/PB/2");
     }
 }
