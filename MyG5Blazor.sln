@@ -5,7 +5,9 @@ VisualStudioVersion = 16.0.29926.136
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "MyG5Blazor", "MyG5Blazor\MyG5Blazor.csproj", "{3DF38663-B675-43AE-8448-6B3C8BEFB6FE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGConfigNDeviceTest", "MyGConfigNDeviceTest\MyGConfigNDeviceTest.csproj", "{C923FA9C-2E97-441E-8BFA-D4B051BCBBA0}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGUpdater", "MyGConfigNDeviceTest\MyGUpdater.csproj", "{C923FA9C-2E97-441E-8BFA-D4B051BCBBA0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "MyGRun", "MyGRun\MyGRun.csproj", "{CC704A12-7C0A-409D-A12D-9B0BCA169BA4}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -21,6 +23,10 @@ Global
 		{C923FA9C-2E97-441E-8BFA-D4B051BCBBA0}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{C923FA9C-2E97-441E-8BFA-D4B051BCBBA0}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{C923FA9C-2E97-441E-8BFA-D4B051BCBBA0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{CC704A12-7C0A-409D-A12D-9B0BCA169BA4}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{CC704A12-7C0A-409D-A12D-9B0BCA169BA4}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{CC704A12-7C0A-409D-A12D-9B0BCA169BA4}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{CC704A12-7C0A-409D-A12D-9B0BCA169BA4}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

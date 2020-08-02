@@ -168,13 +168,13 @@ namespace MyG5Blazor.Data
                 p_message = ex.Message;
             }
         }
-        public static void Write_Log(string p_str, string p_prefix_fileName, ref string p_message)
+        public static void Write_Notes(string p_str, string p_prefix_fileName, ref string p_message)
         {
             p_message = string.Empty;
 
             try
             {
-                string dir = Directory_Logs() + @"\" + DateTime.Now.ToString("yyyyMM");
+                string dir = Directory_Notes() + @"\" + DateTime.Now.ToString("yyyyMM");
                 CreateDirectory(dir);
 
                 string fileName = dir + @"\" + p_prefix_fileName + DateTime.Now.ToString("yyyyMMdd-HH") + ".log";

@@ -16,7 +16,7 @@
       }
     },
     "MyG5Blazor": {
-      "commandName": "Project",
+      "commandName": "Executable",
       "launchBrowser": true,
       "environmentVariables": {
         "ASPNETCORE_ENVIRONMENT": "Development"

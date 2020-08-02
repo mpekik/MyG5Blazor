@@ -16,17 +16,10 @@ namespace MyG5Blazor.Data
 
         public const string PARAM_MACHINE = "param.system.machine";
         // Menu
-        public const string PARAM_MENU_PULSA = "param.menu.pp";
-        public const string PARAM_MENU_HALO = "param.menu.th";
-        public const string PARAM_MENU_GK = "param.menu.gk";
-        public const string PARAM_MENU_U4G = "param.menu.u4g";
-        public const string PARAM_MENU_PSB = "param.menu.psb";
         public const string PARAM_TOKEN = "param.system.token";
 
         public const string PARAM_MYGRAPARI_VER = "param.system.MyGrapariUI.vers";
         public const string PARAM_DEVICE_MONITORING_VER = "param.system.MyGrapariDeviceMonitoring.vers";
-        public const string PARAM_WATCHDOG_VER = "param.system.watchdog.vers";
-        public const string PARAM_DISPENSER_VER = "param.system.dispenser.vers";
         public const string PARAM_UPDATE_PATCH_INTERVAL = "param.config.updatepatch.interval";
         public const string PARAM_MYGRAPRI_REG_STATUS = "param.MyGrapari.reg.status";
 
@@ -58,6 +51,8 @@ namespace MyG5Blazor.Data
         public const string PARAM_PERSO_EXE = "param.perso.exe";
 
         public const string PARAM_PAPER_LENGTH = "param.paper.length";
+        public const string PARAM_PRINTER_PORT = "param.printer.port";
+
         public const string PARAM_RELAY_PORT = "param.relay.port";
         public const string PARAM_RELAY_ON_INTERVAL = "param.relay.on_interval";
 
