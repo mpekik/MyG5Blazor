@@ -118,6 +118,7 @@ namespace MyG5Blazor.Data
             catch (Exception ex)
             {
                 Console.WriteLine(ex.ToString());
+                return null;
             }
             return result;
         }
@@ -167,6 +168,25 @@ namespace MyG5Blazor.Data
                 p_message = ex.Message;
             }
         }
+        public static void Write_Log(string p_str, string p_prefix_fileName, ref string p_message)
+        {
+            p_message = string.Empty;
+
+            try
+            {
+                string dir = Directory_Logs() + @"\" + DateTime.Now.ToString("yyyyMM");
+                CreateDirectory(dir);
+
+                string fileName = dir + @"\" + p_prefix_fileName + DateTime.Now.ToString("yyyyMMdd-HH") + ".log";
+
+                string msg = string.Empty;
+                Write_to_File(DateTime.Now.ToString("yyyyMMdd HH:mm:ss-fff") + " " + p_str, fileName, ref msg);
+            }
+            catch (Exception ex)
+            {
+                p_message = ex.Message;
+            }
+        }
         public static string strIns(string strData, string strInsert)
         {
             int i = 0;
@@ -186,6 +206,14 @@ namespace MyG5Blazor.Data
         public static string Directory_Logs()
         {
             string dir = Directory.GetCurrentDirectory() + @"\Logs";
+
+            CreateDirectory(dir);
+
+            return dir;
+        }
+        public static string Directory_Notes()
+        {
+            string dir = Directory.GetCurrentDirectory() + @"\Notes";
 
             CreateDirectory(dir);
 

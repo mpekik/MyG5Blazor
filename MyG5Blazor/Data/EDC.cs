@@ -254,6 +254,10 @@ namespace MyG5Blazor.Data
                         }
                         else
                         {
+                            _ecr = ByteArrayToString(Encoding.Convert(Encoding.Unicode, Encoding.ASCII, Encoding.Unicode.GetBytes(dataSplit.Substring(3, 1))));
+                            _ecr = _ecr + dataSplit.Substring(4, 299);
+                            Console.WriteLine("ECR Message : " + _ecr);
+
                             intTry += 1;
                             //Console.WriteLine("Repeat : "+intTry);
                                 mre.Set();

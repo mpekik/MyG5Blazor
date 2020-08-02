@@ -971,7 +971,7 @@ namespace MyG5Blazor.Data
                         {
                             GetDataByChannel(response[i + 1], ref data);
                             OurUtility.Write_Log("Uang Yang Dimasukkan : " + CHelper.FormatToCurrency(data.Value), "step-action");
-                            if ((data.Value / 100) < 10000)
+                            if ((data.Value / 100) < 10000 || (total + data.Value/100)>totalTagihan)
                             {
                                 OurUtility.Write_Log("Uang Dikembalikan", "step-action");
                                 ReturnNote();

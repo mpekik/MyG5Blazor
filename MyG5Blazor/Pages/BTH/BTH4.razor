@@ -448,7 +448,6 @@
                                 IsVoid = true;
                                 OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
                                 Void();
-
                             }
                             await Print();
                             await OurUtility.AuditTrail(trans, menu, cst);
@@ -609,9 +608,77 @@
         {
             IsFail = true;
             await Void(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+            await VoidService();
         }
     }
+    private async Task VoidService()
+    {
+        IsLoading = true;
+        string myJson = string.Empty;
+        string apiURL = "transaction/void";
+        
+            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                "\"terminalId\" : \"" + trans.termID + "\"," +
+                                    "\"ecr\" : \"" + trans.ecr + "\"," +
+                                    "\"sn\" : \"" + config.snEdc + "\"}" +
+                                    "}";
 
+        string myURL = _myURL + apiURL;
+
+        OurUtility.Write_Log("== VOID Payment", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        if (strResult != null)
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                resultPayment = (string)jobjResult["transaction"]["statusCode"];
+
+                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                {
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "SUCCESS");
+
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                {
+                    if ((string)jobjResult["transaction"]["errorCode"] != null || (string)jobjResult["transaction"]["statusDesc"] != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                    }
+                    else
+                    {
+                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        trans.errorCode = statusDescSub;
+                    }
+                    trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED 01");
+                }
+                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                {
+                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED 02");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                trans.errorCode = strResult;
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                trans.AddTrail(" VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED EX");
+            }
+        }
+        else
+        {
+            trans.errorCode = strResult;
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED WEB");
+        }
+    }
     private void CheckPerso()
     {
         if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
@@ -804,7 +871,21 @@
             edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
             Console.WriteLine(edc.respondCode);
+
         } while (!edc.mre.WaitOne());
+        trans.ecr = edc.ecr;
+        trans.edcresp = edc.respondCode;
+        trans.edcApproval = trans.ecr.Substring(140, 6);
+        trans.edcTid = trans.ecr.Substring(2, 8);
+        trans.edcMid = trans.ecr.Substring(10, 15);
+        trans.edcBatch = trans.ecr.Substring(25, 6);
+        trans.edcIssuer = trans.ecr.Substring(31, 15);
+        trans.edcTrace = trans.ecr.Substring(52, 6);
+        trans.edcRefNo = trans.ecr.Substring(46, 6);
+        trans.edcCardNo = trans.ecr.Substring(83, 19);
+        trans.edcCardName = trans.ecr.Substring(102, 26);
+        trans.edcDate = trans.ecr.Substring(128, 6);
+        trans.edcTime = trans.ecr.Substring(134, 6);
     }
 
     private async Task Payment(string strURL)

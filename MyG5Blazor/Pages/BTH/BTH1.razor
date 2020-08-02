@@ -208,9 +208,13 @@
         menu.edc = "1";
         menu.cash = "1";
 
-        //byte[] image = OurUtility.CaptureImage();
-        //var imageBytesStr = Convert.ToBase64String(image);
-        string imageBytesStr = "";
+        byte[] image = OurUtility.CaptureImage();
+        string imageBytesStr;
+        if(image!=null)
+            imageBytesStr = Convert.ToBase64String(image);
+        else
+            imageBytesStr = "";
+        
         cst.PhoneNumber = "62" + strNumber.Substring(1);
 
         //Set HTTP Request Body
