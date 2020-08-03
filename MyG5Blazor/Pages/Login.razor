@@ -229,7 +229,7 @@
                             }
                             @if (authorizedLevel == "3"|| authorizedLevel == "1")
                             {
-                            <button @onclick="@OkOnClick" class="btn btn-light modal-button">Configuration</button>
+                            <button @onclick="@(() => NavigateTo("/cashm"))" class="btn btn-light modal-button">Configuration</button>
                             }
                             <button @onclick="@OkOnClick" class="btn btn-danger modal-button">Batal</button>
                         </div>
