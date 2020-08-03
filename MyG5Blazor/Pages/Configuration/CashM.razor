@@ -193,8 +193,6 @@
                 <div class="col-md-6" style="text-align: center;">
                     <label class="teks-data2">User Name</label>
                     <input type="text" name="number" class="num-field2" @onclick="Inputfield1" placeholder="input your username" @bind="userName">
-                    <label class="teks-data2">Password</label>
-                    <input type="text" name="number" class="num-field2" @onclick="Inputfield2" placeholder="input your password" @bind="password">
                     <label class="teks-data2">Passcode</label>
                     <input style="margin-bottom:15px;" type="password" name="number" class="num-field2" @onclick="Inputfield3" placeholder="input your passcode" @bind="passcode">
                     <button @onclick="@(()=>isVisible2=true)" class="btn-arrow btn" value="">Kembali</button>
@@ -254,7 +252,7 @@
 
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
-    public string serviceURL = "upgrade-4g/v1/submit-nohp";
+    public string serviceURL = "cash/v1/cash-collect";
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
     private void DeleteCharField()
@@ -342,20 +340,25 @@
     }
     private async Task Save()
     {
-        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, userName);
+        CheckNumber("");
         IsVisible = false;
     }
     private async Task CheckNumber(string strURL)
     {
-
+        string bankNotes = config.Read("BILL", Config.PARAM_BILL_BANK_STOK);
+        string notesAmount = config.Read("BILL", Config.PARAM_BILL_AMOUNT);
         //Set HTTP Request Body
         string myJson = "{ \"terminalId\" : \"" + trans.termID + "\"" +
-                        "}";
+    "\"token\" : \"" + passcode + "\"" +
+    "\"jumlahUang\" : \"" + bankNotes + "\"" +
+    "\"nominal\" : \"" + notesAmount + "\"" +
+    "\"username\" : \"" + userName + "\"" +
+                "}";
 
         //Set HTTP Request URL
         string myURL = _myURL + serviceURL;
 
-        OurUtility.Write_Log("== Check Phone Number", "step-action");
+        OurUtility.Write_Log("== Cash Management", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
 
         //Call HTTP Request
@@ -373,6 +376,8 @@
                 if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    config.Write("BILL", Config.PARAM_BILL_BANK_STOK, "0");
+                    config.Write("BILL", Config.PARAM_BILL_AMOUNT, "0");
                 }
 
                 //Check If statusCode == 01 (Error Page)
