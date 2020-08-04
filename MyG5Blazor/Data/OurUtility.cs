@@ -361,7 +361,7 @@ namespace MyG5Blazor.Data
             string unixtimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString().Substring(0, 10);
             string md5Input = menu.terminalId + secret + menu.tokenId + unixtimestamp;
             string signature = OurUtility.CreateMD5(md5Input);
-
+            
             string ret = string.Empty;
             signature = signature.ToLower();
             //Task.Delay(200);
