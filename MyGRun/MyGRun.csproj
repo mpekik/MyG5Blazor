@@ -60,6 +60,7 @@
   <ItemGroup>
     <Compile Include="Config.cs" />
     <Compile Include="HTTPHandler.cs" />
+    <Compile Include="OurUtility.cs" />
     <Compile Include="Run.cs">
       <SubType>Form</SubType>
     </Compile>

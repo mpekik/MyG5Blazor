@@ -29,6 +29,7 @@ namespace MyGRun
         string terminalId = string.Empty;
         string tokenId = string.Empty;
         string version = "";
+        string directory = Directory.GetCurrentDirectory();
         private async void Form1_Load(object sender, EventArgs e)
         {
             Run frm1 = new Run();
@@ -103,6 +104,7 @@ namespace MyGRun
             label1.Text = "Check for Update...";
             label1.Left = (this.Size.Width - label1.Size.Width) / 2;
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
+            OurUtility.Write_Log("== Check for Update", "step-action");
             await Task.Delay(1000);
             _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
             terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
@@ -118,7 +120,7 @@ namespace MyGRun
             //OurUtility.Write_Log("== Login Non-Trilogi", "step-action");
             //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
             string strResult = await httpHandler.PostCallAPI(myURL, myJson,terminalId,tokenId);
-            label3.Text = strResult;
+            //label3.Text = strResult;
             //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
             //if(true)
             if (strResult != null)
@@ -135,40 +137,44 @@ namespace MyGRun
                         if ((string)jobjResult["isUpdateAvailable"] == "Y")
                         {
                             CopyConfig();
+                            OurUtility.Write_Log("== Update Available", "step-action");
                             fileName = (string)jobjResult["aplikasi"]["urlUpdate"];
+                            version = (string)jobjResult["aplikasi"]["version"];
                             if ((string)jobjResult["aplikasi"]["propertiesUpdate"] == "Y")
                             { }
                             await DownloadUpdate();
-                        }
+                        }else
+                            OurUtility.Write_Log("== Program is Up to Date", "step-action");
                     }
                     else
                     {
                         //if (true)
+                        string statusDescSub = "";
                         if ((string)jobjResult["transaction"]["errorCode"] != null)
                         {
                             //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");                            
-
+                            statusDescSub = (string)jobjResult["transaction"]["statusDesc"];
                         }
                         else
                         {
                            string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
-                            string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                            statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                             //OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");                            
                         }
                         label1.Text = "Checking Failed...";
                         label1.Left = (this.Size.Width - label1.Size.Width) / 2;
                         label1.Top = (this.Size.Height - label1.Size.Height) / 2;
-
+                        OurUtility.Write_Log("== Checking Failed - " + statusDescSub, "step-action");
                     }
                 }
                 catch (Exception ex)
                 {
                     //OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
                     label1.Text = "Checking Failed...";
-                    label2.Text = ex.Message.ToString();
+                    //label2.Text = ex.Message.ToString();
                     label1.Left = (this.Size.Width - label1.Size.Width) / 2;
                     label1.Top = (this.Size.Height - label1.Size.Height) / 2;
-
+                    OurUtility.Write_Log("== Update Failed - " + ex.Message.ToString(), "step-action");
                 }
             }
             else
@@ -177,7 +183,7 @@ namespace MyGRun
                 label1.Text = "Checking Failed...";
                 label1.Left = (this.Size.Width - label1.Size.Width) / 2;
                 label1.Top = (this.Size.Height - label1.Size.Height) / 2;
-
+                OurUtility.Write_Log("== Checking Failed - Hit WebServiceError", "step-action");
             }
             //await DownloadUpdate();
         }
@@ -186,6 +192,7 @@ namespace MyGRun
             label1.Text = "Downloading Update...";
             label1.Left = (this.Size.Width - label1.Size.Width) / 2;
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
+            OurUtility.Write_Log("== Downloading Update", "step-action");
             await Task.Delay(1000);
             string myURL = _myURL + "update/v1/download/"+fileName;
             string response = await httpHandler.GetCallAPI(myURL,"",terminalId,tokenId,fileName);
@@ -194,12 +201,14 @@ namespace MyGRun
                 label1.Text = "Download Completed";
                 label1.Left = (this.Size.Width - label1.Size.Width) / 2;
                 label1.Top = (this.Size.Height - label1.Size.Height) / 2;
+                OurUtility.Write_Log("== Download Completed", "step-action");
                 await DeleteOlder();
             }else
             {
                 label1.Text = "Download Failed";
                 label1.Left = (this.Size.Width - label1.Size.Width) / 2;
                 label1.Top = (this.Size.Height - label1.Size.Height) / 2;
+                OurUtility.Write_Log("== Download Failed", "step-action");
             }
         }
         
@@ -208,11 +217,11 @@ namespace MyGRun
             label1.Text = "Updating...";
             label1.Left = (this.Size.Width - label1.Size.Width) / 2;
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
-
+            OurUtility.Write_Log("== Updating", "step-action");
             await Task.Delay(1000);
-            if (Directory.Exists(@"C:\MyGrapari\\Old"))
+            if (Directory.Exists(directory + @"\Old"))
             {
-                EmptyFolder(new DirectoryInfo(@"C:\MyGrapari\Old"));
+                EmptyFolder(new DirectoryInfo(directory+@"\Old"));
             }
             await MoveOld();
         }
@@ -234,33 +243,33 @@ namespace MyGRun
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
                 if (file.Name != "MyGRun.pdb" && file.Name != "MyGRun.exe" && file.Name != "MyGApps.zip" && file.Name != "MyGRun.exe.config")
-                    File.Move(file.FullName, @"C:\MyGrapari\Old\" + file.Name);
+                    File.Move(file.FullName, directory+@"\Old\" + file.Name);
             }
         }
         private async Task MoveOld()
         {
             await Task.Delay(1000);
-            if (!Directory.Exists(@"C:\MyGrapari\Old"))
+            if (!Directory.Exists(directory+@"C:\MyGrapari\Old"))
             {
-                Directory.CreateDirectory(@"C:\MyGrapari\Old");
+                Directory.CreateDirectory(directory+@"C:\MyGrapari\Old");
             }
-            if (Directory.Exists(@"C:\MyGrapari\MyGApps"))
+            if (Directory.Exists(directory+@"C:\MyGrapari\MyGApps"))
             {
-                Directory.Move(@"C:\MyGrapari\MyGApps", @"C:\MyGrapari\Old\MyGApps");
+                Directory.Move(directory+@"C:\MyGrapari\MyGApps", directory+@"C:\MyGrapari\Old\MyGApps");
             }
-            if (Directory.Exists(@"C:\MyGrapari\wwwroot"))
+            if (Directory.Exists(directory+@"C:\MyGrapari\wwwroot"))
             {
-                Directory.Move(@"C:\MyGrapari\wwwroot", @"C:\MyGrapari\Old\wwwroot");
+                Directory.Move(directory+@"C:\MyGrapari\wwwroot", directory+@"C:\MyGrapari\Old\wwwroot");
             }
-            MoveFile(new DirectoryInfo(@"C:\MyGrapari"));
+            MoveFile(new DirectoryInfo(directory+@"C:\MyGrapari"));
             await ExtractUpdate();
         }
         private async Task ExtractUpdate()
         {
             await Task.Delay(1000);
-            string zipPath = @"c:\MyGrapari\MyGApps.zip";
-            string extractPath = @"c:\MyGrapari\";
-            if (File.Exists(@"c:\MyGrapari\MyGApps.zip"))
+            string zipPath = directory+@"C:\MyGrapari\MyGApps.zip";
+            string extractPath = directory+@"C:\MyGrapari\";
+            if (File.Exists(directory+@"C:\MyGrapari\MyGApps.zip"))
                 System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, extractPath);
             WriteConfig();
             await RunApps();
@@ -335,7 +344,7 @@ namespace MyGRun
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
 
             await Task.Delay(1000);
-            Process.Start(@"C:\MyGrapari\MyGApps\Run.vbs");
+            Process.Start(directory+@"C:\MyGrapari\MyGApps\Run.vbs");
             this.Close();
         }
     }

@@ -26,7 +26,7 @@
                 }
                 <div class="d-flex justify-content-center">
                     <div class="p-2" style="text-align: center">
-                        <button class="btn btn-block btn-lg btn-danger" @onclick="@(()=>NavigateTo(""))"> OK </button>
+                        <button class="btn btn-block btn-lg btn-danger" @onclick="@(()=>NavigateTo("/main"))"> OK </button>
                     </div>
                 </div>
             </div>
@@ -41,6 +41,6 @@
     }
     private void NavigateTo(string strURL)
     {
-        NavMan.NavigateTo("");
+        NavMan.NavigateTo("/main");
     }
 }

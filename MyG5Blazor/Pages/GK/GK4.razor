@@ -186,7 +186,9 @@
     private int intTryCount = 1;
     private int intTryLimit = 3;
     private int CESno = 0;
+    private int stock = 0;
 
+    private string cardStock = string.Empty;
     private string strNPS1Value = string.Empty;
     private string[] strNPS2Value = { "", "", "", "" };
 
@@ -244,11 +246,15 @@
         strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
+        stock = Int32.Parse(cardStock);
         Switcher.DOWN("500",config.usbEKTP);
         OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
         isLoading = true;
         Switcher.UP("3000",config.usbCardReader);
         await MyPerso();
+        stock = stock - intTryCount;
+        trans.jumlah_kartu = stock;
         if (isError)
         {
             isLoading = false;
@@ -277,7 +283,7 @@
             Timer.OnElapsed += TimerElapsedHandler;
         }
     }
-    
+
     private async Task MyPerso()
     {
         while (intTryCount <= intTryLimit)
@@ -304,10 +310,10 @@
                                     "\"serialNumber\" : \"" + p_icc_id + "\"" +
                                     "}";
 
-                    OurUtility.Write_Log("=== URL : " + myURL, "step-action");
-                    OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                    //OurUtility.Write_Log("=== URL : " + myURL, "step-action");
+                    //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                     string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-                    OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                    //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                     if (strResult != null)
                     {
                         try
@@ -330,9 +336,9 @@
                                         "\"persoId\" : \"" + trans.persoID + "\" ," +
                                         "\"persoStatus\" : \"2\"}";
                                         OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                        //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                         strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-                                        OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                        //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                         trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "SUCCESS");
                                         isLoading = false;
                                         isSuccess = true;
@@ -351,10 +357,10 @@
                                             "\"persoId\" : \"" + trans.persoID + "\" ," +
                                             "\"persoStatus\" : \"3\"}";
                                         OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                        //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                         strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
                                         trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "SUCCESS");
-                                        OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                        //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                         if (intTryCount < intTryLimit)
                                             intTryCount += 1;
                                         else
@@ -512,10 +518,10 @@
         string myURL = _myURL + cesURL;
 
         OurUtility.Write_Log("== Check CES", "step-action");
-        OurUtility.Write_Log("== URL API : " + myURL, "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== URL API : " + myURL, "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try
@@ -667,7 +673,7 @@
 
         PrintContent prtContent = new PrintContent();
         string msg = string.Empty;
-        string logoTsel = "C:\\MyGApps\\wwwroot\\assets\\image\\Logo\\Logo_MyGraPARI_mini.png";
+        string logoTsel = System.IO.Directory.GetCurrentDirectory()+@"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
         string content = prtContent.GK(trans, cst, config);
         string header = prtContent.HeaderGK(trans, cst, config);

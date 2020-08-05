@@ -136,6 +136,7 @@ namespace MyG5Blazor.Data
         public const string PARAM_PAPER_LENGTH = "param.paper.length";
         public const string PARAM_PRINTER_PORT = "param.printer.port";
 
+        //EDC
         public const string PARAM_EDC_PORT = "param.edc.port";
 
         //BILL

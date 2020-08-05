@@ -114,7 +114,7 @@ namespace MyGRun
 
             string ret = string.Empty;
             signature = signature.ToLower();
-            //Task.Delay(200);
+            Task.Delay(200);
             try
             {
                 using (var handler = new HttpClientHandler())
@@ -127,7 +127,7 @@ namespace MyGRun
                         //                  client.DefaultRequestHeaders.Add("secret-key", secret);
                         content.Headers.Add("signature-key", signature);
                         content.Headers.Add("secret-key", secret);
-                        await Task.Delay(2000);
+                        Thread.Sleep(2000);
                         var response = await client.PostAsync(url, content);
                         //Console.WriteLine(response.StatusCode.ToString());
                         if (response != null)
