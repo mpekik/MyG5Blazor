@@ -346,7 +346,7 @@ namespace MyG5Blazor.Data
                     "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
                     "\"status\" : \"" + trans.status + "\"," +
                     "\"description\" : \"" + trans.errorCode + "\"," +
-                    "\"jumlah_kartu\" : \"" + trans.jumlah_kartu + "\"," +
+                    "\"jumlah_kartu\" : \"" + trans.jumlah_kartu + "\"" +
                     "}, \"auditTrail\" : " + auditTrail + "]}";
             string myURL2 = _myURL + saveURL;
 
@@ -377,7 +377,7 @@ namespace MyG5Blazor.Data
                         //                  client.DefaultRequestHeaders.Add("secret-key", secret);
                         content.Headers.Add("signature-key", signature);
                         content.Headers.Add("secret-key", secret);
-                        await Task.Delay(2000);
+                        Thread.Sleep(2000);
                         var response = await client.PostAsync(url, content);
                         //Console.WriteLine(response.StatusCode.ToString());
                         if (response != null)

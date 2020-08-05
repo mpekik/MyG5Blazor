@@ -256,14 +256,14 @@
                     if ((string)jobjResult["transaction"]["errorCode"] != null)
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
                     else
                     {
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
                     trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
                     trans.status = "GAGAL";

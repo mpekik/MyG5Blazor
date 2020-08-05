@@ -71,7 +71,8 @@
         menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
-        NavigateTo("/login");
+        menu.AddMainMenu("Ganti Kartu", "GK/1", mm.SelectToken("icon").ToString(), mm.SelectToken("menuCode").ToString());
+        NavigateTo("/main");
 
     }
     private void NavigateTo(string strURL)
