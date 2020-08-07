@@ -554,7 +554,7 @@
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
                     //                    IsLoading = false;
                     //                  IsVisible = false;
@@ -563,21 +563,21 @@
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                 {
-                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    strMsgError = (string)jobjResult["transaction"]["statusCode"];
                     isVisible = false;
                     IsInvalid = true;
                 }
             }
             catch (Exception ex)
             {
-                trans.errorCode = strResult;
+                trans.errorCode = "Error Code : GE-999";
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 //NavMan.NavigateTo("/error");
             }
         }
         else
         {
-            trans.errorCode = strResult;
+            trans.errorCode = "Error Code : GE-";
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             //NavMan.NavigateTo("/error");
         }

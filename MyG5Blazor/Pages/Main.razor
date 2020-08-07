@@ -131,12 +131,12 @@
 @code
 {
     private bool[] Menu = { true, true, false, true };
-    private string[] stringMenu = { "1", "1", "1", "1", "1" };
+    private string[] stringMenu = { "0", "0", "1", "1", "1" };
     private List<string> listMenu = new List<string>();
 
     //@(()=>CheckStatus(hrefMenu[1],apiURL[1],arrayTrans[1]))
-    private string[] hrefMenu = { "", "", "", "","" };
-    private string[] AssetsPNG = { "", "", "", "", "" };
+    private string[] hrefMenu = { "GK/1", "U4G/1", "", "","" };
+    private string[] AssetsPNG = { "Menu_Ganti_kartu.png", "Menu_Upgrade4G.png", "", "", "" };
     private string[] arrayTrans = { "", "", "", "", "" };
 
     private string WidthPNG = "40%";
@@ -215,7 +215,7 @@
         OurUtility.Write_Log("= Get Menu Status Code", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try

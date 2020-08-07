@@ -206,6 +206,7 @@
         var imageBytesStr = Convert.ToBase64String(image);
         cst.PhoneNumber = "62" + strNumber.Substring(1);
 
+
         //Set HTTP Request Body
         string myJsonForLog = "{ \"terminalId\" : \"" + trans.termID + "\"," +
                         "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\",";
@@ -218,7 +219,7 @@
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         
         //Call HTTP Request
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);

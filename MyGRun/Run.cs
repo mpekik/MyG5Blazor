@@ -33,6 +33,7 @@ namespace MyGRun
         private async void Form1_Load(object sender, EventArgs e)
         {
             Run frm1 = new Run();
+            //label1.Text = "Update Complete";
             label1.Left = (this.Size.Width - label1.Size.Width) / 2;
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
             await Task.Delay(1000);
