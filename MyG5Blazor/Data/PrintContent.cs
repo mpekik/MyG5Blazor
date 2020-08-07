@@ -11,7 +11,7 @@ namespace MyG5Blazor.Data
         {
             DateTime datetimenow = DateTime.Now;
 
-            string contents = "TRANSACTION ID     : "+trans.transID+"\n"+
+            string contents = "TRANSACTION ID     : "+trans.transID+"\n\n\n"+
                 "TERMINAL ID        : "+trans.termID+"\n"+
                 "TANGGAL WAKTU      : "+ datetimenow.ToString("dd-MM-yyyy") + " " + datetimenow.ToString("HH:mm:ss") + "\n" +
                 "NOMOR PONSEL       : "+cst.PhoneNumber+"\n"+

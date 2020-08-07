@@ -131,13 +131,13 @@
 @code
 {
     private bool[] Menu = { true, true, false, true };
-    private string[] stringMenu = { "0", "0", "1", "1", "1" };
+    private string[] stringMenu = { "1", "0", "1", "0", "1" };
     private List<string> listMenu = new List<string>();
 
     //@(()=>CheckStatus(hrefMenu[1],apiURL[1],arrayTrans[1]))
     private string[] hrefMenu = { "BTH/1", "U4G/1", "BPP/1", "GK/1","" };
     private string[] AssetsPNG = { "Menu_Bayar_Tagihan.png", "Menu_Upgrade4G.png", "Menu_Beli_Pulsa.png", "Menu_Ganti_kartu.png" };
-    private string[] arrayTrans = { "PB", "", "", "", "" };
+    private string[] arrayTrans = { "PB", "U4G", "PR", "GK" };
 
     private string WidthPNG = "40%";
     private string HeightPNG = "20%";
@@ -163,14 +163,14 @@
         config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB);
         config.usbCardReader = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER_USB);
         //Console.WriteLine(_myURL);
-        for (int i = 0; i < menu._mainMenu.Count(); i++)
-        {
-            hrefMenu[i] = menu._mainMenu[i]._href;
-            AssetsPNG[i] = menu._mainMenu[i]._icon;
-            arrayTrans[i] = menu._mainMenu[i]._code;
-            apiURL[i] = menu._mainMenu[i]._url;
-            stringMenu[i] = "0";
-        }
+        //for (int i = 0; i < menu._mainMenu.Count(); i++)
+        //{
+        //    hrefMenu[i] = menu._mainMenu[i]._href;
+        //    AssetsPNG[i] = menu._mainMenu[i]._icon;
+        //    arrayTrans[i] = menu._mainMenu[i]._code;
+        //    apiURL[i] = menu._mainMenu[i]._url;
+        //    stringMenu[i] = "0";
+        //}
         Switcher.DOWN("500",config.usbEKTP);
         Switcher.DOWN("500",config.usbCardReader);
         cst.Clear();
