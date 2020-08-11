@@ -341,7 +341,7 @@
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         cst.Clear();
-        OurUtility.Write_Log("= Card Dispenser", "step-action");
+        OurUtility.Write_Log("= Cash Collect", "step-action");
     }
 
     private void InputPhoneNumber(string strInput)
@@ -357,10 +357,6 @@
 
     private void NavigateTo(string strURL)
     {
-        if (strURL != "")
-        {
-            OurUtility.Write_Log("=== Get Phone Number", "step-action");
-        }
         NavMan.NavigateTo(strURL);
     }
     private async Task Save()
@@ -392,7 +388,7 @@
 
         //Call HTTP Request
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != null)
         {
@@ -421,13 +417,11 @@
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
-                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
                     IsLoading = false;
-                    NavMan.NavigateTo("/error");
+                    NavMan.NavigateTo("/errorlogin");
                 }
 
                 //Check If statusCode == 02 (Error Modal)
@@ -440,13 +434,13 @@
             catch (Exception ex)
             {
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
-                NavMan.NavigateTo("/error");
+                NavMan.NavigateTo("/errorlogin");
             }
         }
         else
         {
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            NavMan.NavigateTo("/error");
+            NavMan.NavigateTo("/errorlogin");
         }
     }
 

@@ -364,7 +364,7 @@ namespace MyG5Blazor.Data
             
             string ret = string.Empty;
             signature = signature.ToLower();
-            //Task.Delay(200);
+            await Task.Delay(2000);
             try
             {
                 using (var handler = new HttpClientHandler())
