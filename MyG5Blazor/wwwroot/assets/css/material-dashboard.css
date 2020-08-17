@@ -15077,7 +15077,15 @@ h2.title {
 .tooltip-arrow {
     display: none;
 }
-
+.teks-footer-halo2 {
+    position: absolute;
+    margin-top: 35%;
+    margin-left: -1%;
+    float: left;
+    color: black;
+    font-size: 24pt;
+    line-height: 2;
+}
 .tooltip.show {
     opacity: 1;
     -webkit-transform: translate3d(0, 0px, 0);

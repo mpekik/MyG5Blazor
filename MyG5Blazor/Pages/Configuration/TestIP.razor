@@ -1,0 +1,231 @@
+﻿@page "/iptest"
+@inject IJSRuntime JSRuntime;
+
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Net.Sockets; 
+@using System.Threading.Tasks;
+@using MyG5Blazor.Data
+@using System.Net.NetworkInformation
+@using System.Diagnostics;
+ 
+
+@inject Menu menu
+@inject Costumer cst
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Config config
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+
+            <form class="navbar-form">
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6 teks-title" style="text-align: center;">
+                        Test Ping IP
+                    <div style="margin-top: 2%;">
+                        <button @onclick="@(()=>Ping("1"))" class="btn-arrow-red btn">Ping <br />@_ip1</button>
+                        <button @onclick="@(()=>Ping("2"))" class="btn-arrow-red btn">Ping <br />@_ip2</button>
+                        <button @onclick="@(()=>Ping("3"))" class="btn-arrow-red btn">Ping <br />@_ip3</button>
+                    </div>
+                    
+                </div>
+                <div class="col-md-6 teks-title" style="text-align: center;color: #ffffff;">
+                    Test Telnet IP
+                    <div style="margin-top: 2%;">
+                        <button @onclick="@(()=>Telnet("1"))" class="btn-arrow btn">Telnet <br />@_ip1</button>
+                        <button @onclick="@(()=>Telnet("2"))" class="btn-arrow btn">Telnet <br />@_ip2</button>
+                        <button @onclick="@(()=>Telnet("3"))" class="btn-arrow btn">Telnet <br />@_ip3</button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+</div>
+
+<footer>
+    <div class="footer-side-left">
+        <span class="dot-trans"></span>
+        <span class="dot-trans"></span>
+        <span class="dot-trans"></span>
+        <span class="dot-trans"></span>
+    </div>
+    <div class="footer-side-right">
+        <button @onclick="@(()=>isVisible2=true)" class="btn-single-white btn" value="">Kembali</button>
+        <!-- <sup>Powered By </sup>Trilogi Persada -->
+    </div>
+</footer>
+
+<!-- The Modal -->
+@if (isVisible2)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Apakah Anda Ingin Kembali Ke Halaman Login?</p>
+                    <button @onclick="@(()=>NavigateTo("/login"))" class="btn btn-danger modal-button">Lanjut</button>
+                    <button class="btn btn-light modal-button" @onclick="@(() => isVisible2=false)">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (isVisible)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Hasil Status Telnet ke IP @telnetIP</p>
+                    <p class="text-body">@telnetStatus</p>
+                    <button class="btn btn-light modal-button" @onclick="@(() => isVisible=false)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (isLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
+
+@code{
+    private string telnetStatus = string.Empty;
+    private string telnetIP = string.Empty;
+    private string _ip1 = string.Empty;
+    private string _ip2 = string.Empty;
+    private string _ip3 = string.Empty;
+
+    private bool isVisible = false;
+    private bool isVisible2 = false;
+    private bool isLoading = false;
+
+    //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
+    public string _myURL = string.Empty;
+    public string serviceURL = "upgrade-4g/v1/submit-nohp";
+    private string _termID = string.Empty;
+    private string strMsgError = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _ip1 = config.ReadIP("IP", "param.IP.1");
+        _ip2 = config.ReadIP("IP", "param.IP.2");
+        _ip3 = config.ReadIP("IP", "param.IP.3");
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        cst.Clear();
+        OurUtility.Write_Log("= Card Dispenser", "step-action");
+    }
+
+    private async Task Ping(string ipParam)
+    {
+        string ip = config.ReadIP("IP", "param.IP." + ipParam);
+        string strCmdText;
+        Process command = new Process();
+        ProcessStartInfo commandInfo = new ProcessStartInfo("cmd.exe");
+        commandInfo.WorkingDirectory = @"C:\";
+        commandInfo.UseShellExecute = true;
+        commandInfo.Arguments= @"/K ping " + ip;
+        command.StartInfo = commandInfo;
+        command.Start();
+
+    }
+    private async Task Telnet(string ipParam)
+    {
+        string ip = config.ReadIP("IP", "param.IP." + ipParam);
+        telnetIP = ip;
+        TcpClient tc = null;
+        try
+        {
+            tc = new TcpClient(ip, 443);
+
+            // If we get here, port is open
+            telnetStatus = "Open";
+            isVisible = true;
+        }
+        catch (SocketException se)
+        {
+            // If we get here, port is not open, or host is not reachable
+            telnetStatus = "Closed";
+            isVisible = true;
+        }
+        finally
+        {
+            if (tc != null)
+            {
+                tc.Close();
+            }
+        }
+
+    }
+    private void NavigateTo(string strURL)
+    {
+        if (strURL != "")
+        {
+            OurUtility.Write_Log("=== Get Phone Number", "step-action");
+        }
+        NavMan.NavigateTo(strURL);
+    }
+
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
+
+    private bool timer = false;
+    protected override void OnAfterRender(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            timer = true;
+            theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
+
+            this.StateHasChanged();
+        }
+    }
+
+    [Microsoft.JSInterop.JSInvokable]
+
+    public void theIdleTimeoutFired()
+    {
+        if (timer)
+        {
+            timer = false;
+            //NavMan.NavigateTo(" ");
+        }
+    }
+}

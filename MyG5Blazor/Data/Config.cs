@@ -88,13 +88,17 @@ namespace MyG5Blazor.Data
         public const string PARAM_EKTP_USB = "param.ektp.usb";
         
         private FileIniDataParser iniFile = new FileIniDataParser();
+        private FileIniDataParser iniFileIP = new FileIniDataParser();
         private IniData iniData = null;
+        private IniData iniDataIP = null;
 
         private string fileName = "MyGraPARI-config.properties";
+        private string fileNameIP = "IPTest-config.properties";
 
         public Config()
         {
             fileName= Directory.GetCurrentDirectory() + @"\MyGApps\" + "MyGraPARI-config.properties";
+            fileNameIP = Directory.GetCurrentDirectory() + @"\MyGApps\" + "IPTest-config.properties";
         }
 
         public Config(string p_fileName)
@@ -113,7 +117,17 @@ namespace MyG5Blazor.Data
             }
             catch { }
         }
-
+        public void InitIP()
+        {
+            try
+            {
+                //if (iniData == null)
+                {
+                    iniDataIP = iniFileIP.ReadFile(fileNameIP);
+                }
+            }
+            catch { }
+        }
         public string Read(string p_section, string p_name)
         {
             string result = string.Empty;
@@ -123,6 +137,20 @@ namespace MyG5Blazor.Data
             try
             {
                 result = iniData[p_section][p_name];
+            }
+            catch { }
+
+            return result;
+        }
+        public string ReadIP(string p_section, string p_name)
+        {
+            string result = string.Empty;
+
+            InitIP();
+
+            try
+            {
+                result = iniDataIP[p_section][p_name];
             }
             catch { }
 

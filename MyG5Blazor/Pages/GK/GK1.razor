@@ -203,7 +203,12 @@
 
         //Capture Image From IP CAM
         byte[] image = OurUtility.CaptureImage();
-        var imageBytesStr = Convert.ToBase64String(image);
+        string imageBytesStr;
+        if (image != null)
+            imageBytesStr = Convert.ToBase64String(image);
+        else
+            imageBytesStr = "";
+
         cst.PhoneNumber = "62" + strNumber.Substring(1);
 
         //Set HTTP Request Body
@@ -213,43 +218,43 @@
         string myJson = myJsonForLog +
                         "\"image\" : \"" + imageBytesStr + "\"" +
                         "}";
-        
+
         //Set HTTP Request URL
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
         OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
-        
+
         //Call HTTP Request
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
         //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        
+
         if (strResult != null)
         {
             try
             {
                 //Parse HTTP Request Resul To JObject
                 JObject jobjResult = JObject.Parse(strResult);
-                
+
                 //Set transactionId
                 trans.SetTransaction((string)jobjResult["transaction"]["transactionId"]);
-                
+
                 //Check If statusCode == 00 (Success)
                 if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
-                    
+
                     //Set Costumer Profile
                     cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"], (string)jobjResult["profile"]["idNumber"]);
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
-                    
+
                     //Add Step To Audit Trail List
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "SUCCESS");
-                    
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "00");
+
                     //Navigate To Next Page
                     NavMan.NavigateTo(strURL);
                 }
-                
+
                 //Check If statusCode == 01 (Error Page)
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
                 {
@@ -265,13 +270,13 @@
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
-                    trans.status = "GAGAL";
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
+                    trans.status = "01";
                     await OurUtility.AuditTrail(trans,menu,cst);
-                    
+
                     NavMan.NavigateTo("/error");
                 }
-                
+
                 //Check If statusCode == 02 (Error Modal)
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                 {
@@ -283,6 +288,10 @@
             }
             catch (Exception ex)
             {
+                trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 NavMan.NavigateTo("/error");

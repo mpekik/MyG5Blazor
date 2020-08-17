@@ -37,6 +37,7 @@ namespace MyGRun
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
             await Task.Delay(1000);
             await CekUpdate();
+            await RunApps();
         }
 
         private void CopyConfig()
@@ -249,30 +250,35 @@ namespace MyGRun
         private async Task MoveOld()
         {
             await Task.Delay(1000);
-            if (!Directory.Exists(directory+@"C:\MyGrapari\Old"))
+            if (!Directory.Exists(directory+@"\Old"))
             {
-                Directory.CreateDirectory(directory+@"C:\MyGrapari\Old");
+                Directory.CreateDirectory(directory+@"\Old");
             }
-            if (Directory.Exists(directory+@"C:\MyGrapari\MyGApps"))
+            if (Directory.Exists(directory+@"\MyGApps"))
             {
-                Directory.Move(directory+@"C:\MyGrapari\MyGApps", directory+@"C:\MyGrapari\Old\MyGApps");
+                Directory.Move(directory+@"\MyGApps", directory+@"\Old\MyGApps");
             }
-            if (Directory.Exists(directory+@"C:\MyGrapari\wwwroot"))
+            if (Directory.Exists(directory+@"\wwwroot"))
             {
-                Directory.Move(directory+@"C:\MyGrapari\wwwroot", directory+@"C:\MyGrapari\Old\wwwroot");
+                Directory.Move(directory+@"\wwwroot", directory+@"\Old\wwwroot");
             }
-            MoveFile(new DirectoryInfo(directory+@"C:\MyGrapari"));
+            MoveFile(new DirectoryInfo(directory));
             await ExtractUpdate();
         }
         private async Task ExtractUpdate()
         {
             await Task.Delay(1000);
-            string zipPath = directory+@"C:\MyGrapari\MyGApps.zip";
-            string extractPath = directory+@"C:\MyGrapari\";
-            if (File.Exists(directory+@"C:\MyGrapari\MyGApps.zip"))
+            string zipPath = directory+@"\MyGApps.zip";
+            string extractPath = directory+@"\";
+            if (File.Exists(directory+@"\MyGApps.zip"))
                 System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, extractPath);
             WriteConfig();
-            await RunApps();
+
+            label1.Text = "Update Complete";
+            label1.Left = (this.Size.Width - label1.Size.Width) / 2;
+            label1.Top = (this.Size.Height - label1.Size.Height) / 2;
+
+            //await RunApps();
         }
 
         private void WriteConfig()
@@ -338,13 +344,8 @@ namespace MyGRun
 
         }
         private async Task RunApps()
-        {
-            label1.Text = "Update Complete";
-            label1.Left = (this.Size.Width - label1.Size.Width) / 2;
-            label1.Top = (this.Size.Height - label1.Size.Height) / 2;
-
-            await Task.Delay(1000);
-            Process.Start(directory+@"C:\MyGrapari\MyGApps\Run.vbs");
+        {   await Task.Delay(1000);
+            Process.Start(directory+@"\MyGApps\Run.vbs");
             this.Close();
         }
     }

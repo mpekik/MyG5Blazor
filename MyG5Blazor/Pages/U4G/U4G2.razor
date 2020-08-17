@@ -84,7 +84,7 @@
         </div>
         <div class="footer-side2">
             <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="MenuUtama" class="btn-arrow btn" value="">Menu Utama</button>
+            <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
@@ -136,14 +136,23 @@
 
     private async Task MenuUtama()
     {
-        trans.status = "GAGAL";
+        trans.status = "01";
         trans.errorCode = "EKTP";
         await OurUtility.AuditTrail(trans,menu,cst);
         NavigateTo("/main");
     }
+    private async Task MenuUtamaCanceled()
+    {
+        trans.AddTrail("SCAN EKTP", "CANCELED", "02");
+        trans.status = "02";
+        trans.errorCode = "EKTP";
+        await OurUtility.AuditTrail(trans, menu, cst);
+        NavigateTo("/main");
+    }
     private async Task Back()
     {
-        trans.status = "GAGAL";
+        trans.AddTrail("SCAN EKTP", "CANCELED", "02");
+        trans.status = "02";
         trans.errorCode = "EKTP";
         await OurUtility.AuditTrail(trans,menu,cst);
         NavigateTo("/UP/1");
@@ -201,7 +210,7 @@
             ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer)).ConfigureAwait(false);
             if (length == 0 || ret != 0)
             {
-                trans.AddTrail("SCAN EKTP", "NOT EKTP", "FAILED");
+                trans.AddTrail("SCAN EKTP", "NOT EKTP", "01");
                 OurUtility.Write_Log("==== 6. Ektp_Sdk.ReadDemographic Failed", "step-action");
                 IsLoading = false;
                 if (intTryCount <= intTryLimit)
@@ -236,20 +245,8 @@
                 if (ret != 0 || leftLen == 0 || rightLen == 0)
                 {
                     OurUtility.Write_Log("===== 8. Ektp_Sdk.ReadFingerPrints Failed", "step-action");
-                    trans.AddTrail("SCAN EKTP", "FINGERPIRNT NO DATA", "FAILED");
-                    IsLoading = false;
-                    IsSuccess = false;
-                    if (intTryCount <= intTryLimit)
-                    {
-                        IsVisible = true;
-                        intTryCount += 1;
-                    }
-                    else
-                    {
-                        IsFail = true;
-                    }
-                    //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
-                    return;
+                    trans.AddTrail("SCAN EKTP", "FINGERPIRNT NO DATA", "01");
+
                 }
                 ktp.minutiae1 = leftData;
                 ktp.minutiae2 = rightData;
@@ -260,7 +257,7 @@
 
                 if (cst.EKTPNumber == ktp.Id)
                 {
-                    trans.AddTrail("SCAN EKTP", ktp.Id, "SUCCESS");
+                    trans.AddTrail("SCAN EKTP", ktp.Id, "00");
                     IsLoading = false;
                     IsSuccess = true;
                     Timer.SetTimer(1000);
@@ -268,7 +265,7 @@
                 }
                 else
                 {
-                    trans.AddTrail("SCAN EKTP", "NIK SALAH", "FAILED");
+                    trans.AddTrail("SCAN EKTP", "NIK SALAH", "01");
                     IsLoading = false;
                     IsSuccess = false;
                     if (intTryCount <= intTryLimit)

@@ -229,7 +229,7 @@
 
     private async Task MenuUtama()
     {
-        trans.status = "GAGAL";
+        trans.status = "01";
         await OurUtility.AuditTrail(trans,menu,cst);
         NavigateTo("/main");
     }
@@ -253,13 +253,13 @@
         if (isError)
         {
             isLoading = false;
-            trans.status = "GAGAL";
+            trans.status = "01";
             await OurUtility.AuditTrail(trans,menu,cst);
             NavMan.NavigateTo("/error");
         }else if (isSuccess)
         {
             isLoading = false;
-            trans.status = "BERHASIL";
+            trans.status = "00";
             trans.errorCode = "BERHASIL UPGRADE 4G";
             await OurUtility.AuditTrail(trans,menu,cst);
             await Print();
@@ -271,7 +271,7 @@
         else if (isFail)
         {
             isLoading = false;
-            trans.status = "GAGAL";
+            trans.status = "01";
             await OurUtility.AuditTrail(trans,menu,cst);
 
             Timer.SetTimer(20000);
@@ -294,7 +294,7 @@
                 //ToDO if Reader error
                 if (await CardReaderScan())
                 {
-                    trans.AddTrail("GET SN", p_icc_id, "SUCCESS");
+                    trans.AddTrail("GET SN", p_icc_id, "00");
                     string myURL = _myURL + persoURL;
 
                     string secret_key = OurUtility.RandomString(10);
@@ -331,7 +331,7 @@
                                     if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
                                     {
                                         myURL = _myURL + updateURL;
-                                        trans.AddTrail("PERSO", trans.persoID, "SUCCESS");
+                                        trans.AddTrail("PERSO", trans.persoID, "00");
 
                                         secret_key = OurUtility.RandomString(10);
                                         unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
@@ -347,7 +347,7 @@
                                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                         strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
                                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                                        trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "SUCCESS");
+                                        trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "00");
                                         isLoading = false;
                                         isSuccess = true;
                                         await Task.Run(() => MoveToTheFront());
@@ -355,7 +355,7 @@
                                     }
                                     else
                                     {
-                                        trans.AddTrail("PERSO", trans.persoID, "FAILED");
+                                        trans.AddTrail("PERSO", trans.persoID, "01");
                                         trans.mypersoResponse = msg;
                                         await Task.Run(() => MoveToBin());
 
@@ -374,7 +374,7 @@
                                         OurUtility.Write_Log("=== Update Perso Status", "step-action");
                                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                         strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-                                        trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "SUCCESS");
+                                        trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "00");
                                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                         if (intTryCount < intTryLimit)
                                             intTryCount += 1;
@@ -387,7 +387,7 @@
                                 }
                                 else
                                 {
-                                    trans.AddTrail("GET STRING PANJANG", "", "FAILED");
+                                    trans.AddTrail("GET STRING PANJANG", "", "01");
                                     await Task.Run(() => MoveToBin());
                                     if (intTryCount < intTryLimit)
                                         intTryCount += 1;
@@ -421,7 +421,7 @@
                                         trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                                     }
                                 }
-                                trans.AddTrail("GET STRING PANJANG", "", "FAILED");
+                                trans.AddTrail("GET STRING PANJANG", "", "01");
                                 await Task.Run(() => MoveToBin());
                                 if (intTryCount < intTryLimit)
                                     intTryCount += 1;
@@ -433,7 +433,7 @@
                             }
                             else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                             {
-                                trans.AddTrail("GET STRING PANJANG", "", "FAILED");
+                                trans.AddTrail("GET STRING PANJANG", "", "01");
                                 strMsgError = (string)jobjResult["transaction"]["statusDesc"];
                                 isLoading = false;
                                 //IsVisible = false;
@@ -444,7 +444,7 @@
                         }
                         catch (Exception ex)
                         {
-                            trans.AddTrail("PERSO", trans.persoID, "FAILED");
+                            trans.AddTrail("PERSO", trans.persoID, "01");
                             OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                             trans.errorCode = strResult;
                             isError = true;
@@ -453,7 +453,7 @@
                     }
                     else
                     {
-                        trans.AddTrail("PERSO", trans.persoID, "FAILED");
+                        trans.AddTrail("PERSO", trans.persoID, "01");
                         OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                         trans.errorCode = strResult;
                         isError = true;
@@ -462,7 +462,7 @@
                 }
                 else
                 {
-                    trans.AddTrail("GET SN", "", "FAILED");
+                    trans.AddTrail("GET SN", "", "01");
                     await Task.Run(() => MoveToBin());
                     if (intTryCount < intTryLimit)
                         intTryCount += 1;
@@ -476,8 +476,8 @@
             }
             else
             {
-                trans.AddTrail("GET SN", "", "FAILED");
-                trans.status = "GAGAL";
+                trans.AddTrail("GET SN", "", "01");
+                trans.status = "01";
                 trans.errorCode = "KARTU HABIS";
                 await OurUtility.AuditTrail(trans,menu,cst);
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
@@ -642,11 +642,11 @@
         OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
         if (!cds.MoveTo_The_Front(ref errorcode, ref msg))
         {
-            trans.AddTrail("MOVE TO FRONT", "", "FAILED");
+            trans.AddTrail("MOVE TO FRONT", "", "01");
             OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed", "step-action");
             return;
         }
-        trans.AddTrail("MOVE TO FRONT", "", "SUCCESS");
+        trans.AddTrail("MOVE TO FRONT", "", "00");
 
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);

@@ -203,7 +203,12 @@
 
         //Capture Image From IP CAM
         byte[] image = OurUtility.CaptureImage();
-        var imageBytesStr = Convert.ToBase64String(image);
+        string imageBytesStr;
+        if (image != null)
+            imageBytesStr = Convert.ToBase64String(image);
+        else
+            imageBytesStr = "";
+
         cst.PhoneNumber = "62" + strNumber.Substring(1);
 
         //Set HTTP Request Body
@@ -244,7 +249,7 @@
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
 
                     //Add Step to Audit Trail List
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "SUCCESS");
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "00");
 
                     //Navigate to Next Page
                     NavMan.NavigateTo(strURL);
@@ -265,8 +270,8 @@
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = statusDescSub;
                     }
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
-                    trans.status = "GAGAL";
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
+                    trans.status = "01";
                     await OurUtility.AuditTrail(trans, menu, cst);
                     NavMan.NavigateTo("/error");
                 }
@@ -282,6 +287,10 @@
             }
             catch (Exception ex)
             {
+                trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 NavMan.NavigateTo("/error");

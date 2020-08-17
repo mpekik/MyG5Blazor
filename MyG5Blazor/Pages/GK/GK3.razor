@@ -75,7 +75,7 @@
         </div>
         <div class="footer-side2">
             <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="MenuUtama" class="btn-arrow btn" value="">Menu Utama</button>
+            <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
@@ -157,9 +157,17 @@
     }
     private async Task MenuUtama()
     {
-        trans.status = "GAGAL";
+        trans.status = "01";
         trans.errorCode = "FINGER PRINT";
         await OurUtility.AuditTrail(trans,menu,cst);
+        NavigateTo("/main");
+    }
+    private async Task MenuUtamaCanceled()
+    {
+        trans.AddTrail("SCAN FINGER PRINT", "CANCELED", "02");
+        trans.status = "02";
+        trans.errorCode = "FINGER PRINT";
+        await OurUtility.AuditTrail(trans, menu, cst);
         NavigateTo("/main");
     }
     private async Task Back()
@@ -275,7 +283,7 @@
                                                         ref score, ref matched, format)).ConfigureAwait(false);
                         if (matched == 1)
                         {
-                            trans.AddTrail("FINGERPRINT", "MATCH", "SUCCESS");
+                            trans.AddTrail("FINGERPRINT", "MATCH", "00");
                             OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                             cst.EKTPNumber = ktp.Id;
                             OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
@@ -294,7 +302,7 @@
                         }
                         else
                         {
-                            trans.AddTrail("FINGERPRINT", "NOT-MATCH", "FAILED");
+                            trans.AddTrail("FINGERPRINT", "NOT-MATCH", "01");
                             OurUtility.Write_Log("===== 9. -- Try " + intTryCount.ToString() + ", Failed", "step-action");
 
                             OurUtility.Write_Log("===== 10. Ektp_Sdk.CloseReader", "step-action");

@@ -1,7 +1,33 @@
 #hide{
   display: none;
 }
-
+.num-button3 {
+    position: relative;
+    background-color: #D1D3D4;
+    /* margin: 0px auto; */
+    border-radius: 9px;
+    padding: 10px;
+    color: rgb(0, 0, 0);
+    align-items: center;
+    align-self: center;
+    align-content: center;
+    text-align: center;
+}
+.key-num2 {
+    padding: 5px;
+    background-color: white;
+    border-color: white;
+    color: #000;
+    /* border: 1px solid; */
+    box-shadow: 2px 2px 5px #536976ab;
+    position: relative;
+    font-family: Helvetica;
+    display: inline;
+    width: 58px;
+    height: 55px;
+    font-size: 23pt;
+    font-weight: 500;
+}
 #show{
   display: true;
 }
