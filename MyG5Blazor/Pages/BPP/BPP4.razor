@@ -638,9 +638,9 @@
 
         OurUtility.Write_Log("== Check CES", "step-action");
         OurUtility.Write_Log("== URL API : " + myURL, "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try
@@ -838,9 +838,9 @@
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Payment", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await PostCallAPI(myURL, myJson);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try

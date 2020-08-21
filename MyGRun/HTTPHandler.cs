@@ -44,17 +44,16 @@ namespace MyGRun
                 return sb.ToString();
             }
         }
-        public async Task<string> GetCallAPI(string url, string jsonString, string terminalId, string tokenId, string fileName)
+        public async Task<string> GetCallAPI(string url, string jsonString, string terminalId, string tokenId, string fileName, string directory)
         {
             string secret = RandomString(10);
             long unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
             string unixtimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString().Substring(0, 10);
             string md5Input = terminalId + secret + tokenId + unixtimestamp;
             string signature = CreateMD5(md5Input);
-            //url = "https://homepages.cae.wisc.edu/~ece533/images/airplane.png";
             string ret = string.Empty;
             signature = signature.ToLower();
-            //Task.Delay(200);
+            await Task.Delay(2000);
             try
             {
                 using (var handler = new HttpClientHandler())
@@ -67,8 +66,8 @@ namespace MyGRun
                         //                  client.DefaultRequestHeaders.Add("secret-key", secret);
                         content.Headers.Add("signature-key", signature);
                         content.Headers.Add("secret-key", secret);
-                        //await Task.Delay(2000);
-                        
+                        await Task.Delay(2000);
+
                         var response = await client.GetAsync(url);
                         //Console.WriteLine(response.StatusCode.ToString());
                         if (response != null)
@@ -76,7 +75,7 @@ namespace MyGRun
 
                             if (response.IsSuccessStatusCode) 
                             {
-                                string OutputDirectory = @"C:\MyGrapari\";
+                                string OutputDirectory = directory + @"\";
                                 var httpStream = await response.Content.ReadAsStreamAsync();
                                 var filePath = Path.Combine(OutputDirectory, "MyGApps.zip");
                                 using (var fileStream = File.Create(filePath))
@@ -114,7 +113,7 @@ namespace MyGRun
 
             string ret = string.Empty;
             signature = signature.ToLower();
-            Task.Delay(200);
+            await Task.Delay(2000);
             try
             {
                 using (var handler = new HttpClientHandler())
@@ -127,7 +126,7 @@ namespace MyGRun
                         //                  client.DefaultRequestHeaders.Add("secret-key", secret);
                         content.Headers.Add("signature-key", signature);
                         content.Headers.Add("secret-key", secret);
-                        Thread.Sleep(2000);
+                        await Task.Delay(2000);
                         var response = await client.PostAsync(url, content);
                         //Console.WriteLine(response.StatusCode.ToString());
                         if (response != null)

@@ -81,6 +81,7 @@
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
     </Compile>
+    <None Include="IPTest-config.properties" />
     <None Include="MyGApps\MyGraPARI-config.properties" />
     <None Include="packages.config" />
     <None Include="Properties\Settings.settings">

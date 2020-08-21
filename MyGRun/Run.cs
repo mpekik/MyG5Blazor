@@ -29,6 +29,7 @@ namespace MyGRun
         string terminalId = string.Empty;
         string tokenId = string.Empty;
         string version = "";
+        string versionName = "";
         string directory = Directory.GetCurrentDirectory();
         private async void Form1_Load(object sender, EventArgs e)
         {
@@ -37,6 +38,7 @@ namespace MyGRun
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
             await Task.Delay(1000);
             await CekUpdate();
+            
             await RunApps();
         }
 
@@ -106,8 +108,9 @@ namespace MyGRun
             label1.Left = (this.Size.Width - label1.Size.Width) / 2;
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
             OurUtility.Write_Log("== Check for Update", "step-action");
+            CopyConfig();
             await Task.Delay(1000);
-            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+            _myURL = config.ReadIP("URL", Config.PARAM_UPDATE_URL);
             terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
             version = config.Read("MyGraPARI", Config.PARAM_MYGRAPARI_VER);
             tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
@@ -137,10 +140,11 @@ namespace MyGRun
                         //if (true)
                         if ((string)jobjResult["isUpdateAvailable"] == "Y")
                         {
-                            CopyConfig();
+                            
                             OurUtility.Write_Log("== Update Available", "step-action");
                             fileName = (string)jobjResult["aplikasi"]["urlUpdate"];
                             version = (string)jobjResult["aplikasi"]["version"];
+                            versionName= (string)jobjResult["aplikasi"]["versionName"];
                             if ((string)jobjResult["aplikasi"]["propertiesUpdate"] == "Y")
                             { }
                             await DownloadUpdate();
@@ -171,7 +175,7 @@ namespace MyGRun
                 catch (Exception ex)
                 {
                     //OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
-                    label1.Text = "Checking Failed...";
+                    label1.Text = "Update Failed...";
                     //label2.Text = ex.Message.ToString();
                     label1.Left = (this.Size.Width - label1.Size.Width) / 2;
                     label1.Top = (this.Size.Height - label1.Size.Height) / 2;
@@ -181,6 +185,7 @@ namespace MyGRun
             else
             {
                 //OurUtility.Write_Log("== Login Error : Hit WebService {Error}", "step-action");
+                label4.Visible = false;
                 label1.Text = "Checking Failed...";
                 label1.Left = (this.Size.Width - label1.Size.Width) / 2;
                 label1.Top = (this.Size.Height - label1.Size.Height) / 2;
@@ -196,7 +201,7 @@ namespace MyGRun
             OurUtility.Write_Log("== Downloading Update", "step-action");
             await Task.Delay(1000);
             string myURL = _myURL + "update/v1/download/"+fileName;
-            string response = await httpHandler.GetCallAPI(myURL,"",terminalId,tokenId,fileName);
+            string response = await httpHandler.GetCallAPI(myURL,"",terminalId,tokenId,fileName,directory);
             if (response=="Y")
             {
                 label1.Text = "Download Completed";
@@ -206,6 +211,7 @@ namespace MyGRun
                 await DeleteOlder();
             }else
             {
+                version = config._mygrapari.uiVers;
                 label1.Text = "Download Failed";
                 label1.Left = (this.Size.Width - label1.Size.Width) / 2;
                 label1.Top = (this.Size.Height - label1.Size.Height) / 2;
@@ -215,9 +221,13 @@ namespace MyGRun
         
         private async Task DeleteOlder()
         {
-            label1.Text = "Updating...";
+            //label1.Font = new Font("Microsoft Sans Serif", 48, FontStyle.Bold);
+            label1.Text = "Updating to version" ;
             label1.Left = (this.Size.Width - label1.Size.Width) / 2;
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
+            label4.Text = versionName;
+            label4.Left = (this.Size.Width - label1.Size.Width) / 2;
+            label4.Top = label1.Top+label1.Size.Height;
             OurUtility.Write_Log("== Updating", "step-action");
             await Task.Delay(1000);
             if (Directory.Exists(directory + @"\Old"))
@@ -236,14 +246,14 @@ namespace MyGRun
             foreach (DirectoryInfo subfolder in directoryInfo.GetDirectories())
             {
                 EmptyFolder(subfolder);
-            }
+               }
             Directory.Delete(directoryInfo.FullName);
         }
         private void MoveFile(DirectoryInfo directoryInfo)
         {
             foreach (FileInfo file in directoryInfo.GetFiles())
             {
-                if (file.Name != "MyGRun.pdb" && file.Name != "MyGRun.exe" && file.Name != "MyGApps.zip" && file.Name != "MyGRun.exe.config")
+                if (file.Name != "IPTest-config.properties" && file.Name != "MyGRun.pdb" && file.Name != "MyGRun.exe" && file.Name != "MyGApps.zip" && file.Name != "MyGRun.exe.config")
                     File.Move(file.FullName, directory+@"\Old\" + file.Name);
             }
         }
@@ -272,8 +282,8 @@ namespace MyGRun
             string extractPath = directory+@"\";
             if (File.Exists(directory+@"\MyGApps.zip"))
                 System.IO.Compression.ZipFile.ExtractToDirectory(zipPath, extractPath);
-            WriteConfig();
-
+            label4.Visible = false;
+            label1.Font = new Font("Microsoft Sans Serif", 72, FontStyle.Bold);
             label1.Text = "Update Complete";
             label1.Left = (this.Size.Width - label1.Size.Width) / 2;
             label1.Top = (this.Size.Height - label1.Size.Height) / 2;
@@ -344,7 +354,9 @@ namespace MyGRun
 
         }
         private async Task RunApps()
-        {   await Task.Delay(1000);
+        {
+            WriteConfig();
+            await Task.Delay(1000);
             Process.Start(directory+@"\MyGApps\Run.vbs");
             this.Close();
         }

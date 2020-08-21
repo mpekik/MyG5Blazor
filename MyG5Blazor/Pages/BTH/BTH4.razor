@@ -616,19 +616,19 @@
         IsLoading = true;
         string myJson = string.Empty;
         string apiURL = "transaction/void";
-        
-            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                "\"terminalId\" : \"" + trans.termID + "\"," +
-                                    "\"ecr\" : \"" + trans.ecr + "\"," +
-                                    "\"sn\" : \"" + config.snEdc + "\"}" +
-                                    "}";
+
+        myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"," +
+                                "\"ecr\" : \"" + trans.ecr + "\"," +
+                                "\"sn\" : \"" + config.snEdc + "\"}" +
+                                "}";
 
         string myURL = _myURL + apiURL;
 
         OurUtility.Write_Log("== VOID Payment", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try
@@ -723,9 +723,9 @@
 
         OurUtility.Write_Log("== Check CES", "step-action");
         OurUtility.Write_Log("== URL API : " + myURL, "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try
@@ -926,9 +926,9 @@
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Payment", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try
@@ -1103,7 +1103,7 @@
 
         PrintContent prtContent = new PrintContent();
         string msg = string.Empty;
-        string logoTsel = "C:\\MyGApps\\wwwroot\\assets\\image\\Logo\\Logo_MyGraPARI_mini.png";
+        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
         string content = prtContent.BTH(trans, cst, config);
         string header = prtContent.Header(trans, cst, config);

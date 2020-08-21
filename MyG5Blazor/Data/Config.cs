@@ -98,7 +98,7 @@ namespace MyG5Blazor.Data
         public Config()
         {
             fileName= Directory.GetCurrentDirectory() + @"\MyGApps\" + "MyGraPARI-config.properties";
-            fileNameIP = Directory.GetCurrentDirectory() + @"\MyGApps\" + "IPTest-config.properties";
+            fileNameIP = Directory.GetCurrentDirectory() + @"\" + "IPTest-config.properties";
         }
 
         public Config(string p_fileName)

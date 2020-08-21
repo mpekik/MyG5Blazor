@@ -95,7 +95,7 @@ namespace MyG5Blazor.Data
         public const string PARAM_DEFAULT_URL = "param.system.default.url";
         public const string PARAM_SIGN_URL = "param.system.kiosk.sign.url";
         public const string PARAM_MONITORING_URL = "param.MyGrapari.monitoring.url";
-
+        public const string PARAM_UPDATE_URL = "param.system.update.url";
         //Terminal
         public const string PARAM_MACHINE = "param.system.machine";
         public const string PARAM_TOKEN = "param.system.token";
@@ -148,16 +148,20 @@ namespace MyG5Blazor.Data
         public const string PARAM_EKTP_PCID = "param.ektp.pcid";
         public const string PARAM_EKTP_CONF = "param.ektp.conf";
         public const string PARAM_EKTP_USB = "param.ektp.usb";
-        
+
         private FileIniDataParser iniFile = new FileIniDataParser();
+        private FileIniDataParser iniFileIP = new FileIniDataParser();
         private IniData iniData = null;
+        private IniData iniDataIP = null;
 
         private string fileName = "MyGraPARI-config.properties";
         public const string FILE_NAME_MyGraPARI = "MyGraPARI-config.properties";
         public const string FILE_NAME_UPDATER = "updatePatch_setting.properties";
+        private string fileNameIP = "IPTest-config.properties";
         public Config()
         {
             fileName= Directory.GetCurrentDirectory() + @"\MyGApps\" + "MyGraPARI-config.properties";
+            fileNameIP = Directory.GetCurrentDirectory() + @"\" + "IPTest-config.properties";
         }
 
         public Config(string p_fileName)
@@ -176,7 +180,17 @@ namespace MyG5Blazor.Data
             }
             catch { }
         }
-
+        public void InitIP()
+        {
+            try
+            {
+                //if (iniData == null)
+                {
+                    iniDataIP = iniFileIP.ReadFile(fileNameIP);
+                }
+            }
+            catch { }
+        }
         public string Read(string p_section, string p_name)
         {
             string result = string.Empty;
@@ -191,7 +205,20 @@ namespace MyG5Blazor.Data
 
             return result;
         }
+        public string ReadIP(string p_section, string p_name)
+        {
+            string result = string.Empty;
 
+            InitIP();
+
+            try
+            {
+                result = iniDataIP[p_section][p_name];
+            }
+            catch { }
+
+            return result;
+        }
         public void Write(string p_section, string p_name, string p_value)
         {
             Init();
@@ -214,6 +241,28 @@ namespace MyG5Blazor.Data
                 Console.WriteLine(ex.Message);
             }
         }
-        
+        public void WriteIP(string p_section, string p_name, string p_value)
+        {
+            InitIP();
+
+            try
+            {
+                try
+                {
+                    iniDataIP.Sections.AddSection(p_section);
+                }
+                catch { }
+
+                iniDataIP[p_section][p_name] = p_value;
+
+                iniDataIP.Configuration.NewLineStr = "\r\n";
+                iniFileIP.WriteFile(fileNameIP, iniDataIP);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+
     }
 }
