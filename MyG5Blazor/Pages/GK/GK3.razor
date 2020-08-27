@@ -264,8 +264,9 @@
 
                     //matched right finger
                     result = await Task.Run(() => Ektp_Sdk.MatchFingerPrint(engine, image, size,
-                                                        ktp.minutiae2, ktp.minu2len,
-                                                        ref score, ref matched, format)).ConfigureAwait(false);
+                                                    ktp.minutiae2, ktp.minu2len,
+                                                    ref score, ref matched, format)).ConfigureAwait(false);
+
 
                     if (matched == 1)
                     {

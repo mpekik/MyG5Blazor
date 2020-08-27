@@ -101,13 +101,13 @@
     {
         cst.intMPembayaran = _intMPembayaran;
         trans.intPayment = _intMPembayaran;
-        trans.AddTrail("PAYMENT METHOD", cst.strMPembayaran, "SUCCESS");
+        trans.AddTrail("PAYMENT METHOD", cst.strMPembayaran, "00");
         GetPayment("/PB/3");
     }
     private async Task MainMenu()
     {
-        trans.AddTrail("PAYMENT METHOD", "BACK TO MAIN MENU", "CANCELED BY USER");
-        trans.status = "GAGAL";
+        trans.AddTrail("PAYMENT METHOD", "BACK TO MAIN MENU", "02");
+        trans.status = "02";
         await OurUtility.AuditTrail(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
@@ -151,7 +151,7 @@
                     trans.fee = (string)jobjResult["billPayment"]["fee"];
 
                     TotalTagihan();
-                    trans.AddTrail("GET BILL", cst.intTagihan.ToString(), "SUCCESS");
+                    trans.AddTrail("GET BILL", cst.intTagihan.ToString(), "00");
 
                     //trans.transID = (string)jobjResult["transaction"]["transactionId"];
 
@@ -169,10 +169,10 @@
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusCode"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
-                    trans.AddTrail("GET BILL", cst.strMPembayaran, "FAILED 01");
-                    trans.status = "GAGAL";
+                    trans.AddTrail("GET BILL", cst.strMPembayaran, "01");
+                    trans.status = "01";
                     await OurUtility.AuditTrail(trans, menu, cst);
 
                     NavMan.NavigateTo("/error");
@@ -184,8 +184,8 @@
                     //IsVisible = false;
                     IsInvalid = true;
 
-                    trans.AddTrail("GET BILL", cst.strMPembayaran, "FAILED 02");
-                    trans.status = "GAGAL";
+                    trans.AddTrail("GET BILL", cst.strMPembayaran, "02");
+                    trans.status = "02";
                     await OurUtility.AuditTrail(trans, menu, cst);
 
                 }
@@ -194,8 +194,8 @@
             {
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
-                trans.AddTrail("GET BILL", cst.strMPembayaran, "FAILED EX");
-                trans.status = "GAGAL";
+                trans.AddTrail("GET BILL", cst.strMPembayaran, "01");
+                trans.status = "01";
                 await OurUtility.AuditTrail(trans, menu, cst);
 
                 NavMan.NavigateTo("/error");

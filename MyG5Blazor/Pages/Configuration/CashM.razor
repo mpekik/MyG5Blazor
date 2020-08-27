@@ -384,11 +384,11 @@
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Cash Management", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
 
         //Call HTTP Request
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != null)
         {

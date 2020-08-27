@@ -255,6 +255,7 @@
         await MyPerso();
         stock = stock - intTryCount;
         trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
         if (isError)
         {
             isLoading = false;
@@ -398,7 +399,7 @@
                                     {
                                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                                         OurUtility.Write_Log("=== Status Code : " + statusDescSub + " {Error}", "step-action");
-                                        trans.errorCode = statusDescSub;
+                                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                                     }
                                     else
                                     {
@@ -554,7 +555,7 @@
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
                     //                    IsLoading = false;
                     //                  IsVisible = false;

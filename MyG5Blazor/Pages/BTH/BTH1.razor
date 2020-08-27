@@ -243,7 +243,7 @@
                     cst.intTagihan = OurUtility.ToInt32((string)jobjResult["tagihan"]);
 
                     //Add Step To Audit Trail List
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "SUCCESS");
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "00");
 
                     //trans.transID = "-";
                     //cst.PhoneNumber = "62" + strNumber.Substring(1);
@@ -261,10 +261,10 @@
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
-                    trans.status = "GAGAL";
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
+                    trans.status = "01";
                     await OurUtility.AuditTrail(trans, menu, cst);
 
                     NavMan.NavigateTo("/error");
@@ -275,8 +275,8 @@
                     isLoading = false;
                     IsVisible = false;
                     IsInvalid = true;
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "Tidak Memiliki Tagihan");
-                    trans.status = "GAGAL";
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "02");
+                    trans.status = "02";
                     await OurUtility.AuditTrail(trans, menu, cst);
                 }
             }

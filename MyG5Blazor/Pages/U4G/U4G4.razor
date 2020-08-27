@@ -186,7 +186,9 @@
     private int intTryCount = 1;
     private int intTryLimit = 3;
     private int CESno = 0;
+    private int stock = 0;
 
+    private string cardStock = string.Empty;
     private string strNPS1Value = string.Empty;
     private string[] strNPS2Value = { "", "", "", "" };
 
@@ -244,12 +246,16 @@
         strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
+        stock = Int32.Parse(cardStock);
         Switcher.DOWN("500",config.usbEKTP);
         OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
         isLoading = true;
         Switcher.UP("3000",config.usbCardReader);
         await MyPerso();
-        trans.jumlah_kartu = intTryCount;
+        stock = stock - intTryCount;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
         if (isError)
         {
             isLoading = false;
@@ -273,7 +279,6 @@
             isLoading = false;
             trans.status = "01";
             await OurUtility.AuditTrail(trans,menu,cst);
-
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
@@ -413,7 +418,7 @@
                                     {
                                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                                         OurUtility.Write_Log("=== Status Code : " + statusDescSub + " {Error}", "step-action");
-                                        trans.errorCode = statusDescSub;
+                                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                                     }
                                     else
                                     {
@@ -573,7 +578,7 @@
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
                     //                    IsLoading = false;
                     //                  isVisible = false;

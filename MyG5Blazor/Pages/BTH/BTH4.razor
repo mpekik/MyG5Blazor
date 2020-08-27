@@ -360,7 +360,8 @@
     private int intTryLimit = 3;
     private int MetodePembayaran = 0;
     private int CESno = 0;
-
+    private int logbank = 0;
+    private int logamount = 0;
 
     private string strNPS1Value = string.Empty;
     private string strMsgError = string.Empty;
@@ -427,6 +428,8 @@
 
                             await Print();
                             await CheckNPS("");
+                            trans.status = "00";
+                            trans.errorCode = "PEMBAYARAN TAGIHAN VIA DEBIT BERHASIL";
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -450,6 +453,7 @@
                                 Void();
                             }
                             await Print();
+                            trans.status = "01";
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -462,7 +466,9 @@
                     {
                         IsFail = true;
                         OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
-                        trans.AddTrail("PAYMENT EDC", trans.edcresp, "FAILED");
+                        trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
+                        trans.status = "01";
+                        await OurUtility.AuditTrail(trans, menu, cst);
 
                         //Console.WriteLine("Payment Failed");
                     }
@@ -471,11 +477,15 @@
             case 2:
                 {
                     pageClass = "main-panel bg-home";
+                    logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
+                    logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
                     await Task.Delay(2000);
                     await MainLoop();
                     intAccBill = Payout.total;
                     cst.intUangCount = Payout.uangCount;
                     cst.intTagihanTerbayar = Payout.total;
+                    logamount = logamount + Payout.uangCount;
+                    logbank = logbank + Payout.total;
                     if (!IsTunaiExit)
                     {
                         await Payment("");
@@ -490,6 +500,8 @@
                             await Task.Delay(2000);
                             await Print();
                             await CheckNPS("");
+                            trans.status = "00";
+                            trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -502,6 +514,7 @@
                             IsLoading = false;
                             IsFail = true;
                             await Print();
+                            trans.status = "01";
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -533,6 +546,8 @@
                             await Task.Delay(2000);
                             await Print();
                             await CheckNPS("");
+                            trans.status = "00";
+                            trans.errorCode = "PEMBAYARAN TAGIHAN VIA CC BERHASIL";
                             await OurUtility.AuditTrail(trans, menu, cst);
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -567,7 +582,9 @@
                     else
                     {
                         IsFail = true;
-                        trans.AddTrail("PAYMENT EDC", trans.edcresp, "FAILED");
+                        trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
+                        trans.status = "01";
+                        await OurUtility.AuditTrail(trans, menu, cst);
 
                         Console.WriteLine("Payment Failed");
                     }
@@ -583,7 +600,7 @@
         IsTunaiExit = true;
         IsFail = true;
         await Print();
-        trans.AddTrail("PAYMENT CASH", "Paid Ammount:"+intAccBill.ToString(), "CANCELED BY USER");
+        trans.AddTrail("PAYMENT CASH", "Paid Ammount:"+intAccBill.ToString(), "02");
         Payout.DisableValidator();
         Payout.SSPComms.CloseComPort();
         OurUtility.AuditTrail(trans, menu, cst);
@@ -639,7 +656,7 @@
                 if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
-                    trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "SUCCESS");
+                    trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
 
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
@@ -654,14 +671,14 @@
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
-                    trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED 01");
+                    trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                 {
                     strMsgError = (string)jobjResult["transaction"]["statusDesc"];
-                    trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED 02");
+                    trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "02");
                 }
 
             }
@@ -669,14 +686,14 @@
             {
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
-                trans.AddTrail(" VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED EX");
+                trans.AddTrail(" VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
             }
         }
         else
         {
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED WEB");
+            trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
         }
     }
     private void CheckPerso()
@@ -743,7 +760,7 @@
                         c.answID = question.SelectToken("answerId").ToString();
                         surveys.Add(c);
                     }
-                    trans.AddTrail("CES", "", "SUCCESS");
+                    trans.AddTrail("CES", "", "00");
                     IsVisible = true;
                     return;
                 }
@@ -759,9 +776,9 @@
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
-                    trans.AddTrail("CES", "", "FAILED 01");
+                    trans.AddTrail("CES", "", "01");
 
                     //                    IsLoading = false;
                     //                  IsVisible = false;
@@ -773,7 +790,7 @@
                     strMsgError = (string)jobjResult["transaction"]["statusDesc"];
                     IsVisible = false;
                     IsInvalid = true;
-                    trans.AddTrail("CES", "", "FAILED 02");
+                    trans.AddTrail("CES", "", "02");
 
                 }
             }
@@ -781,7 +798,7 @@
             {
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
-                trans.AddTrail("CES", "", "FAILED EX");
+                trans.AddTrail("CES", "", "01");
 
                 //NavMan.NavigateTo("/error");
             }
@@ -790,7 +807,7 @@
         {
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            trans.AddTrail("CES", "", "FAILED WEB");
+            trans.AddTrail("CES", "", "01");
 
             //NavMan.NavigateTo("/error");
         }
@@ -814,7 +831,7 @@
                 if (edc.respondCode == "00")
                 {
                     OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
-                    trans.AddTrail("PAYMENT EDC", edc.respondCode, "SUCCESS");
+                    trans.AddTrail("PAYMENT EDC", edc.respondCode, "00");
 
                     trans.ecr = edc.ecr;
                     trans.edcresp = edc.respondCode;
@@ -838,7 +855,7 @@
             trans.edcCardName = trans.ecr.Substring(102, 26);
             trans.edcDate = trans.ecr.Substring(128, 6);
             trans.edcTime = trans.ecr.Substring(134, 6);
-            Console.WriteLine(trans.edcresp);
+            //Console.WriteLine(trans.edcresp);
         }
         catch(Exception ex)
         {
@@ -861,7 +878,7 @@
                 IsVoided = true;
                 trans.edcStatus = "VOIDED";
                 OurUtility.Write_Log("== Payment Voided", "step-action");
-                trans.AddTrail("VOID EDC", edc.respondCode, "SUCCESS");
+                trans.AddTrail("VOID EDC", edc.respondCode, "00");
 
                 break;
             }
@@ -939,7 +956,7 @@
                 if ((string)jobjResult["transaction"]["statusCode"] == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
-                    trans.AddTrail("PAYMENT", "Payment Method:"+trans.paymentMethod+",Payment Ammount: "+strAccBill, "SUCCESS");
+                    trans.AddTrail("PAYMENT", "Payment Method:"+trans.paymentMethod+",Payment Ammount: "+strAccBill, "00");
 
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "01")
@@ -954,9 +971,9 @@
                         string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                     }
-                    trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED 01");
+                    trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
                 }
                 else if ((string)jobjResult["transaction"]["statusCode"] == "02")
                 {
@@ -964,7 +981,7 @@
                     IsLoading = false;
                     IsVisible = false;
                     IsInvalid = true;
-                    trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED 02");
+                    trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "02");
                 }
 
             }
@@ -972,14 +989,14 @@
             {
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
-                trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED EX");
+                trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
             }
         }
         else
         {
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "FAILED WEB");
+            trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
         }
     }
     CPayout Payout = new CPayout();
@@ -1038,7 +1055,7 @@
         catch(Exception ex)
         {
             OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
-            trans.AddTrail("BILL ACCEPTOR", "", "FAILED EX");
+            trans.AddTrail("BILL ACCEPTOR", "", "01");
             return;
         }
     }

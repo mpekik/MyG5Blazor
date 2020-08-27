@@ -145,8 +145,8 @@
     }
     private async Task MainMenu()
     {
-        trans.AddTrail("GET BILL", "BACK TO MAIN MENU", "CANCELED BY USER");
-        trans.status = "GAGAL";
+        trans.AddTrail("GET BILL", "BACK TO MAIN MENU", "02");
+        trans.status = "02";
         await OurUtility.AuditTrail(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
