@@ -16,6 +16,7 @@
 @inject BlazorTimer Timer
 @inject Transaction trans
 @inject Config config 
+
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -253,9 +254,9 @@
         isLoading = true;
         Switcher.UP("3000",config.usbCardReader);
         await MyPerso();
-        stock = stock - intTryCount;
-        trans.jumlah_kartu = stock;
-        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
+        //stock = stock - intTryCount;
+        //trans.jumlah_kartu = stock;
+        //config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
         if (isError)
         {
             isLoading = false;
@@ -629,7 +630,9 @@
             return;
         }
         trans.AddTrail("MOVE TO FRONT", "", "00");
-
+        stock = stock - 1;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
     }
@@ -649,6 +652,11 @@
         cds.Initialize(ref errorcode, ref msg);
         OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
         cds.MoveTo_Bin(ref errorcode, ref msg);
+        
+        stock = stock - 1;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
+
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
     }

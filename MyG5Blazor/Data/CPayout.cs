@@ -755,7 +755,6 @@ namespace MyG5Blazor.Data
         public bool DoPoll()
         {
             byte i;
-            uangCount = 0;
             // If a not is to be held in escrow, send hold commands, as poll releases note.
             if (m_HoldCount > 0)
             {

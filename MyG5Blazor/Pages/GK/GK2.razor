@@ -133,29 +133,39 @@
     byte[] pbPcid;
 
     byte[] pbConf;
-
+    private bool translog = true;
     private async Task MenuUtama()
     {
-        trans.status = "01";
-        trans.errorCode = "EKTP";
-        await OurUtility.AuditTrail(trans, menu, cst);
-        NavigateTo("/main");
+        if (translog)
+        {
+            translog = false;
+            trans.status = "01";
+            trans.errorCode = "EKTP";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavigateTo("/main");
+        }
     }
     private async Task MenuUtamaCanceled()
     {
-        trans.AddTrail("SCAN EKTP", "CANCELED", "02");
-        trans.status = "02";
-        trans.errorCode = "EKTP";
-        await OurUtility.AuditTrail(trans, menu, cst);
-        NavigateTo("/main");
+        if (translog)
+        {
+            trans.AddTrail("SCAN EKTP", "CANCELED", "02");
+            trans.status = "02";
+            trans.errorCode = "EKTP";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavigateTo("/main");
+        }
     }
     private async Task Back()
     {
-        trans.AddTrail("SCAN EKTP", "CANCELED", "02");
-        trans.status = "02";
-        trans.errorCode = "EKTP";
-        await OurUtility.AuditTrail(trans, menu, cst);
-        NavigateTo("/GK/1");
+        if (translog)
+        {
+            trans.AddTrail("SCAN EKTP", "CANCELED", "02");
+            trans.status = "02";
+            trans.errorCode = "EKTP";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavigateTo("/GK/1");
+        }
     }
     private void NavigateTo(string strURL)
     {

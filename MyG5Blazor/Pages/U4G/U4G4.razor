@@ -652,6 +652,9 @@
             return;
         }
         trans.AddTrail("MOVE TO FRONT", "", "00");
+        stock = stock - 1;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
 
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
@@ -672,6 +675,10 @@
         cds.Initialize(ref errorcode, ref msg);
         OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
         cds.MoveTo_Bin(ref errorcode, ref msg);
+        stock = stock - 1;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
+
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
     }

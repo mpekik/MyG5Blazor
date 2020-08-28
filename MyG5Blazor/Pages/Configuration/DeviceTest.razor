@@ -8,12 +8,17 @@
 @using System;
 @using System.Threading.Tasks;
 @using MyG5Blazor.Data
+@using System.IO.Ports
 
+
+@inject Card_Dispenser cds
 @inject Menu menu
 @inject Costumer cst
 @inject NavigationManager NavMan
 @inject Transaction trans
 @inject Config config
+@inject EDC edc
+
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -27,7 +32,6 @@
 
 
             <form class="navbar-form">
-                
             </form>
         </div>
     </nav>
@@ -37,96 +41,16 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6" style="text-align: left;">
-                    <table class="table-responsive">
-                        <tr>
-                            <td>Terminal id</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>Default URL</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>Kiosk Sign URL</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>Monitoring URL</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>Token</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>MyGRAPARI UI Vers</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>USB Up</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>USB Down</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>EKTP Reader USB Slot</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>EKTP Reader PCID</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>EKTP Reader CONF</td>
-                            <td><input type="text"></td>
-                        </tr>
-                    </table>
+                    <button @onclick="Payment" class="btn-arrow-red btn">Payment EDC</button>
+                    <button @onclick="Void" class="btn-arrow-red btn">Void EDC</button>
+                    <button @onclick="BillAcceptor" class="btn-arrow-red btn">Start Bill</button>
+                    <button @onclick="@(()=>loopCash=false)" class="btn-arrow-red btn">Stop Bill</button>
+                    <button @onclick="MoveToTheFront" class="btn-arrow-red btn">Front</button>
+                    <button @onclick="MoveToICC" class="btn-arrow-red btn">ICC</button>
+                    <button @onclick="MoveToBin" class="btn-arrow-red btn">BIN</button>
                 </div>
                 <div class="col-md-6" style="text-align: left;">
-                    <table class="table-responsive">
-                        <tr>
-                            <td>Card Dispenser Port</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>Card Reader Type</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>Card Reader USB Slot</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>Perso EXE</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>IP Cam URL</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>IP Cam User</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>IP Cam Password</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>IP Cam Type</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>EDC Port</td>
-                            <td><input type="text"></td>
-                        </tr>
-                        <tr>
-                            <td>Bill Acceptor Port</td>
-                            <td><input type="text"></td>
-                        </tr>
-                    </table>
+                    
                     <button @onclick="@(()=>isVisible2=true)" class="btn-arrow btn" value="">Kembali</button>
                     <button @onclick="@(()=>isVisible2=true)" class="btn-arrow-red btn" value="">Save</button>
                 </div>
@@ -195,6 +119,9 @@
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
 
+    private string msg = string.Empty;
+    private string errorcode = string.Empty;
+    
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -225,6 +152,247 @@
     {
         config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, userName);
         IsVisible = false;
+    }
+    CPayout Payout = new CPayout();
+    Global global = new Global();
+    int inttotal = 0;
+
+    int reconnectionAttempts = 5;
+    bool Running = false;
+    private byte FindMaxProtocolVersion()
+    {
+        byte b = 0x06;
+        while (true)
+        {
+            Payout.SetProtocolVersion(b);
+            if (Payout.CommandStructure.ResponseData[0] == CCommands.SSP_RESPONSE_FAIL)
+                return --b;
+            b++;
+            if (b > 12)
+                return 0x06; // return default
+        }
+    }
+    private bool IsUnitValid(char unitType)
+    {
+        if (unitType == (char)0x00) // 0x06 is Payout, no other types supported by this program
+            return true;
+        return false;
+    }
+    private bool ConnectToValidator(int attemps, int interval)
+    {
+        //reconnectionTimer.Interval = interval * 1000;
+        Task.Delay(interval * 1000).GetAwaiter();
+        for (int i = 0; i < attemps; i++)
+        {
+            Payout.SSPComms.CloseComPort();
+            Payout.CommandStructure.EncryptionStatus = false;
+            if (Payout.OpenComPort() && Payout.NegotiateKeys())
+            {
+                Payout.CommandStructure.EncryptionStatus = true;
+                byte maxPVersion = FindMaxProtocolVersion();
+                if (maxPVersion >= 6)
+                {
+                    Payout.SetProtocolVersion(maxPVersion);
+                }
+                else
+                {
+                    return false;
+                }
+                Payout.PayoutSetupRequest();
+                if (!IsUnitValid(Payout.UnitType))
+                {
+                    break;
+                    return false;
+                }
+
+                Payout.SetInhibits();
+                Payout.GetSerialNumber();
+                Payout.EnableValidator();
+                Payout.EnablePayout();
+                return true;
+            }
+        }
+        return false;
+    }
+    bool loopCash = false;
+    private async Task MainLoop()
+    {
+        try
+        {
+            Payout.CommandStructure.ComPort = global.ComPort;
+            Payout.CommandStructure.SSPAddress = global.SSPAddress;
+            Payout.CommandStructure.Timeout = 3000;
+            Payout.HoldNumber = 0;
+
+            if (ConnectToValidator(reconnectionAttempts, 2))
+            {
+                //Console.WriteLine("1");
+                Running = true;
+                //Payout.ConfigureBezel(0x00, 0xFF, 0x00);
+            }
+
+            while (loopCash)
+            {
+                await Task.Delay(1000);
+                //Console.WriteLine("2");
+                if (!Payout.DoPoll())
+                {
+                    //Console.WriteLine("Poll failed, attempting to reconnect...\r\n");
+                    while (true)
+                    {
+                        Payout.SSPComms.CloseComPort();
+                        if (ConnectToValidator(reconnectionAttempts, 2) == true)
+                            break;
+                        Payout.SSPComms.CloseComPort();
+                        return;
+                    }
+                    //Console.WriteLine("Reconnected\r\n");
+                }
+                //Console.WriteLine("9");
+                inttotal = Payout.total;
+                //Console.WriteLine("inttotal = " + inttotal);
+                StateHasChanged();
+                // UpdateUI();
+                //if(!bFormSetup)
+                //{
+                //}
+            }
+
+            //Console.WriteLine("10");
+            Payout.DisableValidator();
+            Payout.SSPComms.CloseComPort();
+        }
+        catch (Exception ex)
+        {
+            OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+            trans.AddTrail("BILL ACCEPTOR", "", "01");
+            return;
+        }
+    }
+    private async Task BillAcceptor()
+    {
+        Payout.total = 0;
+        Payout.uangCount = 0;
+        int logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
+        int logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+        loopCash = true;
+        await MainLoop();
+        logamount = logamount + Payout.total;
+        logbank = logbank + Payout.uangCount;
+        config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
+        config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
+    }
+    private async Task Void()
+    {
+        //string strInvoice = "18";
+        string strBilling = "2";
+        string strBill = "1000";
+        int MetodePembayaran = 1;
+        string strCOM = "COM" + config.Read("EDC", Config.PARAM_EDC_PORT);
+        await Void(strCOM, strBill, strTrace, strBilling, MetodePembayaran.ToString());
+    }
+    private async Task Void(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
+    {
+        string _transType = "02";
+        edc.Clear();
+        edc.serialPort = new SerialPort();
+        edc.serialPort.PortName = serialPortName;
+        edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
+        do
+        {
+            await Task.Delay(2000);
+            if (edc.respondCode == "00")
+            {
+                //IsVoided = true;
+                //trans.edcStatus = "VOIDED";
+                //OurUtility.Write_Log("== Payment Voided", "step-action");
+                //trans.AddTrail("VOID EDC", edc.respondCode, "00");
+
+                break;
+            }
+            //if (edc.intTry > intTryLimit)
+            //break;
+
+            edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
+
+            Console.WriteLine(edc.respondCode);
+
+        } while (!edc.mre.WaitOne());
+        trans.ecr = edc.ecr;
+        trans.edcresp = edc.respondCode;
+        trans.edcApproval = trans.ecr.Substring(140, 6);
+        trans.edcTid = trans.ecr.Substring(2, 8);
+        trans.edcMid = trans.ecr.Substring(10, 15);
+        trans.edcBatch = trans.ecr.Substring(25, 6);
+        trans.edcIssuer = trans.ecr.Substring(31, 15);
+        trans.edcTrace = trans.ecr.Substring(52, 6);
+        trans.edcRefNo = trans.ecr.Substring(46, 6);
+        trans.edcCardNo = trans.ecr.Substring(83, 19);
+        trans.edcCardName = trans.ecr.Substring(102, 26);
+        trans.edcDate = trans.ecr.Substring(128, 6);
+        trans.edcTime = trans.ecr.Substring(134, 6);
+    }
+    private string strTrace = "";
+    private async Task Payment()
+    {
+        string strInvoice = "1";
+        string strBilling = "2";
+        string strBill = "1000";
+        int MetodePembayaran = 1;
+        string strCOM = "COM" + config.Read("EDC", Config.PARAM_EDC_PORT);
+        await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+    }
+
+    private async Task Pay(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
+    {
+        try
+        {
+            OurUtility.Write_Log("== Device Test EDC", "step-action");
+            string _transType = "01";
+            //cst.intTagihanTerbayar = intBill;
+            edc.Clear();
+            edc.serialPort = new SerialPort();
+            edc.serialPort.PortName = serialPortName;
+            //edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
+            do
+            {
+                edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
+
+                await Task.Delay(2000);
+                if (edc.respondCode == "00")
+                {
+                    //OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
+                    //trans.AddTrail("PAYMENT EDC", edc.respondCode, "00");
+
+                    trans.ecr = edc.ecr;
+                    trans.edcresp = edc.respondCode;
+                    IsLoading = true;
+                    //pageClass = "main-panel bg-home";
+                    return;
+                }
+                //edc.mre.WaitOne();
+            } while (!edc.mre.WaitOne());
+            //} while (edc.intTry < 3);
+            trans.ecr = edc.ecr;
+            trans.edcresp = edc.respondCode;
+            trans.edcApproval = trans.ecr.Substring(140, 6);
+            trans.edcTid = trans.ecr.Substring(2, 8);
+            trans.edcMid = trans.ecr.Substring(10, 15);
+            trans.edcBatch = trans.ecr.Substring(25, 6);
+            trans.edcIssuer = trans.ecr.Substring(31, 15);
+            trans.edcTrace = trans.ecr.Substring(52, 6);
+            trans.edcRefNo = trans.ecr.Substring(46, 6);
+            trans.edcCardNo = trans.ecr.Substring(83, 19);
+            trans.edcCardName = trans.ecr.Substring(102, 26);
+            trans.edcDate = trans.ecr.Substring(128, 6);
+            trans.edcTime = trans.ecr.Substring(134, 6);
+            strTrace = trans.edcTrace;
+            //Console.WriteLine(trans.edcresp);
+        }
+        catch (Exception ex)
+        {
+            Console.WriteLine(ex.Message);
+        }
     }
     private async Task CheckNumber(string strURL)
     {
@@ -299,6 +467,88 @@
 
             this.StateHasChanged();
         }
+    }
+
+    private void MoveToICC()
+    {
+        string strCOM = "COM" + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
+        //int stock = Int32.Parse(config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1));
+
+        //OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
+        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " + errorcode + "message: " + msg, "step-action");
+            return;
+        }
+        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card", "step-action");
+        if (!cds.MoveTo_IC_Card(ref errorcode, ref msg))
+        {
+            //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card, Failed " + errorcode + " message : " + msg, "step-action");
+            return;
+        }
+        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return;
+    }
+
+    private void MoveToBin()
+    {
+        string strCOM = "COM" + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
+        int stock = Int32.Parse(config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1));
+
+        //OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
+        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return;
+        }
+        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
+        cds.MoveTo_Bin(ref errorcode, ref msg);
+
+        stock = stock - 1;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
+
+        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+    }
+    private void MoveToTheFront()
+    {
+        string strCOM = "COM" + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
+        int stock = Int32.Parse(config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1));
+        //OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
+        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return;
+        }
+        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
+        if (!cds.MoveTo_The_Front(ref errorcode, ref msg))
+        {
+            trans.AddTrail("MOVE TO FRONT", "", "01");
+            //OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed", "step-action");
+            return;
+        }
+        //trans.AddTrail("MOVE TO FRONT", "", "00");
+        stock = stock - 1;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, stock.ToString());
+        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
     }
 
     [Microsoft.JSInterop.JSInvokable]

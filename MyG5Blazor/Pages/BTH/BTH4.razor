@@ -235,7 +235,6 @@
         <div class="footer-side2">
             @if (MetodePembayaran == 2 && !IsFail && !IsSuccess)
             {
-                <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Kembali</button>
                 <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Menu Utama</button>
             }
             <!--<sup>Powered By </sup>Trilogi Persada -->
@@ -477,15 +476,19 @@
             case 2:
                 {
                     pageClass = "main-panel bg-home";
-                    logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
-                    logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+                    Payout.total = 0;
+                    Payout.uangCount = 0;
+                    logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
+                    logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
                     await Task.Delay(2000);
                     await MainLoop();
                     intAccBill = Payout.total;
                     cst.intUangCount = Payout.uangCount;
                     cst.intTagihanTerbayar = Payout.total;
-                    logamount = logamount + Payout.uangCount;
-                    logbank = logbank + Payout.total;
+                    logamount = logamount + Payout.total;
+                    logbank = logbank + Payout.uangCount;
+        config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
+        config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
                     if (!IsTunaiExit)
                     {
                         await Payment("");
@@ -934,7 +937,7 @@
                 "\"amount\" : \"" + cst.intTagihan + "\"," +
                 "\"accountId\" : \"" + cst.accountId + "\"," +
                 "\"submitAmount\" : \"" + strAccBill + "\"," +
-                "\"lembar_uang\" : \"" + cst.intUangCount + "\"," +
+                "\"lembarUang\" : \"" + cst.intUangCount + "\"," +
                                     "\"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
                                     "\"fee\" : \"" + trans.fee + "\"," +
                                     "\"bit48\" : \"" + trans.bit + "\"" +
