@@ -321,13 +321,13 @@
                         try
                         {
                             JObject jobjResult = JObject.Parse(strResult);
-                            trans.transID = (string)jobjResult["transaction"]["transactionId"];
-                            if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                            trans.transID = (string)jobjResult["transaction"].SelectToken("transactionId");
+                            if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                             {
-                                strPanjang = (string)jobjResult["perso"]["message"];
+                                strPanjang = (string)jobjResult["perso"].SelectToken("message");
                                 if (strPanjang != null)
                                 {
-                                    trans.persoID = (string)jobjResult["perso"]["persoId"];
+                                    trans.persoID = (string)jobjResult["perso"].SelectToken("persoId");
                                     trans.AddTrail("GET STRING PANJANG", trans.persoID, "00");
                                     if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
                                     {
@@ -386,26 +386,26 @@
                                 }
 
                             }
-                            else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                            else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                             {
-                                if ((string)jobjResult["transaction"]["errorCode"] != null)
+                                if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                                 {
-                                    OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                                    trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                                    OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                                    trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
                                 }
                                 else
                                 {
-                                    string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                                    string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
                                     if (_statusDescSub != null)
                                     {
                                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                                         OurUtility.Write_Log("=== Status Code : " + statusDescSub + " {Error}", "step-action");
-                                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
+                                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                                     }
                                     else
                                     {
-                                        OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
-                                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
+                                        OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                                     }
                                 }
                                 trans.AddTrail("GET STRING PANJANG", "", "01");
@@ -418,10 +418,10 @@
                                     return;
                                 }
                             }
-                            else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                            else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                             {
                                 trans.AddTrail("GET STRING PANJANG", "", "01");
-                                strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                                strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                                 isLoading = false;
                                 //IsVisible = false;
                                 IsInvalid = true;
@@ -529,9 +529,9 @@
             try
             {
                 JObject jobjResult = JObject.Parse(strResult);
-                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     foreach (var question in jobjResult.SelectToken("surveys"))
                     {
                         CES c = new CES();
@@ -544,28 +544,24 @@
                     isVisible = true;
                     return;
                 }
-                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
-                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                        string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
-                    //                    IsLoading = false;
-                    //                  IsVisible = false;
-                    //                IsInvalid = true;
-                    //NavMan.NavigateTo("/error");
                 }
-                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                 {
-                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     isVisible = false;
                     IsInvalid = true;
                 }

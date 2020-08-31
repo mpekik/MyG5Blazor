@@ -1,6 +1,7 @@
 ﻿@page "/IP/2"
 
 @using MyG5Blazor.Data
+@using System.Linq;
 
 @inject IJSRuntime JSRuntime
 @inject Costumer cst
@@ -34,38 +35,103 @@
                 </div>
 
                 <div class="col-md-6">
-                    <div class="row" style="margin-left: 10px;">
-                        <div class="col">
-                            <img @onclick="@(()=>Nominal(10000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_10.png">
-                        </div>
-                        <div class="col">
-                            <img @onclick="@(()=>Nominal(20000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_20.png">
-                        </div>
+                    @*@foreach ((Menu.MenuPulsa mp,Int32 i) in menu._menuPulsa.Select((mp, i) => (mp, i)))
+        {
+         @if(i%2==0)
+         {
+             @((MarkupString)mp._addHTML)
+         }
+                <div class="col">
+                    <img @onclick="@(() => Nominal(int.Parse(mp._labelNominal)))" id="" class="nominal" src="../../assets/image/Voucher/@mp._icon">
+                </div>
+         @if(i%2==1)
+         {
+             @((MarkupString)mp._addHTML)
+         }
+        }*@
+
+                    @*@for (int i = 0; i < menu._menuPulsa.Count; i=i+2)
+        {
+            @if (i % 2 == 0)
+            {
+                <div class="row" style="margin-left: 10px;">
+                    <div class="col">
+                        <img @onclick="@(()=>Nominal(int.Parse(menu._menuPulsa[i]._labelNominal)))" id="" class="nominal" src="../../assets/image/Voucher/@menu._menuPulsa[i]._icon">
                     </div>
+                    @if (i + 1 < menu._menuPulsa.Count)
+                    {
+                <div class="col">
+                    <img @onclick="@(()=>Nominal(int.Parse(menu._menuPulsa[i+1]._labelNominal)))" id="" class="nominal" src="../../assets/image/Voucher/@menu._menuPulsa[i+1]._icon">
+                </div>
+                    }
+                </div>
+            }
+        }*@
                     <div class="row" style="margin-left: 10px;">
-                        <div class="col">
-                            <img @onclick="@(()=>Nominal(30000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_30.png">
-                        </div>
-                        <div class="col">
-                            <img @onclick="@(()=>Nominal(40000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_40.png">
-                        </div>
+                        @if (stringMenu[0] == "0")
+                        {
+                            <div class="col">
+                                <img @onclick="@(() => Nominal(int.Parse(arrayTrans[0])))" id="" class="nominal" src="../../assets/image/Voucher/@AssetsPNG[0]">
+                            </div>
+                        }
+                        @if (stringMenu[1] == "0")
+                        {
+                            <div class="col">
+                                <img @onclick="@(() => Nominal(int.Parse(arrayTrans[1])))" id="" class="nominal" src="../../assets/image/Voucher/@AssetsPNG[1]">
+                            </div>
+                        }
                     </div>
-                    <div class="row" style="margin-left: 10px;">
-                        <div class="col">
-                            <img @onclick="@(()=>Nominal(50000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_50.png">
+                    @if (stringMenu[2] == "0")
+                    {
+                        <div class="row" style="margin-left: 10px;">
+                            @if (stringMenu[2] == "0")
+                            {
+                                <div class="col">
+                                    <img @onclick="@(() => Nominal(int.Parse(arrayTrans[2])))" id="" class="nominal" src="../../assets/image/Voucher/@AssetsPNG[2]">
+                                </div>
+                            }
+                            @if (stringMenu[3] == "0")
+                            {
+                                <div class="col">
+                                    <img @onclick="@(() => Nominal(int.Parse(arrayTrans[3])))" id="" class="nominal" src="../../assets/image/Voucher/@AssetsPNG[3]">
+                                </div>
+                            }
                         </div>
-                        <div class="col">
-                            <img @onclick="@(()=>Nominal(100000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_100.png">
+                    }
+                    @if (stringMenu[4] == "0")
+                    {
+                        <div class="row" style="margin-left: 10px;">
+                            @if (stringMenu[4] == "0")
+                            {
+                                <div class="col">
+                                    <img @onclick="@(() => Nominal(int.Parse(arrayTrans[4])))" id="" class="nominal" src="../../assets/image/Voucher/@AssetsPNG[4]">
+                                </div>
+                            }
+                            @if (stringMenu[5] == "0")
+                            {
+                                <div class="col">
+                                    <img @onclick="@(() => Nominal(int.Parse(arrayTrans[5])))" id="" class="nominal" src="../../assets/image/Voucher/@AssetsPNG[5]">
+                                </div>
+                            }
                         </div>
-                    </div>
-                    <div class="row" style="margin-left: 10px;">
-                        <div class="col">
-                            <img @onclick="@(()=>Nominal(150000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_150.png">
+                    }
+                    @if (stringMenu[6] == "0")
+                    {
+                        <div class="row" style="margin-left: 10px;">
+                            @if (stringMenu[6] == "0")
+                            {
+                                <div class="col">
+                                    <img @onclick="@(() => Nominal(int.Parse(arrayTrans[6])))" id="" class="nominal" src="../../assets/image/Voucher/@AssetsPNG[6]">
+                                </div>
+                            }
+                            @if (stringMenu[7] == "0")
+                            {
+                                <div class="col">
+                                    <img @onclick="@(() => Nominal(int.Parse(arrayTrans[7])))" id="" class="nominal" src="../../assets/image/Voucher/@AssetsPNG[7]">
+                                </div>
+                            }
                         </div>
-                        <div class="col">
-                            <img @onclick="@(()=>Nominal(200000))" id="" class="nominal" src="../../assets/image/Voucher/Voucher_200.png">
-                        </div>
-                    </div>
+                    }
                 </div>
             </div>
         </div>
@@ -89,11 +155,30 @@
 
 @code
 {
+    private string[] hrefMenu = { "", "", "", "", "", "", "", "" };
+    private string[] AssetsPNG = { "", "", "", "", "", "", "", "" };
+    private string[] arrayTrans = { "", "", "", "", "", "", "", "" };
+    private string[] stringMenu = { "1", "1", "1", "1", "1", "1", "1", "1" };
+
+    protected override async Task OnInitializedAsync()
+    {
+        PopulatePulsa();
+    }
+
     private void Nominal(int intNominal)
     {
         cst.intTagihan = intNominal;
         trans.AddTrail("CHOOSE NOMINAL", cst.intTagihan.ToString(), "SUCCESS");
         NavMan.NavigateTo("/IP/3");
+    }
+    private async Task PopulatePulsa()
+    {
+        for (int i = 0; i < menu._menuPulsa.Count(); i++)
+        {
+            AssetsPNG[i] = menu._menuPulsa[i]._icon;
+            arrayTrans[i] = menu._menuPulsa[i]._labelNominal;
+            stringMenu[i] = "0";
+        }
     }
 
     private void NavigateTo(string strURL)

@@ -280,6 +280,8 @@
         private string password = string.Empty;
         private string isTextfield = "1";
 
+        private string[] StylePNG = { "margin-left: 10%;", "margin-left: 5%;", "margin-left: 10%; margin-top: 5%;", "margin-left: 5%; margin-top: 5%;" };
+
         private string authorizedLevel = string.Empty;
         private bool isAuthorized = false;
         private bool isLoading = false;
@@ -532,30 +534,30 @@
                 try
                 {
                     JObject jobjResult = JObject.Parse(strResult);
-                    if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                    if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                         OurUtility.Write_Log("== Login Berhasil", "step-action");
-                        foreach (var mm in jobjResult.SelectToken("menu"))
+                        foreach ((var mm, Int32 i) in jobjResult.SelectToken("menu").Select((mm, i) => (mm, i)))
                         {
-                            menu.AddMainMenu(mm.SelectToken("namaMenu").ToString(), mm.SelectToken("url").ToString(), mm.SelectToken("icon").ToString(), mm.SelectToken("menuCode").ToString());
+                            menu.AddMainMenu(mm.SelectToken("namaMenu").ToString(), mm.SelectToken("url").ToString(), mm.SelectToken("icon").ToString(), mm.SelectToken("menuCode").ToString(),StylePNG[i]);
                         }
                         NavigateTo("/main");
                         return;
                     }
                     else
                     {
-                        if ((string)jobjResult["transaction"]["errorCode"] != null)
+                        if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                         {
-                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                            trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
                         }
                         else
                         {
-                            string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                            string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
                             string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                             OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                            trans.errorCode = statusDescSub;
+                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                         }
                         OurUtility.Write_Log("== Login Gagal", "step-action");
                     }

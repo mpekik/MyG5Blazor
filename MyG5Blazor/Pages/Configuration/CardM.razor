@@ -197,19 +197,19 @@
                 JObject jobjResult = JObject.Parse(strResult);
 
                 //Check If statusCode == 00 (Success)
-                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                 }
 
                 //Check If statusCode == 01 (Error Page)
-                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
                     NavMan.NavigateTo("/errorlogin");
                 }
 
                 //Check If statusCode == 02 (Error Modal)
-                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                 {
 
                 }

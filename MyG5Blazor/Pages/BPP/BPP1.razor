@@ -95,7 +95,7 @@
 </footer>
 
 <!-- The Modal -->
-@if (IsVisible)
+@if (isVisible)
 {
     <div id="myModal" class="modal">
 
@@ -114,7 +114,7 @@
     </div>
 }
 
-@if (IsInvalid)
+@if (isVisible2)
 {
     <div id="myModal" class="modal">
 
@@ -123,7 +123,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="text-body">@((MarkupString)strMsgError)</p>
-                    <button class="btn btn-danger modal-button" @onclick="@(() => OkOnClick(false))">OK</button>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => isVisible2 = false)">OK</button>
                 </div>
             </div>
         </div>
@@ -142,10 +142,8 @@
 }
 @code{
     private string strNumber = string.Empty;
-    private bool IsVisible = false;
-    private bool IsVisible2 = false;
-    private bool IsInvalid = false;
-    private bool IsValid => !IsInvalid;
+    private bool isVisible = false;
+    private bool isVisible2 = false;
     private bool isLoading = false;
 
     public string _myURL = string.Empty;
@@ -167,13 +165,12 @@
         {
             if (strNumber.Length > 8 && strNumber.Length < 14)
             {
-                IsVisible = visiblestatus;
+                isVisible = visiblestatus;
             }
         }
         else
         {
-            IsVisible = visiblestatus;
-            IsInvalid = visiblestatus;
+            isVisible = visiblestatus;
         }
     }
 
@@ -202,14 +199,16 @@
     {
         trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-        IsVisible = false;
+        isVisible = false;
         isLoading = true;
 
-        menu.edc = "1";
-        menu.cash = "1";
+        //byte[] image = OurUtility.CaptureImage();
+        string imageBytesStr;
+        //if (image != null)
+        //    imageBytesStr = Convert.ToBase64String(image);
+        //else
+        imageBytesStr = "";
 
-        byte[] image = OurUtility.CaptureImage();
-        var imageBytesStr = Convert.ToBase64String(image);
         cst.PhoneNumber = "62" + strNumber.Substring(1);
 
         //Set HTTP Request Body
@@ -229,55 +228,76 @@
         {
             try
             {
+                //Parse HTTP Request Resul To JObject
                 JObject jobjResult = JObject.Parse(strResult);
-                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+
+                //Set transactionId
+                trans.SetTransaction((string)jobjResult["transaction"].SelectToken("transactionId"));
+
+                //Check If statusCode == 00 (Success)
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
-                    trans.SetTransaction((string)jobjResult["transaction"]["transactionId"]);
-                    cst.CostumerProfile((string)jobjResult["profile"]["type"], (string)jobjResult["profile"]["nama"], (string)jobjResult["profile"]["noHp"], (string)jobjResult["profile"]["idType"], (string)jobjResult["profile"]["idNumber"], (string)jobjResult["profile"]["accountId"]);
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+
+                    //Set Costumer Profile
+                    cst.CostumerProfile((string)jobjResult["profile"].SelectToken("type"), (string)jobjResult["profile"].SelectToken("nama"), (string)jobjResult["profile"].SelectToken("noHp"), (string)jobjResult["profile"].SelectToken("idType"), (string)jobjResult["profile"].SelectToken("idNumber"));
                     OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
-                    cst.intTagihan = OurUtility.ToInt32((string)jobjResult["tagihan"]);
+
+                    foreach ((var mm,Int32 i) in jobjResult.SelectToken("listPulsa").Select((mm,i)=>(mm,i)))
+                    {
+                        if (i % 2 == 0)
+                        {  menu.AddMenuPulsa((string)mm.SelectToken("nominal"),(string)mm.SelectToken("labelNominal"), (string)mm.SelectToken("icon"), "<div class=\"row\" style=\"margin - left: 10px; \">");
+                        }
+                        else
+                        {
+                            menu.AddMenuPulsa((string)mm.SelectToken("nominal"), (string)mm.SelectToken("labelNominal"), (string)mm.SelectToken("icon"), "</div>");
+                        }
+                    }
 
                     //Add Step To Audit Trail List
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "SUCCESS");
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "00");
 
-                    //trans.transID = "-";
-                    //cst.PhoneNumber = "62" + strNumber.Substring(1);
+                    //Navigate To Next Page
                     NavMan.NavigateTo(strURL);
                 }
-                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+
+                //Check If statusCode == 01 (Error Page)
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
-                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
+                        string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                         OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = statusDescSub;
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "FAILED");
-                    trans.status = "GAGAL";
+                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
+                    trans.status = "01";
                     await OurUtility.AuditTrail(trans, menu, cst);
 
                     NavMan.NavigateTo("/error");
                 }
-                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+
+                //Check If statusCode == 02 (Error Modal)
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                 {
-                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     isLoading = false;
-                    IsVisible = false;
-                    IsInvalid = true;
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "Tidak Memiliki Tagihan");
-                    trans.status = "GAGAL";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    isVisible = false;
+                    isVisible2 = true;
                 }
             }
             catch (Exception ex)
             {
+                trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
                 trans.errorCode = strResult;
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 NavMan.NavigateTo("/error");

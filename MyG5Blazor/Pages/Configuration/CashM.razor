@@ -398,9 +398,9 @@
                 JObject jobjResult = JObject.Parse(strResult);
 
                 //Check If statusCode == 00 (Success)
-                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     IsLoading = false;
                     isSuccess = true;
                     config.Write("BILL", Config.PARAM_BILL_BANK_STOK, "0");
@@ -408,24 +408,24 @@
                 }
 
                 //Check If statusCode == 01 (Error Page)
-                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
-                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     IsLoading = false;
                     NavMan.NavigateTo("/errorlogin");
                 }
 
                 //Check If statusCode == 02 (Error Modal)
-                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                 {
                     IsLoading = false;
                     isModal = true;
