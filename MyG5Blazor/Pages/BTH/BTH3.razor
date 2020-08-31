@@ -65,32 +65,33 @@
                     <div class="col-md-6">
                         @if (!IsLanjut)
                         {
-                            <div id="btn-lanjut" class="teks-nominal"> Tekan <b class="teks-bold">LANJUT</b> Untuk Melanjutkan
+                            <div id="btn-lanjut" class="teks-nominal">
+                                Tekan <b class="teks-bold">LANJUT</b> Untuk Melanjutkan
                                 <button class="btn btn-danger btn-right" @onclick="@(() => IsLanjut = true)" id="btn-ok" value="">Lanjut</button>
                             </div>
                         }
                         else
                         {
-                        <div class="teks-nominal">
-                            <table id="tabel">
-                                <tr>
-                                    <td>Nomor</td>
-                                    <td> &emsp;&emsp; : </td>
-                                    <td>&emsp;<span style="font-weight: bold;">@cst.PhoneNumber</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Nominal</td>
-                                    <td>&emsp;&emsp; : </td>
-                                    <td>&emsp;<span style="font-weight: bold;">Rp @cst.intTagihan.ToString("N0")</span></td>
-                                </tr>
-                                <tr>
-                                    <td>Metode Bayar</td>
-                                    <td>&emsp;&emsp; : </td>
-                                    <td>&emsp;<span style="font-weight: bold;">@cst.strMPembayaran</span></td>
-                                </tr>
-                            </table>
-                            <button class="btn btn-danger btn-right" @onclick="@(() => NavigateTo("/PB/4"))" id="btn-ok" value="">OK</button>
-                        </div>
+                            <div class="teks-nominal">
+                                <table id="tabel">
+                                    <tr>
+                                        <td>Nomor</td>
+                                        <td> &emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">@cst.PhoneNumber</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nominal</td>
+                                        <td>&emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">Rp @cst.intTagihan.ToString("N0")</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Metode Bayar</td>
+                                        <td>&emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">@cst.strMPembayaran</span></td>
+                                    </tr>
+                                </table>
+                                <button class="btn btn-danger btn-right" @onclick="@(() => NavigateTo("/PB/4"))" id="btn-ok" value="">OK</button>
+                            </div>
                         }
                     </div>
                 </div>
@@ -106,18 +107,30 @@
                 <span class="dot">4</span>
             </div>
             <div class="footer-side2">
-                
-                    <button @onclick="@(() => NavigateTo("/PB/2"))" class="btn-arrow btn" value="">Kembali</button>
-                
+
+                <button @onclick="@(() => NavigateTo("/PB/2"))" class="btn-arrow btn" value="">Kembali</button>
+
                 <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu<br>Utama</button>
                 <!-- <sup>Powered By </sup>Trilogi Persada -->
             </div>
         </footer>
+        @if (isLoading)
+        {
+            <div id="myModal" class="modal">
+                <div class="modal-blank">
+                    <img class="lds-spinner" src="../../assets/image/loader.gif">
+                    <p><br>Mohon tunggu</p>
+                    <p>proses sedang berlangsung...</p>
+                </div>
+            </div>
+        }
     </div>
 
 @code
 {
     private bool IsLanjut = false;
+    private bool translog = true;
+    private bool isLoading = false;
     private int intTotalTagihan = 0;
     private string strTotalTagihan => intTotalTagihan.ToString();
     protected override async Task OnInitializedAsync()
@@ -145,13 +158,18 @@
     }
     private async Task MainMenu()
     {
-        trans.AddTrail("GET BILL", "BACK TO MAIN MENU", "02");
-        trans.status = "02";
-        await OurUtility.AuditTrail(trans, menu, cst);
-        NavMan.NavigateTo("/main");
-    }
-        private void NavigateTo(string strURL)
+        if (translog)
         {
-            NavMan.NavigateTo(strURL);
+            translog = false;
+            isLoading = true;
+            trans.AddTrail("GET BILL", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavMan.NavigateTo("/main");
         }
+    }
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
 }

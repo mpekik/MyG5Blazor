@@ -487,8 +487,8 @@
                     cst.intTagihanTerbayar = Payout.total;
                     logamount = logamount + Payout.total;
                     logbank = logbank + Payout.uangCount;
-        config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
-        config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
+                    config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
+                    config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
                     if (!IsTunaiExit)
                     {
                         await Payment("");
@@ -595,20 +595,33 @@
                 }
         }
     }
+    private bool translog = true;
     private async Task TunaiExitFail()
     {
-        intAccBill = Payout.total;
-        cst.intTagihanTerbayar = Payout.total;
-        IsExit = false;
-        IsTunaiExit = true;
-        IsFail = true;
-        await Print();
-        trans.AddTrail("PAYMENT CASH", "Paid Ammount:"+intAccBill.ToString(), "02");
-        Payout.DisableValidator();
-        Payout.SSPComms.CloseComPort();
-        OurUtility.AuditTrail(trans, menu, cst);
-        Timer.SetTimer(20000);
-        Timer.OnElapsed += TimerElapsedHandler;
+        if (translog)
+        {
+            translog = false;
+            intAccBill = Payout.total;
+            cst.intTagihanTerbayar = Payout.total;
+            IsExit = false;
+            IsTunaiExit = true;
+            IsFail = true;
+            await Print();
+            trans.AddTrail("PAYMENT CASH", "Paid Ammount:" + intAccBill.ToString(), "02");
+            Payout.DisableValidator();
+            Payout.SSPComms.CloseComPort();
+            
+            logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
+            logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+            logamount = logamount + Payout.total;
+            logbank = logbank + Payout.uangCount;
+            config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
+            config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
+
+            OurUtility.AuditTrail(trans, menu, cst);
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
+        }
     }
     private async Task CountMoneyBillAcceptor()
     {

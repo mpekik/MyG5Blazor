@@ -93,6 +93,8 @@
     private string errorcode = string.Empty;
     private string strMsgError = string.Empty;
     private int intTotalTagihan = 0;
+    private bool translog = true;
+
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -106,10 +108,15 @@
     }
     private async Task MainMenu()
     {
-        trans.AddTrail("PAYMENT METHOD", "BACK TO MAIN MENU", "02");
-        trans.status = "02";
-        await OurUtility.AuditTrail(trans, menu, cst);
-        NavMan.NavigateTo("/main");
+        if (translog)
+        {
+            translog = false;
+            isLoading = true;
+            trans.AddTrail("PAYMENT METHOD", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavMan.NavigateTo("/main");
+        }
     }
     private void NavigateTo(string strURL)
     {

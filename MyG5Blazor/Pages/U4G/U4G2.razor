@@ -11,109 +11,119 @@
 @inject Menu menu 
 @using MyG5Blazor.Data
 
-<div class="main-panel bg-home">
-    <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-        <div class="container-fluid">
-            <div class="navbar-wrapper">
-                <div class="logo">
-                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
-                </div>
-                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
-            </div>
-
-            <form class="col-md-6">
-                <div class="input-group no-border">
-                    <div class="checklist">
-                        @if (IsLoading)
-                        {
-                            <img src="../../assets/image/loader.gif" />
-                        }
-                        else if (IsSuccess)
-                        {
-                            <img src="../../assets/image/tanda_checklist.png" />
-                        }
+    <div class="main-panel bg-home">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+                <div class="navbar-wrapper">
+                    <div class="logo">
+                        <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
                     </div>
+                    <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
                 </div>
-            </form>
-        </div>
-    </nav>
-    <!-- End Navbar -->
 
-    <div class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="teks-title">Upgrade dan Ganti Kartu 4G</div>
-
-                    @if (!IsSuccess)
-                    {
-                        <div id="proses-pindai">
-                            <div class="teks-center"> Letakkan <span style="font-weight: bold;">e-KTP</span> Anda pada Alat Pemindai</div>
-                            <div class="teks-footer"> Lalu tekan <span style="font-weight: bold;">"Pindai"</span></div>
+                <form class="col-md-6">
+                    <div class="input-group no-border">
+                        <div class="checklist">
+                            @if (IsLoading)
+                            {
+                                <img src="../../assets/image/loader.gif" />
+                            }
+                            else if (IsSuccess)
+                            {
+                                <img src="../../assets/image/tanda_checklist.png" />
+                            }
                         </div>
-                    }
-                    else
-                    {
-                        <div id="proses-berhasil">
-                            <div class="teks-center"> Proses Pindai e-Ktp Berhasil</div>
-                        </div>
-                    }
-                </div>
-
-                <div class="col-md-6">
-                    <img class="ktp" src="../../assets/image/Scan_KTP-01.png">
-                    @if (!IsSuccess)
-                    {
-                        <a id="myBtn" href="" @onclick="CheckEKTP" @onclick:preventDefault>
-                            <img class="pindai" src="../../assets/image/Pindai.png">
-                        </a>
-                    }
-                </div>
+                    </div>
+                </form>
             </div>
-        </div>
-    </div>
+        </nav>
+        <!-- End Navbar -->
 
-    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
-    <footer>
-        <div class="footer-side1">
-            <span class="dot">1</span>
-            <span class="dot" id="dot-active">2</span>
-            <span class="dot">3</span>
-            <span class="dot">4</span>
-        </div>
-        <div class="footer-side2">
-            <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
-            <!-- <sup>Powered By </sup>Trilogi Persada -->
-        </div>
-    </footer>
-    @if (IsVisible)
-    {
-        <div id="myModal" class="modal">
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="teks-title">Upgrade dan Ganti Kartu 4G</div>
 
-            <!-- Modal content -->
-            <div class="modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        @if (intTryCount <= intTryLimit)
+                        @if (!IsSuccess)
                         {
-                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> yang digunakan tidak sesuai dengan nomor yang terdaftar pada sistem MyGraPARI. Silahkan gunakan<span style="font-weight: bold;"> e-KTP </span>yang sesuai.</p>
-                            <button class="btn btn-danger modal-button" @onclick="CheckEKTP">OK</button>
+                            <div id="proses-pindai">
+                                <div class="teks-center"> Letakkan <span style="font-weight: bold;">e-KTP</span> Anda pada Alat Pemindai</div>
+                                <div class="teks-footer"> Lalu tekan <span style="font-weight: bold;">"Pindai"</span></div>
+                            </div>
                         }
                         else
                         {
-                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
-                            <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
+                            <div id="proses-berhasil">
+                                <div class="teks-center"> Proses Pindai e-Ktp Berhasil</div>
+                            </div>
                         }
-                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+
+                    <div class="col-md-6">
+                        <img class="ktp" src="../../assets/image/Scan_KTP-01.png">
+                        @if (!IsSuccess)
+                        {
+                            <a id="myBtn" href="" @onclick="CheckEKTP" @onclick:preventDefault>
+                                <img class="pindai" src="../../assets/image/Pindai.png">
+                            </a>
+                        }
                     </div>
                 </div>
             </div>
-
         </div>
-    }
-</div>
+
+        <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+        <footer>
+            <div class="footer-side1">
+                <span class="dot">1</span>
+                <span class="dot" id="dot-active">2</span>
+                <span class="dot">3</span>
+                <span class="dot">4</span>
+            </div>
+            <div class="footer-side2">
+                <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
+                <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
+                <!-- <sup>Powered By </sup>Trilogi Persada -->
+            </div>
+        </footer>
+        @if (IsVisible)
+        {
+            <div id="myModal" class="modal">
+
+                <!-- Modal content -->
+                <div class="modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            @if (intTryCount <= intTryLimit)
+                            {
+                                <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> yang digunakan tidak sesuai dengan nomor yang terdaftar pada sistem MyGraPARI. Silahkan gunakan<span style="font-weight: bold;"> e-KTP </span>yang sesuai.</p>
+                                <button class="btn btn-danger modal-button" @onclick="CheckEKTP">OK</button>
+                            }
+                            else
+                            {
+                                <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
+                                <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
+                            }
+                            <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
+        @if (isLoading2)
+        {
+            <div id="myModal" class="modal">
+                <div class="modal-blank">
+                    <img class="lds-spinner" src="../../assets/image/loader.gif">
+                    <p><br>Mohon tunggu</p>
+                    <p>proses sedang berlangsung...</p>
+                </div>
+            </div>
+        }
+    </div>
 
 @code{
     private bool IsVisible = false;
@@ -121,6 +131,7 @@
     private bool IsSuccess = false;
     private bool IsFail = false;
     private bool IsNext = false;
+    private bool isLoading2 = false;
 
     public string _myURL = "";
     public string saveURL = "log/v1/save";
@@ -129,33 +140,49 @@
     private int intTryLimit = 3;
 
     private IntPtr hContext = IntPtr.Zero;
-
+    private bool translog = true;
     byte[] pbPcid;
 
     byte[] pbConf;
 
     private async Task MenuUtama()
     {
-        trans.status = "01";
-        trans.errorCode = "EKTP";
-        await OurUtility.AuditTrail(trans,menu,cst);
-        NavigateTo("/main");
+        if (translog)
+        {
+            translog = false;
+            IsVisible = false;
+            isLoading2 = true;
+            trans.status = "01";
+            trans.errorCode = "EKTP";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavigateTo("/main");
+        }
     }
     private async Task MenuUtamaCanceled()
     {
-        trans.AddTrail("SCAN EKTP", "CANCELED", "02");
-        trans.status = "02";
-        trans.errorCode = "EKTP";
-        await OurUtility.AuditTrail(trans, menu, cst);
-        NavigateTo("/main");
+        if (translog)
+        {
+            translog = false;
+            IsVisible = false;
+            isLoading2 = true; 
+            trans.AddTrail("SCAN EKTP", "CANCELED", "02");
+            trans.status = "02";
+            trans.errorCode = "EKTP";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavigateTo("/main");
+        }
     }
     private async Task Back()
     {
-        trans.AddTrail("SCAN EKTP", "CANCELED", "02");
-        trans.status = "02";
-        trans.errorCode = "EKTP";
-        await OurUtility.AuditTrail(trans,menu,cst);
-        NavigateTo("/UP/1");
+        if (translog)
+        {
+            translog = false;
+            trans.AddTrail("SCAN EKTP", "CANCELED", "02");
+            trans.status = "02";
+            trans.errorCode = "EKTP";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavigateTo("/UP/1");
+        }
     }
     private void NavigateTo(string strURL)
     {
