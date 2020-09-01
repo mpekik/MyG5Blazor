@@ -331,7 +331,7 @@
     <div id="myModal" class="modal">
         <div class="modal-blank">
             <img class="lds-spinner" onclick="buttonLoad()" src="../../assets/image/loader.gif" id="myBtn2">
-            <p><br>Proses pembayaran tagihan kartuHalo</p>
+            <p><br>Proses pembelian pulsa prabayar</p>
             <p>sedang berjalan, mohon tunggu beberapa</p>
             <p>saat...</p>
         </div>
@@ -368,7 +368,7 @@
     private int intMinus = 0;
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
-    public string serviceURL = "bayar-halo/v1/payment";
+    public string serviceURL = "isi-pulsa/v1/payment";
     private static string cesURL = "ces/v1/eligibility-check";
 
     private string qu1IndText = string.Empty;
@@ -426,7 +426,7 @@
                             await Print();
                             await CheckNPS("");
                             trans.status = "00";
-                            trans.errorCode = "PEMBAYARAN TAGIHAN VIA DEBIT BERHASIL";
+                            trans.errorCode = "PEMBELIAN PULSA VIA DEBIT BERHASIL";
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -502,7 +502,7 @@
                             await Print();
                             await CheckNPS("");
                             trans.status = "00";
-                            trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
+                            trans.errorCode = "PEMBELIAN PULSA VIA CASH BERHASIL";
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -549,7 +549,7 @@
                             await Print();
                             await CheckNPS("");
                             trans.status = "00";
-                            trans.errorCode = "PEMBAYARAN TAGIHAN VIA CC BERHASIL";
+                            trans.errorCode = "PEMBELIAN PULSA VIA CC BERHASIL";
                             await OurUtility.AuditTrail(trans, menu, cst);
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -650,12 +650,13 @@
     {
         IsLoading = true;
         string myJson = string.Empty;
-        string apiURL = "transaction/void";
+        string apiURL = "transaction/v1/void";
 
         myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
             "\"terminalId\" : \"" + trans.termID + "\"," +
                                 "\"ecr\" : \"" + trans.ecr + "\"," +
-                                "\"sn\" : \"" + config.snEdc + "\"}" +
+                                "\"sn\" : \"" + config.snEdc + "\"," +
+                                "\"moduleName\" : \"" + trans.jenisTrans + "\"" +
                                 "}";
 
         string myURL = _myURL + apiURL;

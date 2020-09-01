@@ -109,6 +109,8 @@
         if (!IsMethod)
         {
             cst.intMPembayaran = _intMPembayaran;
+            trans.intPayment = _intMPembayaran;
+            trans.AddTrail("PAYMENT METHOD", cst.strMPembayaran, "00");
             IsMethod = true;
         }
     }
