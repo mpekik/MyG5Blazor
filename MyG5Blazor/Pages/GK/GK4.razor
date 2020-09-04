@@ -247,10 +247,9 @@
         strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        try
-        {
-            cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
-        }catch(Exception ex)
+        cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
+        
+        if(cardStock==null)
         {
             trans.AddTrail("GET STOCK", "", "01");
             trans.status = "01";

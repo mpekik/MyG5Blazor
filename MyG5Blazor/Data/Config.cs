@@ -138,7 +138,9 @@ namespace MyG5Blazor.Data
             {
                 result = iniData[p_section][p_name];
             }
-            catch { }
+            catch {
+                result = null;
+            }
 
             return result;
         }
