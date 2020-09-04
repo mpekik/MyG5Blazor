@@ -247,6 +247,18 @@
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
+        if (cardStock == "")
+        {
+            isFail = true;
+            trans.AddTrail("GET STOCK", "", "01");
+            trans.status = "01";
+            trans.errorCode = "CARD DISPENSER";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            trans.errorCode = "CD - 003";
+            OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
+            NavigateTo("/error");
+            return;
+        }
         stock = Int32.Parse(cardStock);
         Switcher.DOWN("500",config.usbEKTP);
         OurUtility.Write_Log("== Step 4. Perso Page", "step-action");

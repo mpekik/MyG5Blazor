@@ -248,9 +248,10 @@
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
-        
-        if(cardStock==null)
+
+        if(cardStock=="")
         {
+            isFail = true;
             trans.AddTrail("GET STOCK", "", "01");
             trans.status = "01";
             trans.errorCode = "CARD DISPENSER";
