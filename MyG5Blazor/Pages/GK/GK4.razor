@@ -488,7 +488,14 @@
                 }
             }else
             {
-
+                trans.AddTrail("GET STOCK", "", "01");
+                trans.status = "01";
+                trans.errorCode = "KARTU HABIS";
+                await OurUtility.AuditTrail(trans, menu, cst);
+                OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
+                trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
+                NavigateTo("/error");
+                break;
             }
         }
     }

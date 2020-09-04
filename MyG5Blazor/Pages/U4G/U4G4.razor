@@ -300,99 +300,123 @@
     {
         while (intTryCount <= intTryLimit)
         {
-            if (await Task.Run(() => MoveToICC()))
+            if (stock > 0)
             {
-
-                if (!cds.Start(ref errorcode, strCOM, ref msg))
+                if (await Task.Run(() => MoveToICC()))
                 {
-                    OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
-                    return;
-                }
-                //ToDO if Reader error
-                if (await CardReaderScan())
-                {
-                    trans.AddTrail("GET SN", p_icc_id, "00");
-                    string myURL = _myURL + persoURL;
 
-                    string secret_key = OurUtility.RandomString(10);
-                    long unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                    string md5Input = trans.termID + secret_key + menu.tokenId + unix_timestamp.ToString();
-                    string signatureKey = OurUtility.CreateMD5(md5Input);
-
-                    //ToDO add if trans.transID != null
-                    string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                                "\"terminalId\" : \"" + trans.termID + "\"," +
-                                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
-                                "\"nik\" : \"" + cst.EKTPNumber + "\"," +
-                                "\"buid\" : \"" + config.apiBuid + "\"," +
-                                "\"serialNumber\" : \"" + p_icc_id + "\"" +
-                                "}";
-
-                    OurUtility.Write_Log("=== URL : " + myURL, "step-action");
-                    OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
-                    string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-                    OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                    if (strResult != null)
+                    if (!cds.Start(ref errorcode, strCOM, ref msg))
                     {
-                        try
-                        {
-                            JObject jobjResult = JObject.Parse(strResult);
-                            trans.transID = (string)jobjResult["transaction"]["transactionId"];
-                            if ((string)jobjResult["transaction"]["statusCode"] == "00")
-                            {
-                                strPanjang = (string)jobjResult["perso"]["message"];
-                                if (strPanjang != null)
-                                {
-                                    trans.persoID = (string)jobjResult["perso"]["persoId"];
-                                    trans.AddTrail("GET STRING PANJANG", trans.persoID, "SUCCESS");
-                                    if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
-                                    {
-                                        myURL = _myURL + updateURL;
-                                        trans.AddTrail("PERSO", trans.persoID, "00");
+                        OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
+                        return;
+                    }
+                    //ToDO if Reader error
+                    if (await CardReaderScan())
+                    {
+                        trans.AddTrail("GET SN", p_icc_id, "00");
+                        string myURL = _myURL + persoURL;
 
-                                        secret_key = OurUtility.RandomString(10);
-                                        unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                                        md5Input = trans.termID + secret_key + menu.tokenId + unix_timestamp.ToString();
-                                        signatureKey = OurUtility.CreateMD5(md5Input);
+                        string secret_key = OurUtility.RandomString(10);
+                        long unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                        string md5Input = trans.termID + secret_key + menu.tokenId + unix_timestamp.ToString();
+                        string signatureKey = OurUtility.CreateMD5(md5Input);
 
-                                        myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                        //ToDO add if trans.transID != null
+                        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                     "\"terminalId\" : \"" + trans.termID + "\"," +
-                                    "\"persoId\" : \"" + trans.persoID + "\" ," +
-                                    "\"persoStatus\" : \"2\""+
+                                    "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                                    "\"nik\" : \"" + cst.EKTPNumber + "\"," +
+                                    "\"buid\" : \"" + config.apiBuid + "\"," +
+                                    "\"serialNumber\" : \"" + p_icc_id + "\"" +
                                     "}";
-                                        OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
-                                        strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-                                        OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                                        trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "00");
-                                        isLoading = false;
-                                        isSuccess = true;
-                                        await Task.Run(() => MoveToTheFront());
-                                        break;
+
+                        OurUtility.Write_Log("=== URL : " + myURL, "step-action");
+                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+                        OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                        if (strResult != null)
+                        {
+                            try
+                            {
+                                JObject jobjResult = JObject.Parse(strResult);
+                                trans.transID = (string)jobjResult["transaction"].SelectToken("transactionId");
+                                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                                {
+                                    strPanjang = (string)jobjResult["perso"].SelectToken("message");
+                                    if (strPanjang != null)
+                                    {
+                                        trans.persoID = (string)jobjResult["perso"].SelectToken("persoId");
+                                        trans.AddTrail("GET STRING PANJANG", trans.persoID, "SUCCESS");
+                                        if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+                                        {
+                                            myURL = _myURL + updateURL;
+                                            trans.AddTrail("PERSO", trans.persoID, "00");
+
+                                            secret_key = OurUtility.RandomString(10);
+                                            unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                                            md5Input = trans.termID + secret_key + menu.tokenId + unix_timestamp.ToString();
+                                            signatureKey = OurUtility.CreateMD5(md5Input);
+
+                                            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                        "\"terminalId\" : \"" + trans.termID + "\"," +
+                                        "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                        "\"persoStatus\" : \"2\"" +
+                                        "}";
+                                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                            trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "00");
+                                            isLoading = false;
+                                            isSuccess = true;
+                                            if (!await Task.Run(() => MoveToTheFront()))
+                                            {
+                                                trans.AddTrail("MOVE TO FRONT", "", "01");
+                                                trans.status = "01";
+                                                trans.errorCode = "CARD DISPENSER";
+                                                await OurUtility.AuditTrail(trans, menu, cst);
+                                                OurUtility.Write_Log("=== Card Dispenser Error", "step-action");
+                                                trans.errorCode = "CD - 002";
+                                                NavigateTo("/error");
+                                            }
+                                            break;
+                                        }
+                                        else
+                                        {
+                                            trans.AddTrail("PERSO", trans.persoID, "01");
+                                            trans.mypersoResponse = msg;
+                                            await Task.Run(() => MoveToBin());
+
+                                            myURL = _myURL + updateURL;
+
+                                            secret_key = OurUtility.RandomString(10);
+                                            unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                                            md5Input = trans.termID + secret_key + menu.tokenId + unix_timestamp.ToString();
+                                            signatureKey = OurUtility.CreateMD5(md5Input);
+
+                                            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                            "\"terminalId\" : \"" + trans.termID + "\"," +
+                                            "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                            "\"persoStatus\" : \"3\"" +
+                                            "}";
+                                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+                                            trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "00");
+                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                            if (intTryCount < intTryLimit)
+                                                intTryCount += 1;
+                                            else
+                                            {
+                                                isFail = true;
+                                                return;
+                                            }
+                                        }
                                     }
                                     else
                                     {
-                                        trans.AddTrail("PERSO", trans.persoID, "01");
-                                        trans.mypersoResponse = msg;
+                                        trans.AddTrail("GET STRING PANJANG", "", "01");
                                         await Task.Run(() => MoveToBin());
-
-                                        myURL = _myURL + updateURL;
-
-                                        secret_key = OurUtility.RandomString(10);
-                                        unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                                        md5Input = trans.termID + secret_key + menu.tokenId + unix_timestamp.ToString();
-                                        signatureKey = OurUtility.CreateMD5(md5Input);
-
-                                        myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                                        "\"terminalId\" : \"" + trans.termID + "\"," +
-                                        "\"persoId\" : \"" + trans.persoID + "\" ," +
-                                        "\"persoStatus\" : \"3\""+
-                                        "}";
-                                        OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
-                                        strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-                                        trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "00");
-                                        OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                         if (intTryCount < intTryLimit)
                                             intTryCount += 1;
                                         else
@@ -401,9 +425,20 @@
                                             return;
                                         }
                                     }
+
                                 }
-                                else
+                                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                                 {
+                                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                                    {
+                                        OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                                    }
+                                    else
+                                    {
+                                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                                    }
                                     trans.AddTrail("GET STRING PANJANG", "", "01");
                                     await Task.Run(() => MoveToBin());
                                     if (intTryCount < intTryLimit)
@@ -414,42 +449,27 @@
                                         return;
                                     }
                                 }
-
-                            }
-                            else if ((string)jobjResult["transaction"]["statusCode"] == "01")
-                            {
-                                if ((string)jobjResult["transaction"]["errorCode"] != null)
+                                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                                 {
-                                    OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                                    trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
-                                }
-                                else
-                                {
-                                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
-                                    trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
-                                }
-                                trans.AddTrail("GET STRING PANJANG", "", "01");
-                                await Task.Run(() => MoveToBin());
-                                if (intTryCount < intTryLimit)
-                                    intTryCount += 1;
-                                else
-                                {
+                                    trans.AddTrail("GET STRING PANJANG", "", "01");
+                                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                                    isLoading = false;
+                                    //IsVisible = false;
+                                    IsInvalid = true;
                                     isFail = true;
                                     return;
                                 }
                             }
-                            else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                            catch (Exception ex)
                             {
-                                trans.AddTrail("GET STRING PANJANG", "", "01");
-                                strMsgError = (string)jobjResult["transaction"]["statusDesc"];
-                                isLoading = false;
-                                //IsVisible = false;
-                                IsInvalid = true;
-                                isFail = true;
+                                trans.AddTrail("PERSO", trans.persoID, "01");
+                                OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
+                                trans.errorCode = strResult;
+                                isError = true;
                                 return;
                             }
                         }
-                        catch (Exception ex)
+                        else
                         {
                             trans.AddTrail("PERSO", trans.persoID, "01");
                             OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
@@ -460,33 +480,36 @@
                     }
                     else
                     {
-                        trans.AddTrail("PERSO", trans.persoID, "01");
-                        OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
-                        trans.errorCode = strResult;
-                        isError = true;
-                        return;
+                        trans.AddTrail("GET SN", "", "01");
+                        await Task.Run(() => MoveToBin());
+                        if (intTryCount < intTryLimit)
+                            intTryCount += 1;
+                        else
+                        {
+                            trans.errorCode = "FAILED GET SN";
+                            isFail = true;
+                            return;
+                        }
                     }
                 }
                 else
                 {
                     trans.AddTrail("GET SN", "", "01");
-                    await Task.Run(() => MoveToBin());
-                    if (intTryCount < intTryLimit)
-                        intTryCount += 1;
-                    else
-                    {
-                        trans.errorCode = "FAILED GET SN";
-                        isFail = true;
-                        return;
-                    }
+                    trans.status = "01";
+                    trans.errorCode = "CARD DISPENSER";
+                    await OurUtility.AuditTrail(trans, menu, cst);
+                    OurUtility.Write_Log("=== Card Dispenser Error", "step-action");
+                    trans.errorCode = "CD - 001";
+                    NavigateTo("/error");
+                    break;
                 }
             }
             else
             {
-                trans.AddTrail("GET SN", "", "01");
+                trans.AddTrail("GET STOCK", "", "01");
                 trans.status = "01";
                 trans.errorCode = "KARTU HABIS";
-                await OurUtility.AuditTrail(trans,menu,cst);
+                await OurUtility.AuditTrail(trans, menu, cst);
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
                 NavigateTo("/error");
@@ -553,9 +576,9 @@
             try
             {
                 JObject jobjResult = JObject.Parse(strResult);
-                if ((string)jobjResult["transaction"]["statusCode"] == "00")
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     foreach (var question in jobjResult.SelectToken("surveys"))
                     {
                         CES c = new CES();
@@ -568,26 +591,26 @@
                     isVisible = true;
                     return;
                 }
-                else if ((string)jobjResult["transaction"]["statusCode"] == "01")
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
-                    if ((string)jobjResult["transaction"]["errorCode"] != null)
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"]["statusDesc"];
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     }
                     else
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     //                    IsLoading = false;
                     //                  isVisible = false;
                     //                IsInvalid = true;
                     //NavMan.NavigateTo("/error");
                 }
-                else if ((string)jobjResult["transaction"]["statusCode"] == "02")
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                 {
-                    strMsgError = (string)jobjResult["transaction"]["statusDesc"];
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     isVisible = false;
                     IsInvalid = true;
                 }
@@ -631,7 +654,7 @@
         return true;
     }
 
-    private void MoveToTheFront()
+    private bool MoveToTheFront()
     {
         OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
@@ -640,17 +663,17 @@
         if (!cds.Start(ref errorcode, strCOM, ref msg))
         {
             OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
-            return;
+            return false;
         }
         OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
         OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
         if (!cds.MoveTo_The_Front(ref errorcode, ref msg))
         {
-            trans.AddTrail("MOVE TO FRONT", "", "01");
             OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed", "step-action");
-            return;
+            return false;
         }
+
         trans.AddTrail("MOVE TO FRONT", "", "00");
         stock = stock - 1;
         trans.jumlah_kartu = stock;
@@ -658,9 +681,10 @@
 
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
+        return true;
     }
 
-    private void MoveToBin()
+    private bool MoveToBin()
     {
         OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
@@ -669,18 +693,25 @@
         if (!cds.Start(ref errorcode, strCOM, ref msg))
         {
             OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
-            return;
+            return false;
         }
         OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
         OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
-        cds.MoveTo_Bin(ref errorcode, ref msg);
+        if (!cds.MoveTo_Bin(ref errorcode, ref msg))
+        {
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin, Failed " + errorcode + " message : " + msg, "step-action");
+            return false;
+        }
+
+        trans.AddTrail("MOVE TO BIN", "", "00");
         stock = stock - 1;
         trans.jumlah_kartu = stock;
         config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
 
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
+        return true;
     }
 
     private async Task<bool> CardReaderScan()
@@ -704,7 +735,7 @@
 
         PrintContent prtContent = new PrintContent();
         string msg = string.Empty;
-        string logoTsel = "C:\\MyGApps\\wwwroot\\assets\\image\\Logo\\Logo_MyGraPARI_mini.png";
+        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
         string content = prtContent.U4G(trans, cst, config);
         string header = prtContent.HeaderU4G(trans, cst, config);
