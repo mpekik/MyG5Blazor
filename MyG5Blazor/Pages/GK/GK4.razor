@@ -252,7 +252,13 @@
             cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
         }catch(Exception ex)
         {
+            trans.AddTrail("GET STOCK", "", "01");
+            trans.status = "01";
+            trans.errorCode = "CARD DISPENSER";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            trans.errorCode = "CD - 003";
             OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
+            NavigateTo("/error");
             return;
         }
         stock = Int32.Parse(cardStock);
@@ -565,9 +571,7 @@
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
-                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                 }
