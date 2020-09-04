@@ -173,7 +173,7 @@
             IsVisible = false;
             isLoading2 = true;
             trans.status = "01";
-            trans.errorCode = "FINGER PRINT";
+            trans.errorCode = "FINGERPRINT";
             await OurUtility.AuditTrail(trans, menu, cst);
             NavigateTo("/main");
         }
@@ -185,9 +185,9 @@
             translog = false;
             IsVisible = false;
             isLoading2 = true;
-            trans.AddTrail("SCAN FINGER PRINT", "CANCELED", "02");
+            trans.AddTrail("SCAN FINGERPRINT", "CANCELED", "02");
             trans.status = "02";
-            trans.errorCode = "FINGER PRINT";
+            trans.errorCode = "FINGERPRINT";
             await OurUtility.AuditTrail(trans, menu, cst);
             NavigateTo("/main");
         }
@@ -218,7 +218,7 @@
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
-        OurUtility.Write_Log("=== Step 3. Finger Print Scan Page", "step-action");
+        OurUtility.Write_Log("=== Step 3. FingerPrint Scan Page", "step-action");
         await FingerPrintScan();
     }
 
@@ -226,7 +226,7 @@
     {
         //ektp.InitializeEktp();
         IsLoading = true;
-        OurUtility.Write_Log("==== Scan Finger Print", "step-action");
+        OurUtility.Write_Log("==== Scan FingerPrint", "step-action");
         OurUtility.Write_Log("===== 1. Ektp_Sdk.EktpConnect, Connect Reader", "step-action");
         await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
 
@@ -309,7 +309,7 @@
                             trans.AddTrail("FINGERPRINT", "MATCH", "00");
                             OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                             cst.EKTPNumber = ktp.Id;
-                            OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+                            //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
                             IsLoading = false;
                             IsSuccess = true;
 
@@ -349,7 +349,7 @@
     {
         OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
         cst.EKTPNumber = ktp.Id;
-        OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+        //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
         NavMan.NavigateTo("/GK/4");
     }
     [Microsoft.AspNetCore.Components.Inject]

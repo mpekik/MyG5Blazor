@@ -31,7 +31,8 @@
                         </div>
                         <div class="navbar-form">
                             <div class="input-group no-border">
-                                <button @onclick="@(() => NavigateTo("/iptest"))" class="btn btn-white btn-round btn-just-icon" style="font-size: 15px; margin-top: -40px;">IP</button>   
+                                <button @onclick="@Restart" class="btn btn-white btn-round btn-just-icon" style="font-size: 15px; margin-top: -40px;">R</button>
+                                <button @onclick="@(() => NavigateTo("/iptest"))" class="btn btn-white btn-round btn-just-icon" style="font-size: 15px; margin-top: -40px;">IP</button>
                             </div>
                         </div>
                     </div>
@@ -288,6 +289,7 @@
         private bool isNotAuthorized = false;
         private bool isNumeric = false;
         private bool isUpper = false;
+        private bool isRestart = true;
 
         private string _myURL = string.Empty;
 
@@ -357,14 +359,16 @@
             menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
             _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
             menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
-
-
             //OurUtility.Write_Log(_myURL, "step-action");
         }
         [Microsoft.AspNetCore.Components.Inject]
 
         protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
-
+        private async Task Restart()
+        {
+            isRestart = true;
+            System.Diagnostics.Process.Start("shutdown.exe", "-r -f -t 0");
+        }
         protected override void OnAfterRender(bool bFirstRender)
         {
             if (bFirstRender)
@@ -554,9 +558,7 @@
                         }
                         else
                         {
-                            string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
-                            string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                            OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                             trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                         }
                         OurUtility.Write_Log("== Login Gagal", "step-action");
