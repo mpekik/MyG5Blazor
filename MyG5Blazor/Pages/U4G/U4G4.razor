@@ -413,18 +413,8 @@
                                 }
                                 else
                                 {
-                                    string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
-                                    if (_statusDescSub != null)
-                                    {
-                                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                                        OurUtility.Write_Log("=== Status Code : " + statusDescSub + " {Error}", "step-action");
-                                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
-                                    }
-                                    else
-                                    {
-                                        OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
-                                        trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
-                                    }
+                                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Error}", "step-action");
+                                    trans.errorCode = (string)jobjResult["transaction"]["statusCode"];
                                 }
                                 trans.AddTrail("GET STRING PANJANG", "", "01");
                                 await Task.Run(() => MoveToBin());

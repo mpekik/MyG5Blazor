@@ -31,7 +31,8 @@
                         </div>
                         <div class="navbar-form">
                             <div class="input-group no-border">
-                                <button @onclick="@Restart" class="btn btn-white btn-round btn-just-icon" style="font-size: 15px; margin-top: -40px;">R</button>
+                                <button @onclick="@Restart" class="btn btn-white btn-round btn-just-icon" style="font-size: 15px; margin-top: -40px; margin-right:5px;">R</button>
+                                <button @onclick="@Shutdown" class="btn btn-white btn-round btn-just-icon" style="font-size: 15px; margin-top: -40px; margin-right:5px;">S</button>
                                 <button @onclick="@(() => NavigateTo("/iptest"))" class="btn btn-white btn-round btn-just-icon" style="font-size: 15px; margin-top: -40px;">IP</button>
                             </div>
                         </div>
@@ -368,6 +369,11 @@
         {
             isRestart = true;
             System.Diagnostics.Process.Start("shutdown.exe", "-r -f -t 0");
+        }
+        private async Task Shutdown()
+        {
+            isRestart = true;
+            System.Diagnostics.Process.Start("shutdown.exe", "-f -t 0");
         }
         protected override void OnAfterRender(bool bFirstRender)
         {
