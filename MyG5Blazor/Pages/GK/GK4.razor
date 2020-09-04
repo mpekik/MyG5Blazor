@@ -302,7 +302,7 @@
     {
         while (intTryCount <= intTryLimit)
         {
-            if (stock <= 0)
+            if (stock > 0)
             {
                 if (await Task.Run(() => MoveToICC()))
                 {
