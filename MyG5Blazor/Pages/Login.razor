@@ -373,7 +373,7 @@
         private async Task Shutdown()
         {
             isRestart = true;
-            System.Diagnostics.Process.Start("shutdown.exe", "-f -t 0");
+            System.Diagnostics.Process.Start("shutdown.exe", "-s -f -t 0");
         }
         protected override void OnAfterRender(bool bFirstRender)
         {
