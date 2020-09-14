@@ -150,7 +150,7 @@ namespace MyG5Blazor.Data
             m_cmd.CommandData[0] = CCommands.SSP_CMD_ENABLE;
             m_cmd.CommandDataLength = 1;
             if (!SendCommand()) return;
-            if (CheckGenericResponses()) ;
+            if (CheckGenericResponses());
         }
 
         public void DisableValidator()

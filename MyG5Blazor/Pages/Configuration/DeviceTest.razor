@@ -76,22 +76,6 @@
 </footer>
 
 <!-- The Modal -->
-@if (IsVisible)
-{
-    <div id="myModal" class="modal">
-        <!-- Modal content -->
-        <div class="modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <p class="text-body">Anda akan memasukkan jumlah kartu yang tersedia pada card dispenser sebanyak :</p>
-                    <p style="font-size: 25pt; font-weight: bold;">@userName</p>
-                    <button @onclick="Save" class="btn btn-danger modal-button">Lanjut</button>
-                    <button class="btn btn-light modal-button" @onclick="@(() => IsVisible=false)">Batal</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
 @if (isVisible2)
 {
     <div id="myModal" class="modal">
