@@ -9,8 +9,10 @@
 @using System.Threading.Tasks;
 @using MyG5Blazor.Data
 @using System.IO.Ports
+@using Aratek.TrustFinger;
+@using Laxton.Innovatrics;
 
-
+@inject Ektp_Data ktp
 @inject Card_Dispenser cds
 @inject Menu menu
 @inject Costumer cst
@@ -48,9 +50,10 @@
                     <button @onclick="MoveToTheFront" class="btn-arrow-red btn">Front</button>
                     <button @onclick="MoveToICC" class="btn-arrow-red btn">ICC</button>
                     <button @onclick="MoveToBin" class="btn-arrow-red btn">BIN</button>
+                    <button @onclick="ScanKTP" class="btn-arrow-red btn">EKTP</button>
                 </div>
                 <div class="col-md-6" style="text-align: left;">
-                    
+
                     <button @onclick="@(()=>isVisible2=true)" class="btn-arrow btn" value="">Kembali</button>
                     <button @onclick="@(()=>isVisible2=true)" class="btn-arrow-red btn" value="">Save</button>
                 </div>
@@ -113,6 +116,8 @@
     private bool isVisible2 = false;
     private bool IsLoading = false;
 
+    private TrustFingerDevice dev = null;
+    private int pos = 7;
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
     public string serviceURL = "upgrade-4g/v1/submit-nohp";
@@ -121,7 +126,7 @@
 
     private string msg = string.Empty;
     private string errorcode = string.Empty;
-    
+
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -549,6 +554,171 @@
         config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, stock.ToString());
         //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
+    }
+
+    private IntPtr hContext = IntPtr.Zero;
+    byte[] pbPcid;
+    byte[] pbConf;
+    private bool IsFail = false;
+    private bool IsNext = false;
+    private async Task ScanKTP()
+    {
+        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
+        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
+
+        OurUtility.Write_Log("==== Scan e-KTP", "step-action");
+        OurUtility.Write_Log("===== 1. Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
+        if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)
+        {
+            OurUtility.Write_Log("===== 2. Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
+            Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_PCID, pbPcid, pbPcid.Length);
+            OurUtility.Write_Log("===== 3. Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
+            Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_CONFIG, pbConf, pbConf.Length);
+        }
+        OurUtility.Write_Log("===== 4. Ektp_Sdk.EktpConnect", "step-action");
+        await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
+
+        int length = 2048;
+        byte[] tempBuffer = new byte[length];
+        int ret = -1;
+        OurUtility.Write_Log("===== 5. Ektp_Sdk.ReadDemographic From eKTP", "step-action");
+        ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer));
+        if (length == 0 || ret != 0)
+        {
+            OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Failed", "step-action");
+            IsLoading = false;
+
+            return;
+        }
+        byte[] demoGraphic = new byte[length];
+        for (int i = 0; i < length; i++)
+        {
+            demoGraphic[i] = tempBuffer[i];
+        }
+        OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Success", "step-action");
+        ktp.demographic = demoGraphic;
+        IsVisible = false;
+        IsNext = true;
+
+        if (IsNext)
+        {
+            //int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
+            ret = await Task.Run(() => Ektp_Sdk.ReadLeftFingerPrint(hContext, ref length, tempBuffer));
+            int leftLen = length;
+            byte[] leftData = tempBuffer;
+
+            ret = await Task.Run(() => Ektp_Sdk.ReadRightFingerPrint(hContext, ref length, tempBuffer));
+            int rightLen = length;
+            byte[] rightData = tempBuffer;
+
+            OurUtility.Write_Log("===== 7. Ektp_Sdk.ReadFingerPrints", "step-action");
+            //ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData));
+
+            if (leftLen == 0 || rightLen == 0)
+            {
+                OurUtility.Write_Log("===== 8. Ektp_Sdk.ReadFingerPrints Failed", "step-action");
+                return;
+            }
+            ktp.minutiae1 = leftData;
+            ktp.minutiae2 = rightData;
+            ktp.minu1len = leftLen;
+            ktp.minu2len = rightLen;
+
+            OurUtility.Write_Log("===== 8. Ektp_Sdk.ReadFingerPrints Success", "step-action");
+            OurUtility.Write_Log("==== Scan FingerPrint", "step-action");
+            OurUtility.Write_Log("===== 1. Ektp_Sdk.EktpConnect, Connect Reader", "step-action");
+            await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
+
+            OurUtility.Write_Log("===== 2. Ektp_Sdk.OpenFingerPrintReader", "step-action");
+
+            // -- Step 2, Open Device Fingerprint
+            IntPtr reader = IntPtr.Zero;
+            int result = -1;
+            result = await Task.Run(() => Ektp_Sdk.OpenFingerPrintReader(ref reader, "uareu")).ConfigureAwait(false);
+            if (reader == IntPtr.Zero)
+            {
+                OurUtility.Write_Log("===== 3. Ektp_Sdk.OpenFingerPrintReader Failed", "step-action");
+
+                //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
+            }
+            else
+            {
+                OurUtility.Write_Log("===== 3. Ektp_Sdk.OpenFingerPrintReader Success", "step-action");
+                OurUtility.Write_Log("===== 4. Ektp_Sdk.StartEngine", "step-action");
+
+                IntPtr engine = IntPtr.Zero;
+                int engineType = 0;//engineType = 0, it means that finger print engine is uareu
+                result = await Task.Run(() => Ektp_Sdk.StartEngine(engineType, ref engine)).ConfigureAwait(false);
+                if (engine == IntPtr.Zero)
+                {
+                    OurUtility.Write_Log("===== 5. Ektp_Sdk.StartEngine Failed", "step-action");
+                }
+                else
+                {
+                    OurUtility.Write_Log("===== 5. Ektp_Sdk.StartEngine Success", "step-action");
+
+                    int size = 120000;
+                    int score = -1;
+                    byte[] image = new byte[size];
+                    result = await Task.Run(() => Ektp_Sdk.CaptureFingerPrint(reader, image, ref size, ref score));
+                    if (result != 0)
+                    {
+                        OurUtility.Write_Log("===== 7. Ektp_Sdk.CaptureFingerPrint Failed", "step-action");
+                        //break;
+                    }
+                    else
+                    {
+                        FingerPosition fingerprintPosition = (FingerPosition)pos;
+                        IFingerprintFeature feature = null;
+
+                        //byte[] iso = FingerprintImageHelper.RawToISO(image, 300, 400,fingerprintPosition, 0, 600);
+                        // -- Step 5, Compare
+
+                        int matched = 0;//matched == 1, it means finger print matched
+                        int format = 0;//format == 0, it means finger print template type is ISO
+
+                        //matched right finger
+                        result = await Task.Run(() => Ektp_Sdk.MatchFingerPrint(engine, image, size,
+                                                        ktp.minutiae2, ktp.minu2len,
+                                                        ref score, ref matched, format)).ConfigureAwait(false);
+
+
+                        if (matched == 1)
+                        {
+                            IsLoading = false;
+                            //break;
+                        }
+                        else
+                        {
+                            result = await Task.Run(() => Ektp_Sdk.MatchFingerPrint(engine, image, size,
+                                                            ktp.minutiae1, ktp.minu1len,
+                                                            ref score, ref matched, format)).ConfigureAwait(false);
+                            if (matched == 1)
+                            {
+                                cst.EKTPNumber = ktp.Id;
+                                //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+                                IsLoading = false;
+
+                                OurUtility.Write_Log("===== 10. Ektp_Sdk.CloseReader", "step-action");
+                                result = Ektp_Sdk.CloseReader(reader);
+
+                                //OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
+                                //Switcher.DOWN("500",config.usbEKTP);
+
+                                //break;
+                            }
+                            else
+                            {
+
+                                OurUtility.Write_Log("===== 10. Ektp_Sdk.CloseReader", "step-action");
+                                result = Ektp_Sdk.CloseReader(reader);
+                                IsFail = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
     }
 
     [Microsoft.JSInterop.JSInvokable]

@@ -205,11 +205,11 @@
         IsVisible = false;
         isLoading = true;
 
-        byte[] image = OurUtility.CaptureImage();
+        //byte[] image = OurUtility.CaptureImage();
         string imageBytesStr;
-        if(image!=null)
-            imageBytesStr = Convert.ToBase64String(image);
-        else
+        //if(image!=null)
+            //imageBytesStr = Convert.ToBase64String(image);
+        //else
             imageBytesStr = "";
         
         cst.PhoneNumber = "62" + strNumber.Substring(1);
@@ -225,7 +225,7 @@
 
         OurUtility.Write_Log("== Check Phone Number", "step-action");
         //OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);        
         ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {

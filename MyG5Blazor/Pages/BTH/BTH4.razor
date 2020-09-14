@@ -18,7 +18,7 @@
 @inject Transaction trans
 @inject Config config
 @inject Menu menu
- 
+
 <div class=@pageClass>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -339,6 +339,19 @@
         </div>
     </div>
 }
+@if (isTunaiComplete)
+{
+    <div class="modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p class="text-body">Anda memiliki <span style="font-weight: bold;">KEMBALIAN</span> sebesar<span style="font-weight: bold;"> Rp  </span> yang otomatis akan mengurangi tagihan kartuHalo anda di bulan berikutnya.</p>
+                <button class="btn btn-danger modal-button" @onclick="Tunai">Lanjut</button>
+                <button class="btn btn-light modal-button" @onclick="CancelComplete">Batal</button>
+                <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+            </div>
+        </div>
+    </div>
+}
 @code
 {
     public List<CES> surveys = new List<CES>();
@@ -354,6 +367,7 @@
     private bool IsVoided = false;
     private bool IsInvalid = false;
     private bool IsTunaiExit = false;
+    private bool isTunaiComplete = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
@@ -492,39 +506,8 @@
                     config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
                     if (!IsTunaiExit)
                     {
-                        await Payment("");
-                        //Console.WriteLine("inttotal = " + inttotal);
-                        StateHasChanged();
-                        if (resultPayment == "00")
-                        {
-                            trans.edcStatus = "SUCCESS";
-                            IsLoading = false;
-                            IsSuccess = true;
-                            //Console.WriteLine("Payment Success");
-                            await Task.Delay(2000);
-                            await Print();
-                            await CheckNPS("");
-                            trans.status = "00";
-                            trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
-                            await OurUtility.AuditTrail(trans, menu, cst);
-
-                            Timer.SetTimer(20000);
-                            Timer.OnElapsed += TimerElapsedHandler;
-
-                            break;
-                        }
-                        else
-                        {
-                            IsLoading = false;
-                            IsFail = true;
-                            await Print();
-                            trans.status = "01";
-                            await OurUtility.AuditTrail(trans, menu, cst);
-
-                            Timer.SetTimer(20000);
-                            Timer.OnElapsed += TimerElapsedHandler;
-                            break;
-                        }
+                        isTunaiComplete = true;
+                        break;
                     }
                     else { break; }
                 }
@@ -597,6 +580,46 @@
                 }
         }
     }
+
+    private async Task CancelComplete()
+    {
+        isTunaiComplete = false;
+        IsExit = true;
+    }
+    private async Task Tunai()
+    {
+        await Payment("");
+        //Console.WriteLine("inttotal = " + inttotal);
+        StateHasChanged();
+        if (resultPayment == "00")
+        {
+            trans.edcStatus = "SUCCESS";
+            IsLoading = false;
+            IsSuccess = true;
+            //Console.WriteLine("Payment Success");
+            await Task.Delay(2000);
+            await Print();
+            await CheckNPS("");
+            trans.status = "00";
+            trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
+        }
+        else
+        {
+            IsLoading = false;
+            IsFail = true;
+            await Print();
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
+        }
+    }
+
     private bool translog = true;
     private async Task TunaiExitFail()
     {
@@ -759,7 +782,7 @@
         OurUtility.Write_Log("== Check CES", "step-action");
         OurUtility.Write_Log("== URL API : " + myURL, "step-action");
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
@@ -875,7 +898,7 @@
             trans.edcTime = trans.ecr.Substring(134, 6);
             //Console.WriteLine(trans.edcresp);
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             Console.WriteLine(ex.Message);
         }
@@ -962,7 +985,7 @@
 
         OurUtility.Write_Log("== Payment", "step-action");
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
@@ -974,7 +997,7 @@
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
-                    trans.AddTrail("PAYMENT", "Payment Method:"+trans.paymentMethod+",Payment Ammount: "+strAccBill, "00");
+                    trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
 
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
@@ -1070,7 +1093,7 @@
             Payout.DisableValidator();
             Payout.SSPComms.CloseComPort();
         }
-        catch(Exception ex)
+        catch (Exception ex)
         {
             OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
             trans.AddTrail("BILL ACCEPTOR", "", "01");
