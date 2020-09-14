@@ -415,7 +415,7 @@
         MetodePembayaran = cst.intMPembayaran;
         intBill = cst.intTagihan;
         //intAccBill = 10000;
-        intMinus = intBill - intAccBill;
+        //intMinus = intBill - intAccBill;
         switch (MetodePembayaran)
         {
             case 1:
@@ -506,6 +506,7 @@
                     config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
                     if (!IsTunaiExit)
                     {
+                        intMinus = intAccBill - intBill;
                         isTunaiComplete = true;
                         break;
                     }
@@ -628,6 +629,10 @@
             translog = false;
             intAccBill = Payout.total;
             cst.intTagihanTerbayar = Payout.total;
+
+            cst.intUangCount = Payout.uangCount;
+            cst.intTagihanTerbayar = Payout.total;
+
             IsExit = false;
             IsTunaiExit = true;
             IsFail = true;
@@ -635,6 +640,8 @@
             trans.AddTrail("PAYMENT CASH", "Paid Ammount:" + intAccBill.ToString(), "02");
             Payout.DisableValidator();
             Payout.SSPComms.CloseComPort();
+
+            await Payment("");
 
             logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
             logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
