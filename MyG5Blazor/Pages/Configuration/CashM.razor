@@ -25,7 +25,6 @@
                 <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
             </div>
 
-
             <form class="navbar-form">
             </form>
         </div>
@@ -196,7 +195,7 @@
                     <label class="teks-data2">Passcode</label>
                     <input style="margin-bottom:15px;" type="password" name="number" class="num-field2" @onclick="Inputfield3" placeholder="input your passcode" @bind="passcode">
                     <button @onclick="@(()=>isVisible2=true)" class="btn-arrow btn" value="">Kembali</button>
-                    <button class="btn-arrow-red btn" style="margin-top:10px;" @onclick="@(()=>IsVisible=true)">Collect</button>
+                    <button class="btn-arrow-red btn" style="margin-top:10px;" @onclick="@CheckInputData">Collect</button>
                     <div class="col-md-12" style="margin-top:0%">
 
                     </div>
@@ -261,6 +260,50 @@
         </div>
     </div>
 }
+@if (isAlready)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Anda pada hari ini telah melakukan pelaporan pengambilan uang dari Cash Box</p>
+                    <p class="text-body">Silahkan melakukan pelaporan pengambilan uang dari Cash Box pada lain hari</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => isAlready=false)">Kembali</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (isModal)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">User Name dan Passcode salah.</p>
+                    <p class="text-body">Silahkan diperiksa kembali.</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => isModal=false)">Kembali</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (isEmpty)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Silahkan isi User Name dan Passcode</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => isEmpty=false)">Kembali</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code{
     private string userName = string.Empty;
     private string password = string.Empty;
@@ -270,6 +313,8 @@
     private bool IsLoading = false;
     private bool isModal = false;
     private bool isSuccess = false;
+    private bool isAlready = false;
+    private bool isEmpty = false;
 
     private string isTextField = "1";
     private bool isUpper = false;
@@ -280,6 +325,20 @@
     public string serviceURL = "cash/v1/cash-collect";
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
+    private string lastDate = string.Empty;
+    private string nowDate = string.Empty;
+
+    private void CheckInputData()
+    {
+        if (userName == "" || passcode == "")
+        {
+            isEmpty = true;
+        }
+        else
+        {
+            IsVisible = true;
+        }
+    }
     private void DeleteCharField()
     {
         switch (isTextField)
@@ -341,6 +400,7 @@
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         cst.Clear();
+        nowDate = DateTime.Now.Day.ToString();
         OurUtility.Write_Log("= Cash Collect", "step-action");
     }
 
@@ -367,80 +427,91 @@
     }
     private async Task CheckNumber(string strURL)
     {
-        IsVisible = false;
-        IsLoading = true;
-        string terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
-        string bankNotes = config.Read("BILL", Config.PARAM_BILL_BANK_STOK);
-        string notesAmount = config.Read("BILL", Config.PARAM_BILL_AMOUNT);
-        //Set HTTP Request Body
-        string myJson = "{ \"terminalId\" : \"" + terminalId + "\"," +
-    "\"token\" : \"" + passcode + "\"," +
-    "\"jumlahUang\" : \"" + bankNotes + "\"," +
-    "\"nominal\" : \"" + notesAmount + "\"," +
-    "\"username\" : \"" + userName + "\"" +
-                "}";
+        lastDate = config.ReadUtil("CASH", Config.PARAM_CASH_COLLECTED);
 
-        //Set HTTP Request URL
-        string myURL = _myURL + serviceURL;
-
-        OurUtility.Write_Log("== Cash Management", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-
-        //Call HTTP Request
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-
-        if (strResult != null)
+        if (nowDate != lastDate)
         {
-            try
+            IsVisible = false;
+            IsLoading = true;
+            string terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
+            string bankNotes = config.Read("BILL", Config.PARAM_BILL_BANK_STOK);
+            string notesAmount = config.Read("BILL", Config.PARAM_BILL_AMOUNT);
+            //Set HTTP Request Body
+            string myJson = "{ \"terminalId\" : \"" + terminalId + "\"," +
+        "\"token\" : \"" + passcode + "\"," +
+        "\"jumlahUang\" : \"" + bankNotes + "\"," +
+        "\"nominal\" : \"" + notesAmount + "\"," +
+        "\"username\" : \"" + userName + "\"" +
+                    "}";
+
+            //Set HTTP Request URL
+            string myURL = _myURL + serviceURL;
+
+            OurUtility.Write_Log("== Cash Management", "step-action");
+            OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+
+            //Call HTTP Request
+            string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+
+            if (strResult != null)
             {
-                //Parse HTTP Request Result to JObject
-                JObject jobjResult = JObject.Parse(strResult);
-
-                //Check If statusCode == 00 (Success)
-                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                try
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
-                    IsLoading = false;
-                    isSuccess = true;
-                    config.Write("BILL", Config.PARAM_BILL_BANK_STOK, "0");
-                    config.Write("BILL", Config.PARAM_BILL_AMOUNT, "0");
+                    //Parse HTTP Request Result to JObject
+                    JObject jobjResult = JObject.Parse(strResult);
+
+                    //Check If statusCode == 00 (Success)
+                    if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                        IsLoading = false;
+                        isSuccess = true;
+                        config.Write("BILL", Config.PARAM_BILL_BANK_STOK, "0");
+                        config.Write("BILL", Config.PARAM_BILL_AMOUNT, "0");
+                        config.WriteUtil("CASH", Config.PARAM_CASH_COLLECTED, nowDate);
+                    }
+
+                    //Check If statusCode == 01 (Error Page)
+                    else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                    {
+                        if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                        {
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                        }
+                        else
+                        {
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                        }
+                        IsLoading = false;
+                        NavMan.NavigateTo("/errorlogin");
+                    }
+
+                    //Check If statusCode == 02 (Error Modal)
+                    else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                    {
+                        IsLoading = false;
+                        isModal = true;
+                    }
                 }
-
-                //Check If statusCode == 01 (Error Page)
-                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                catch (Exception ex)
                 {
-                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
-                    {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
-                    }
-                    else
-                    {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
-                    }
-                    IsLoading = false;
+                    OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                     NavMan.NavigateTo("/errorlogin");
                 }
-
-                //Check If statusCode == 02 (Error Modal)
-                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
-                {
-                    IsLoading = false;
-                    isModal = true;
-                }
             }
-            catch (Exception ex)
+            else
             {
-                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
                 NavMan.NavigateTo("/errorlogin");
             }
         }
         else
         {
-            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            NavMan.NavigateTo("/errorlogin");
+            IsVisible = false;
+            isAlready = true;
         }
     }
 

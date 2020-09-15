@@ -86,18 +86,25 @@ namespace MyG5Blazor.Data
         public const string PARAM_EKTP_PCID = "param.ektp.pcid";
         public const string PARAM_EKTP_CONF = "param.ektp.conf";
         public const string PARAM_EKTP_USB = "param.ektp.usb";
-        
+
+        //Util
+        public const string PARAM_CASH_COLLECTED = "cash.collected";
+
         private FileIniDataParser iniFile = new FileIniDataParser();
         private FileIniDataParser iniFileIP = new FileIniDataParser();
+        private FileIniDataParser iniFileUtil = new FileIniDataParser();
         private IniData iniData = null;
         private IniData iniDataIP = null;
+        private IniData iniDataUtil = null;
 
         private string fileName = "MyGraPARI-config.properties";
         private string fileNameIP = "IPTest-config.properties";
+        private string fileNameUtil = "Util-config.properties";
 
         public Config()
         {
             fileName= Directory.GetCurrentDirectory() + @"\MyGApps\" + "MyGraPARI-config.properties";
+            fileNameUtil = Directory.GetCurrentDirectory() + @"\MyGApps\" + "Util.properties";
             fileNameIP = Directory.GetCurrentDirectory() + @"\" + "IPTest-config.properties";
         }
 
@@ -124,6 +131,17 @@ namespace MyG5Blazor.Data
                 //if (iniData == null)
                 {
                     iniDataIP = iniFileIP.ReadFile(fileNameIP);
+                }
+            }
+            catch { }
+        }
+        public void InitUtil()
+        {
+            try
+            {
+                //if (iniData == null)
+                {
+                    iniDataUtil = iniFileUtil.ReadFile(fileNameUtil);
                 }
             }
             catch { }
@@ -158,7 +176,20 @@ namespace MyG5Blazor.Data
 
             return result;
         }
+        public string ReadUtil(string p_section, string p_name)
+        {
+            string result = string.Empty;
 
+            InitUtil();
+
+            try
+            {
+                result = iniDataUtil[p_section][p_name];
+            }
+            catch { }
+
+            return result;
+        }
         public void Write(string p_section, string p_name, string p_value)
         {
             Init();
@@ -175,6 +206,28 @@ namespace MyG5Blazor.Data
 
                 iniData.Configuration.NewLineStr = "\r\n";
                 iniFile.WriteFile(fileName, iniData);
+            }
+            catch (Exception ex)
+            {
+                Console.WriteLine(ex.Message);
+            }
+        }
+        public void WriteUtil(string p_section, string p_name, string p_value)
+        {
+            InitUtil();
+
+            try
+            {
+                try
+                {
+                    iniDataUtil.Sections.AddSection(p_section);
+                }
+                catch { }
+
+                iniDataUtil[p_section][p_name] = p_value;
+
+                iniDataUtil.Configuration.NewLineStr = "\r\n";
+                iniFileUtil.WriteFile(fileNameUtil, iniDataUtil);
             }
             catch (Exception ex)
             {

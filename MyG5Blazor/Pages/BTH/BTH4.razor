@@ -15,6 +15,7 @@
 @inject NavigationManager NavMan
 @inject EDC edc
 @inject BlazorTimer Timer
+@inject BlazorTimer TimerCES
 @inject Transaction trans
 @inject Config config
 @inject Menu menu
@@ -341,15 +342,17 @@
 }
 @if (isTunaiComplete)
 {
+    <div id="myModal" class="modal">
     <div class="modal-dialog-centered" role="document">
         <div class="modal-content">
             <div class="modal-body">
-                <p class="text-body">Anda memiliki <span style="font-weight: bold;">KEMBALIAN</span> sebesar<span style="font-weight: bold;"> Rp  </span> yang otomatis akan mengurangi tagihan kartuHalo anda di bulan berikutnya.</p>
+                <p class="text-body">Anda memiliki <span style="font-weight: bold;">KEMBALIAN</span> sebesar<span style="font-weight: bold;"> Rp @intMinus.ToString("N0") </span> yang otomatis akan mengurangi tagihan kartuHalo anda di bulan berikutnya.</p>
                 <button class="btn btn-danger modal-button" @onclick="Tunai">Lanjut</button>
-                <button class="btn btn-light modal-button" @onclick="CancelComplete">Batal</button>
+                <button class="btn btn-light modal-button" @onclick="TunaiExitFail">Batal</button>
                 <!-- <button class="btn btn-light modal-button">Tidak</button> -->
             </div>
         </div>
+    </div>
     </div>
 }
 @code
@@ -383,6 +386,7 @@
     private int intBill = 0;
     private int intAccBill = 0;
     private int intMinus = 0;
+
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
     public string serviceURL = "bayar-halo/v1/payment";
@@ -407,7 +411,7 @@
     private string strBilling = "2";
     private string strCOM = "COM";
     private string resultPayment = string.Empty;
-
+    private string resultCash = "01";
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -432,6 +436,7 @@
                         await Task.Delay(2000);
                         intAccBill = intBill;
                         await Payment("");
+                        //resultPayment = "00";
                         if (resultPayment == "00")
                         {
                             trans.edcStatus = "SUCCESS";
@@ -440,8 +445,11 @@
                             //Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
 
+                            //TimerCES.SetTimer(5000);
+                            //TimerCES.OnElapsed += TimerElapsedHandlerCES;
+
                             await Print();
-                            await CheckNPS("");
+
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN TAGIHAN VIA DEBIT BERHASIL";
                             await OurUtility.AuditTrail(trans, menu, cst);
@@ -534,7 +542,7 @@
                             Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
                             await Print();
-                            await CheckNPS("");
+                            //await CheckNPS("");
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN TAGIHAN VIA CC BERHASIL";
                             await OurUtility.AuditTrail(trans, menu, cst);
@@ -585,10 +593,14 @@
     private async Task CancelComplete()
     {
         isTunaiComplete = false;
-        IsExit = true;
+        //IsExit = true;
+
+
     }
     private async Task Tunai()
     {
+        resultCash = "00";
+
         await Payment("");
         //Console.WriteLine("inttotal = " + inttotal);
         StateHasChanged();
@@ -629,9 +641,8 @@
             translog = false;
             intAccBill = Payout.total;
             cst.intTagihanTerbayar = Payout.total;
-
             cst.intUangCount = Payout.uangCount;
-            cst.intTagihanTerbayar = Payout.total;
+            resultCash = "01";
 
             IsExit = false;
             IsTunaiExit = true;
@@ -664,7 +675,6 @@
         await Payment("");
         Console.WriteLine("inttotal = " + inttotal);
         StateHasChanged();
-
     }
 
     private async Task Void()
@@ -985,6 +995,7 @@
                 "\"lembarUang\" : \"" + cst.intUangCount + "\"," +
                                     "\"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
                                     "\"fee\" : \"" + trans.fee + "\"," +
+                                    "\"responseCode\" : \"" + resultCash + "\"," +
                                     "\"bit48\" : \"" + trans.bit + "\"" +
                                     "}";
         }
@@ -1180,6 +1191,16 @@
     {
         NavMan.NavigateTo("/main");
     }
+
+
+    private void TimerElapsedHandlerCES()
+    {
+        //CheckNPS("");
+        IsLoading = true;
+        StateHasChanged();
+    }
+
+
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);
