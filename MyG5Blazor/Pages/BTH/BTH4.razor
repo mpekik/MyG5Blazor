@@ -599,6 +599,7 @@
     }
     private async Task Tunai()
     {
+        isTunaiComplete = false;
         resultCash = "00";
 
         await Payment("");
@@ -646,6 +647,7 @@
 
             IsExit = false;
             IsTunaiExit = true;
+            isTunaiComplete = false;
             IsFail = true;
             await Print();
             trans.AddTrail("PAYMENT CASH", "Paid Ammount:" + intAccBill.ToString(), "02");
