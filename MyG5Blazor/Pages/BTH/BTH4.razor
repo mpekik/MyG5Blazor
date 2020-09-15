@@ -656,13 +656,6 @@
 
             await Payment("");
 
-            logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
-            logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
-            logamount = logamount + Payout.total;
-            logbank = logbank + Payout.uangCount;
-            config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
-            config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
-
             OurUtility.AuditTrail(trans, menu, cst);
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
