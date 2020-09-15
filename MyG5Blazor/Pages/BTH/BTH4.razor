@@ -1009,6 +1009,7 @@
         {
             try
             {
+                IsLoading = false;
                 JObject jobjResult = JObject.Parse(strResult);
                 resultPayment = (string)jobjResult["transaction"].SelectToken("statusCode");
 
