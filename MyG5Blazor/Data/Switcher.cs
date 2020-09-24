@@ -28,7 +28,7 @@ namespace MyG5Blazor.Data
         {
             int delay = OurUtility.ToInt32(p_delay);
 
-            OurUtility.Write_Log("ykushcmd.exe UP untuk ekTP [delay : " + delay.ToString() + "]", "step-action");
+            OurUtility.Write_Log("ykushcmd.exe UP port: "+_port+" [delay : " + delay.ToString() + "]", "step-action");
 
             try
             {
@@ -48,7 +48,7 @@ namespace MyG5Blazor.Data
         {
             int delay = OurUtility.ToInt32(p_delay);
 
-            OurUtility.Write_Log("ykushcmd.exe DOWN untuk ekTP [delay : " + delay.ToString() + "]", "step-action");
+            OurUtility.Write_Log("ykushcmd.exe DOWN port "+_port+" [delay : " + delay.ToString() + "]", "step-action");
 
             try
             {

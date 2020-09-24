@@ -164,7 +164,7 @@
         {
             translog = false;
             IsVisible = false;
-            isLoading2 = true; 
+            isLoading2 = true;
             trans.AddTrail("SCAN EKTP", "CANCELED", "02");
             trans.status = "02";
             trans.errorCode = "EKTP";
@@ -189,13 +189,16 @@
         NavMan.NavigateTo(strURL);
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
-        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
-        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
-        OurUtility.Write_Log("== Scan e-KTP Page", "step-action");
-        Switcher.UP("3000",config.usbEKTP);
+        if (bFirstRender)
+        {
+            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+            pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
+            pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
+            OurUtility.Write_Log("== Scan e-KTP Page", "step-action");
+            Switcher.UP("3000", config.usbEKTP);
+        }
     }
 
     private async Task CheckEKTP()
@@ -257,6 +260,8 @@
                 demoGraphic[i] = tempBuffer[i];
             }
             OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Success", "step-action");
+            Switcher.DOWN("500", config.usbEKTP);
+            Switcher.UP("3000", config.usbEKTP);
             ktp.demographic = demoGraphic;
             IsVisible = false;
             IsNext = true;

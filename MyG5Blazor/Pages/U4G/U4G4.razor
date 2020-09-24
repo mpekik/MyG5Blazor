@@ -16,6 +16,7 @@
 @inject BlazorTimer Timer
 @inject Config config  
 @inject Menu menu
+
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -240,59 +241,65 @@
         NavMan.NavigateTo(strURL);
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
-        mypersoexe = config.Read("Dispenser", Config.PARAM_PERSO_EXE);
-        strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
-        readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
-        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
-        if (cardStock == "")
+        if (bFirstRender)
         {
-            isFail = true;
-            trans.AddTrail("GET STOCK", "", "01");
-            trans.status = "01";
-            trans.errorCode = "CARD DISPENSER";
-            await OurUtility.AuditTrail(trans, menu, cst);
-            trans.errorCode = "CD - 003";
-            OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
-            NavigateTo("/error");
-            return;
-        }
-        stock = Int32.Parse(cardStock);
-        Switcher.DOWN("500",config.usbEKTP);
-        OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
-        isLoading = true;
-        Switcher.UP("3000",config.usbCardReader);
-        await MyPerso();
-        stock = stock - intTryCount;
-        trans.jumlah_kartu = stock;
-        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
-        if (isError)
-        {
-            isLoading = false;
-            trans.status = "01";
-            await OurUtility.AuditTrail(trans,menu,cst);
-            NavMan.NavigateTo("/error");
-        }else if (isSuccess)
-        {
-            isLoading = false;
-            trans.status = "00";
-            trans.errorCode = "BERHASIL UPGRADE 4G";
-            await OurUtility.AuditTrail(trans,menu,cst);
-            await Print();
+            mypersoexe = config.Read("Dispenser", Config.PARAM_PERSO_EXE);
+            strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
+            readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
+            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+            cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
 
-            Timer.SetTimer(20000);
-            Timer.OnElapsed += TimerElapsedHandler;
-            //await CheckNPS("");
-        }
-        else if (isFail)
-        {
-            isLoading = false;
-            trans.status = "01";
-            await OurUtility.AuditTrail(trans,menu,cst);
-            Timer.SetTimer(20000);
-            Timer.OnElapsed += TimerElapsedHandler;
+            if (cardStock == "")
+            {
+                isFail = true;
+                trans.AddTrail("GET STOCK", "", "01");
+                trans.status = "01";
+                trans.errorCode = "CARD DISPENSER";
+                await OurUtility.AuditTrail(trans, menu, cst);
+                trans.errorCode = "CD - 003";
+                OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
+                NavigateTo("/error");
+                return;
+            }
+            stock = Int32.Parse(cardStock);
+            Switcher.DOWN("500", config.usbEKTP);
+            OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
+            isLoading = true;
+            Switcher.UP("3000", config.usbCardReader);
+            await MyPerso();
+            //stock = stock - intTryCount;
+            //trans.jumlah_kartu = stock;
+            //config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
+            if (isError)
+            {
+                isLoading = false;
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+                NavMan.NavigateTo("/error");
+            }
+            else if (isSuccess)
+            {
+                isLoading = false;
+                trans.status = "00";
+                trans.errorCode = "BERHASIL UPGRADE 4G";
+                trans.kip = "Berhasil, terminal id:" + menu.terminalId;
+                await OurUtility.AuditTrail(trans, menu, cst);
+                await Print();
+
+                Timer.SetTimer(20000);
+                Timer.OnElapsed += TimerElapsedHandler;
+                //await CheckNPS("");
+            }
+            else if (isFail)
+            {
+                isLoading = false;
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+                Timer.SetTimer(20000);
+                Timer.OnElapsed += TimerElapsedHandler;
+            }
         }
     }
 
@@ -302,6 +309,8 @@
         {
             if (stock > 0)
             {
+                Switcher.DOWN("500", config.usbEKTP);
+                Switcher.UP("3000", config.usbCardReader);
                 if (await Task.Run(() => MoveToICC()))
                 {
 
@@ -316,12 +325,6 @@
                         trans.AddTrail("GET SN", p_icc_id, "00");
                         string myURL = _myURL + persoURL;
 
-                        string secret_key = OurUtility.RandomString(10);
-                        long unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                        string md5Input = trans.termID + secret_key + menu.tokenId + unix_timestamp.ToString();
-                        string signatureKey = OurUtility.CreateMD5(md5Input);
-
-                        //ToDO add if trans.transID != null
                         string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                     "\"terminalId\" : \"" + trans.termID + "\"," +
                                     "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
@@ -330,10 +333,10 @@
                                     "\"serialNumber\" : \"" + p_icc_id + "\"" +
                                     "}";
 
-                        OurUtility.Write_Log("=== URL : " + myURL, "step-action");
-                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                        //OurUtility.Write_Log("=== URL : " + myURL, "step-action");
+                        //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-                        OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                        //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                         if (strResult != null)
                         {
                             try
@@ -346,26 +349,27 @@
                                     if (strPanjang != null)
                                     {
                                         trans.persoID = (string)jobjResult["perso"].SelectToken("persoId");
-                                        trans.AddTrail("GET STRING PANJANG", trans.persoID, "SUCCESS");
+                                        trans.AddTrail("GET STRING PANJANG", trans.persoID, "00");
+
+                                        Switcher.DOWN("500", config.usbEKTP);
+                                        Switcher.UP("3000", config.usbCardReader);
+                                        if (!cds.Start(ref errorcode, strCOM, ref msg))
+                                        {
+                                            OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
+                                            return;
+                                        }
                                         if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
                                         {
                                             myURL = _myURL + updateURL;
                                             trans.AddTrail("PERSO", trans.persoID, "00");
-
-                                            secret_key = OurUtility.RandomString(10);
-                                            unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                                            md5Input = trans.termID + secret_key + menu.tokenId + unix_timestamp.ToString();
-                                            signatureKey = OurUtility.CreateMD5(md5Input);
-
                                             myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                         "\"terminalId\" : \"" + trans.termID + "\"," +
                                         "\"persoId\" : \"" + trans.persoID + "\" ," +
-                                        "\"persoStatus\" : \"2\"" +
-                                        "}";
+                                        "\"persoStatus\" : \"2\"}";
                                             OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                            //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                             trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "00");
                                             isLoading = false;
                                             isSuccess = true;
@@ -374,6 +378,7 @@
                                                 trans.AddTrail("MOVE TO FRONT", "", "01");
                                                 trans.status = "01";
                                                 trans.errorCode = "CARD DISPENSER";
+                                                trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
                                                 await OurUtility.AuditTrail(trans, menu, cst);
                                                 OurUtility.Write_Log("=== Card Dispenser Error", "step-action");
                                                 trans.errorCode = "CD - 002";
@@ -388,27 +393,21 @@
                                             await Task.Run(() => MoveToBin());
 
                                             myURL = _myURL + updateURL;
-
-                                            secret_key = OurUtility.RandomString(10);
-                                            unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-                                            md5Input = trans.termID + secret_key + menu.tokenId + unix_timestamp.ToString();
-                                            signatureKey = OurUtility.CreateMD5(md5Input);
-
                                             myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                             "\"terminalId\" : \"" + trans.termID + "\"," +
                                             "\"persoId\" : \"" + trans.persoID + "\" ," +
-                                            "\"persoStatus\" : \"3\"" +
-                                            "}";
+                                            "\"persoStatus\" : \"3\"}";
                                             OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                                             trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "00");
-                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                            //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                             if (intTryCount < intTryLimit)
                                                 intTryCount += 1;
                                             else
                                             {
                                                 isFail = true;
+                                                trans.kip = "Perso gagal, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
                                                 return;
                                             }
                                         }
