@@ -264,6 +264,7 @@
             OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Success", "step-action");
             Switcher.DOWN("500", config.usbEKTP);
             Switcher.UP("3000", config.usbEKTP);
+            
             ktp.demographic = demoGraphic;
             IsVisible = false;
             IsNext = true;

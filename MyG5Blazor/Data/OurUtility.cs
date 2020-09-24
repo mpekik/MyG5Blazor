@@ -210,7 +210,7 @@ namespace MyG5Blazor.Data
         }
         public static string Directory_Logs()
         {
-            string dir = Directory.GetCurrentDirectory() + @"\Logs";
+            string dir = Directory.GetCurrentDirectory() + @"\Logs\Action";
 
             CreateDirectory(dir);
 
@@ -218,7 +218,7 @@ namespace MyG5Blazor.Data
         }
         public static string Directory_Notes()
         {
-            string dir = Directory.GetCurrentDirectory() + @"\Notes";
+            string dir = Directory.GetCurrentDirectory() + @"\Logs\Notes";
 
             CreateDirectory(dir);
 
