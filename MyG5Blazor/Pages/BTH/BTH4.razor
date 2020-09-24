@@ -520,14 +520,14 @@
                         logamount = 0;
                     }
                     await Task.Delay(2000);
-                    await MainLoop();
+                    await MainLoop(logbank,logamount);
                     intAccBill = Payout.total;
                     cst.intUangCount = Payout.uangCount;
                     cst.intTagihanTerbayar = Payout.total;
-                    logamount = logamount + Payout.total;
-                    logbank = logbank + Payout.uangCount;
-                    config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
-                    config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
+                    //logamount = logamount + Payout.total;
+                    //logbank = logbank + Payout.uangCount;
+                    //config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
+                    //config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
                     if (!IsTunaiExit)
                     {
                         intMinus = intAccBill - intBill;
@@ -682,16 +682,16 @@
             Timer.OnElapsed += TimerElapsedHandler;
         }
     }
-    private async Task CountMoneyBillAcceptor()
-    {
-        StateHasChanged();
-        await Task.Delay(1000);
-        await MainLoop();
-        intAccBill = Payout.total;
-        await Payment("");
-        Console.WriteLine("inttotal = " + inttotal);
-        StateHasChanged();
-    }
+    //private async Task CountMoneyBillAcceptor()
+    //{
+    //    StateHasChanged();
+    //    await Task.Delay(1000);
+    //    await MainLoop();
+    //    intAccBill = Payout.total;
+    //    await Payment("");
+    //    Console.WriteLine("inttotal = " + inttotal);
+    //    StateHasChanged();
+    //}
 
     private async Task Void()
     {
@@ -1082,7 +1082,7 @@
     int reconnectionAttempts = 5;
     bool Running = false;
 
-    private async Task MainLoop()
+    private async Task MainLoop(int bankNote, int bankAmount)
     {
         try
         {
@@ -1102,7 +1102,7 @@
             {
                 await Task.Delay(1000);
                 //Console.WriteLine("2");
-                if (!Payout.DoPoll())
+                if (!Payout.DoPoll(trans,bankNote,bankAmount))
                 {
                     //Console.WriteLine("Poll failed, attempting to reconnect...\r\n");
                     while (true)

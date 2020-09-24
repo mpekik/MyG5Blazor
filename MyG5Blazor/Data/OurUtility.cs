@@ -51,7 +51,12 @@ namespace MyG5Blazor.Data
                 return sb.ToString();
             }
         }
-        
+        public static void Write_BankLog(string p_str, string p_prefix_fileName)
+        {
+            string msg = string.Empty;
+
+            Write_Notes(p_str, p_prefix_fileName, ref msg);
+        }
         public static void Write_Log(string p_str, string p_prefix_fileName)
         {
             string msg = string.Empty;
@@ -180,7 +185,7 @@ namespace MyG5Blazor.Data
                 string fileName = dir + @"\" + p_prefix_fileName + DateTime.Now.ToString("yyyyMMdd-HH") + ".log";
 
                 string msg = string.Empty;
-                Write_to_File(DateTime.Now.ToString("yyyyMMdd HH:mm:ss-fff") + " " + p_str, fileName, ref msg);
+                Write_to_File(p_str + " | "+ DateTime.Now.ToString("yyyy-MM-dd"), fileName, ref msg);
             }
             catch (Exception ex)
             {

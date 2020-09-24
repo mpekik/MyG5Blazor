@@ -68,10 +68,16 @@
                             }
                             else if (IsSuccess)
                             {
-                                <div class="col-md-6">
-                                    <div class="teks-title">Beli Pulsa Prabayar</div>
-                                    <div id="status-pay" class="teks-center teks-bold">Proses Pembelian Pulsa Prabayar<br> <b class="green">Berhasil</b></div>
-                                </div>
+            <div class="col-md-6">
+                <div class="teks-title">Beli Pulsa Prabayar</div>
+                <div id="status-pay" class="teks-center teks-bold">Proses Pembelian Pulsa Prabayar<br> <b class="green">Berhasil</b></div>
+                <div id="teks-pastikan">
+                    <div class="teks-center" style="margin-top: 32%;"> Terima kasih telah melakukan pengisian <br> ulang pulsa senilai <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b> </div>
+                </div>
+                <div id="bayar2">
+                    <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b></div>
+                </div>
+            </div>
 
                                 <div class="col-md-6">
                                     <div id="image-pulsa" class="image-center2">
@@ -352,12 +358,12 @@
     private bool IsVoided = false;
     private bool IsInvalid = false;
     private bool IsTunaiExit = false;
+    private bool isTunaiComplete = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
     private int MetodePembayaran = 0;
     private int CESno = 0;
-
 
     private string strNPS1Value = string.Empty;
     private string strMsgError = string.Empty;
@@ -390,6 +396,7 @@
     private string strBilling = "2";
     private string strCOM = "COM";
     private string resultPayment = string.Empty;
+    private string resultCash = "01";
 
     protected override async Task OnInitializedAsync()
     {
@@ -424,9 +431,10 @@
                             await Task.Delay(2000);
 
                             await Print();
-                            await CheckNPS("");
+                            //await CheckNPS("");
                             trans.status = "00";
                             trans.errorCode = "PEMBELIAN PULSA VIA DEBIT BERHASIL";
+                            trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -451,6 +459,7 @@
                             }
                             await Print();
                             trans.status = "01";
+                            trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -476,8 +485,22 @@
                     pageClass = "main-panel bg-home";
                     Payout.total = 0;
                     Payout.uangCount = 0;
-                    logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
-                    logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+                    try
+                    {
+                        logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
+                    }
+                    catch (Exception ex)
+                    {
+                        logbank = 0;
+                    }
+                    try
+                    {
+                        logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+                    }
+                    catch (Exception ex)
+                    {
+                        logamount = 0;
+                    }
                     await Task.Delay(2000);
                     await MainLoop();
                     intAccBill = Payout.total;
@@ -489,39 +512,9 @@
                     config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
                     if (!IsTunaiExit)
                     {
-                        await Payment("");
-                        //Console.WriteLine("inttotal = " + inttotal);
-                        StateHasChanged();
-                        if (resultPayment == "00")
-                        {
-                            trans.edcStatus = "SUCCESS";
-                            IsLoading = false;
-                            IsSuccess = true;
-                            //Console.WriteLine("Payment Success");
-                            await Task.Delay(2000);
-                            await Print();
-                            await CheckNPS("");
-                            trans.status = "00";
-                            trans.errorCode = "PEMBELIAN PULSA VIA CASH BERHASIL";
-                            await OurUtility.AuditTrail(trans, menu, cst);
-
-                            Timer.SetTimer(20000);
-                            Timer.OnElapsed += TimerElapsedHandler;
-
-                            break;
-                        }
-                        else
-                        {
-                            IsLoading = false;
-                            IsFail = true;
-                            await Print();
-                            trans.status = "01";
-                            await OurUtility.AuditTrail(trans, menu, cst);
-
-                            Timer.SetTimer(20000);
-                            Timer.OnElapsed += TimerElapsedHandler;
-                            break;
-                        }
+                        intMinus = intAccBill - intBill;
+                        isTunaiComplete = true;
+                        break;
                     }
                     else { break; }
                 }
@@ -547,9 +540,10 @@
                             Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
                             await Print();
-                            await CheckNPS("");
+                            //await CheckNPS("");
                             trans.status = "00";
                             trans.errorCode = "PEMBELIAN PULSA VIA CC BERHASIL";
+                            trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -584,11 +578,13 @@
                     else
                     {
                         IsFail = true;
+                        OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
                         trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
                         trans.status = "01";
+                        trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                         await OurUtility.AuditTrail(trans, menu, cst);
 
-                        Console.WriteLine("Payment Failed");
+                        //Console.WriteLine("Payment Failed");
                     }
                     break;
                 }
@@ -605,21 +601,21 @@
             translog = false;
             intAccBill = Payout.total;
             cst.intTagihanTerbayar = Payout.total;
+            cst.intUangCount = Payout.uangCount;
+            resultCash = "01";
+
             IsExit = false;
             IsTunaiExit = true;
+            isTunaiComplete = false;
             IsFail = true;
             await Print();
             trans.AddTrail("PAYMENT CASH", "Paid Ammount:" + intAccBill.ToString(), "02");
             Payout.DisableValidator();
             Payout.SSPComms.CloseComPort();
 
-            logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
-            logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
-            logamount = logamount + Payout.total;
-            logbank = logbank + Payout.uangCount;
-            config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
-            config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
+            await Payment("");
 
+            trans.kip = "Pembayaran tidak dilanjutkan, terminal id:" + menu.terminalId;
             OurUtility.AuditTrail(trans, menu, cst);
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
