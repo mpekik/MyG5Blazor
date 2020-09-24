@@ -24,25 +24,6 @@ namespace MyG5Blazor.Data
         public bool Light_Switch_Off()
         { return false; }
 
-        public static void UP_eKTP(string p_delay)
-        {
-            int delay = OurUtility.ToInt32(p_delay);
-
-            OurUtility.Write_Log("ykushcmd.exe UP untuk ekTP [delay : " + delay.ToString() + "]", "step-action");
-
-            try
-            {
-                Process process = new Process();
-
-                process.StartInfo.FileName = "ykushcmd.exe";
-                process.StartInfo.Arguments = "-u 3";
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-                process.Start();
-
-                Thread.Sleep(delay);
-            }
-            catch { }
-        }
         public static void UP(string p_delay,string _port)
         {
             int delay = OurUtility.ToInt32(p_delay);
@@ -62,6 +43,7 @@ namespace MyG5Blazor.Data
             }
             catch { }
         }
+
         public static void DOWN(string p_delay,string _port)
         {
             int delay = OurUtility.ToInt32(p_delay);
@@ -80,111 +62,6 @@ namespace MyG5Blazor.Data
                 Thread.Sleep(delay);
             }
             catch { }
-        }
-        public static void DOWN_eKTP(string p_delay)
-        {
-            int delay = OurUtility.ToInt32(p_delay);
-
-            OurUtility.Write_Log("ykushcmd.exe DOWN untuk ekTP [delay : " + delay.ToString() + "]", "step-action");
-
-            try
-            {
-                Process process = new Process();
-
-                process.StartInfo.FileName = "ykushcmd.exe";
-                process.StartInfo.Arguments = "-d 3";
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-                process.Start();
-
-                Thread.Sleep(delay);
-            }
-            catch { }
-        }
-
-        public static void UP_Reader_1(string p_delay)
-        {
-            int delay = OurUtility.ToInt32(p_delay);
-
-            OurUtility.Write_Log("ykushcmd.exe UP untuk Reader 1 [delay : " + delay.ToString() + "]", "step-action");
-
-            try
-            {
-                Process process = new Process();
-
-                process.StartInfo.FileName = "ykushcmd.exe";
-                process.StartInfo.Arguments = "-u 1";
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-                process.Start();
-
-                Thread.Sleep(delay);
-            }
-            catch { }
-        }
-
-        public static void DOWN_Reader_1(string p_delay)
-        {
-            int delay = OurUtility.ToInt32(p_delay);
-
-            OurUtility.Write_Log("ykushcmd.exe DOWN untuk Reader 1 [delay : " + delay.ToString() + "]", "step-action");
-
-            try
-            {
-                Process process = new Process();
-
-                process.StartInfo.FileName = "ykushcmd.exe";
-                process.StartInfo.Arguments = "-d 1";
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-                process.Start();
-
-                Thread.Sleep(delay);
-            }
-            catch { }
-        }
-
-        public static void UP_Reader_2(string p_delay)
-        {
-            int delay = OurUtility.ToInt32(p_delay);
-
-            OurUtility.Write_Log("ykushcmd.exe UP untuk Reader 2 [delay : " + delay.ToString() + "]", "step-action");
-
-            try
-            {
-                Process process = new Process();
-
-                process.StartInfo.FileName = "ykushcmd.exe";
-                process.StartInfo.Arguments = "-u 2";
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-                process.Start();
-
-                Thread.Sleep(delay);
-            }
-            catch { }
-        }
-
-        public static void DOWN_Reader_2(string p_delay)
-        {
-            int delay = OurUtility.ToInt32(p_delay);
-
-            OurUtility.Write_Log("ykushcmd.exe DOWN untuk Reader 2 [delay : " + delay.ToString() + "]", "step-action");
-
-            try
-            {
-                Process process = new Process();
-
-                process.StartInfo.FileName = "ykushcmd.exe";
-                process.StartInfo.Arguments = "-d 2";
-                process.StartInfo.WindowStyle = ProcessWindowStyle.Minimized;
-                process.Start();
-
-                Thread.Sleep(delay);
-            }
-            catch { }
-        }
-
-        public static void Startup(string p_delay)
-        {
-            DOWN_Reader_1(p_delay);
-            DOWN_eKTP(p_delay);
         }
 
     }

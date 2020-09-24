@@ -346,7 +346,8 @@ namespace MyG5Blazor.Data
                     "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
                     "\"status\" : \"" + trans.status + "\"," +
                     "\"description\" : \"" + trans.errorCode + "\"," +
-                    "\"jumlahKartu\" : \"" + trans.jumlah_kartu + "\"" +
+                    "\"jumlahKartu\" : \"" + trans.jumlah_kartu + "\"," +
+                    "\"kip\" : \"" + trans.kip + "\"" +
                     "}, \"auditTrail\" : " + auditTrail + "]}";
             string myURL2 = _myURL + saveURL;
 
@@ -416,9 +417,6 @@ namespace MyG5Blazor.Data
             Write_Log("Call function MyPerso()", "step-action");
 
             // pastikan bahwa Close jalur ke eKTP
-            Switcher.DOWN_eKTP(p_delay_DOWN);
-
-                Switcher.UP_Reader_1(p_delay_UP);
 
             try
             {
@@ -462,8 +460,7 @@ namespace MyG5Blazor.Data
             {
                 p_message = "[file : " + p_perso_exe + "] " + exception.Message;
             }
-                Switcher.DOWN_Reader_1(p_delay_DOWN);
-
+                
             return result;
         }
 

@@ -9,8 +9,6 @@
 @using System.Threading.Tasks;
 @using MyG5Blazor.Data
 @using System.IO.Ports
-@using Aratek.TrustFinger;
-@using Laxton.Innovatrics;
 
 @inject Ektp_Data ktp
 @inject Card_Dispenser cds
@@ -100,7 +98,6 @@
     private bool isVisible2 = false;
     private bool IsLoading = false;
 
-    private TrustFingerDevice dev = null;
     private int pos = 7;
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = string.Empty;
@@ -547,6 +544,7 @@
     private bool IsNext = false;
     private async Task ScanKTP()
     {
+        Ektp ektpsdk = new Ektp();
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
 
@@ -567,6 +565,7 @@
         int ret = -1;
         OurUtility.Write_Log("===== 5. Ektp_Sdk.ReadDemographic From eKTP", "step-action");
         ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer));
+        //bool resp = ektpsdk.
         if (length == 0 || ret != 0)
         {
             OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Failed", "step-action");
@@ -581,11 +580,28 @@
         }
         OurUtility.Write_Log("===== 6. Ektp_Sdk.ReadDemographic Success", "step-action");
         ktp.demographic = demoGraphic;
+
         IsVisible = false;
         IsNext = true;
 
         if (IsNext)
         {
+            byte[] lengthtest = new byte[4];
+            byte[] datatest;
+            int sizetest;
+
+            // Minutiae1
+            sizetest = lengthtest.Length;
+            ret = Ektp_Sdk.EktpGetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_MINUTIAE1_SIZE, lengthtest, ref sizetest);
+
+            sizetest = BitConverter.ToInt32(lengthtest, 0);
+            datatest = new byte[sizetest];
+
+            ret = Ektp_Sdk.EktpGetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_MINUTIAE1, datatest, ref sizetest);
+
+            ktp.minutiae1 = datatest;
+            ktp.minu1len = sizetest;
+
             //int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
             ret = await Task.Run(() => Ektp_Sdk.ReadLeftFingerPrint(hContext, ref length, tempBuffer));
             int leftLen = length;
@@ -652,8 +668,8 @@
                     }
                     else
                     {
-                        FingerPosition fingerprintPosition = (FingerPosition)pos;
-                        IFingerprintFeature feature = null;
+                        //FingerPosition fingerprintPosition = (FingerPosition)pos;
+                        //                        IFingerprintFeature feature = null;
 
                         //byte[] iso = FingerprintImageHelper.RawToISO(image, 300, 400,fingerprintPosition, 0, 600);
                         // -- Step 5, Compare

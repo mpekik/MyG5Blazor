@@ -11,6 +11,12 @@ namespace MyG5Blazor.Data
         private bool initialized = false;
         public IntPtr hContext = IntPtr.Zero;
 
+        public byte[] minutiae1 { get; set; }
+        public int minu1len { get; set; }
+
+        public byte[] minutiae2 { get; set; }
+        public int minu2len { get; set; }
+
         /* FIXME: change to the right PCID & CONFIGFILE  */
 
         byte[] pbPcid = null;
@@ -45,7 +51,7 @@ namespace MyG5Blazor.Data
             }
         }
 
-        private bool ReadEktp(ref Ektp_Data ktp)
+        public bool ReadEktp(ref Ektp_Data ktp)
         {
             byte[] length = new byte[4];
             byte[] data;
@@ -118,7 +124,8 @@ namespace MyG5Blazor.Data
                 return false;
 
             ktp.minutiae1 = data;
-
+            minutiae1 = data;
+            minu1len = size;
             // Minutiae2
             size = length.Length;
             ret = Ektp_Sdk.EktpGetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_MINUTIAE2_SIZE, length, ref size);
@@ -133,7 +140,8 @@ namespace MyG5Blazor.Data
                 return false;
 
             ktp.minutiae2 = data;
-
+            minutiae2 = data;
+            minu2len = size;
             return true;
         }
 

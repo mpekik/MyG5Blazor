@@ -169,30 +169,33 @@
 
     private int logutCount = 0;
     private bool isLogout = false;
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
-        menu._menuPulsa.Clear();
-        menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
-        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
-        config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB);
-        config.usbCardReader = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER_USB);
-        //Console.WriteLine(_myURL);
-        for (int i = 0; i < menu._mainMenu.Count(); i++)
+        if (bFirstRender)
         {
-            hrefMenu[i] = menu._mainMenu[i]._href;
-            AssetsPNG[i] = menu._mainMenu[i]._icon;
-            arrayTrans[i] = menu._mainMenu[i]._code;
-            apiURL[i] = menu._mainMenu[i]._url;
-            stringMenu[i] = "0";
-        }
-        Switcher.DOWN("500",config.usbEKTP);
-        Switcher.DOWN("500",config.usbCardReader);
-        cst.Clear();
-        trans.ClearTransaction();
-        CheckMenuStatus();
+            menu._menuPulsa.Clear();
+            menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
+            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+            menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
+            config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB);
+            config.usbCardReader = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER_USB);
+            //Console.WriteLine(_myURL);
+            for (int i = 0; i < menu._mainMenu.Count(); i++)
+            {
+                hrefMenu[i] = menu._mainMenu[i]._href;
+                AssetsPNG[i] = menu._mainMenu[i]._icon;
+                arrayTrans[i] = menu._mainMenu[i]._code;
+                apiURL[i] = menu._mainMenu[i]._url;
+                stringMenu[i] = "0";
+            }
+            Switcher.DOWN("500", config.usbEKTP);
+            Switcher.DOWN("500", config.usbCardReader);
+            cst.Clear();
+            trans.ClearTransaction();
+            CheckMenuStatus();
 
-        intMenu = 0;
+            intMenu = 0;
+        }
     }
 
     private void CheckMenuStatus()

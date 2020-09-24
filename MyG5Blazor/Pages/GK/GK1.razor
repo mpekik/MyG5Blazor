@@ -140,6 +140,7 @@
     private bool IsVisible = false;
     private bool IsInvalid = false;
     private bool IsLoading = false;
+    private bool isSubmit = true;
 
     //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
     public string _myURL = "";
@@ -148,12 +149,15 @@
     private string _termID = string.Empty;
     private string strMsgError = string.Empty;
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
-        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        cst.Clear();
-        OurUtility.Write_Log("== Ganti Kartu Hilang/Rusak", "step-action");
-        OurUtility.Write_Log("=== Step 1. Insert Phone Number Page", "step-action");
+        if (bFirstRender)
+        {
+            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+            cst.Clear();
+            OurUtility.Write_Log("== Ganti Kartu Hilang/Rusak", "step-action");
+            OurUtility.Write_Log("=== Step 1. Insert Phone Number Page", "step-action");
+        }
     }
 
     private void OkOnClick(bool visiblestatus)
@@ -169,6 +173,7 @@
         {
             IsVisible = visiblestatus;
             IsInvalid = visiblestatus;
+            isSubmit = true;
         }
     }
 
@@ -195,114 +200,127 @@
 
     private async Task CheckNumber(string strURL)
     {
-        //Get Start Time For Audit Trail And Transaction Log
-        trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
-
-        //Set UI Loading
-        IsLoading = true;
-
-        //Capture Image From IP CAM
-        byte[] image = OurUtility.CaptureImage();
-        string imageBytesStr;
-        if (image != null)
-            imageBytesStr = Convert.ToBase64String(image);
-        else
-            imageBytesStr = "";
-
-        cst.PhoneNumber = "62" + strNumber.Substring(1);
-
-        //Set HTTP Request Body
-        string myJsonForLog = "{ \"terminalId\" : \"" + trans.termID + "\"," +
-                        "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\",";
-
-        string myJson = myJsonForLog +
-                        "\"image\" : \"" + imageBytesStr + "\"" +
-                        "}";
-
-        //Set HTTP Request URL
-        string myURL = _myURL + serviceURL;
-
-        OurUtility.Write_Log("== Check Phone Number", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
-
-        //Call HTTP Request
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-        ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-
-        if (strResult != null)
+        if (isSubmit)
         {
-            try
+            isSubmit = false;
+            //Get Start Time For Audit Trail And Transaction Log
+            trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            //Set UI Loading
+            IsLoading = true;
+
+            //Capture Image From IP CAM
+            byte[] image = OurUtility.CaptureImage();
+            string imageBytesStr;
+            if (image != null)
+                imageBytesStr = Convert.ToBase64String(image);
+            else
+                imageBytesStr = "";
+
+            cst.PhoneNumber = "62" + strNumber.Substring(1);
+
+            //Set HTTP Request Body
+            string myJsonForLog = "{ \"terminalId\" : \"" + trans.termID + "\"," +
+                            "\"noHp\" : \"" + "62" + strNumber.Substring(1) + "\",";
+
+            string myJson = myJsonForLog +
+                            "\"image\" : \"" + imageBytesStr + "\"" +
+                            "}";
+
+            //Set HTTP Request URL
+            string myURL = _myURL + serviceURL;
+
+            OurUtility.Write_Log("== Check Phone Number", "step-action");
+            //OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
+
+            //Call HTTP Request
+            string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+            ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+
+
+            if (strResult != null)
             {
-                //Parse HTTP Request Resul To JObject
-                JObject jobjResult = JObject.Parse(strResult);
-
-                //Set transactionId
-                trans.SetTransaction((string)jobjResult["transaction"].SelectToken("transactionId"));
-
-                //Check If statusCode == 00 (Success)
-                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                if (strResult != "Forbidden")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    try
+                    {
+                        //Parse HTTP Request Resul To JObject
+                        JObject jobjResult = JObject.Parse(strResult);
 
-                    //Set Costumer Profile
-                    cst.CostumerProfile((string)jobjResult["profile"].SelectToken("type"), (string)jobjResult["profile"].SelectToken("nama"), (string)jobjResult["profile"].SelectToken("noHp"), (string)jobjResult["profile"].SelectToken("idType"), (string)jobjResult["profile"].SelectToken("idNumber"));
-                    OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
+                        //Set transactionId
+                        trans.SetTransaction((string)jobjResult["transaction"].SelectToken("transactionId"));
 
-                    //Add Step To Audit Trail List
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "00");
+                        //Check If statusCode == 00 (Success)
+                        if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                        {
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
 
-                    //Navigate To Next Page
-                    NavMan.NavigateTo(strURL);
+                            //Set Costumer Profile
+                            cst.CostumerProfile((string)jobjResult["profile"].SelectToken("type"), (string)jobjResult["profile"].SelectToken("nama"), (string)jobjResult["profile"].SelectToken("noHp"), (string)jobjResult["profile"].SelectToken("idType"), (string)jobjResult["profile"].SelectToken("idNumber"));
+                            OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
+
+                            //Add Step To Audit Trail List
+                            trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "00");
+
+                            //Navigate To Next Page
+                            NavMan.NavigateTo(strURL);
+                        }
+
+                        //Check If statusCode == 01 (Error Page)
+                        else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                        {
+                            if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                            {
+                                OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                                trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                            }
+                            else
+                            {
+                                OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                                trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                            }
+                            trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
+                            trans.status = "01";
+                            await OurUtility.AuditTrail(trans, menu, cst);
+
+                            NavMan.NavigateTo("/error");
+                        }
+
+                        //Check If statusCode == 02 (Error Modal)
+                        else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                        {
+                            strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                            IsLoading = false;
+                            IsVisible = false;
+                            IsInvalid = true;
+                        }
+                    }
+                    catch (Exception ex)
+                    {
+                        trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
+                        trans.status = "01";
+                        await OurUtility.AuditTrail(trans, menu, cst);
+
+                        trans.errorCode = strResult;
+                        OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                        NavMan.NavigateTo("/error");
+                    }
                 }
-
-                //Check If statusCode == 01 (Error Page)
-                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                else
                 {
-                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
-                    {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
-                    }
-                    else
-                    {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
-                    }
-                    trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
-                    trans.status = "01";
-                    await OurUtility.AuditTrail(trans,menu,cst);
-
+                    trans.errorCode = strResult;
+                    OurUtility.Write_Log("== Error : " + strResult, "step-action");
                     NavMan.NavigateTo("/error");
                 }
-
-                //Check If statusCode == 02 (Error Modal)
-                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
-                {
-                    strMsgError= (string)jobjResult["transaction"].SelectToken("statusDesc");
-                    IsLoading = false;
-                    IsVisible = false;
-                    IsInvalid = true;
-                }
             }
-            catch (Exception ex)
+            else
             {
-                trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
-                trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
-
                 trans.errorCode = strResult;
-                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
                 NavMan.NavigateTo("/error");
             }
         }
-        else
-        {
-            trans.errorCode = strResult;
-            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            NavMan.NavigateTo("/error");
-        }
     }
-
     [Microsoft.AspNetCore.Components.Inject]
 
     protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
@@ -312,16 +330,16 @@
     protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
 
     private bool timer = false;
-    protected override void OnAfterRender(bool bFirstRender)
-    {
-        if (bFirstRender)
-        {
-            timer = true;
-            theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
+    //protected override void OnAfterRender(bool bFirstRender)
+    //{
+    //    if (bFirstRender)
+    //    {
+    //        timer = true;
+    //        theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
 
-            this.StateHasChanged();
-        }
-    }
+    //        this.StateHasChanged();
+    //    }
+    //}
 
     [Microsoft.JSInterop.JSInvokable]
 

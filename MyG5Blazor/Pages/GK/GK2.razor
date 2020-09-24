@@ -191,13 +191,16 @@
         NavMan.NavigateTo(strURL);
     }
 
-    protected override async Task OnInitializedAsync()
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
-        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
-        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
-        OurUtility.Write_Log("=== Step 2. Scan e-KTP Page", "step-action");
-        Switcher.UP("3000",config.usbEKTP);
+        if (bFirstRender)
+        {
+            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+            pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
+            pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
+            OurUtility.Write_Log("=== Step 2. Scan e-KTP Page", "step-action");
+            Switcher.UP("3000", config.usbEKTP);
+        }
     }
 
     private async Task CheckEKTP()
@@ -327,16 +330,16 @@
     protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
 
     private bool timer = false;
-    protected override void OnAfterRender(bool bFirstRender)
-    {
-        if (bFirstRender)
-        {
-            timer = true;
-            theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
+    //protected override void OnAfterRender(bool bFirstRender)
+    //{
+    //    if (bFirstRender)
+    //    {
+    //        timer = true;
+    //        theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
 
-            this.StateHasChanged();
-        }
-    }
+    //        this.StateHasChanged();
+    //    }
+    //}
 
     [Microsoft.JSInterop.JSInvokable]
 

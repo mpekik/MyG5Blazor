@@ -164,6 +164,7 @@
             isLoading = true;
             trans.AddTrail("GET BILL", "BACK TO MAIN MENU", "02");
             trans.status = "02";
+            trans.kip = "Pembayaran tidak dilanjutkan, terminal id:" + menu.terminalId;
             await OurUtility.AuditTrail(trans, menu, cst);
             NavMan.NavigateTo("/main");
         }

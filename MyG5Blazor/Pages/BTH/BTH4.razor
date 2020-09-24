@@ -452,6 +452,7 @@
 
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN TAGIHAN VIA DEBIT BERHASIL";
+                            trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -476,6 +477,7 @@
                             }
                             await Print();
                             trans.status = "01";
+                            trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -501,8 +503,22 @@
                     pageClass = "main-panel bg-home";
                     Payout.total = 0;
                     Payout.uangCount = 0;
-                    logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
-                    logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+                    try
+                    {
+                        logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
+                    }
+                    catch (Exception ex)
+                    {
+                        logbank = 0;
+                    }
+                    try
+                    {
+                        logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+                    }
+                    catch (Exception ex)
+                    {
+                        logamount = 0;
+                    }
                     await Task.Delay(2000);
                     await MainLoop();
                     intAccBill = Payout.total;
@@ -545,6 +561,7 @@
                             //await CheckNPS("");
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN TAGIHAN VIA CC BERHASIL";
+                            trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -568,6 +585,7 @@
                                 Void();
                             }
                             await Print();
+                            trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:"+trans.transID+" , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -616,6 +634,7 @@
             await CheckNPS("");
             trans.status = "00";
             trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
+            trans.kip = "Berhasil, terminal id:" + menu.terminalId;
             await OurUtility.AuditTrail(trans, menu, cst);
 
             Timer.SetTimer(20000);
@@ -627,6 +646,7 @@
             IsFail = true;
             await Print();
             trans.status = "01";
+            trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
             await OurUtility.AuditTrail(trans, menu, cst);
 
             Timer.SetTimer(20000);
@@ -656,6 +676,7 @@
 
             await Payment("");
 
+            trans.kip = "Pembayaran tidak dilanjutkan, terminal id:" + menu.terminalId;
             OurUtility.AuditTrail(trans, menu, cst);
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;

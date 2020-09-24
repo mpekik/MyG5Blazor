@@ -382,17 +382,21 @@
         {
             isTextfield = "3";
         }
-        protected override async Task OnInitializedAsync()
-        {
-            cst.Clear();
-            trans.ClearTransaction();
-            menu._mainMenu.Clear();
-            OurUtility.Write_Log("Login Page", "step-action");
-            menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
-            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-            menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
-            //OurUtility.Write_Log(_myURL, "step-action");
-        }
+
+        private int logbank = 0;
+        private int logamount = 0;
+
+        //protected override async Task OnInitializedAsync()
+        //{
+        //    cst.Clear();
+        //    trans.ClearTransaction();
+        //    menu._mainMenu.Clear();
+        //    OurUtility.Write_Log("Login Page", "step-action");
+        //    menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
+        //    _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        //    menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
+        //    //OurUtility.Write_Log(_myURL, "step-action");
+        //}
         [Microsoft.AspNetCore.Components.Inject]
 
         protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
@@ -408,14 +412,21 @@
             isLoading = true;
             System.Diagnostics.Process.Start("shutdown.exe", "-s -f -t 5");
         }
-        protected override void OnAfterRender(bool bFirstRender)
+        protected override async Task OnAfterRenderAsync(bool bFirstRender)
         {
             if (bFirstRender)
             {
                 //theJavaScriptEngine.InvokeAsync<System.Object>("callKeyboard");
-                this.StateHasChanged();
+                //this.StateHasChanged();
+                cst.Clear();
+                trans.ClearTransaction();
+                menu._mainMenu.Clear();
+                OurUtility.Write_Log("Login Page", "step-action");
+                menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
+                _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+                menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
             }
-        }
+        }   
 
         private async Task NavigateTo(string strURL)
         {
@@ -576,7 +587,7 @@
             {
                 try
                 {
-                    JObject jobjResult = JObject.Parse(strResult);
+                    JObject jobjResult = JObject.Parse(strResult); 
                     if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
