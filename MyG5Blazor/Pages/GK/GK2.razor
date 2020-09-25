@@ -276,7 +276,7 @@
                 byte[] rightData = new byte[rightLen];
 
                 OurUtility.Write_Log("===== 7. Ektp_Sdk.ReadFingerPrints", "step-action");
-                ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(false);
+                ret = Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData);
                 if (ret != 0 || leftLen == 0 || rightLen == 0)
                 {
                     OurUtility.Write_Log("===== 8. Ektp_Sdk.ReadFingerPrints Failed", "step-action");
