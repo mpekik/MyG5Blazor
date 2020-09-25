@@ -132,39 +132,7 @@
     byte[] pbConf;
     public string _myURL = "";
     public string saveURL = "log/v1/save";
-    public static async Task<string> PostCallAPI(string url, string jsonString)
-    {
-        string ret = string.Empty;
-        try
-        {
-            using (var handler = new HttpClientHandler())
-            {
-                handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
-                using (HttpClient client = new HttpClient(handler))
-                {
-                    var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
-                    var response = await client.PostAsync(url, content);
-                    if (response != null)
-                    {
-                        if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
-                        {
-                            var jsonStringResult = await response.Content.ReadAsStringAsync();
-                            return jsonStringResult;
-                        }
-                        else
-                        {
-                            return response.StatusCode.ToString();
-                        }
-                    }
-                }
-            }
-        }
-        catch (Exception ex)
-        {
-            OurUtility.Write_Log("==" + ex.Message, "step-action");
-        }
-        return ret;
-    }
+
     private async Task MenuUtama()
     {
         if (translog)
@@ -227,34 +195,8 @@
         //ektp.InitializeEktp();
         IsLoading = true;
         OurUtility.Write_Log("==== Scan FingerPrint", "step-action");
-        //OurUtility.Write_Log("===== Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
-        //if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)
-        //{
-        //    OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
-        //    Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_PCID, pbPcid, pbPcid.Length);
-        //    OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
-        //    Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_CONFIG, pbConf, pbConf.Length);
-        //}
         OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
         await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
-
-        //int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
-        //byte[] leftData = new byte[leftLen];
-        //byte[] rightData = new byte[rightLen];
-
-        //OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints", "step-action");
-        //int ret = Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData);
-        //if (ret != 0 || leftLen == 0 || rightLen == 0)
-        //{
-        //    OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Failed", "step-action");
-        //    trans.AddTrail("SCAN EKTP", "FINGERPRINT NO DATA", "01");
-        //    //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
-        //    //return;
-        //}
-        //ktp.minutiae1 = leftData;
-        //ktp.minutiae2 = rightData;
-        //ktp.minu1len = leftLen;
-        //ktp.minu2len = rightLen;
 
         OurUtility.Write_Log("===== Ektp_Sdk.OpenFingerPrintReader", "step-action");
 

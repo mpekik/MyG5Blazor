@@ -281,8 +281,6 @@
                 {
                     OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Failed", "step-action");
                     trans.AddTrail("SCAN EKTP", "FINGERPRINT NO DATA", "01");
-                    //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
-                    //return;
                 }else if(ret==0)
                 {
                     ktp.minutiae1 = leftData;

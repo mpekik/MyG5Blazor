@@ -232,7 +232,7 @@
 
     private async Task MenuUtama()
     {
-        trans.status = "GAGAL";
+        trans.status = "01";
         await OurUtility.AuditTrail(trans,menu,cst);
         NavigateTo("/main");
     }
@@ -262,10 +262,10 @@
             return;
         }
         stock = Int32.Parse(cardStock);
-        Switcher.DOWN("500", config.usbEKTP);
+        //Switcher.DOWN("500", config.usbEKTP);
         OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
         isLoading = true;
-        Switcher.UP("3000", config.usbCardReader);
+        //Switcher.UP("3000", config.usbCardReader);
         await MyPerso();
         //stock = stock - intTryCount;
         //trans.jumlah_kartu = stock;
@@ -315,6 +315,10 @@
                     if (!cds.Start(ref errorcode, strCOM, ref msg))
                     {
                         OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
+                    }else
+                    {
+                        OurUtility.Write_Log("==== Card_Dispenser.Start, Success", "step-action");
+                        cds.Stop(ref msg);
                     }
                     //ToDO if Reader error
                     if (await CardReaderScan())
@@ -350,6 +354,11 @@
                                         if (!cds.Start(ref errorcode, strCOM, ref msg))
                                         {
                                             OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
+                                        }
+                                        else
+                                        {
+                                            OurUtility.Write_Log("==== Card_Dispenser.Start, Success", "step-action");
+                                            cds.Stop(ref msg);
                                         }
                                         if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
                                         {
@@ -549,7 +558,6 @@
     }
     private async Task CheckNPS(string strURL)
     {
-
         string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                 "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                                 "\"terminalId\" : \"" + trans.termID + "\"" +
@@ -558,9 +566,9 @@
 
         OurUtility.Write_Log("== Check CES", "step-action");
         //OurUtility.Write_Log("== URL API : " + myURL, "step-action");
-        ////OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-        ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != null)
         {
             try
