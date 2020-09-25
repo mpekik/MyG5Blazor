@@ -227,14 +227,14 @@
         //ektp.InitializeEktp();
         IsLoading = true;
         OurUtility.Write_Log("==== Scan FingerPrint", "step-action");
-        OurUtility.Write_Log("===== Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
-        if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)
-        {
-            OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
-            Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_PCID, pbPcid, pbPcid.Length);
-            OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
-            Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_CONFIG, pbConf, pbConf.Length);
-        }
+        //OurUtility.Write_Log("===== Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
+        //if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)
+        //{
+        //    OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
+        //    Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_PCID, pbPcid, pbPcid.Length);
+        //    OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
+        //    Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_CONFIG, pbConf, pbConf.Length);
+        //}
         OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
         await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
 
