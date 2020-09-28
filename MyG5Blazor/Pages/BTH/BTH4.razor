@@ -736,10 +736,10 @@
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
-                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null || (string)jobjResult["transaction"].SelectToken("statusDesc") != null)
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
@@ -844,7 +844,7 @@
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
@@ -1038,10 +1038,10 @@
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
-                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null || (string)jobjResult["transaction"].SelectToken("statusDesc") != null)
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
