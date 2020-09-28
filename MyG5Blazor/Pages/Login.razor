@@ -426,7 +426,7 @@
                 _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
                 menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
             }
-        }   
+        }
 
         private async Task NavigateTo(string strURL)
         {
@@ -494,38 +494,49 @@
             {
                 try
                 {
-                    if (strResult != "Unauthorized")
+                    if (strResult != "Forbidden")
                     {
-                        JObject jobjResult = JObject.Parse(strResult);
-                        if (jobjResult.ContainsKey("transaction"))
+                        if (strResult != "Unauthorized")
                         {
-                            if (jobjResult["transaction"].SelectToken("statusCode") != null)
+                            JObject jobjResult = JObject.Parse(strResult);
+                            if (jobjResult.ContainsKey("transaction"))
                             {
-                                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                                if (jobjResult["transaction"].SelectToken("statusCode") != null)
                                 {
-                                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
-                                    OurUtility.Write_Log("== Login Berhasil", "step-action");
-
-                                    menu.userName = userName;
-                                    authorizedLevel = (string)jobjResult["userLevel"];
-                                    isLoading = false;
-                                    isNotAuthorized = false;
-                                    isAuthorized = true;
-                                    return;
-                                }
-                                else
-                                {
-                                    if (jobjResult["transaction"].SelectToken("errorCode") != null)
+                                    if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                                     {
-                                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                                        OurUtility.Write_Log("== Login Berhasil", "step-action");
+
+                                        menu.userName = userName;
+                                        authorizedLevel = (string)jobjResult["userLevel"];
+                                        isLoading = false;
+                                        isNotAuthorized = false;
+                                        isAuthorized = true;
+                                        return;
                                     }
                                     else
                                     {
-                                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
-                                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                                        if (jobjResult["transaction"].SelectToken("errorCode") != null)
+                                        {
+                                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                                        }
+                                        else
+                                        {
+                                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                                        }
+                                        OurUtility.Write_Log("== Login Gagal", "step-action");
+                                        isLoading = false;
+                                        isAuthorized = false;
+                                        isNotAuthorized = true;
                                     }
-                                    OurUtility.Write_Log("== Login Gagal", "step-action");
+                                }
+                                else
+                                {
+                                    trans.errorCode = "Invalid Status Code";
+                                    OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
                                     isLoading = false;
                                     isAuthorized = false;
                                     isNotAuthorized = true;
@@ -533,8 +544,8 @@
                             }
                             else
                             {
-                                trans.errorCode = "Invalid Status Code";
-                                OurUtility.Write_Log("== Login Gagal : " +trans.errorCode, "step-action");
+                                trans.errorCode = "Invalid Transaction Response";
+                                OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
                                 isLoading = false;
                                 isAuthorized = false;
                                 isNotAuthorized = true;
@@ -542,20 +553,20 @@
                         }
                         else
                         {
-                            trans.errorCode = "Invalid Transaction Response";
+                            trans.errorCode = "Unauthorized";
                             OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
                             isLoading = false;
                             isAuthorized = false;
                             isNotAuthorized = true;
                         }
-                    }
-                    else
+                    }else
                     {
-                        trans.errorCode = "Unauthorized";
+                        trans.errorCode = "Forbidden";
                         OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
                         isLoading = false;
                         isAuthorized = false;
-                        isNotAuthorized = true;
+                        isNotAuthorized = false;
+                        NavMan.NavigateTo("/errorLogin");
                     }
                 }
                 catch (Exception ex)
@@ -587,7 +598,7 @@
             {
                 try
                 {
-                    JObject jobjResult = JObject.Parse(strResult); 
+                    JObject jobjResult = JObject.Parse(strResult);
                     if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");

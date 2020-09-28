@@ -75,7 +75,7 @@
                     <div class="teks-center" style="margin-top: 32%;"> Terima kasih telah melakukan pengisian <br> ulang pulsa senilai <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b> </div>
                 </div>
                 <div id="bayar2">
-                    <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b></div>
+                    <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @sisaPulsa</b></div>
                 </div>
             </div>
 
@@ -376,6 +376,7 @@
     public string _myURL = string.Empty;
     public string serviceURL = "isi-pulsa/v1/payment";
     private static string cesURL = "ces/v1/eligibility-check";
+    private static string sisaPulsa = "0";
 
     private string qu1IndText = string.Empty;
     private string qu1ID = string.Empty;
@@ -972,7 +973,7 @@
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
-
+                    sisaPulsa = (string)jobjResult["transaction"].SelectToken("pulsa");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {

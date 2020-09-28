@@ -7,6 +7,7 @@
 @inject NavigationManager NavMan
 @inject Menu menu
 @inject Transaction trans  
+@inject Config config 
     <div class="main-panel bg-home">
         <!-- Navbar -->
         <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -50,15 +51,27 @@
                         }
                     </div>
 
-                    <div class="col-md-6">
-                        @if (!IsMethod)
-                        {
-                            <img @onclick="@(() => SetPaymentMethod(1))" id="" class="pembayaran" src="../../assets/image/Bayar_Debit.png">
-                            <img @onclick="@(() => SetPaymentMethod(2))" id="" class="pembayaran" src="../../assets/image/Bayar_Tunai.png">
-                            <img @onclick="@(() => SetPaymentMethod(3))" id="" class="pembayaran" src="../../assets/image/Bayar_Kredit.png">
-                        }
-                        else
-                        {
+
+                    @if (!IsMethod)
+                    {
+                        <div class="col-md-6" style="text-align: center;">
+                            @if (config.edc == "1")
+                            {
+                                <img @onclick="@(() => SetPaymentMethod(1))" id="" class="pembayaran" src="../../assets/image/Bayar_Debit.png">
+                            }
+                            @if (false)
+                            {
+                                <img @onclick="@(() => SetPaymentMethod(2))" id="" class="pembayaran" src="../../assets/image/Bayar_Tunai.png">
+                            }
+                            @if (config.edc == "1")
+                            {
+                                <img @onclick="@(() => SetPaymentMethod(3))" id="" class="pembayaran" src="../../assets/image/Bayar_Kredit.png">
+                            }
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="col-md-6">
                             <div class="teks-nominal">
                                 <table id="tabel">
                                     <tr>
@@ -77,12 +90,12 @@
                                         <td>&emsp;<span style="font-weight: bold;">@cst.strMPembayaran</span></td>
                                     </tr>
                                 </table>
-                                <button class="btn btn-danger btn-right" @onclick="@(()=>NavMan.NavigateTo("/IP/4"))" id="btn-ok" value="">OK</button>
+                                <button class="btn btn-danger btn-right" @onclick="@(() => NavMan.NavigateTo("/IP/4"))" id="btn-ok" value="">OK</button>
                             </div>
-                        }
+                        </div>
+                    }
+                        </div>
                     </div>
-                </div>
-            </div>
         </div>
 
         <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
