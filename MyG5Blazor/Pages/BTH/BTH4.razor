@@ -114,7 +114,7 @@
                                         <div class="teks-center" style="margin-top: 32%;"> Pastikan Pembayaran Menggunakan <br> Uang Kertas Minimal Pecahan Rp 10.000 </div>
                                     </div>
                                     <div id="bayar2">
-                                        <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian</div>
+                                        <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 45%; line-height: 1;">Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian</div>
                                     </div>
                                     <div id="bayar3">
                                         <div class="teks-bot2" style="text-transform: uppercase; font-weight: bold; margin-top: 70%;">NILAI DARI KELEBIHAN PEMBAYARAN SECARA OTOMATIS AKAN MENGURANGI TAGIHAN KARTUHALO ANDA DI BULAN BERIKUTNYA.</div>
@@ -437,7 +437,6 @@
                         await Task.Delay(2000);
                         intAccBill = intBill;
                         await Payment("");
-                        //resultPayment = "00";
                         if (resultPayment == "00")
                         {
                             trans.edcStatus = "SUCCESS";
@@ -556,7 +555,7 @@
                             trans.edcStatus = "SUCCESS";
                             IsLoading = false;
                             IsSuccess = true;
-                            Console.WriteLine("Payment Success");
+                            //Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
                             await Print();
                             //await CheckNPS("");
@@ -598,11 +597,13 @@
                     else
                     {
                         IsFail = true;
+                        OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
                         trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
                         trans.status = "01";
+                        trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                         await OurUtility.AuditTrail(trans, menu, cst);
 
-                        Console.WriteLine("Payment Failed");
+                        //Console.WriteLine("Payment Failed");
                     }
                     break;
                 }
@@ -934,7 +935,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            //Console.WriteLine(ex.Message);
         }
     }
 
@@ -962,7 +963,7 @@
 
             edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
-            Console.WriteLine(edc.respondCode);
+            //Console.WriteLine(edc.respondCode);
 
         } while (!edc.mre.WaitOne());
         trans.ecr = edc.ecr;

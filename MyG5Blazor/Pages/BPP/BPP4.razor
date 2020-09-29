@@ -68,16 +68,16 @@
                             }
                             else if (IsSuccess)
                             {
-            <div class="col-md-6">
-                <div class="teks-title">Beli Pulsa Prabayar</div>
-                <div id="status-pay" class="teks-center teks-bold">Proses Pembelian Pulsa Prabayar<br> <b class="green">Berhasil</b></div>
-                <div id="teks-pastikan">
-                    <div class="teks-center" style="margin-top: 32%;"> Terima kasih telah melakukan pengisian <br> ulang pulsa senilai <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b> </div>
-                </div>
-                <div id="bayar2">
-                    <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @sisaPulsa</b></div>
-                </div>
-            </div>
+                                <div class="col-md-6">
+                                    <div class="teks-title">Beli Pulsa Prabayar</div>
+                                    <div id="status-pay" class="teks-top teks-bold">Proses Pembelian Pulsa Prabayar <b class="green">Berhasil</b></div>
+                                    <div id="teks-pastikan">
+                                        <div class="teks-center" style="margin-top: 32%;"> Terima kasih telah melakukan pengisian ulang pulsa senilai <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b> </div>
+                                    </div>
+                                    <div id="bayar2">
+                                        <div class="teks-bot" style="margin-top: 49%; line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @sisaPulsa.ToString("N0")</b></div>
+                                    </div>
+                                </div>
 
                                 <div class="col-md-6">
                                     <div id="image-pulsa" class="image-center2">
@@ -192,7 +192,13 @@
                             {
                                 <div class="col-md-6">
                                     <div class="teks-title">Beli Pulsa Prabayar</div>
-                                    <div id="status-pay" class="teks-center teks-bold">Proses Pembelian Pulsa Prabayar<br> <b class="green">Berhasil</b></div>
+                                    <div id="status-pay" class="teks-top teks-bold">Proses Pembelian Pulsa Prabayar <b class="green">Berhasil</b></div>
+                                    <div id="teks-pastikan">
+                                        <div class="teks-center" style="margin-top: 32%;"> Terima kasih telah melakukan pengisian ulang pulsa senilai <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b> </div>
+                                    </div>
+                                    <div id="bayar2">
+                                        <div class="teks-bot" style="margin-top: 49%; line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @sisaPulsa.ToString("N0")</b></div>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6">
@@ -364,6 +370,7 @@
     private int intTryLimit = 3;
     private int MetodePembayaran = 0;
     private int CESno = 0;
+    private int sisaPulsa = 0;
 
     private string strNPS1Value = string.Empty;
     private string strMsgError = string.Empty;
@@ -376,7 +383,6 @@
     public string _myURL = string.Empty;
     public string serviceURL = "isi-pulsa/v1/payment";
     private static string cesURL = "ces/v1/eligibility-check";
-    private static string sisaPulsa = "0";
 
     private string qu1IndText = string.Empty;
     private string qu1ID = string.Empty;
@@ -406,7 +412,7 @@
         MetodePembayaran = cst.intMPembayaran;
         intBill = cst.intTagihan;
         //intAccBill = 10000;
-        intMinus = intBill - intAccBill;
+        //intMinus = intBill - intAccBill;
         switch (MetodePembayaran)
         {
             case 1:
@@ -431,8 +437,11 @@
                             //Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
 
+                            //TimerCES.SetTimer(5000);
+                            //TimerCES.OnElapsed += TimerElapsedHandlerCES;
+
                             await Print();
-                            //await CheckNPS("");
+
                             trans.status = "00";
                             trans.errorCode = "PEMBELIAN PULSA VIA DEBIT BERHASIL";
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
@@ -538,7 +547,7 @@
                             trans.edcStatus = "SUCCESS";
                             IsLoading = false;
                             IsSuccess = true;
-                            Console.WriteLine("Payment Success");
+                            //Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
                             await Print();
                             //await CheckNPS("");
@@ -568,6 +577,7 @@
                                 Void();
                             }
                             await Print();
+                            trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
                             Timer.SetTimer(20000);
@@ -629,7 +639,7 @@
         await MainLoop();
         intAccBill = Payout.total;
         await Payment("");
-        Console.WriteLine("inttotal = " + inttotal);
+        //Console.WriteLine("inttotal = " + inttotal);
         StateHasChanged();
 
     }
@@ -875,7 +885,7 @@
         }
         catch (Exception ex)
         {
-            Console.WriteLine(ex.Message);
+            //Console.WriteLine(ex.Message);
         }
     }
 
@@ -903,7 +913,7 @@
 
             edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
-            Console.WriteLine(edc.respondCode);
+            //Console.WriteLine(edc.respondCode);
 
         } while (!edc.mre.WaitOne());
         trans.ecr = edc.ecr;
@@ -973,7 +983,7 @@
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
-                    sisaPulsa = (string)jobjResult["transaction"].SelectToken("pulsa");
+                    sisaPulsa = int.Parse((string)jobjResult["transaction"].SelectToken("amount"));
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {

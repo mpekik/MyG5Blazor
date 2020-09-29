@@ -209,7 +209,7 @@ namespace MyG5Blazor.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                //Console.WriteLine(ex.Message);
             }
         }
         public void WriteUtil(string p_section, string p_name, string p_value)
@@ -231,7 +231,7 @@ namespace MyG5Blazor.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.Message);
+                //Console.WriteLine(ex.Message);
             }
         }
         public string terminalId = string.Empty;

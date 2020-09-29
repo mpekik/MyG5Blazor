@@ -82,7 +82,7 @@ namespace MyG5Blazor.Data
             catch (Exception ex)
             {
                 // Exception handling here:  Response.Write("Ex.: " + ex.Message);
-                Console.WriteLine("Exception " + ex.Message);
+                //Console.WriteLine("Exception " + ex.Message);
             }
 
             return null;
@@ -111,7 +111,7 @@ namespace MyG5Blazor.Data
                 myHttpWebRequest.Credentials = myCredentialCache;
 
                 var response = (HttpWebResponse)myHttpWebRequest.GetResponse();
-                Console.WriteLine(response.StatusCode);
+                //Console.WriteLine(response.StatusCode);
                 result = ReadFully(response.GetResponseStream());
                 MemoryStream mStream = new MemoryStream();
                 byte[] pData = result;
@@ -122,7 +122,7 @@ namespace MyG5Blazor.Data
             }
             catch (Exception ex)
             {
-                Console.WriteLine(ex.ToString());
+                //Console.WriteLine(ex.ToString());
                 return null;
             }
             return result;
@@ -404,7 +404,7 @@ namespace MyG5Blazor.Data
             }
             catch (HttpRequestException e)
             {
-                Console.WriteLine(e.InnerException.Message);
+                //Console.WriteLine(e.InnerException.Message);
             }
             return ret;
         }
