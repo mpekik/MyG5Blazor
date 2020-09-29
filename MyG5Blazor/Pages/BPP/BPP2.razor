@@ -36,37 +36,37 @@
 
                 <div class="col-md-6">
                     @*@foreach ((Menu.MenuPulsa mp,Int32 i) in menu._menuPulsa.Select((mp, i) => (mp, i)))
-        {
-         @if(i%2==0)
-         {
-             @((MarkupString)mp._addHTML)
-         }
-                <div class="col">
-                    <img @onclick="@(() => Nominal(int.Parse(mp._labelNominal)))" id="" class="nominal" src="../../assets/image/Voucher/@mp._icon">
-                </div>
-         @if(i%2==1)
-         {
-             @((MarkupString)mp._addHTML)
-         }
-        }*@
+                        {
+                         @if(i%2==0)
+                         {
+                             @((MarkupString)mp._addHTML)
+                         }
+                                <div class="col">
+                                    <img @onclick="@(() => Nominal(int.Parse(mp._labelNominal)))" id="" class="nominal" src="../../assets/image/Voucher/@mp._icon">
+                                </div>
+                         @if(i%2==1)
+                         {
+                             @((MarkupString)mp._addHTML)
+                         }
+                        }*@
 
                     @*@for (int i = 0; i < menu._menuPulsa.Count; i=i+2)
-        {
-            @if (i % 2 == 0)
-            {
-                <div class="row" style="margin-left: 10px;">
-                    <div class="col">
-                        <img @onclick="@(()=>Nominal(int.Parse(menu._menuPulsa[i]._labelNominal)))" id="" class="nominal" src="../../assets/image/Voucher/@menu._menuPulsa[i]._icon">
-                    </div>
-                    @if (i + 1 < menu._menuPulsa.Count)
-                    {
-                <div class="col">
-                    <img @onclick="@(()=>Nominal(int.Parse(menu._menuPulsa[i+1]._labelNominal)))" id="" class="nominal" src="../../assets/image/Voucher/@menu._menuPulsa[i+1]._icon">
-                </div>
-                    }
-                </div>
-            }
-        }*@
+                        {
+                            @if (i % 2 == 0)
+                            {
+                                <div class="row" style="margin-left: 10px;">
+                                    <div class="col">
+                                        <img @onclick="@(()=>Nominal(int.Parse(menu._menuPulsa[i]._labelNominal)))" id="" class="nominal" src="../../assets/image/Voucher/@menu._menuPulsa[i]._icon">
+                                    </div>
+                                    @if (i + 1 < menu._menuPulsa.Count)
+                                    {
+                                <div class="col">
+                                    <img @onclick="@(()=>Nominal(int.Parse(menu._menuPulsa[i+1]._labelNominal)))" id="" class="nominal" src="../../assets/image/Voucher/@menu._menuPulsa[i+1]._icon">
+                                </div>
+                                    }
+                                </div>
+                            }
+                        }*@
                     <div class="row" style="margin-left: 10px;">
                         @if (stringMenu[0] == "0")
                         {
@@ -151,6 +151,23 @@
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
+    @if (isTimeOut)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                            <p class="text-body"><span style="font-weight: bold;">Sesi Anda akan segera berakhir.</span><br />Anda akan keluar dari sistem dalam <span style="font-weight: bold;">@dtkTimeOut.ToString()</span> detik.</p>
+                            <button class="btn btn-danger modal-button" @onclick="StopTimer">OK</button>
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
 </div>
 
 @code
@@ -160,6 +177,8 @@
     private string[] arrayTrans = { "", "", "", "", "", "", "", "" };
     private string[] stringMenu = { "1", "1", "1", "1", "1", "1", "1", "1" };
 
+    private bool isTimeOut = false;
+    private int dtkTimeOut = 60;
     protected override async Task OnInitializedAsync()
     {
         PopulatePulsa();
@@ -198,5 +217,70 @@
         trans.status = "GAGAL";
         await OurUtility.AuditTrail(trans, menu, cst);
         NavMan.NavigateTo("/IP/1");
+    }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
+
+    private bool timer = false;
+    protected override void OnAfterRender(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            //timer = true;
+            //theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 10000, true });
+
+            //this.StateHasChanged();
+        }
+    }
+
+    [Microsoft.JSInterop.JSInvokable]
+
+    public void theIdleTimeoutFired()
+    {
+        if (timer)
+        {
+            timer = false;
+            isTimeOut = true;
+            StateHasChanged();
+            Console.WriteLine("Tes");
+            //NavMan.NavigateTo(" ");
+        }
+    }
+
+    TimeSpan tsTimeOut = new TimeSpan();
+    bool isStopWatch = false;
+
+    async Task TimeLeft()
+    {
+        while(dtkTimeOut>0 &&isTimeOut)
+        {
+            Console.WriteLine(dtkTimeOut);
+            await Task.Delay(1000);
+            dtkTimeOut -= 1;
+            StateHasChanged();
+        }
+        await AfterTime();
+    }
+
+    Task AfterTime()
+    {
+        if(dtkTimeOut==0)
+        {
+            Console.WriteLine("Task Completed");
+            return Task.CompletedTask;
+        }
+        return Task.CompletedTask;
+    }
+
+    async Task StopTimer()
+    {
+        isTimeOut = false;
+        dtkTimeOut = 60;
     }
 }

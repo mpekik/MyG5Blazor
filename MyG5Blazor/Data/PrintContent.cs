@@ -78,16 +78,11 @@ namespace MyG5Blazor.Data
                 contents = contents + "TID : " + trans.edcTid + "\tMID : " + trans.edcMid + "\n" +
                 "BATCH : " + trans.edcBatch + "\tTRACE No : " + trans.edcTrace + "\n" +
                 "EDC REF NO : " + trans.edcRefNo + "\tAPPR CODE : " + trans.edcApproval + "\n" +
-                "\nRINCIAN TAGIHAN : \n";
-            foreach (dynamic t in cst.GetlistTagihan)
-            {
-                contents = contents +
-                    "AMOUNT : " + t._intTagihan.ToString("N0") + "\n";
-            }
+                "\n\n";
 
             contents = contents +
                 "\n" +
-                "TOTAL TAGIHAN : Rp " + cst.intTagihan.ToString("N0") + "\n" +
+                "NOMINAL PULSA : Rp " + cst.intTagihan.ToString("N0") + "\n" +
                 "METODE PEMBAYARAN : " + cst.strMPembayaran + "\n" +
                 "TOTAL PEMBAYARAN : Rp " + cst.intTagihanTerbayar.ToString("N0");
 

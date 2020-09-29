@@ -93,7 +93,24 @@
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
+@if (isTimeOut)
+{
+    <div id="myModal" class="modal">
 
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body"><span style="font-weight: bold;">Sesi Anda akan segera berakhir.</span><br />Anda akan keluar dari sistem dalam <span style="font-weight: bold;">@dtkTimeOut.ToString()</span> detik.</p>
+                    <button class="btn btn-danger modal-button" @onclick="StopTimer">Lanjutkan Sesi</button>
+                    <button class="btn btn-white modal-button" @onclick="StopTimer">Selesai</button>
+                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
 <!-- The Modal -->
 @if (isVisible)
 {
@@ -156,6 +173,11 @@
     {
         if (bFirstRender)
         {
+            //timer = true;
+            //theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 10000, true });
+
+            //this.StateHasChanged();
+
             _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
             cst.Clear();
             OurUtility.Write_Log("= Beli Pulsa Prabayar", "step-action");
@@ -175,8 +197,9 @@
         else
         {
             isVisible = visiblestatus;
-            isSubmit = true;
+
         }
+        isSubmit = true;
     }
 
     private void InputPhoneNumber(string strInput)
@@ -319,5 +342,61 @@
                 NavMan.NavigateTo("/error");
             }
         }
+    }
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
+
+    [Microsoft.AspNetCore.Components.Inject]
+
+    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
+
+    private bool timer = false;
+    private bool isTimeOut = false;
+    private int dtkTimeOut = 60;
+
+    [Microsoft.JSInterop.JSInvokable]
+
+    public void theIdleTimeoutFired()
+    {
+        if (timer)
+        {
+            timer = false;
+            isTimeOut = true;
+            StateHasChanged();
+            Console.WriteLine("Tes");
+            //NavMan.NavigateTo(" ");
+        }
+    }
+
+    TimeSpan tsTimeOut = new TimeSpan();
+    bool isStopWatch = false;
+
+    async Task TimeLeft()
+    {
+        while (dtkTimeOut > 0 && isTimeOut)
+        {
+            Console.WriteLine(dtkTimeOut);
+            await Task.Delay(1000);
+            dtkTimeOut -= 1;
+            StateHasChanged();
+        }
+        await AfterTime();
+    }
+
+    Task AfterTime()
+    {
+        if (dtkTimeOut == 0)
+        {
+            Console.WriteLine("Task Completed");
+            return Task.CompletedTask;
+        }
+        return Task.CompletedTask;
+    }
+
+    async Task StopTimer()
+    {
+        isTimeOut = false;
+        dtkTimeOut = 60;
     }
 }
