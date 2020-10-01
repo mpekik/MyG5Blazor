@@ -86,6 +86,7 @@ namespace MyG5Blazor.Data
             edcStatus = "FAILED";
             status = string.Empty;
             jumlah_kartu = 0;
+            kip = "-";
             _auditTrail.Clear();
         }
 

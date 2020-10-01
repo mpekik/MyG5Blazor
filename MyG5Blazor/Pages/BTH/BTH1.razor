@@ -247,7 +247,6 @@
 
                         trans.SetTransaction((string)jobjResult["transaction"].SelectToken("transactionId"));
                         cst.CostumerProfile((string)jobjResult["profile"].SelectToken("type"), (string)jobjResult["profile"].SelectToken("nama"), (string)jobjResult["profile"].SelectToken("noHp"), (string)jobjResult["profile"].SelectToken("idType"), (string)jobjResult["profile"].SelectToken("idNumber"), (string)jobjResult["profile"].SelectToken("accountId"));
-
                         OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
                         cst.intTagihan = OurUtility.ToInt32((string)jobjResult["tagihan"]);
 

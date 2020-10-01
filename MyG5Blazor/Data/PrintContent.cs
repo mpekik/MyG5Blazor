@@ -14,7 +14,7 @@ namespace MyG5Blazor.Data
             string contents = "TRANSACTION ID     : "+trans.transID+"\n\n\n"+
                 "TERMINAL ID        : "+trans.termID+"\n"+
                 "TANGGAL WAKTU      : "+ datetimenow.ToString("dd-MM-yyyy") + " " + datetimenow.ToString("HH:mm:ss") + "\n" +
-                "NOMOR PONSEL       : "+cst.PhoneNumber+"\n"+
+                "NOMOR PONSEL       : "+cst.phoneNumberMasked+"\n"+
                 "\n"+
                 "ANDA TELAH BERHASIL GANTI KARTU HILANG/RUSAK\n";
 
@@ -27,7 +27,7 @@ namespace MyG5Blazor.Data
             string contents = "TRANSACTION ID     : " + trans.transID + "\n\n\n" +
                 "TERMINAL ID        : " + trans.termID + "\n" +
                 "TANGGAL WAKTU      : " + datetimenow.ToString("dd-MM-yyyy") + " " + datetimenow.ToString("HH:mm:ss") + "\n" +
-                "NOMOR PONSEL       : " + cst.PhoneNumber + "\n" +
+                "NOMOR PONSEL       : " + cst.phoneNumberMasked + "\n" +
                 "\n" +
                 "ANDA TELAH BERHASIL UPGRADE 4G\n" ;
 
@@ -41,7 +41,7 @@ namespace MyG5Blazor.Data
                 "DATE : " + datetimenow.ToString("dd-MM-yyyy") + "\tTIME : " + datetimenow.ToString("HH:mm:ss") + "\n" +
                 "MACHINE ID : " + trans.termID + "\n" +
                 "TRANSACTION ID : " + trans.transID + "\n" +
-                "MSISDN : " + cst.PhoneNumber + "\n" +
+                "MSISDN : " + cst.phoneNumberMasked + "\n" +
                 "NAME : " + cst.Name + "\n" +
                 "\n";
             if (cst.intMPembayaran != 2)
@@ -71,7 +71,7 @@ namespace MyG5Blazor.Data
                 "DATE : " + datetimenow.ToString("dd-MM-yyyy") + "\tTIME : " + datetimenow.ToString("HH:mm:ss") + "\n" +
                 "MACHINE ID : " + trans.termID + "\n" +
                 "TRANSACTION ID : " + trans.transID + "\n" +
-                "MSISDN : " + cst.PhoneNumber + "\n" +
+                "MSISDN : " + cst.phoneNumberMasked + "\n" +
                 "NAME : " + cst.Name + "\n" +
                 "\n";
             if (cst.intMPembayaran != 2)

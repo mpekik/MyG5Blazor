@@ -9,7 +9,9 @@ namespace MyG5Blazor.Data
     {
         public string Type { get; set; }
         public string Name { get; set; }
+        public string nameMasked { get; set; }
         public string PhoneNumber { get; set; }
+        public string phoneNumberMasked => PhoneNumber.Substring(0, PhoneNumber.Length - 4).PadRight(PhoneNumber.Length, '*');
         public string EKTPNumber { get; set; }
         public string IDType { get;set; }
         
@@ -31,7 +33,18 @@ namespace MyG5Blazor.Data
             public string _custName { get; set; }
         }
 
-            
+        public void MaskingName()
+        {
+            string[] strSplit = Name.Split(" ");
+            foreach(string ss in strSplit)
+            {
+                if (ss != "")
+                {
+                    string sm = ss.Substring(0, 2).PadRight(ss.Length, '*');
+                    nameMasked = nameMasked + sm + " ";
+                }
+            }
+        }
 
         private List<Tagihan> _listTagihan = new List<Tagihan>();
 
@@ -56,14 +69,21 @@ namespace MyG5Blazor.Data
         public void Clear()
         {
             Name = string.Empty;
+            nameMasked = string.Empty;
             PhoneNumber = string.Empty;
             EKTPNumber = string.Empty;
+            IDType = string.Empty;
             intMPembayaran = 0;
             intTagihan = 0;
             intTagihanTerbayar = 0;
             intUangCount = 0;
             accountId = string.Empty;
             _listTagihan.Clear();
+            Type = string.Empty;
+            intMPembayaran = 0;
+            intTagihan = 0;
+            intTagihanTerbayar = 0;
+            intUangCount = 0;
         }
         public void CostumerProfile(string _type, string _name, string _phoneNumber, string _idType, string _ektpNumber)
         {
@@ -72,6 +92,7 @@ namespace MyG5Blazor.Data
             PhoneNumber = _phoneNumber;
             IDType = _idType;
             EKTPNumber = _ektpNumber;
+            MaskingName();
         }
         public void CostumerProfile(string _type, string _name, string _phoneNumber, string _idType, string _ektpNumber,string _accId)
         {
@@ -81,6 +102,7 @@ namespace MyG5Blazor.Data
             IDType = _idType;
             EKTPNumber = _ektpNumber;
             accountId = _accId;
+            MaskingName();
         }
         public void ClearTagihan()
         {

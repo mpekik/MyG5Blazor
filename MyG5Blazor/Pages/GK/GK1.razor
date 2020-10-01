@@ -214,9 +214,9 @@
             //byte[] image = OurUtility.CaptureImage();
             string imageBytesStr;
             //if (image != null)
-              //  imageBytesStr = Convert.ToBase64String(image);
+            //  imageBytesStr = Convert.ToBase64String(image);
             //else
-                imageBytesStr = "";
+            imageBytesStr = "";
 
             cst.PhoneNumber = "62" + strNumber.Substring(1);
 
@@ -259,7 +259,6 @@
                             //Set Costumer Profile
                             cst.CostumerProfile((string)jobjResult["profile"].SelectToken("type"), (string)jobjResult["profile"].SelectToken("nama"), (string)jobjResult["profile"].SelectToken("noHp"), (string)jobjResult["profile"].SelectToken("idType"), (string)jobjResult["profile"].SelectToken("idNumber"));
                             OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
-
                             //Add Step To Audit Trail List
                             trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "00");
 
