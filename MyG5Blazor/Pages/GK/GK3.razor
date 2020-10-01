@@ -181,16 +181,13 @@
         }
     }
 
-    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (bFirstRender)
-        {
             _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
             pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
             pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
             OurUtility.Write_Log("=== Step 3. FingerPrint Scan Page", "step-action");
             await FingerPrintScan();
-        }
     }
 
     private async Task FingerPrintScan()

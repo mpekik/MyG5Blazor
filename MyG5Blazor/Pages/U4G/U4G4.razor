@@ -241,10 +241,8 @@
         NavMan.NavigateTo(strURL);
     }
 
-    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (bFirstRender)
-        {
             mypersoexe = config.Read("Dispenser", Config.PARAM_PERSO_EXE);
             strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
             readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
@@ -265,9 +263,11 @@
             }
             stock = Int32.Parse(cardStock);
             Switcher.DOWN("500", config.usbEKTP);
+            await Task.Delay(500);
             OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
             isLoading = true;
             Switcher.UP("3000", config.usbCardReader);
+            await Task.Delay(3000);
             await MyPerso();
             //stock = stock - intTryCount;
             //trans.jumlah_kartu = stock;
@@ -301,7 +301,6 @@
                 Timer.OnElapsed += TimerElapsedHandler;
             }
         }
-    }
 
     private async Task MyPerso()
     {
@@ -310,6 +309,7 @@
             if (stock > 0)
             {
                 Switcher.DOWN("500", config.usbEKTP);
+                await Task.Delay(500);
                 Switcher.UP("3000", config.usbCardReader);
                 await Task.Delay(3000);
                 if (await Task.Run(() => MoveToICC()))

@@ -241,10 +241,8 @@
         NavMan.NavigateTo(strURL);
     }
 
-    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (bFirstRender)
-        {
             mypersoexe = config.Read("Dispenser", Config.PARAM_PERSO_EXE);
             strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
             readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
@@ -301,7 +299,6 @@
                 Timer.OnElapsed += TimerElapsedHandler;
             }
         }
-    }
 
     private async Task MyPerso()
     {

@@ -128,7 +128,7 @@
     public async Task GetPayment(string strURL)
     {
         isLoading = true;
-        await Task.Delay(10000);
+        await Task.Delay(1000);
         string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
             "\"terminalId\" : \"" + trans.termID + "\"," +
             "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
