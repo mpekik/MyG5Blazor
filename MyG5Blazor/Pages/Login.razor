@@ -416,6 +416,8 @@
         {
             if (bFirstRender)
             {
+                string url = config.ReadUtil("URL", Config.PARAM_DEFAULT_URL);
+                config.Write("URL", Config.PARAM_DEFAULT_URL, url);
                 //theJavaScriptEngine.InvokeAsync<System.Object>("callKeyboard");
                 //this.StateHasChanged();
                 cst.Clear();

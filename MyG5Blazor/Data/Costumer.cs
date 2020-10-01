@@ -40,8 +40,15 @@ namespace MyG5Blazor.Data
             {
                 if (ss != "")
                 {
-                    string sm = ss.Substring(0, 2).PadRight(ss.Length, '*');
-                    nameMasked = nameMasked + sm + " ";
+                    if (ss.Length > 2)
+                    {
+                        string sm = ss.Substring(0, 2).PadRight(ss.Length, '*');
+                        nameMasked = nameMasked + sm + " ";
+                    }
+                    else if (ss.Length == 1)
+                    {
+                        nameMasked = nameMasked + ss + " ";
+                    }
                 }
             }
         }
