@@ -255,7 +255,7 @@
             //OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
             ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-            if (strResult != null)
+            if (strResult != "")
             {
                 try
                 {

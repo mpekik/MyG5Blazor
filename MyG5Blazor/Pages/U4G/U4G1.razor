@@ -211,11 +211,11 @@
             IsLoading = true;
 
             //Capture Image From IP CAM
-            byte[] image = OurUtility.CaptureImage();
+            //byte[] image = OurUtility.CaptureImage();
             string imageBytesStr;
-            if (image != null)
-                imageBytesStr = Convert.ToBase64String(image);
-            else
+            //if (image != null)
+              //  imageBytesStr = Convert.ToBase64String(image);
+            //else
                 imageBytesStr = "";
 
             cst.PhoneNumber = "62" + strNumber.Substring(1);
@@ -238,7 +238,7 @@
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
             ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
-            if (strResult != null)
+            if (strResult != "")
             {
                 if (strResult != "Forbidden")
                 {

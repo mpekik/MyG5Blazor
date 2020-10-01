@@ -434,6 +434,7 @@
                         {
                             trans.edcStatus = "SUCCESS";
                             IsLoading = false;
+                            IsFail = false;
                             IsSuccess = true;
                             //Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
@@ -458,6 +459,7 @@
                             IsLoading = false;
                             //IsVoid = true;
                             IsFail = true;
+                            IsSuccess = false;
                             strInvoice = trans.edcTrace;
                             await Task.Delay(2000);
                             if (trans.edcresp == "00")
@@ -547,6 +549,7 @@
                         {
                             trans.edcStatus = "SUCCESS";
                             IsLoading = false;
+                            IsFail = false;
                             IsSuccess = true;
                             //Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
@@ -566,6 +569,7 @@
                             IsLoading = false;
                             //IsVoid = true;
                             IsFail = true;
+                            IsSuccess = false;
                             strInvoice = trans.edcTrace;
                             await Task.Delay(2000);
                             if (trans.edcresp == "00")
@@ -578,6 +582,7 @@
                                 Void();
                             }
                             await Print();
+                            trans.status = "01";
                             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
@@ -593,7 +598,6 @@
                         OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
                         trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
                         trans.status = "01";
-                        trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                         await OurUtility.AuditTrail(trans, menu, cst);
 
                         //Console.WriteLine("Payment Failed");
@@ -628,7 +632,8 @@
             await Payment("");
 
             trans.kip = "Pembayaran tidak dilanjutkan, terminal id:" + menu.terminalId;
-            OurUtility.AuditTrail(trans, menu, cst);
+            trans.status = "02";
+            await OurUtility.AuditTrail(trans, menu, cst);
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
@@ -673,7 +678,7 @@
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != null)
+        if (strResult != "")
         {
             try
             {
@@ -770,7 +775,7 @@
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != null)
+        if (strResult != "")
         {
             try
             {
@@ -974,7 +979,7 @@
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != null)
+        if (strResult != "")
         {
             try
             {

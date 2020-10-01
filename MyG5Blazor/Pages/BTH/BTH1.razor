@@ -47,11 +47,11 @@
                 <div class="col-md-6">
                     @if (strNumber == string.Empty)
                     {
-                        <input type="text" name="number" placeholder="0811 1234 5678" class="num-field">
+                        <input type="text" name="number" placeholder="0811 1234 5678" class="num-field" readonly>
                     }
                     else
                     {
-                        <input type="text" name="number" class="num-field" @bind="strNumber" />
+                        <input type="text" name="number" class="num-field" @bind="strNumber" readonly/>
                     }
                     <div class="num-button">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
@@ -214,12 +214,12 @@
             IsVisible = false;
             isLoading = true;
 
-            byte[] image = OurUtility.CaptureImage();
+            //byte[] image = OurUtility.CaptureImage();
             string imageBytesStr;
-            if(image!=null)
-                imageBytesStr = Convert.ToBase64String(image);
-            else
-                imageBytesStr = "";
+            //if(image!=null)
+            //    imageBytesStr = Convert.ToBase64String(image);
+            //else
+            imageBytesStr = "";
 
             cst.PhoneNumber = "62" + strNumber.Substring(1);
 
@@ -236,7 +236,7 @@
             //OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
             ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-            if (strResult != null)
+            if (strResult != "")
             {
                 try
                 {

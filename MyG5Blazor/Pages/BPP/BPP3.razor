@@ -130,7 +130,7 @@
     private async Task MainMenu()
     {
         trans.AddTrail("GET PAYMENT METHOD", "BACK TO MAIN MENU", "CANCELED BY USER");
-        trans.status = "GAGAL";
+        trans.status = "02";
         await OurUtility.AuditTrail(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
