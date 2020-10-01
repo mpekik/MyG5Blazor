@@ -930,6 +930,7 @@
         trans.edcCardName = trans.ecr.Substring(102, 26);
         trans.edcDate = trans.ecr.Substring(128, 6);
         trans.edcTime = trans.ecr.Substring(134, 6);
+        OurUtility.Write_Log("== EDC: " + edc.ecr, "step-action");
     }
 
     private async Task Payment(string strURL)

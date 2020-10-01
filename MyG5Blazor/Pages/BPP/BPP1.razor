@@ -49,11 +49,11 @@
                 <div class="col-md-6">
                     @if (strNumber == string.Empty)
                     {
-                        <input type="text" name="number" placeholder="0811 1234 5678" class="num-field">
+                        <input type="text" name="number" placeholder="0811 1234 5678" class="num-field" readonly>
                     }
                     else
                     {
-                        <input type="text" name="number" class="num-field" @bind="strNumber" />
+                        <input type="text" name="number" class="num-field" @bind="strNumber" readonly/>
                     }
                     <div class="num-button">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
@@ -307,6 +307,10 @@
                             string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
                             OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                             trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                            if ((string)jobjResult["profile"].SelectToken("type") == "Postpaid")
+                            {
+                                trans.errorCode = "Nomor invalid: Postpaid";
+                            }
                         }
                         trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
                         trans.status = "01";
