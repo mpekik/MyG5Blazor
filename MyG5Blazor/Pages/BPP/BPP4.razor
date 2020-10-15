@@ -18,7 +18,7 @@
 @inject Transaction trans
 @inject Config config
 @inject Menu menu
- 
+
 <div class=@pageClass>
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -119,7 +119,8 @@
                                         <div class="teks-center" style="margin-top: 32%;"> Pastikan Pembayaran Menggunakan <br> Uang Kertas Minimal Pecahan Rp 10.000 </div>
                                     </div>
                                     <div id="bayar2">
-                                        <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian</div>
+                                        <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian
+                                        <br /> <span style="font-weight:normal; font-style:italic;">Seluruh uang yang masuk ke mesin akan menjadi pulsa</span></div>
                                     </div>
                                 }
                                 @if (IsVisible2)
@@ -259,9 +260,9 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>seluruh uang yang Anda masukkan dapat diambil di<br>Kasir GraPARI dengan menunjukkan struk dari<br>MyGraPARI.</p>
-                    <button class="btn btn-danger modal-button" @onclick="TunaiExitFail" id="btn-lanjut">Lanjut</button>
-                    <button @onclick="@(() => IsExit = false)" class="btn btn-light modal-button">Batal</button>
+                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>pulsa sejumlah uang yang Anda masukkan sebesar:<br><span style="color:red;">Rp @intAccBill.ToString("N0")</span><br>Akan ditambahkan ke nomor <span style="font-weight:bold;">@cst.PhoneNumber</span>.</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => IsExit = false)" id="btn-lanjut">Lanjutkan Pembayaran</button>
+                    <button @onclick="Tunai" class="btn btn-light modal-button">Setuju dan Isi Pulsa Sebesar Rp @intAccBill.ToString("N0")</button>
                 </div>
             </div>
         </div>
@@ -333,6 +334,20 @@
                         </label>
                     </div>
                     <button class="btn btn-danger button-nps" value="">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (isTunaiComplete)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Anda memasukkan uang sebesar<span style="font-weight: bold;"> Rp @intAccBill.ToString("N0") </span>.<br>Mesin ini tidak mengeluarkan kembalian, seluruh uang Anda akan menjadi pulsa.</p>
+                    <button class="btn btn-danger modal-button" @onclick="Tunai">Lanjut</button>
+                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                 </div>
             </div>
         </div>
@@ -515,14 +530,14 @@
                         logamount = 0;
                     }
                     await Task.Delay(2000);
-                    await MainLoop();
+                    await MainLoop(logbank, logamount);
                     intAccBill = Payout.total;
                     cst.intUangCount = Payout.uangCount;
                     cst.intTagihanTerbayar = Payout.total;
-                    logamount = logamount + Payout.total;
-                    logbank = logbank + Payout.uangCount;
-                    config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
-                    config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
+                    //logamount = logamount + Payout.total;
+                    //logbank = logbank + Payout.uangCount;
+                    //config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
+                    //config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
                     if (!IsTunaiExit)
                     {
                         intMinus = intAccBill - intBill;
@@ -609,7 +624,44 @@
     private bool translog = true;
     private int logbank = 0;
     private int logamount = 0;
+    private async Task Tunai()
+    {
+        isTunaiComplete = false;
+        resultCash = "00";
 
+        await Payment("");
+        //Console.WriteLine("inttotal = " + inttotal);
+        StateHasChanged();
+        if (resultPayment == "00")
+        {
+            trans.edcStatus = "SUCCESS";
+            IsLoading = false;
+            IsSuccess = true;
+            //Console.WriteLine("Payment Success");
+            await Task.Delay(2000);
+            await Print();
+            await CheckNPS("");
+            trans.status = "00";
+            trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
+            trans.kip = "Berhasil, terminal id:" + menu.terminalId;
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
+        }
+        else
+        {
+            IsLoading = false;
+            IsFail = true;
+            await Print();
+            trans.status = "01";
+            trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            Timer.SetTimer(20000);
+            Timer.OnElapsed += TimerElapsedHandler;
+        }
+    }
     private async Task TunaiExitFail()
     {
         if (translog)
@@ -637,17 +689,6 @@
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
-    }
-    private async Task CountMoneyBillAcceptor()
-    {
-        StateHasChanged();
-        await Task.Delay(1000);
-        await MainLoop();
-        intAccBill = Payout.total;
-        await Payment("");
-        //Console.WriteLine("inttotal = " + inttotal);
-        StateHasChanged();
-
     }
 
     private async Task Void()
@@ -970,6 +1011,7 @@
                 "\"lembarUang\" : \"" + cst.intUangCount + "\"," +
                                     "\"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
                                     "\"fee\" : \"" + trans.fee + "\"," +
+                                    "\"responseCode\" : \"" + resultCash + "\"," +
                                     "\"bit48\" : \"" + trans.bit + "\"" +
                                     "}";
         }
@@ -1039,7 +1081,7 @@
     int reconnectionAttempts = 5;
     bool Running = false;
 
-    private async Task MainLoop()
+    private async Task MainLoop(int bankNote, int bankAmount)
     {
         try
         {
@@ -1059,7 +1101,7 @@
             {
                 await Task.Delay(1000);
                 //Console.WriteLine("2");
-                if (!Payout.DoPoll())
+                if (!Payout.DoPoll(trans, bankNote, bankAmount))
                 {
                     //Console.WriteLine("Poll failed, attempting to reconnect...\r\n");
                     while (true)
