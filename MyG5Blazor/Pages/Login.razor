@@ -324,7 +324,7 @@
         private bool isShutdown = false;
 
         private string _myURL = string.Empty;
-
+        //private string name = "Uci  M  - Sanusi";
         private void DeleteCharField()
         {
             switch(isTextfield)
@@ -416,6 +416,8 @@
         {
             if (bFirstRender)
             {
+                //cst.Name = name;
+                //cst.MaskingName();
                 string url = config.ReadUtil("URL", Config.PARAM_DEFAULT_URL);
                 config.Write("URL", Config.PARAM_DEFAULT_URL, url);
                 //theJavaScriptEngine.InvokeAsync<System.Object>("callKeyboard");

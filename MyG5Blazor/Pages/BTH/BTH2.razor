@@ -214,6 +214,10 @@
         {
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            trans.AddTrail("GET BILL", cst.strMPembayaran, "01");
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+
             NavMan.NavigateTo("/error");
         }
     }

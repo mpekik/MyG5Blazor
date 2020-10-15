@@ -1,6 +1,14 @@
 #hide{
   display: none;
 }
+.btn-right2 {
+    width: 85%;
+    height: 60px;
+    font-size: medium;
+    font-weight: bold;
+    font-size: 23pt;
+    border-radius: 8px;
+}
 .num-button3 {
     position: relative;
     background-color: #D1D3D4;

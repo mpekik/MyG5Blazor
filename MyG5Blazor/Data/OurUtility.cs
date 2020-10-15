@@ -356,9 +356,9 @@ namespace MyG5Blazor.Data
                     "}, \"auditTrail\" : " + auditTrail + "]}";
             string myURL2 = _myURL + saveURL;
 
-            //OurUtility.Write_Log("== Request API : " + myJson2, "step-action");
+            OurUtility.Write_Log("== Request Trans Log : " + myJson2, "step-action");
             string strResult2 = await OurUtility.PostCallAPI(myURL2, myJson2,menu);
-            //OurUtility.Write_Log("== Response API : " + strResult2, "step-action");
+            OurUtility.Write_Log("== Response Trans Log : " + strResult2, "step-action");
         }
         public static async Task<string> PostCallAPI(string url, string jsonString, Menu menu)
         {

@@ -38,14 +38,14 @@ namespace MyG5Blazor.Data
             string[] strSplit = Name.Split(" ");
             foreach(string ss in strSplit)
             {
-                if (ss != "")
+                if (ss != "" && ss!="-")
                 {
-                    if (ss.Length > 2)
+                    if (ss.Length > 3)
                     {
-                        string sm = ss.Substring(0, 2).PadRight(ss.Length, '*');
+                        string sm = ss.Substring(ss.Length-3, 3).PadLeft(ss.Length, '*');
                         nameMasked = nameMasked + sm + " ";
                     }
-                    else if (ss.Length == 1)
+                    else
                     {
                         nameMasked = nameMasked + ss + " ";
                     }

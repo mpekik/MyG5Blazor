@@ -42,7 +42,7 @@ namespace MyG5Blazor.Data
                 "MACHINE ID : " + trans.termID + "\n" +
                 "TRANSACTION ID : " + trans.transID + "\n" +
                 "MSISDN : " + cst.phoneNumberMasked + "\n" +
-                "NAME : " + cst.Name + "\n" +
+                "NAME : " + cst.nameMasked + "\n" +
                 "\n";
             if (cst.intMPembayaran != 2)
                 contents = contents + "TID : " + trans.edcTid + "\tMID : " + trans.edcMid + "\n" +
@@ -72,7 +72,7 @@ namespace MyG5Blazor.Data
                 "MACHINE ID : " + trans.termID + "\n" +
                 "TRANSACTION ID : " + trans.transID + "\n" +
                 "MSISDN : " + cst.phoneNumberMasked + "\n" +
-                "NAME : " + cst.Name + "\n" +
+                "NAME : " + cst.nameMasked + "\n" +
                 "\n";
             if (cst.intMPembayaran != 2)
                 contents = contents + "TID : " + trans.edcTid + "\tMID : " + trans.edcMid + "\n" +
