@@ -1,4 +1,5 @@
 ﻿@page "/IP/2"
+@page "/PR/2"
 
 @using MyG5Blazor.Data
 @using System.Linq;
@@ -159,8 +160,8 @@
             <div class="modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
-                            <p class="text-body"><span style="font-weight: bold;">Sesi Anda akan segera berakhir.</span><br />Anda akan keluar dari sistem dalam <span style="font-weight: bold;">@dtkTimeOut.ToString()</span> detik.</p>
-                            <button class="btn btn-danger modal-button" @onclick="StopTimer">OK</button>
+                        <p class="text-body"><span style="font-weight: bold;">Sesi Anda akan segera berakhir.</span><br />Anda akan keluar dari sistem dalam <span style="font-weight: bold;">@dtkTimeOut.ToString()</span> detik.</p>
+                        <button class="btn btn-danger modal-button" @onclick="StopTimer">OK</button>
                         <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                     </div>
                 </div>
@@ -258,7 +259,7 @@
 
     async Task TimeLeft()
     {
-        while(dtkTimeOut>0 &&isTimeOut)
+        while (dtkTimeOut > 0 && isTimeOut)
         {
             Console.WriteLine(dtkTimeOut);
             await Task.Delay(1000);
@@ -270,7 +271,7 @@
 
     Task AfterTime()
     {
-        if(dtkTimeOut==0)
+        if (dtkTimeOut == 0)
         {
             Console.WriteLine("Task Completed");
             return Task.CompletedTask;

@@ -1,4 +1,5 @@
 ﻿@page "/IP/1"
+@page "/PR/1"
 
 @using Newtonsoft.Json;
 @using Newtonsoft.Json.Linq;
@@ -53,7 +54,7 @@
                     }
                     else
                     {
-                        <input type="text" name="number" class="num-field" @bind="strNumber" readonly/>
+                        <input type="text" name="number" class="num-field" @bind="strNumber" readonly />
                     }
                     <div class="num-button">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
