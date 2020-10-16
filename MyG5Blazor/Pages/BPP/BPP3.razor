@@ -60,7 +60,7 @@
                         {
                             <img @onclick="@(() => SetPaymentMethod(1))" id="" class="pembayaran" src="../../assets/image/Bayar_Debit.png">
                         }
-                        @if (false)
+                        @if (config.cash=="1")
                         {
                             <img @onclick="@(() => SetPaymentMethod(2))" id="" class="pembayaran" src="../../assets/image/Bayar_Tunai.png">
                         }

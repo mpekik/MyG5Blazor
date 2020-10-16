@@ -263,9 +263,9 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>pulsa sejumlah uang yang Anda masukkan sebesar:<br><span style="color:red;">Rp @intAccBill.ToString("N0")</span><br>Akan ditambahkan ke nomor <span style="font-weight:bold;">@cst.PhoneNumber</span>.</p>
+                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>pulsa sejumlah uang yang Anda masukkan sebesar:<br><span style="color:red;">Rp @inttotal.ToString("N0")</span><br>Akan ditambahkan ke nomor <span style="font-weight:bold;">@cst.PhoneNumber</span>.</p>
                     <button class="btn btn-danger modal-button" @onclick="@(() => IsExit = false)" id="btn-lanjut">Lanjutkan Pembayaran</button>
-                    <button @onclick="Tunai" class="btn btn-light modal-button">Setuju dan Isi Pulsa Sebesar Rp @intAccBill.ToString("N0")</button>
+                    <button @onclick="Tunai" class="btn btn-light modal-button">Setuju dan Isi Pulsa Sebesar Rp @inttotal.ToString("N0")</button>
                 </div>
             </div>
         </div>
@@ -348,7 +348,7 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Anda memasukkan uang sebesar<span style="font-weight: bold;"> Rp @intAccBill.ToString("N0") </span>.<br>Mesin ini tidak mengeluarkan kembalian, seluruh uang Anda akan menjadi pulsa.</p>
+                    <p class="text-body">Anda memasukkan uang sebesar<span style="font-weight: bold;"> Rp @inttotal.ToString("N0") </span>.<br>Mesin ini tidak mengeluarkan kembalian, seluruh uang Anda akan menjadi pulsa.</p>
                     <button class="btn btn-danger modal-button" @onclick="Tunai">Lanjut</button>
                     <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                 </div>
