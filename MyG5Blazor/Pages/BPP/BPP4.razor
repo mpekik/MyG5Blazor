@@ -140,7 +140,7 @@
                                         </div>
                                         <div id="bayar2">
                                             <div class="teks-bot" style="font-weight: bold; margin-top: 49%; line-height: 1;">
-                                                Pulsa sebesar <span style="color:red">Rp @intAccBill.ToString("N0")</span> akan<br> ditambahkan ke nomor @nomorHP
+                                                Pulsa sebesar <span style="color:red">Rp @inttotal.ToString("N0")</span> akan<br> ditambahkan ke nomor @nomorHP
                                             </div>
                                         </div>
                                     }
@@ -286,9 +286,9 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>pulsa sejumlah uang yang Anda masukkan sebesar:<br><span style="color:red;">Rp @intAccBill.ToString("N0")</span><br>Akan ditambahkan ke nomor <span style="font-weight:bold;">@cst.PhoneNumber</span>.</p>
+                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>pulsa sejumlah uang yang Anda masukkan sebesar:<br><span style="color:red;">Rp @inttotal.ToString("N0")</span><br>Akan ditambahkan ke nomor <span style="font-weight:bold;">@nomorHP</span>.</p>
                     <button class="btn btn-danger modal-button" @onclick="@(() => IsExit = false)" id="btn-lanjut">Lanjutkan Pembayaran</button>
-                    <button @onclick="Tunai" class="btn btn-light modal-button">Setuju dan Isi Pulsa Sebesar Rp @intAccBill.ToString("N0")</button>
+                    <button @onclick="Tunai" class="btn btn-light modal-button">Setuju dan Isi Pulsa Sebesar Rp @inttotal.ToString("N0")</button>
                 </div>
             </div>
         </div>
@@ -660,8 +660,10 @@
         IsLoading = true;
         IsExit = false;
         isTunaiComplete = false;
-        cst.intTagihan = intAccBill;
+        cst.intTagihan = inttotal;
         resultCash = "00";
+        if (inttotal == 0)
+            resultCash = "01";
 
         await Task.Delay(5000);
         resultPayment = "00";
