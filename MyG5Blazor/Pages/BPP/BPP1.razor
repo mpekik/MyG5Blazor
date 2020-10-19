@@ -287,7 +287,10 @@
                                 menu.AddMenuPulsa((string)mm.SelectToken("nominal"), (string)mm.SelectToken("labelNominal"), (string)mm.SelectToken("icon"), "</div>");
                             }
                         }
-
+                        menu._menuPulsa.Sort(delegate (Menu.MenuPulsa x, Menu.MenuPulsa y)
+                        {
+                            return x._nominal.CompareTo(y._nominal);
+                        });
                         //Add Step To Audit Trail List
                         trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "00");
 
