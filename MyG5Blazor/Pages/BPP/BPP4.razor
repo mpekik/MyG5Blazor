@@ -16,6 +16,8 @@
 @inject NavigationManager NavMan
 @inject EDC edc
 @inject BlazorTimer Timer
+@inject BlazorTimer timerMain
+@inject BlazorTimer timerTunai
 @inject Transaction trans
 @inject Config config
 @inject Menu menu
@@ -110,30 +112,47 @@
                     case 2:
                         {
                             <div class="col-md-6">
+                                <div class="teks-title">Beli Pulsa Prabayar</div>
                                 @if (!IsFail && !IsSuccess)
                                 {
-                                    <div class="teks-title">Beli Pulsa Prabayar</div>
-                                    <div id="teks-silakan">
-                                        <div class="teks-top"> Silakan Masukan Uang Kertas pada Alat Penerima Uang Tunai secara Lembar per Lembar </div>
-                                    </div>
-                                    <div id="teks-pastikan">
-                                        <div class="teks-center" style="margin-top: 32%;"> Pastikan Pembayaran Menggunakan <br> Uang Kertas Minimal Pecahan Rp 10.000 </div>
-                                    </div>
-                                    <div id="bayar2">
-                                        <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">
-                                            Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian
-                                            <br /> <span style="font-weight:normal; font-style:italic;">Seluruh uang yang masuk ke mesin akan menjadi pulsa</span>
+                                    @if (inttotal < intBill)
+                                    {
+                                        <div id="teks-silakan">
+                                            <div class="teks-top"> Silakan Masukan Uang Kertas pada Alat Penerima Uang Tunai secara Lembar per Lembar </div>
                                         </div>
-                                    </div>
-                                }
-                                @if (IsVisible2)
-                                {
-                                    <div id="teks-sudah-sesuai">
-                                        <div class="teks-center" style="margin-top: 38%;"> Uang yang Anda Masukkan Sudah Sesuai dengan Jumlah yang Harus Dibayarkan </div>
-                                    </div>
-                                }
+                                        <div id="teks-pastikan">
+                                            <div class="teks-center" style="margin-top: 32%;"> Pastikan Pembayaran Menggunakan <br> Uang Kertas Minimal Pecahan Rp 10.000 </div>
+                                        </div>
+                                        <div id="bayar2">
+                                            <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">
+                                                Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian
+                                                <br /> <span style="font-weight:normal; font-style:italic;">Seluruh uang yang masuk ke mesin akan menjadi pulsa</span>
+                                            </div>
+                                        </div>
+                                    }
+                                    else if (inttotal > intBill)
+                                    {
+                                        <div id="teks-silakan">
+                                            <div class="teks-top"> Terdapat kelebihan pembayaran sebesar<br> <span style="font-weight:bold;">Rp @lebihPembayaran.ToString("N0")</span> </div>
+                                        </div>
+                                        <div id="teks-pastikan">
+                                            <div class="teks-center" style="text-transform: uppercase; font-weight: bold; margin-top: 32%; line-height: 1;"> MESIN INI TIDAK MENGELUARKAN <br> KEMBALIAN </div>
+                                        </div>
+                                        <div id="bayar2">
+                                            <div class="teks-bot" style="font-weight: bold; margin-top: 49%; line-height: 1;">
+                                                Pulsa sebesar <span style="color:red">Rp @intAccBill.ToString("N0")</span> akan<br> ditambahkan ke nomor @nomorHP
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div id="teks-sudah-sesuai">
+                                            <div class="teks-center" style="margin-top: 38%;"> Uang yang Anda Masukkan Sudah Sesuai dengan Jumlah yang Harus Dibayarkan </div>
+                                        </div>
+                                    }
 
-                                @if (IsFail)
+                                }
+                                else if (IsFail)
                                 {
                                     <div id="status-pay" class="teks-status2">Proses Pembelian Pulsa Prabayar <br><b class="red">Tidak Berhasil</b></div>
                                     <div id="nominal-pay" class="teks-center"> Silakan Ambil Struk Transaksi dan <br> Hubungi Kasir GraPARI untuk Bantuan</div>
@@ -162,6 +181,10 @@
                                         @if (inttotal < intBill)
                                         {
                                             <div class="nominal-rupiah" id="nominal-kurang">Rp @inttotal.ToString("N0")</div>
+                                        }
+                                        else if (inttotal > intBill)
+                                        {
+                                            <div class="nominal-rupiah" id="nominal-lebih">Rp @inttotal.ToString("N0")</div>
                                         }
                                         else
                                         {
@@ -248,7 +271,7 @@
         <div class="footer-side2">
             @if (MetodePembayaran == 2 && !IsFail && !IsSuccess)
             {
-                <button @onclick="@(() => IsExit = true)" class="btn-arrow btn" value="">Kembali</button>
+                <!--<button @onclick="@(() => IsExit = true)" class="btn-arrow btn" value="">Kembali</button>-->
                 <button @onclick="@(() => IsExit = true)" class="btn-arrow btn" value="">Menu Utama</button>
             }
             <!--<sup>Powered By </sup>Trilogi Persada -->
@@ -263,9 +286,9 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>pulsa sejumlah uang yang Anda masukkan sebesar:<br><span style="color:red;">Rp @inttotal.ToString("N0")</span><br>Akan ditambahkan ke nomor <span style="font-weight:bold;">@cst.PhoneNumber</span>.</p>
+                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>pulsa prabayar. Jika Anda keluar dari menu ini,<br>pulsa sejumlah uang yang Anda masukkan sebesar:<br><span style="color:red;">Rp @intAccBill.ToString("N0")</span><br>Akan ditambahkan ke nomor <span style="font-weight:bold;">@cst.PhoneNumber</span>.</p>
                     <button class="btn btn-danger modal-button" @onclick="@(() => IsExit = false)" id="btn-lanjut">Lanjutkan Pembayaran</button>
-                    <button @onclick="Tunai" class="btn btn-light modal-button">Setuju dan Isi Pulsa Sebesar Rp @inttotal.ToString("N0")</button>
+                    <button @onclick="Tunai" class="btn btn-light modal-button">Setuju dan Isi Pulsa Sebesar Rp @intAccBill.ToString("N0")</button>
                 </div>
             </div>
         </div>
@@ -348,7 +371,7 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Anda memasukkan uang sebesar<span style="font-weight: bold;"> Rp @inttotal.ToString("N0") </span>.<br>Mesin ini tidak mengeluarkan kembalian, seluruh uang Anda akan menjadi pulsa.</p>
+                    <p class="text-body">Anda memasukkan uang sebesar<span style="font-weight: bold;"> Rp @intAccBill.ToString("N0") </span>.<br>Mesin ini tidak mengeluarkan kembalian, seluruh uang Anda akan menjadi pulsa.</p>
                     <button class="btn btn-danger modal-button" @onclick="Tunai">Lanjut</button>
                     <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                 </div>
@@ -383,6 +406,7 @@
     private bool IsInvalid = false;
     private bool IsTunaiExit = false;
     private bool isTunaiComplete = false;
+    private bool isTimerTunai = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
@@ -390,11 +414,12 @@
     private int CESno = 0;
     private int intPulsa = 0;
     private int sisaPulsa = 0;
+    private int lebihPembayaran => intAccBill - intBill;
 
     private string strNPS1Value = string.Empty;
     private string strMsgError = string.Empty;
     private string strBillCom = string.Empty;
-
+    private string nomorHP => "0" + cst.PhoneNumber.Substring(2);
     private int intBill = 0;
     private int intAccBill = 0;
     private int intMinus = 0;
@@ -544,7 +569,10 @@
                     if (!IsTunaiExit)
                     {
                         intMinus = intAccBill - intBill;
-                        isTunaiComplete = true;
+
+                        isTimerTunai = true;
+                        Timer.SetTimer(5000);
+                        Timer.OnElapsed += TimerElapsedHandlerTunai;
                         break;
                     }
                     else { break; }
@@ -629,9 +657,14 @@
     private int logamount = 0;
     private async Task Tunai()
     {
+        IsLoading = true;
+        IsExit = false;
         isTunaiComplete = false;
+        cst.intTagihan = intAccBill;
         resultCash = "00";
 
+        await Task.Delay(5000);
+        resultPayment = "00";
         await Payment("");
         //Console.WriteLine("inttotal = " + inttotal);
         StateHasChanged();
@@ -643,14 +676,14 @@
             //Console.WriteLine("Payment Success");
             await Task.Delay(2000);
             await Print();
-            await CheckNPS("");
             trans.status = "00";
             trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
             await OurUtility.AuditTrail(trans, menu, cst);
 
-            Timer.SetTimer(20000);
-            Timer.OnElapsed += TimerElapsedHandler;
+            isCES = true;
+            Timer.SetTimer(5000);
+            Timer.OnElapsed += TimerElapsedHandlerCES;
         }
         else
         {
@@ -1208,7 +1241,29 @@
 
     private void TimerElapsedHandler()
     {
-        NavMan.NavigateTo("/main");
+        if (isTimerMain)
+            NavMan.NavigateTo("/main");
+    }
+    bool isCES = false;
+    bool isTimerMain = false;
+    private void TimerElapsedHandlerCES()
+    {
+        if (isCES)
+        {
+            //Task.Run(() => CheckNPS("")).ConfigureAwait(true);
+            Console.WriteLine("TES CES");
+            isTimerMain = true;
+            timerMain.SetTimer(20000);
+            timerMain.OnElapsed += TimerElapsedHandler;
+        }
+    }
+    private void TimerElapsedHandlerTunai()
+    {
+        if (isTimerTunai)
+        {
+            Console.WriteLine("TES TUNAI");
+            Tunai();
+        }
     }
     private void NavigateTo(string strURL)
     {
