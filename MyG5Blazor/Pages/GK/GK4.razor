@@ -372,68 +372,50 @@
                                             //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                                             //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                                            if (strResult != "")
+                                            if (strResult != "" || strResult != "NotFound" || strResult != "Forbidden")
                                             {
-                                                if (strResult != "NotFound")
+                                                JObject jobjResult2 = JObject.Parse(strResult);
+                                                if ((string)jobjResult2["transaction"].SelectToken("statusCode") == "00")
                                                 {
-                                                    JObject jobjResult2 = JObject.Parse(strResult);
-                                                    if ((string)jobjResult2["transaction"].SelectToken("statusCode") == "00")
-                                                    {
-                                                        trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "00");
-                                                        if (!await Task.Run(() => MoveToTheFront()))
-                                                        {
-                                                            isSuccess = false;
-                                                            isError = true;
-                                                            trans.AddTrail("MOVE TO FRONT", "", "01");
-                                                            trans.status = "01";
-                                                            trans.errorCode = "CARD DISPENSER MOVE TO FRONT ERROR";
-                                                            trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
-                                                            //await OurUtility.AuditTrail(trans, menu, cst);
-                                                            OurUtility.Write_Log("=== Card Dispenser Error, Move To Front", "step-action");
-                                                            trans.errorCode = "CD - 002";
-                                                            //NavigateTo("/error");
-                                                        }
-
-                                                        isLoading = false;
-                                                        isSuccess = true;
-                                                        break;
-                                                    }
-                                                }else
-                                                {
-                                                    if (!await Task.Run(() => MoveToBin()))
+                                                    trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "00");
+                                                    if (!await Task.Run(() => MoveToTheFront()))
                                                     {
                                                         isSuccess = false;
                                                         isError = true;
-                                                        trans.AddTrail("MOVE TO BIN", "", "01");
+                                                        trans.AddTrail("MOVE TO FRONT", "", "01");
                                                         trans.status = "01";
+                                                        trans.errorCode = "CARD DISPENSER MOVE TO FRONT ERROR";
+                                                        trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
                                                         //await OurUtility.AuditTrail(trans, menu, cst);
-                                                        OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
-                                                        trans.errorCode = "CD - 004";
+                                                        OurUtility.Write_Log("=== Card Dispenser Error, Move To Front", "step-action");
+                                                        trans.errorCode = "CD - 002";
                                                         //NavigateTo("/error");
                                                     }
-                                                    trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
+
                                                     isLoading = false;
-                                                    isFail = true;
+                                                    isSuccess = true;
                                                     break;
                                                 }
-
                                             }
-                                            trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "01");
-                                            if (!await Task.Run(() => MoveToBin()))
+                                            else
                                             {
-                                                isSuccess = false;
-                                                isError = true;
-                                                trans.AddTrail("MOVE TO BIN", "", "01");
-                                                trans.status = "01";
-                                                //await OurUtility.AuditTrail(trans, menu, cst);
-                                                OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
-                                                trans.errorCode = "CD - 004";
-                                                //NavigateTo("/error");
+                                                trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "01");
+                                                if (!await Task.Run(() => MoveToBin()))
+                                                {
+                                                    isSuccess = false;
+                                                    isError = true;
+                                                    trans.AddTrail("MOVE TO BIN", "", "01");
+                                                    trans.status = "01";
+                                                    //await OurUtility.AuditTrail(trans, menu, cst);
+                                                    OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
+                                                    trans.errorCode = "CD - 004";
+                                                    //NavigateTo("/error");
+                                                }
+                                                trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
+                                                isLoading = false;
+                                                isFail = true;
+                                                break;
                                             }
-                                            trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
-                                            isLoading = false;
-                                            isFail = true;
-                                            break;
                                         }
                                         else
                                         {
