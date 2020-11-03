@@ -394,7 +394,7 @@
 
                                                     isLoading = false;
                                                     isSuccess = true;
-                                                    break;
+                                                    return;
                                                 }
                                             }
                                             else
@@ -414,7 +414,7 @@
                                                 trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
                                                 isLoading = false;
                                                 isFail = true;
-                                                break;
+                                                return;
                                             }
                                         }
                                         else
