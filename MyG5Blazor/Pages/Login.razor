@@ -19,7 +19,7 @@
 @inject Menu menu
 <div class="bg-login">
     <div class="wrapper">
-        <div class="main-panel">
+        <div class="main-panel" style="position:fixed;">
             <!-- Navbar -->
             <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
                 <div class="container-fluid">
@@ -217,6 +217,7 @@
                     </div>
                 </div>
             </div>
+            <span style="font-size:smaller;">Vers: @vers</span>
         </div>
     </div>
 
@@ -246,7 +247,7 @@
                 </div>
             </div>
         </div>
-    }
+     }
 
     @if (isNotAuthorized)
     {
@@ -274,39 +275,38 @@
     }
     @if (isRestart)
     {
-<div id="myModal" class="modal">
-    <!-- Modal content -->
-    <div class="modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <p class="text-body">Anda ingin melakukan <span style="font-weight: bold;">RESTART</span> mesin?</p>
-                <button @onclick="@Restart" class="btn btn-danger modal-button">Ya</button>
-                <button class="btn btn-light modal-button" @onclick="@(()=> isRestart=false)">Tidak</button>
+        <div id="myModal" class="modal">
+        <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-body">Anda ingin melakukan <span style="font-weight: bold;">RESTART</span> mesin?</p>
+                        <button @onclick="@Restart" class="btn btn-danger modal-button">Ya</button>
+                        <button class="btn btn-light modal-button" @onclick="@(()=> isRestart=false)">Tidak</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
     }
     @if (isShutdown)
     {
-<div id="myModal" class="modal">
-    <!-- Modal content -->
-    <div class="modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <p class="text-body">Anda ingin melakukan <span style="font-weight: bold;">SHUTDOWN</span> mesin?</p>
-                <button @onclick="@Shutdown" class="btn btn-danger modal-button">Ya</button>
-                <button class="btn btn-light modal-button" @onclick="@(()=> isShutdown=false)">Tidak</button>
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-body">Anda ingin melakukan <span style="font-weight: bold;">SHUTDOWN</span> mesin?</p>
+                        <button @onclick="@Shutdown" class="btn btn-danger modal-button">Ya</button>
+                        <button class="btn btn-light modal-button" @onclick="@(()=> isShutdown=false)">Tidak</button>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
     }
 </div>
 
 
     @code{
-
         private string terminalId = string.Empty;
         private string userName = string.Empty;
         private string password = string.Empty;
@@ -324,6 +324,7 @@
         private bool isShutdown = false;
 
         private string _myURL = string.Empty;
+        private string vers = string.Empty;
         //private string name = "Uci  M  - Sanusi";
         private void DeleteCharField()
         {
@@ -386,17 +387,12 @@
         private int logbank = 0;
         private int logamount = 0;
 
-        //protected override async Task OnInitializedAsync()
-        //{
-        //    cst.Clear();
-        //    trans.ClearTransaction();
-        //    menu._mainMenu.Clear();
-        //    OurUtility.Write_Log("Login Page", "step-action");
-        //    menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
-        //    _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        //    menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
-        //    //OurUtility.Write_Log(_myURL, "step-action");
-        //}
+        protected override async Task OnInitializedAsync()
+        {
+            config.vers = config.ReadUtil("MyGraPARI", Config.PARAM_ADMIN_RELEASE);
+            config.Write("MyGraPARI", Config.PARAM_ADMIN_RELEASE, config.vers);
+            vers = config.Read("MyGraPARI", Config.PARAM_ADMIN_RELEASE);
+        }
         [Microsoft.AspNetCore.Components.Inject]
 
         protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }

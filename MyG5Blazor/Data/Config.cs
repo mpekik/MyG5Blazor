@@ -101,6 +101,7 @@ namespace MyG5Blazor.Data
         private string fileNameIP = "IPTest-config.properties";
         private string fileNameUtil = "Util-config.properties";
 
+        public string vers = string.Empty;
         public Config()
         {
             fileName= Directory.GetCurrentDirectory() + @"\MyGApps\" + "MyGraPARI-config.properties";
