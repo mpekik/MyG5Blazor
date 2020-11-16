@@ -123,6 +123,23 @@
                 </div>
             </div>
         }
+        @if (isFPNoData)
+        {
+            <div id="myModal" class="modal">
+
+                <!-- Modal content -->
+                <div class="modal-dialog-centered" role="document">
+                    <div class="modal-content">
+                        <div class="modal-body">
+                            <p class="text-body">Silahkan angkat EKTP Anda, kemudian letakkan kembali kepada alat pemindai.</p>
+                            <button class="btn btn-danger modal-button" @onclick="FP2">OK</button>
+                            <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                        </div>
+                    </div>
+                </div>
+
+            </div>
+        }
     </div>
 
 @code{
@@ -132,6 +149,8 @@
     private bool IsFail = false;
     private bool IsNext = false;
     private bool isLoading2 = false;
+    private bool isFPNoData = false;
+    private bool isFPNoDataPush = true;
 
     public string _myURL = "";
     public string saveURL = "log/v1/save";
@@ -206,19 +225,85 @@
         if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
         {
             IsLoading = true;
-            await ScanKTP();
+            if (config.ektpType == "a")
+            {
+                await ScanKTP();
+            }
+            else if (config.ektpType == "c")
+            {
+                await ScanEKTPC();
+            }
+            else
+            {
+                trans.AddTrail("READ EKTP", "EK - 001", "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
+                trans.errorCode = "EK - 001";
+                OurUtility.Write_Log("== Error : EK - 001", "step-action");
+                NavMan.NavigateTo("/error");
+            }
         }
         else if (IsVisible)
         {
             IsVisible = false;
         }
     }
+    private async Task ScanEKTPC()
+    {
 
+    }
+    private async Task FP2()
+    {
+        if (isFPNoDataPush)
+        {
+            isFPNoDataPush = false;
+            isFPNoData = false;
+            int ret = -1;
+            int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
+            byte[] leftData = new byte[leftLen];
+            byte[] rightData = new byte[rightLen];
+
+            OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints New Card", "step-action");
+            ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(true);
+            if (ret != 0 || leftLen == 0 || rightLen == 0)
+            {
+                OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Failed", "step-action");
+                trans.AddTrail("SCAN EKTP", "FINGERPIRNT NO DATA", "01");
+                IsLoading = false;
+                if (intTryCount <= intTryLimit)
+                {
+                    IsVisible = true;
+                    intTryCount += 1;
+                }
+                else
+                {
+                    IsFail = true;
+                }
+                return;
+            }
+            else if (ret == 0)
+            {
+                ktp.minutiae1 = leftData;
+                ktp.minutiae2 = rightData;
+                ktp.minu1len = leftLen;
+                ktp.minu2len = rightLen;
+
+                OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
+
+                trans.AddTrail("SCAN EKTP", ktp.Id, "00");
+                IsLoading = false;
+                IsSuccess = true;
+                await Task.Delay(1000);
+                NavMan.NavigateTo("/UP/3");
+                return;
+            }
+        }
+    }
     //FIXME: Create as Service
     private async Task ScanKTP()
     {
-        OurUtility.Write_Log("=== Switcher.UP_eKTP", "step-action");
-
+        isFPNoDataPush = true;
         if (intTryCount <= intTryLimit)
         {
             OurUtility.Write_Log("=== Scan e-KTP", "step-action");
@@ -260,10 +345,10 @@
                 demoGraphic[i] = tempBuffer[i];
             }
             OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
-            Switcher.DOWN("500", config.usbEKTP);
-            await Task.Delay(500);
-            Switcher.UP("3000", config.usbEKTP);
-            await Task.Delay(3000);
+            //Switcher.DOWN("500", config.usbEKTP);
+            //await Task.Delay(500);
+            //Switcher.UP("3000", config.usbEKTP);
+            //await Task.Delay(3000);
             ktp.demographic = demoGraphic;
             IsVisible = false;
             IsNext = true;
@@ -274,29 +359,33 @@
                 byte[] leftData = new byte[leftLen];
                 byte[] rightData = new byte[rightLen];
 
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints", "step-action");
-                ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(false);
-                if (ret != 0 || leftLen == 0 || rightLen == 0)
-                {
-                    OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Failed", "step-action");
-                    trans.AddTrail("SCAN EKTP", "FINGERPIRNT NO DATA", "01");
-                }else if (ret == 0)
-                {
-                    ktp.minutiae1 = leftData;
-                    ktp.minutiae2 = rightData;
-                    ktp.minu1len = leftLen;
-                    ktp.minu2len = rightLen;
-
-                    OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Success", "step-action");
-                }
-
                 if (cst.EKTPNumber == ktp.Id)
                 {
-                    trans.AddTrail("SCAN EKTP", ktp.Id, "00");
-                    IsLoading = false;
-                    IsSuccess = true;
-                    Timer.SetTimer(1000);
-                    Timer.OnElapsed += TimerElapsedHandler;
+                    OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card", "step-action");
+                    ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(true);
+                    if (ret != 0 || leftLen == 0 || rightLen == 0)
+                    {
+                        isFPNoData = true;
+                        return;
+                    }
+                    else if (ret == 0)
+                    {
+                        ktp.minutiae1 = leftData;
+                        ktp.minutiae2 = rightData;
+                        ktp.minu1len = leftLen;
+                        ktp.minu2len = rightLen;
+
+                        OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
+
+                        trans.AddTrail("SCAN EKTP", ktp.Id, "00");
+                        IsLoading = false;
+                        IsSuccess = true;
+                        await Task.Delay(1000);
+                        NavMan.NavigateTo("/UP/3");
+                        return;
+                    }
+                    //Timer.SetTimer(1000);
+                    //Timer.OnElapsed += TimerElapsedHandler;
                 }
                 else
                 {
