@@ -263,6 +263,7 @@ namespace MyG5Blazor.Data
 
         public string usbEKTP = string.Empty;
         public string usbCardReader = string.Empty;
+        public string ektpType = string.Empty;
         public void Terminal(string _termID, string _termDesc, string _termLoc, string _areaCode, string _regionCode, string _unitId, string _unitName)
         {
             terminalId = _termID;

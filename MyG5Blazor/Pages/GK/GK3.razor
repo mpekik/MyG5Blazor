@@ -183,11 +183,11 @@
 
     protected override async Task OnInitializedAsync()
     {
-            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-            pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
-            pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
-            OurUtility.Write_Log("=== Step 3. FingerPrint Scan Page", "step-action");
-            await FingerPrintScan();
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
+        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
+        OurUtility.Write_Log("=== Step 3. FingerPrint Scan Page", "step-action");
+        await FingerPrintScan();
     }
 
     private async Task FingerPrintScan()
@@ -232,6 +232,7 @@
 
                 int size = 120000;
                 int score = -1;
+
                 byte[] image = new byte[size];
                 result = await Task.Run(() => Ektp_Sdk.CaptureFingerPrint(reader, image, ref size, ref score)).ConfigureAwait(false);
                 if (result != 0)
@@ -248,11 +249,14 @@
 
                     int matched = 0;//matched == 1, it means finger print matched
                     int format = 0;//format == 0, it means finger print template type is ISO
+                    int threshold = 40;
 
+                    Ektp_Sdk.SetMatchFingerPrintThreshold(engine, threshold);
+                    Ektp_Sdk.GetMatchFingerPrintThreshold(engine, ref threshold);
                     //matched right finger
                     result = await Task.Run(() => Ektp_Sdk.MatchFingerPrint(engine, image, size,
-                                                    ktp.minutiae2, ktp.minu2len,
-                                                    ref score, ref matched, format)).ConfigureAwait(false);
+                                                ktp.minutiae2, ktp.minu2len,
+                                                ref score, ref matched, format)).ConfigureAwait(false);
 
                     if (matched == 1)
                     {

@@ -239,10 +239,8 @@
             ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
 
-            if (strResult != "")
+            if (strResult != "" || strResult != "Forbidden" || strResult!="NotFound")
             {
-                if (strResult != "Forbidden")
-                {
                     try
                     {
                         //Parse HTTP Request Resul To JObject
@@ -305,18 +303,11 @@
                         OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                         NavMan.NavigateTo("/error");
                     }
-                }
-                else
-                {
-                    trans.errorCode = strResult;
-                    OurUtility.Write_Log("== Error : " + strResult, "step-action");
-                    NavMan.NavigateTo("/error");
-                }
             }
             else
             {
                 trans.errorCode = strResult;
-                OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+                OurUtility.Write_Log("== Error : Hit WebService {Error} "+strResult , "step-action");
                 NavMan.NavigateTo("/error");
             }
         }

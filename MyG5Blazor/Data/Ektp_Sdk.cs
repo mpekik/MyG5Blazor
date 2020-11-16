@@ -112,6 +112,21 @@ namespace MyG5Blazor.Data
                                                 ref int rightLen,
                                                 byte[] rightFinger);
 
+
+        //----------------new interface------------------
+        [DllImport("EktpSdk.dll")]
+        public static extern int GetTemplateFromImage(IntPtr engine,
+                                              byte[] image, int image_size,
+                                              byte[] templatebuf, ref int templatebuf_size,
+                                              int format);
+        [DllImport("EktpSdk.dll")]
+        public static extern int SetMatchFingerPrintThreshold(IntPtr engine, int threshold);
+
+        [DllImport("EktpSdk.dll")]
+        public static extern int GetMatchFingerPrintThreshold(IntPtr engine, ref int threshold);
+        //---------------------------------------------------------------------------
+
+
         [DllImport("EktpSdk.dll")]
         public static extern int CloseReader(IntPtr phContext);
 

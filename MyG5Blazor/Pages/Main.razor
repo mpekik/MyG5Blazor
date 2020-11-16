@@ -173,12 +173,13 @@
     {
         if (bFirstRender)
         {
-            
+
             menu._menuPulsa.Clear();
             menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
             _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
             menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
-            config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB);
+            config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(0,1);
+            config.ektpType = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(1);
             config.usbCardReader = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER_USB);
             //Console.WriteLine(_myURL);
             for (int i = 0; i < menu._mainMenu.Count(); i++)

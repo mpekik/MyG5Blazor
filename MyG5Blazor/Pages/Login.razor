@@ -419,7 +419,13 @@
                 //cst.Name = name;
                 //cst.MaskingName();
                 string url = config.ReadUtil("URL", Config.PARAM_DEFAULT_URL);
-                //config.Write("URL", Config.PARAM_DEFAULT_URL, url);
+                config.Write("URL", Config.PARAM_DEFAULT_URL, url);
+                string ektpReader = config.Read("EKTP", Config.PARAM_EKTP_USB);
+                if(ektpReader.Length==1)
+                {
+                    ektpReader = ektpReader + "a";
+                }
+                config.Write("EKTP", Config.PARAM_EKTP_USB, ektpReader);
                 //theJavaScriptEngine.InvokeAsync<System.Object>("callKeyboard");
                 //this.StateHasChanged();
                 cst.Clear();
