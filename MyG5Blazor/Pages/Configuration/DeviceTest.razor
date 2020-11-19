@@ -9,6 +9,7 @@
 @using System.Threading.Tasks;
 @using MyG5Blazor.Data
 @using System.IO.Ports
+@using Aratek.TrustFinger;
 
 @inject Ektp_Data ktp
 @inject Card_Dispenser cds
@@ -41,6 +42,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6" style="text-align: left;">
+                    @c1
                     <button @onclick="Payment" class="btn-arrow-red btn">Payment EDC</button>
                     <button @onclick="Void" class="btn-arrow-red btn">Void EDC</button>
                     <button @onclick="BillAcceptor" class="btn-arrow-red btn">Start Bill</button>
@@ -48,7 +50,8 @@
                     <button @onclick="MoveToTheFront" class="btn-arrow-red btn">Front</button>
                     <button @onclick="MoveToICC" class="btn-arrow-red btn">ICC</button>
                     <button @onclick="MoveToBin" class="btn-arrow-red btn">BIN</button>
-                    <button @onclick="ScanKTP" class="btn-arrow-red btn">EKTP</button>
+                    <button @onclick="ScanEKTPC" class="btn-arrow-red btn">EKTP</button>
+                    <button @onclick="FingerPrintAratek" class="btn-arrow-red btn">Finger Print</button>
                 </div>
                 <div class="col-md-6" style="text-align: left;">
 
@@ -124,14 +127,19 @@
     private string msg = string.Empty;
     private string errorcode = string.Empty;
 
+    private CRT_Interface ektpCRT = new CRT_Interface();
+
     protected override async Task OnInitializedAsync()
     {
+        await Task.Run(()=> tt());
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
 
         config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(0, 1);
         config.ektpType = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(1);
-        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
-        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
+        PCID = config.Read("EKTP", Config.PARAM_EKTP_PCID);
+        CONF = config.Read("EKTP", Config.PARAM_EKTP_CONF);
+        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(PCID,","));
+        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(CONF,","));
         cst.Clear();
     }
 
@@ -576,9 +584,50 @@
             await ScanEKTPC();
         }
     }
+    private CRT_Interface ektpC = new CRT_Interface();
+    public string PCID = string.Empty;
+    public string CONF = string.Empty;
+
     private async Task ScanEKTPC()
     {
+        int r = -999;
+        string errMsg =string.Empty;
+        Switcher.DOWN("500", config.usbEKTP);
+        await Task.Delay(500);
+        Switcher.UP("3000", config.usbEKTP);
+        await Task.Delay(3000);
+        UInt16 rf = 0;
+        UInt16 sam = 1;
+        if(true)
+        {
+            r = ektpC.StartEKTP(PCID, CONF,rf,sam);
+            if(r!=0)
+            {
+                if (r > 0 && r < 10)
+                    errMsg = "EKTP - 00" + r.ToString();
+                else
+                    errMsg = "EKTP - 0" + r.ToString();
 
+                trans.AddTrail("SCAN EKTP", "EKTP - "+errMsg, "01");
+                OurUtility.Write_Log("===== EKTP ERROR - "+errMsg, "step-action");
+                IsLoading = false;
+            }
+            else
+            {
+                byte[] demoGraphic = new byte[ektpC.ektpData.biolen];
+                for (int i = 0; i < ektpC.ektpData.biolen; i++)
+                {
+                    demoGraphic[i] = ektpC.ektpData.byteBio[i];
+                }
+                OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
+
+                ktp.demographic = demoGraphic;
+
+                ektpC.ektpData.strBio = Encoding.ASCII.GetString(ektpC.ektpData.byteBio);
+                String[] strBio = ektpC.ektpData.SplitBio(ektpC.ektpData.strBio);
+
+            }
+        }
     }
     private async Task ScanKTP()
     {
@@ -770,6 +819,23 @@
             return;
         }
     }
+    private async Task FingerPrintAratek()
+    {
+        try
+        {
+            TrustFingerManager.GlobalInitialize();
+        }
+        catch
+        {
+            return;
+        }
+        await Task.Run(() => ektpCRT.FPReader());
+        await Task.Run(() => ektpCRT.StartCaptureFingerprint());
+        while (!ektpCRT.isCaptured)
+        {
+            Task.Delay(500);
+        }
+    }
     private async Task FingerPrintScan()
     {
         //ektp.InitializeEktp();
@@ -877,6 +943,25 @@
         {
             timer = false;
             //NavMan.NavigateTo(" ");
+        }
+    }
+    int c1 = 60;
+
+    private static System.Timers.Timer aTimer;
+    void tt()
+    {
+        if (aTimer is null)
+        {
+            aTimer = new System.Timers.Timer(1000);
+            aTimer.Elapsed += (sender, args) => { c1 = c1 < 2 ? 60 : c1 - 1; Console.WriteLine(c1);  InvokeAsync(StateHasChanged); };
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
+        }
+        else
+        {
+            aTimer.Stop();
+            aTimer.Dispose();
+            aTimer = null;
         }
     }
 }

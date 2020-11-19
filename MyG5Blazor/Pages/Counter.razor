@@ -28,6 +28,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        tt();
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
@@ -104,5 +105,28 @@
         string header = prtContent.HeaderGK(trans, cst, config);
         string footer = prtContent.FooterGK(trans, cst, config);
         bool result = Printer.Print(config, header, content, logoTsel, footer, ref msg);
+    }
+    int c1 = 30;
+
+    private static System.Timers.Timer aTimer;
+    void test()
+    {
+        c1 = 30;
+    }
+    void tt()
+    {
+        if (aTimer is null)
+        {
+            aTimer = new System.Timers.Timer(1000);
+            aTimer.Elapsed += (sender, args) => { c1 = c1 < 2 ? 30 : c1 - 1; InvokeAsync(StateHasChanged); };
+            aTimer.AutoReset = true;
+            aTimer.Enabled = true;
+        }
+        else
+        {
+            aTimer.Stop();
+            aTimer.Dispose();
+            aTimer = null;
+        }
     }
 }

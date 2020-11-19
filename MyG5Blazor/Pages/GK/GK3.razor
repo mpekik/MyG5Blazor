@@ -3,117 +3,119 @@
 @using System.Threading
 @using System.Net.Http;
 @using System.Text;
-@inject Menu menu 
+@using Aratek.TrustFinger;
+
+@inject Menu menu
 @inject IJSRuntime JSRuntime;
 @inject BlazorTimer Timer
 @inject Ektp_Data ktp
 @inject NavigationManager NavMan
 @inject Costumer cst
 @inject Config config
-@inject Transaction trans 
-    <div class="main-panel bg-home">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-transparent fixed-top ">
-            <div class="container-fluid">
-                <div class="navbar-wrapper">
-                    <div class="logo">
-                        <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
-                    </div>
-                    <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+@inject Transaction trans
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
                 </div>
-
-                <form class="col-md-6">
-                    <div class="input-group no-border">
-                        <div class="checklist">
-                            @if (IsLoading)
-                            {
-                                <img src="../../assets/image/loader.gif" />
-                            }
-                            else if (IsSuccess)
-                            {
-                                <img src="../../assets/image/tanda_checklist.png" />
-                            }
-                        </div>
-                    </div>
-                </form>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
             </div>
-        </nav>
-        <!-- End Navbar -->
 
-        <div class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="teks-title">Ganti Kartu Hilang/Rusak</div>
-                        @if (!IsSuccess)
+            <form class="col-md-6">
+                <div class="input-group no-border">
+                    <div class="checklist">
+                        @if (IsLoading)
                         {
-                            <div id="proses-pindai">
-                                <div class="teks-center"> Letakkan <span style="font-weight: bold;"> Telunjuk Kanan/Kiri </span> Anda pada Alat Pemindai Sidik Jari</div>
-                            </div>
+                            <img src="../../assets/image/loader.gif" />
                         }
-                        else
+                        else if (IsSuccess)
                         {
-                            <div id="proses-berhasil">
-                                <div class="teks-center">Proses Pindai Sidik Jari Berhasil</div>
-                            </div>
+                            <img src="../../assets/image/tanda_checklist.png" />
                         }
                     </div>
-                    <div class="col-md-6">
-                        <img class="ktp" id="myBtn" @onclick="CheckFinger" src="../../assets/image/Scan_Finger-01.png">
-                    </div>
+                </div>
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="teks-title">Ganti Kartu Hilang/Rusak</div>
+                    @if (!IsSuccess)
+                    {
+                        <div id="proses-pindai">
+                            <div class="teks-center"> Letakkan <span style="font-weight: bold;"> Telunjuk Kanan/Kiri </span> Anda pada Alat Pemindai Sidik Jari</div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="proses-berhasil">
+                            <div class="teks-center">Proses Pindai Sidik Jari Berhasil</div>
+                        </div>
+                    }
+                </div>
+                <div class="col-md-6">
+                    <img class="ktp" id="myBtn" @onclick="CheckFinger" src="../../assets/image/Scan_Finger-01.png">
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
-        <footer>
-            <div class="footer-side1">
-                <span class="dot">1</span>
-                <span class="dot">2</span>
-                <span class="dot" id="dot-active">3</span>
-                <span class="dot">4</span>
-            </div>
-            <div class="footer-side2">
-                <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
-                <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
-                <!-- <sup>Powered By </sup>Trilogi Persada -->
-            </div>
-        </footer>
-        @if (IsVisible)
-        {
-            <div id="myModal" class="modal">
-                <!-- Modal content -->
-                <div class="modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            @if (intTryCount <= intTryLimit)
-                            {
-                                <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;"> Jari Telunjuk Kanan/Kiri </span>Anda, pastikan alat pemindai dalam keadaan bersih.</p>
-                                <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
-                            }
-                            else
-                            {
-                                <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>tidak sesuai dengan eKTP yang digunakan. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
-                                <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
-                            }
-                            <!-- <button class="btn btn-light modal-button">Tidak</button> -->
-                        </div>
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+    <footer>
+        <div class="footer-side1">
+            <span class="dot">1</span>
+            <span class="dot">2</span>
+            <span class="dot" id="dot-active">3</span>
+            <span class="dot">4</span>
+        </div>
+        <div class="footer-side2">
+            <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
+            <!-- <sup>Powered By </sup>Trilogi Persada -->
+        </div>
+    </footer>
+    @if (IsVisible)
+    {
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        @if (intTryCount <= intTryLimit)
+                        {
+                            <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;"> Jari Telunjuk Kanan/Kiri </span>Anda, pastikan alat pemindai dalam keadaan bersih.</p>
+                            <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
+                        }
+                        else
+                        {
+                            <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>tidak sesuai dengan eKTP yang digunakan. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
+                            <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
+                        }
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                     </div>
                 </div>
+            </div>
 
+        </div>
+    }
+    @if (isLoading2)
+    {
+        <div id="myModal" class="modal">
+            <div class="modal-blank">
+                <img class="lds-spinner" src="../../assets/image/loader.gif">
+                <p><br>Mohon tunggu</p>
+                <p>proses sedang berlangsung...</p>
             </div>
-        }
-        @if (isLoading2)
-        {
-            <div id="myModal" class="modal">
-                <div class="modal-blank">
-                    <img class="lds-spinner" src="../../assets/image/loader.gif">
-                    <p><br>Mohon tunggu</p>
-                    <p>proses sedang berlangsung...</p>
-                </div>
-            </div>
-        }
-    </div>
+        </div>
+    }
+</div>
 
 @code{
     private bool IsVisible = false;
@@ -121,10 +123,14 @@
     private bool IsSuccess = false;
     private bool IsFail = false;
     private bool isLoading2 = false;
+    private bool isInit = true;
+
     private int intTryCount = 1;
     private int intTryLimit = 3;
 
     private IntPtr hContext = IntPtr.Zero;
+    private CRT_Interface ektpCRT = new CRT_Interface();
+    private TrustFingerDevice dev = null;
 
     /* FIXME: change to the right PCID & CONFIGFILE  */
     byte[] pbPcid;
@@ -170,10 +176,28 @@
     }
     private async Task CheckFinger()
     {
-        if (IsVisible)
+        if (IsVisible || isInit)
         {
+            isInit = false;
             IsVisible = false;
-            await FingerPrintScan();
+            if (config.ektpType == "a")
+            {
+                await FingerPrintScan();
+            }
+            else if (config.ektpType == "c")
+            {
+                await FingerPrintScanC();
+            }
+            else
+            {
+                trans.AddTrail("READ EKTP", "FP - 001", "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
+                trans.errorCode = "FP - 001";
+                OurUtility.Write_Log("== Error : FP - 001", "step-action");
+                NavMan.NavigateTo("/error");
+            }
         }
         else if (!IsLoading && !IsSuccess && !IsFail)
         {
@@ -187,9 +211,83 @@
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
         OurUtility.Write_Log("=== Step 3. FingerPrint Scan Page", "step-action");
-        await FingerPrintScan();
+        await CheckFinger();
     }
+    private async Task FingerPrintScanC()
+    {
+        IsLoading = true;
+        OurUtility.Write_Log("==== Scan FingerPrint", "step-action");
+        OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
 
+        try
+        {
+            TrustFingerManager.GlobalInitialize();
+        }
+        catch
+        {
+            trans.AddTrail("READ EKTP", "FP - 101", "01");
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            trans.errorCode = "FP - 101";
+            OurUtility.Write_Log("== Error : FP - 101", "step-action");
+            NavMan.NavigateTo("/error");
+            return;
+        }
+        await Task.Run(() => ektpCRT.FPReader());
+        await Task.Run(() => ektpCRT.StartCaptureFingerprint());
+        try
+        {
+            while (!ektpCRT.isCaptured)
+            {
+                Task.Delay(500);
+                byte[] feature = new byte[ektpCRT.ektpData.FPR.Length];
+                feature = ektpCRT.ektpData.FPR;
+
+                var result = dev.Verify(3, feature, ktp.minutiae1);
+
+                var result2 = dev.Verify(3, feature,ktp.minutiae2);
+
+                if (result.IsMatch || result2.IsMatch)
+                {
+                    trans.AddTrail("FINGERPRINT", "MATCH", "00");
+
+                    OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                    cst.EKTPNumber = ktp.Id;
+                    IsLoading = false;
+                    IsSuccess = true;
+
+                    Timer.SetTimer(1000);
+                    Timer.OnElapsed += TimerElapsedHandler;
+                    return;
+                }
+                else
+                {
+                    trans.AddTrail("FINGERPRINT", "NOT-MATCH", "01");
+                    OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                    intTryCount += 1;
+                    IsLoading = false;
+                    IsVisible = true;
+                    if (intTryCount > intTryLimit)
+                    {
+                        IsFail = true;
+                    }
+                }
+            }
+        }
+        catch
+        {
+            trans.AddTrail("READ EKTP", "FP - 002", "01");
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            trans.errorCode = "FP - 002";
+            OurUtility.Write_Log("== Error : FP - 002", "step-action");
+            NavMan.NavigateTo("/error");
+            return;
+        }
+    }
     private async Task FingerPrintScan()
     {
         //ektp.InitializeEktp();
@@ -201,7 +299,7 @@
         OurUtility.Write_Log("===== Ektp_Sdk.OpenFingerPrintReader", "step-action");
 
         // -- Step 2, Open Device Fingerprint
-        IntPtr reader = IntPtr.Zero;
+        IntPtr reader = IntPtr.Zero;    
         int result = -1;
         result = await Task.Run(() => Ektp_Sdk.OpenFingerPrintReader(ref reader, "uareu")).ConfigureAwait(false);
         if (reader == IntPtr.Zero)
@@ -249,7 +347,7 @@
 
                     int matched = 0;//matched == 1, it means finger print matched
                     int format = 0;//format == 0, it means finger print template type is ISO
-                    int threshold = 40;
+                    int threshold = 20;
 
                     Ektp_Sdk.SetMatchFingerPrintThreshold(engine, threshold);
                     Ektp_Sdk.GetMatchFingerPrintThreshold(engine, ref threshold);
@@ -260,9 +358,15 @@
 
                     if (matched == 1)
                     {
+                        trans.AddTrail("FINGERPRINT", "MATCH", "00");
+
                         OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                        cst.EKTPNumber = ktp.Id;
                         IsLoading = false;
                         IsSuccess = true;
+                        OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                        result = Ektp_Sdk.CloseReader(reader);
+
                         Timer.SetTimer(1000);
                         Timer.OnElapsed += TimerElapsedHandler;
                         //break;

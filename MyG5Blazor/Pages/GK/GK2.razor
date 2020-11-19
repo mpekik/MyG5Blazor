@@ -154,11 +154,15 @@
 
     public string _myURL = "";
     public string saveURL = "log/v1/save";
+    public string PCID = string.Empty;
+    public string CONF = string.Empty;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
 
     private IntPtr hContext = IntPtr.Zero;
+
+    private CRT_Interface ektpC = new CRT_Interface();
 
     byte[] pbPcid;
 
@@ -260,8 +264,10 @@
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
-        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
+        PCID = config.Read("EKTP", Config.PARAM_EKTP_PCID);
+        CONF = config.Read("EKTP", Config.PARAM_EKTP_CONF);
+        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(PCID, ","));
+        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(CONF, ","));
         OurUtility.Write_Log("=== Step 2. Scan e-KTP Page", "step-action");
         //Switcher.UP("3000", config.usbEKTP);
         //await Task.Delay(3000);
@@ -297,6 +303,81 @@
     }
     private async Task ScanEKTPC()
     {
+        int r = -999;
+        string errMsg =string.Empty;
+        Switcher.DOWN("500", config.usbEKTP);
+        await Task.Delay(500);
+        Switcher.UP("3000", config.usbEKTP);
+        await Task.Delay(3000);
+        UInt16 rf = 0;
+        UInt16 sam = 1;
+        if(intTryCount<=intTryLimit)
+        {
+            r = ektpC.StartEKTP(PCID, CONF,rf,sam);
+            if(r!=0)
+            {
+                if (r > 0 && r < 10)
+                    errMsg = "EK - 10" + r.ToString();
+                else
+                    errMsg = "EK - 1" + r.ToString();
+
+                trans.AddTrail("SCAN EKTP", errMsg, "01");
+                OurUtility.Write_Log("===== EKTP ERROR - "+errMsg, "step-action");
+                IsLoading = false;
+                if (intTryCount <= intTryLimit)
+                {
+                    IsVisible = true;
+                    intTryCount += 1;
+                }
+                else
+                {
+                    IsFail = true;
+                }
+                return;
+            }
+            else
+            {
+                byte[] demoGraphic = new byte[ektpC.ektpData.biolen];
+                for (int i = 0; i < ektpC.ektpData.biolen; i++)
+                {
+                    demoGraphic[i] = ektpC.ektpData.byteBio[i];
+                }
+                OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
+
+                ktp.demographic = demoGraphic;
+
+                if(cst.EKTPNumber==ktp.Id)
+                {
+                    ktp.minutiae1 = ektpC.ektpData.byteMinu1;
+                    ktp.minutiae2 = ektpC.ektpData.byteMinu2;
+                    ktp.minu1len = ektpC.ektpData.minu1len;
+                    ktp.minu2len = ektpC.ektpData.minu2len;
+
+                    trans.AddTrail("SCAN EKTP", ktp.Id, "00");
+                    IsLoading = false;
+                    IsSuccess = true;
+                    await Task.Delay(1000);
+                    NavMan.NavigateTo("/GK/3");
+                    return;
+                }
+                else
+                {
+                    trans.AddTrail("SCAN EKTP", "NIK SALAH", "01");
+                    IsLoading = false;
+                    IsSuccess = false;
+                    if (intTryCount <= intTryLimit)
+                    {
+                        IsVisible = true;
+                        intTryCount += 1;
+                    }
+                    else
+                    {
+                        IsFail = true;
+                    }
+                    return;
+                }
+            }
+        }
 
     }
     //FIXME: Create as Service
