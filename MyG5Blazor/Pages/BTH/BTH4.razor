@@ -677,11 +677,13 @@
             Payout.DisableValidator();
             Payout.SSPComms.CloseComPort();
 
-            await Payment("");
+            await Payment("").ConfigureAwait(false);
+            Task.Delay(500);
 
             trans.kip = "Pembayaran tidak dilanjutkan, terminal id:" + menu.terminalId;
             trans.status = "02";
             await OurUtility.AuditTrail(trans, menu, cst);
+
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
@@ -1001,7 +1003,7 @@
                                     "\"edc\" : {" +
                                     "\"responseCode\" : \"" + edc.respondCode + "\"," +
                                     "\"ecr\" : \"" + trans.ecr + "\"," +
-                                    "\"sn\" : \"" + config.snEdc + "\"}" +
+                                    "\"sn\" : \"" + config.snEdc + "\"" +
                                     "}";
         }
         else

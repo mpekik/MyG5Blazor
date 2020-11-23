@@ -143,6 +143,7 @@
     {
         if (translog)
         {
+            IsLoading = false;
             translog = false;
             IsVisible = false;
             isLoading2 = true;
@@ -299,7 +300,7 @@
         OurUtility.Write_Log("===== Ektp_Sdk.OpenFingerPrintReader", "step-action");
 
         // -- Step 2, Open Device Fingerprint
-        IntPtr reader = IntPtr.Zero;    
+        IntPtr reader = IntPtr.Zero;
         int result = -1;
         result = await Task.Run(() => Ektp_Sdk.OpenFingerPrintReader(ref reader, "uareu")).ConfigureAwait(false);
         if (reader == IntPtr.Zero)
@@ -347,7 +348,7 @@
 
                     int matched = 0;//matched == 1, it means finger print matched
                     int format = 0;//format == 0, it means finger print template type is ISO
-                    int threshold = 20;
+                    int threshold = Config.ektpThreshold;
 
                     Ektp_Sdk.SetMatchFingerPrintThreshold(engine, threshold);
                     Ektp_Sdk.GetMatchFingerPrintThreshold(engine, ref threshold);

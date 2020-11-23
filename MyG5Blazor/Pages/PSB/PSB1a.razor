@@ -63,7 +63,7 @@
 
             <div class="col-md-6">
               <div class="teks-nominal" style="text-align: center;">
-                <button class="btn btn-danger btn-right" onclick="buttonOk()" id="btn-ok" value="">Lanjut</button>
+                <button class="btn btn-danger btn-right" @onclick="Lanjut" id="btn-ok" value="">Lanjut</button>
               </div>
             </div>
           </div>
@@ -74,10 +74,10 @@
 
 <footer>
     <div class="footer-side1">
-        <span class="dot" id="dot-active">1</span>
-        <span class="dot">2</span>
-        <span class="dot">3</span>
-        <span class="dot">4</span>
+        <span class="dot2" id="dot-active">1</span>
+        <span class="dot2">2</span>
+        <span class="dot2">3</span>
+        <span class="dot2">4</span>
         <span class="dot2">5</span>
         <span class="dot2">6</span>
         <span class="dot2">7</span>
@@ -128,5 +128,16 @@
             cst.Clear();
         }
     }
-    
+
+    private void Lanjut()
+    {
+
+        menu.AddMenuPSB("Halo Kick Gold", "15", "15", "100", "40", "200", "100000");
+        menu.AddMenuPSB("Halo Kick Gold", "25", "25", "200", "80", "400", "150000");
+        menu.AddMenuPSB("Halo Kick Platinum", "50", "50", "500", "250", "1000", "300000");
+        menu.AddMenuPSB("Halo Kick Platinum", "100", "100", "1000", "500", "2000", "550000");
+
+        NavMan.NavigateTo("/PSB/1b");
+    }
+
 }

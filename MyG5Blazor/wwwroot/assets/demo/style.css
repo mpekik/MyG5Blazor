@@ -500,6 +500,18 @@ footer {
     border-color: rgb(192, 0, 0);
 }
 
+.dot2 {
+    padding: 7px;
+    height: 35px;
+    width: 35px;
+    color: white;
+    background-color: rgb(168, 168, 168);
+    border-radius: 50%;
+    display: inline-block;
+    font-weight: bold;
+    font-size: 17pt;
+    margin: 10px;
+}
 .dot {
     padding: 7px;
     height: 35px;
@@ -547,6 +559,20 @@ footer {
     background-color: rgba(19, 19, 20, 0.924); /* Black w/ opacity */
   }
 
+.modal2 {
+    font-size: large;
+    display: block; /* Hidden by default */
+    position: fixed; /* Stay in place */
+    z-index: 1; /* Sit on top */
+    padding-top: 100px; /* Location of the box */
+    left: 0;
+    top: 0;
+    width: 100%; /* Full width */
+    height: 100%; /* Full height */
+    overflow: auto; /* Enable scroll if needed */
+    background-color: rgb(0,0,0); /* Fallback color */
+    background-color: rgba(19, 19, 20, 0.924); /* Black w/ opacity */
+}
   .text-header {
     text-align: left;
     font-weight: bold;
@@ -555,6 +581,14 @@ footer {
     margin-top: 20px;
     color: black;
   }
+.text-header2 {
+    text-align: left;
+    font-weight: bold;
+    font-size: 25pt;
+    padding-left: 18px;
+    margin-top: 18px;
+    color: rgb(255, 0, 0);
+}
 
 .text-body {
     font-family: "Helvetica", Helvetica;

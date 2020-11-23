@@ -3,8 +3,8 @@
 @using System.Threading
 @using System.Net.Http;
 @using System.Text;
-@inject IJSRuntime JSRuntime;
-<a href="C:\Trilogi\Program\MyG5Blazor\MyG5Blazor\Pages\U4G\U4G3.razor">C:\Trilogi\Program\MyG5Blazor\MyG5Blazor\Pages\U4G\U4G3.razor</a>
+
+@inject IJSRuntime JSRuntime
 @inject BlazorTimer Timer
 @inject Ektp_Data ktp
 @inject NavigationManager NavMan
@@ -139,6 +139,7 @@
         if (translog)
         {
             translog = false;
+            IsLoading = false;
             IsVisible = false;
             isLoading2 = true;
             trans.status = "01";
@@ -250,7 +251,7 @@
 
                     int matched = 0;//matched == 1, it means finger print matched
                     int format = 0;//format == 0, it means finger print template type is ISO
-                    int threshold = 40;
+                    int threshold = Config.ektpThreshold;
 
                     Ektp_Sdk.SetMatchFingerPrintThreshold(engine, threshold);
                     Ektp_Sdk.GetMatchFingerPrintThreshold(engine, ref threshold);
@@ -269,7 +270,7 @@
                         IsSuccess = true;
                         OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
                         result = Ektp_Sdk.CloseReader(reader);
-                        
+
                         Timer.SetTimer(1000);
                         Timer.OnElapsed += TimerElapsedHandler;
                         //break;

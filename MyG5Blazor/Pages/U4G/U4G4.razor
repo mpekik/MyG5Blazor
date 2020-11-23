@@ -252,26 +252,19 @@
         if (cardStock == "")
         {
             isFail = true;
-            trans.AddTrail("GET STOCK", "", "01");
+            trans.AddTrail("GET STOCK", "CD - 004", "01");
             trans.status = "01";
             trans.errorCode = "CARD DISPENSER";
             await OurUtility.AuditTrail(trans, menu, cst);
-            trans.errorCode = "CD - 003";
+            trans.errorCode = "CD - 004";
             OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
             NavigateTo("/error");
             return;
         }
         stock = Int32.Parse(cardStock);
-        Switcher.DOWN("500", config.usbEKTP);
-        await Task.Delay(500);
         OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
         isLoading = true;
-        Switcher.UP("3000", config.usbCardReader);
-        await Task.Delay(3000);
         await MyPerso();
-        //stock = stock - intTryCount;
-        //trans.jumlah_kartu = stock;
-        //config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
         if (isError)
         {
             isLoading = false;
@@ -474,7 +467,16 @@
                                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                                     }
                                     trans.AddTrail("GET STRING PANJANG", "", "01");
-                                    await Task.Run(() => MoveToBin());
+                                    if (!await Task.Run(() => MoveToBin()))
+                                    {
+                                        isSuccess = false;
+                                        isError = true;
+                                        trans.AddTrail("MOVE TO BIN", "", "01");
+                                        trans.status = "01";
+                                        OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
+                                        trans.errorCode = "CD - 003";
+                                        return;
+                                    }
                                     if (intTryCount < intTryLimit)
                                         intTryCount += 1;
                                     else
@@ -514,8 +516,17 @@
                     }
                     else
                     {
-                        trans.AddTrail("GET SN", "", "01");
-                        await Task.Run(() => MoveToBin());
+                        trans.AddTrail("GET SN", "CR - 001", "01");
+                        if (!await Task.Run(() => MoveToBin()))
+                        {
+                            isSuccess = false;
+                            isError = true;
+                            trans.AddTrail("MOVE TO BIN", "", "01");
+                            trans.status = "01";
+                            OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
+                            trans.errorCode = "CD - 003";
+                            return;
+                        }
                         if (intTryCount < intTryLimit)
                             intTryCount += 1;
                         else

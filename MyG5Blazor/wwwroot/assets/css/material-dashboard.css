@@ -22,6 +22,7 @@
     border-radius: 8px;
 }
 .nominal-kuota {
+    z-index=-1;
     margin-right: -2rem;
     margin-top: 10%;
     font-weight: bold;
@@ -1449,6 +1450,7 @@ kbd {
         box-shadow: none;
     }
 
+
 pre {
     display: block;
     font-size: 87.5%;
@@ -1973,7 +1975,7 @@ pre {
     }
 
     .col-md-1 {
-        flex: 0 0 8.333333%;
+        flex: 0 0 6%;
         max-width: 8.333333%;
     }
 
@@ -5359,6 +5361,7 @@ tbody.collapse.show {
 }
 
 .card-header {
+    z-index=-1;
     padding: 0.75rem 1.25rem;
     margin-bottom: 0;
     background-color: #fff;
@@ -18252,7 +18255,7 @@ html[dir="rtl"] .form-check .form-check-sign .check:before {
         }
 
     .card .card-header {
-        z-index: 3 !important;
+        z-index: 1 !important;
     }
 
         .card .card-header .card-title {

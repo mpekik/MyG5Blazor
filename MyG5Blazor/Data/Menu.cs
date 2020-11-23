@@ -38,7 +38,31 @@ namespace MyG5Blazor.Data
         public string[] AssetsPNG = { "Menu_Bayar_Tagihan.png", "Menu_Upgrade4G.png", "Menu_Beli_Pulsa.png", "Menu_Ganti_kartu.png" };
         public string[] apiURL = { "bayar-halo/v1/init", "upgrade-4g/v1/init", "isi-pulsa/v1/init", "ganti-kartu/v1/init" };
         public string[] stringMenu = { "1", "1", "1", "1", "1" };
+        
+        public class MenuPSB
+        {
+            public string _Header { get; set; }
+            public string _internet { get; set; }
+            public string _entertainment { get; set; }
+            public string _telpTsel { get; set; }
+            public string _telpLain { get; set; }
+            public string _smsTsel { get; set; }
+            public string _nominal { get; set; }
+        }
 
+        public List<MenuPSB> _menuPSB = new List<MenuPSB> ();
+        public void AddMenuPSB (string header, string internet, string entertainment, string telpTsel, string telpLain, string smsTsel, string nominal)
+        {
+            MenuPSB menuPSB = new MenuPSB();
+            menuPSB._Header = header;
+            menuPSB._internet = internet;
+            menuPSB._entertainment = entertainment;
+            menuPSB._telpTsel = telpTsel;
+            menuPSB._telpLain = telpLain;
+            menuPSB._smsTsel = smsTsel;
+            menuPSB._nominal = nominal;
+            _menuPSB.Add(menuPSB);
+        }
         public class MenuPulsa
         {
             public string _nominal { get; set; }
