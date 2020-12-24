@@ -90,7 +90,7 @@
                                         <td>&emsp;<span style="font-weight: bold;">@cst.strMPembayaran</span></td>
                                     </tr>
                                 </table>
-                                <button class="btn btn-danger btn-right" @onclick="@(() => NavigateTo("/PB/4"))" id="btn-ok" value="">OK</button>
+                                <button class="btn btn-danger btn-right" @onclick="@(() => InvokeAsync(Lanjut))" id="btn-ok" value="">OK</button>
                             </div>
                         }
                     </div>
@@ -131,6 +131,8 @@
     private bool IsLanjut = false;
     private bool translog = true;
     private bool isLoading = false;
+    private bool isButtonLanjut = true;
+
     private int intTotalTagihan = 0;
     private string strTotalTagihan => intTotalTagihan.ToString();
     protected override async Task OnInitializedAsync()
@@ -172,5 +174,14 @@
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);
+    }
+
+    private async Task Lanjut()
+    {
+        if(isButtonLanjut)
+        {
+            isButtonLanjut = false;
+            NavigateTo("/PB/4");
+        }
     }
 }

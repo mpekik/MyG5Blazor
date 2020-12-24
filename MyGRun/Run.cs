@@ -272,6 +272,10 @@ namespace MyGRun
             {
                 Directory.Move(directory+@"\wwwroot", directory+@"\Old\wwwroot");
             }
+            if (Directory.Exists(directory + @"\x86"))
+            {
+                Directory.Move(directory + @"\wwwroot", directory + @"\Old\wwwroot");
+            }
             MoveFile(new DirectoryInfo(directory));
             await ExtractUpdate();
         }

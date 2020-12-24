@@ -217,7 +217,7 @@ namespace MyG5Blazor.Data
         private UInt16 _readerSAM = 1;
 
         private bool isOpen = false;
-        private bool isCapture = false;
+        public bool isCapture = false;
         private bool capturing = true;
         private bool LFDFlag = false;
         public bool isCaptured = false;
@@ -367,7 +367,7 @@ namespace MyG5Blazor.Data
                 return;
             }
         }
-        
+
         public bool SAMReaderSlot(string strData5)
         {
             int rc;
@@ -1697,16 +1697,17 @@ namespace MyG5Blazor.Data
                 return false;
             }
         }
-        public int StartEKTP(string pbPcid, string pbConf,UInt16 _rf, UInt16 _sam)
+        public int StartEKTP(string pbPcid, string pbConf, UInt16 _rf, UInt16 _sam)
         {
             try
             {
-                SetReaderParameter(_rf,_sam);
+
+                SetReaderParameter(_rf, _sam);
 
                 SetSAMParameter(pbPcid, pbConf);
                 bool resp;
                 resp = InitializeContext();
-                if(!resp)
+                if (!resp)
                 {
                     return 14;
                 }
@@ -1716,10 +1717,10 @@ namespace MyG5Blazor.Data
                     return 15;
                 }
                 resp = ConnectRFReader();
-                if (!resp)
-                {
-                    return 1;
-                }
+                //if (!resp)
+                //{
+                //    return 1;
+                //}
                 resp = ConnectSAM();
                 if (!resp)
                 {
@@ -1727,10 +1728,10 @@ namespace MyG5Blazor.Data
                 }
                 resp = ReadUIDA();
                 resp = ReadPhoto();
-                if (!resp)
-                {
-                    return 4;
-                }
+                //if (!resp)
+                //{
+                //    return 4;
+                //}
                 resp = ReadUIDB();
                 resp = Authentication();
                 if (!resp)
@@ -1763,10 +1764,10 @@ namespace MyG5Blazor.Data
                     return 11;
                 }
                 resp = ReadMinutiae2();
-                if (!resp)
-                {
-                    return 12;
-                }
+                //if (!resp)
+                //{
+                //    return 12;
+                //}
                 DisconnectReader();
                 return 0;
             }
@@ -1782,7 +1783,7 @@ namespace MyG5Blazor.Data
             CRT_DLLHandler.DisconnectSCardReader(_readerRF);
         }
 
-        public void StartCaptureFingerprint()
+        public async Task StartCaptureFingerprint()
         {
             TurnOffA600GreenLight();
             TurnOffA600RedLight();
@@ -1809,6 +1810,7 @@ namespace MyG5Blazor.Data
                 LiveCaptureFingerprintBitmapData bitmap1 = null;
                 LiveCaptureFingerprintBitmapData bitmap2 = null;
                 isCapture = true;
+                isCaptured = false;
                 int raisefinger = 0;
                 int raisesound = 0;
                 int qulitytemp = 0;
@@ -1931,7 +1933,7 @@ namespace MyG5Blazor.Data
 
                                 }
 
-                                if (qulity <= 20 && raisesound == 1)
+                                if (raisesound == 1)
                                 {
                                     raisefinger = 1;
                                 }
@@ -2059,7 +2061,7 @@ namespace MyG5Blazor.Data
             }
             return bmp;
         }
-        public void FPReader()
+        public async Task FPReader()
         {
             try
             {
@@ -2087,18 +2089,23 @@ namespace MyG5Blazor.Data
                 return;
             }
         }
-        private void OpenFPReader()
+        dynamic result;
+        dynamic result2;
+
+        public bool FPMatch(byte[] feature, byte[] minutiae1, byte[] minutiae2)
         {
-            FingerPosition fingerprintPosition = (FingerPosition)1;
-            IFingerprintFeature fearture = null;
-            ISOFingerprintFeature isofeature = null;
-            if (devCount == 0)
+            result = dev.Verify(5, feature, minutiae1);
+            result2 = dev.Verify(5, feature, minutiae2);
+            CloseFPReader();
+            if (result.IsMatch || result2.IsMatch)
             {
-                return;
+                return true;
             }
-
-            DeviceItem selectDev = new DeviceItem() { Name = "AUTO", DeviceIndex = 0 };
-
+            else
+                return false;
+        }
+        public async Task CloseFPReader()
+        {
             if (isOpen == true)
             {
                 TurnOffA600GreenLight();
@@ -2126,6 +2133,25 @@ namespace MyG5Blazor.Data
 
                 capturing = false;
                 dev?.Dispose();
+            }
+            isOpen = false;
+        }
+        private async Task OpenFPReader()
+        {
+            isCaptured = false;
+            FingerPosition fingerprintPosition = (FingerPosition)1;
+            IFingerprintFeature fearture = null;
+            ISOFingerprintFeature isofeature = null;
+            if (devCount == 0)
+            {
+                return;
+            }
+
+            DeviceItem selectDev = new DeviceItem() { Name = "AUTO", DeviceIndex = 0 };
+
+            if (isOpen == true)
+            {
+                
             }
             else
             {

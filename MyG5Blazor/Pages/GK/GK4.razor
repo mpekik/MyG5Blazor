@@ -243,6 +243,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        //trans.serviceErrorCode = "asd";
         mypersoexe = config.Read("Dispenser", Config.PARAM_PERSO_EXE);
         strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
@@ -251,7 +252,7 @@
 
         if (cardStock == "")
         {
-            isFail = true;
+            isFail = true; 
             trans.AddTrail("GET STOCK", "CD - 004", "01");
             trans.status = "01";
             trans.errorCode = "CARD DISPENSER";
@@ -309,7 +310,7 @@
                 {
 
                     if (!cds.Start(ref errorcode, strCOM, ref msg))
-                    {
+                    { 
                         OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
                     }
                     else
@@ -321,10 +322,24 @@
                     if (await CardReaderScan())
                     {
                         trans.AddTrail("GET SN", p_icc_id, "00");
+                        if(p_icc_id.Substring(2,2)=="62")
+                        {
+                            await Task.Run(() => MoveToBin());
+                            if (intTryCount < intTryLimit)
+                            {
+                                intTryCount += 1;
+                                continue;
+                            }
+                            else
+                            {
+                                isFail = true;
+                                return;
+                            }
+                        }
                         string myURL = _myURL + persoURL;
 
                         string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                                        "\"terminalId\" : \"" + trans.termID + "\"," +
+                                        "\"terminalId\" : \"" + menu.terminalId + "\"," +
                                         "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                                         "\"nik\" : \"" + cst.EKTPNumber + "\"," +
                                         "\"buid\" : \"" + config.apiBuid + "\"," +
@@ -332,7 +347,7 @@
                                         "}";
 
                         //OurUtility.Write_Log("=== URL : " + myURL, "step-action");
-                        //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                         //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                         if (strResult != "")
@@ -364,9 +379,10 @@
                                             myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                             "\"terminalId\" : \"" + trans.termID + "\"," +
                                             "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                            "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                                             "\"persoStatus\" : \"2\"}";
                                             OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                            //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                                             //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                             if (strResult != "" || strResult != "NotFound" || strResult != "Forbidden")
@@ -375,6 +391,8 @@
                                                 if ((string)jobjResult2["transaction"].SelectToken("statusCode") == "00")
                                                 {
                                                     trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "00");
+                                                    isLoading = false;
+
                                                     if (!await Task.Run(() => MoveToTheFront()))
                                                     {
                                                         isSuccess = false;
@@ -388,9 +406,11 @@
                                                         trans.errorCode = "CD - 002";
                                                         //NavigateTo("/error");
                                                     }
+                                                    else
+                                                    {
+                                                        isSuccess = true;
+                                                    }
 
-                                                    isLoading = false;
-                                                    isSuccess = true;
                                                     return;
                                                 }
                                             }
@@ -424,9 +444,10 @@
                                             myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                                 "\"terminalId\" : \"" + trans.termID + "\"," +
                                                 "\"persoId\" : \"" + trans.persoID + "\" ," +
-                                                "\"persoStatus\" : \"3\"}";
+                                                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                                                "\"persoStatus\" : \"4\"}";
                                             OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                            //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                                             trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "00");
                                             //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
@@ -448,6 +469,7 @@
                                             intTryCount += 1;
                                         else
                                         {
+                                            isLoading = false;
                                             isFail = true;
                                             return;
                                         }
@@ -460,19 +482,27 @@
                                     {
                                         OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                                        trans.serviceErrorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                                        if ((string)jobjResult["transaction"].SelectToken("errorCode") == "303018") 
+                                        {
+                                            trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
+                                            //OurUtility.AuditTrail(trans, menu, cst);
+                                            isFail = true;
+                                            return;
+                                        }
                                     }
                                     else
                                     {
                                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                                     }
-                                    trans.AddTrail("GET STRING PANJANG", "", "01");
+                                    trans.status = "01";
+                                    trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
                                     if (!await Task.Run(() => MoveToBin()))
                                     {
                                         isSuccess = false;
                                         isError = true;
                                         trans.AddTrail("MOVE TO BIN", "", "01");
-                                        trans.status = "01";
                                         OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
                                         trans.errorCode = "CD - 003";
                                         return;
@@ -481,13 +511,14 @@
                                         intTryCount += 1;
                                     else
                                     {
+                                        isLoading = false;
                                         isFail = true;
                                         return;
                                     }
                                 }
                                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                                 {
-                                    trans.AddTrail("GET STRING PANJANG", "", "01");
+                                    trans.AddTrail("GET STRING PANJANG", "", "02");
                                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                                     isLoading = false;
                                     //IsVisible = false;
@@ -499,8 +530,8 @@
                             catch (Exception ex)
                             {
                                 trans.AddTrail("PERSO", trans.persoID, "01");
-                                OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
-                                trans.errorCode = strResult;
+                                OurUtility.Write_Log("=== Status Code : " + ex.Message + " {Error}", "step-action");
+                                trans.errorCode = "Exception Error";
                                 isError = true;
                                 return;
                             }
@@ -516,13 +547,13 @@
                     }
                     else
                     {
+                        trans.status = "01";
                         trans.AddTrail("GET SN", "CR - 001", "01");
                         if (!await Task.Run(() => MoveToBin()))
                         {
                             isSuccess = false;
                             isError = true;
                             trans.AddTrail("MOVE TO BIN", "", "01");
-                            trans.status = "01";
                             OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
                             trans.errorCode = "CD - 003";
                             return;
@@ -608,7 +639,7 @@
 
         OurUtility.Write_Log("== Check CES", "step-action");
         //OurUtility.Write_Log("== URL API : " + myURL, "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
         //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "")
@@ -653,7 +684,7 @@
             }
             catch (Exception ex)
             {
-                trans.errorCode = strResult;
+                trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 //NavMan.NavigateTo("/error");
             }

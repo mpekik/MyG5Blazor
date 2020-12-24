@@ -1,0 +1,230 @@
+﻿@page "/PSB/2a"
+@inject IJSRuntime JSRuntime;
+
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Threading.Tasks;
+@using MyG5Blazor.Data
+
+@inject Costumer cst
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Config config 
+@inject Menu menu 
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+
+            <form class="navbar-form">
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="teks-title2">Berlangganan KartuHalo</p>
+                    <div class="teks-top3">
+                        <p>Kami telah mengirimkan kode verifikasi melalui e-mail ke:</p> <br>
+                        <p style="font-weight:bold">@trans.psbDetail.alamatEmail</p> <br>
+                        <p>Harap ketikkan 6-digit kode verifikasi tersebut.</p> <br>
+                        <p style="font-size:small; font-style:italic">Jika anda tidak menerima e-mail kami, Anda bisa meminta pengiriman ulang dalam @counterTime.ToString() detik (max 3 kali pengiriman ulang).</p>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+
+                    <input type="text" name="number" class="num-field" @bind="otp" readonly />
+
+                    <div class="num-button">
+                        <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
+                        <button class="key-num btn" value="2" @onclick="@(() => InputPhoneNumber("2"))">2</button>
+                        <button class="key-num btn" value="3" @onclick="@(() => InputPhoneNumber("3"))">3</button>
+                        <button class="key-num btn" value="4" @onclick="@(() => InputPhoneNumber("4"))">4</button>
+                        <button class="key-num btn" value="5" @onclick="@(() => InputPhoneNumber("5"))">5</button>
+                        <button class="key-num btn" value="6" @onclick="@(() => InputPhoneNumber("6"))">6</button>
+                        <button class="key-num btn" value="7" @onclick="@(() => InputPhoneNumber("7"))">7</button>
+                        <button class="key-num btn" value="8" @onclick="@(() => InputPhoneNumber("8"))">8</button>
+                        <button class="key-num btn" value="9" @onclick="@(() => InputPhoneNumber("9"))">9</button>
+                        <button class="key-num btn btn-hapus" value="Hapus" @onclick="RemovePhoneNumber">Hapus</button>
+                        <button class="key-num btn" value="0" id="myBtnUndefine" @onclick="@(() => InputPhoneNumber("0"))">0</button>
+                        <button class="key-num btn btn-hapus" id="myBtn" value="ok" @onclick="Ok">Ok</button>
+                        <button class="btn btn-danger btn-right3" id="btn-ok" style="width:100%;" value="" disabled="@kirimUlang" @onclick="KirimUlang">Kirim Ulang</button>
+
+                    </div>
+                    <div class="button-down">
+                        <!-- <button class="btn-arrow" value="">Kembali</button>
+        <button class="btn-arrow" value="">Menu Utama</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+</div>
+
+<footer>
+    <div class="footer-side1">
+        <span class="dot2">1</span>
+        <span class="dot2" id="dot-active">2</span>
+        <span class="dot2">3</span>
+        <span class="dot2">4</span>
+        <span class="dot2">5</span>
+        <span class="dot2">6</span>
+        <span class="dot2">7</span>
+        <span class="dot2">8</span>
+        <span class="dot2">9</span>
+    </div>
+    <div class="footer-side2">
+        <button @onclick="@(()=>NavigateTo("/main"))" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="@(()=>NavigateTo("/main"))" class="btn-arrow btn" value="">Menu Utama</button>
+        <!-- <sup>Powered By </sup>Trilogi Persada -->
+    </div>
+</footer>
+
+<!-- The Modal -->
+@if (isInvalid)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Maaf, kode verifikasi yang Anda masukkan tidak valid.<br />
+                        Mohon cek kembali kode verifikasi yang Anda terima.
+                    </p>
+                    <p style="font-size: 25pt; font-weight: bold;"></p>
+                    <button class="btn btn-danger modal-button"@onclick="InvalidOK">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@if (isLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
+
+@code{
+    private bool isVisible = false;
+    private bool isLoading = false;
+    private bool isValid = false;
+    private bool isInvalid = false;
+    private bool isOTPError = false;
+
+    private string otp = string.Empty;
+
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool kirimUlang = true;
+
+    private async Task OTPTime()
+    {
+        //InvokeAsync(StateHasChanged);
+        do
+        {
+            await Task.Delay(1000);
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime<1)
+            {
+                kirimUlang = false;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (counterTime>0);
+    }
+
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            await Task.Run(() => OTPTime()).ConfigureAwait(false);
+            return;
+        }
+
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        counterTime = counterTreshold;
+    }
+
+    private async Task KirimUlang()
+    {
+        kirimUlang = true;
+        counterTime = counterTreshold;
+        await Task.Run(() => OTPTime()).ConfigureAwait(false);
+
+    }
+
+    private void InputPhoneNumber(string strInput)
+    {
+        if(otp.Length<6)
+            otp += strInput;
+    }
+
+    private void RemovePhoneNumber()
+    {
+        if (otp.Length > 0)
+            otp = otp.Substring(0, otp.Length - 1);
+    }
+
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+
+    private async Task CekOTP()
+    {
+        isLoading = true;
+        await Task.Delay(5000);
+        isValid = true;
+        isInvalid = false;
+    }
+    private async Task Ok()
+    {
+        if(otp.Length==6)
+        {
+            await CekOTP();
+            if(isValid)
+            {
+                NavigateTo("/PSB/3");
+            }else if(isInvalid)
+            {
+                NavigateTo("/main");
+            }else if(isOTPError)
+            {
+                NavigateTo("/error");
+            }
+        }
+    }
+    private async Task InvalidOK()
+    {
+        isLoading = false;
+        isValid = false;
+        isInvalid = false;
+        isOTPError = false;
+    }
+}

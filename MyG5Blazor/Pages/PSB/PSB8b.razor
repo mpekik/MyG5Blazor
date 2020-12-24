@@ -1,0 +1,156 @@
+﻿@page "/PSB/8b"
+
+@using MyG5Blazor.Data 
+
+@inject IJSRuntime JSRuntime
+@inject Costumer cst
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Menu menu
+
+    <div class="main-panel bg-home">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+                <div class="navbar-wrapper">
+                    <div class="logo">
+                        <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                    </div>
+                    <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+                </div>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-6">
+                        <div class="teks-title">Berlangganan Kartu Halo</div>
+                        <div id="teks-konfirmasi">
+                            <div class="teks-status"> Konfirmasi Pembayaran Proses<br> Berlangganan KartuHalo</div>
+                        </div>
+                        @if (false)
+                        {
+                        <div id="info">
+                            <div class="teks-footer2" style="font-weight: bold;">
+                                BAYAR DENGAN UANG PAS, MESIN<br> INI TIDAK MENGELUARKAN<br> KEMBALIAN
+                            </div>
+                        </div>
+                        }
+                    </div>
+
+                    <div class="col-md-6">
+                        <div id="ket-pembelian">
+                            <div class="teks-nominal">
+                                <table>
+                                    <tr>
+                                        <td>Nomor</td>
+                                        <td> &emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">081388889999</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Nominal</td>
+                                        <td>&emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">Rp 54.321</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Paket</td>
+                                        <td>&emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">Halo Kick Platinum</span></td>
+                                    </tr>
+                                    <tr>
+                                        <td>Metode Bayar</td>
+                                        <td>&emsp;&emsp; : </td>
+                                        <td>&emsp;<span style="font-weight: bold;">Tunai (Uang Pas)</span></td>
+                                    </tr>
+                                </table>
+                                <button class="btn btn-danger btn-right" onclick="buttonOk()" id="btn-ok" value="">OK</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+        <footer>
+            <div class="footer-side1">
+                <span class="dot2">1</span>
+                <span class="dot2">2</span>
+                <span class="dot2">3</span>
+                <span class="dot2">4</span>
+                <span class="dot2">5</span>
+                <span class="dot2">6</span>
+                <span class="dot2">7</span>
+                <span class="dot2" id="dot-active">8</span>
+                <span class="dot2">9</span>
+            </div>
+            <div class="footer-side2">
+
+                <button @onclick="@(() => NavigateTo("/PSB/8a"))" class="btn-arrow btn" value="">Kembali</button>
+
+                <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu<br>Utama</button>
+                <!-- <sup>Powered By </sup>Trilogi Persada -->
+            </div>
+        </footer>
+        @if (isLoading)
+        {
+            <div id="myModal" class="modal">
+                <div class="modal-blank">
+                    <img class="lds-spinner" src="../../assets/image/loader.gif">
+                    <p><br>Mohon tunggu</p>
+                    <p>proses sedang berlangsung...</p>
+                </div>
+            </div>
+        }
+    </div>
+
+@code
+{
+    private bool IsLanjut = false;
+    private bool translog = true;
+    private bool isLoading = false;
+    private int intTotalTagihan = 0;
+    private string strTotalTagihan => intTotalTagihan.ToString();
+    protected override async Task OnInitializedAsync()
+    {
+        //TotalTagihan();
+    }
+
+    private void buttonOk()
+    {
+        IsLanjut = !IsLanjut;
+    }
+
+    private void Nominal(int intNominal)
+    {
+        cst.intTagihan = intNominal;
+    }
+
+    private void TotalTagihan()
+    {
+        foreach (dynamic t in cst.GetlistTagihan)
+        {
+            intTotalTagihan += t._intTagihan;
+        }
+        cst.intTagihan = intTotalTagihan;
+    }
+    private async Task MainMenu()
+    {
+        if (translog)
+        {
+            translog = false;
+            isLoading = true;
+            trans.AddTrail("GET BILL", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            trans.kip = "Pembayaran tidak dilanjutkan, terminal id:" + menu.terminalId;
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavMan.NavigateTo("/main");
+        }
+    }
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+}

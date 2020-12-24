@@ -33,7 +33,24 @@ namespace MyG5Blazor.Data
 
             return new string(chars);
         }
+        public static string ByteArrayToString(byte[] p_bytes, int pbytes)
+        {
+            string result = string.Empty;
 
+            try
+            {
+                for (int i = 0; i < pbytes; i++)
+                {
+                    result = result + p_bytes[i].ToString("X02");
+                }
+            }
+            catch (Exception ex)
+            {
+                result = "Error : " + ex.ToString();
+            }
+
+            return result;
+        }
         public static string CreateMD5(string input)
         {
             // Use input string to calculate MD5 hash
@@ -322,13 +339,14 @@ namespace MyG5Blazor.Data
 
         public static async Task AuditTrail(Transaction trans, Menu menu, Costumer cst)
         {
+            string auditTrail = string.Empty;
+            int stepTrail = 1;
+
             string _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
             string saveURL = "log/v1/save";
             
             trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
-            string auditTrail = string.Empty;
-            int stepTrail = 1;
             auditTrail = auditTrail + "[ ";
             foreach (dynamic at in trans._auditTrail)
             {
@@ -344,7 +362,7 @@ namespace MyG5Blazor.Data
 
             string myJson2 = "{ \"transaction\" : " +
                 "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                "\"terminalId\" : \"" + trans.termID + "\"," +
+                "\"terminalId\" : \"" + menu.terminalId + "\"," +
                 "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
                     "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                     "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +

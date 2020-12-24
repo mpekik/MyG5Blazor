@@ -11,136 +11,173 @@
 @inject Menu menu 
 @using MyG5Blazor.Data
 
-    <div class="main-panel bg-home">
-        <!-- Navbar -->
-        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-            <div class="container-fluid">
-                <div class="navbar-wrapper">
-                    <div class="logo">
-                        <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+<div class="main-panel bg-home" @onclick="@(()=>InvokeAsync(ResetTimer))">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+
+            <form class="col-md-6">
+                <div class="input-group no-border">
+                    <div class="checklist">
+                        @if (IsLoading)
+                        {
+                            <img src="../../assets/image/loader.gif" />
+                        }
+                        else if (IsSuccess)
+                        {
+                            <img src="../../assets/image/tanda_checklist.png" />
+                        }
                     </div>
-                    <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+                </div>
+            </form>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="teks-title">Upgrade dan Ganti Kartu 4G</div>
+
+                    @if (!IsSuccess)
+                    {
+                        <div id="proses-pindai">
+                            <div class="teks-center"> Letakkan <span style="font-weight: bold;">e-KTP</span> Anda pada Alat Pemindai</div>
+                            <div class="teks-footer"> Lalu tekan <span style="font-weight: bold;">"Pindai"</span></div>
+                        </div>
+                    }
+                    else
+                    {
+                        <div id="proses-berhasil">
+                            <div class="teks-center"> Proses Pindai e-Ktp Berhasil</div>
+                        </div>
+                    }
                 </div>
 
-                <form class="col-md-6">
-                    <div class="input-group no-border">
-                        <div class="checklist">
-                            @if (IsLoading)
-                            {
-                                <img src="../../assets/image/loader.gif" />
-                            }
-                            else if (IsSuccess)
-                            {
-                                <img src="../../assets/image/tanda_checklist.png" />
-                            }
-                        </div>
-                    </div>
-                </form>
+                <div class="col-md-6">
+                    <img class="ktp" src="../../assets/image/Scan_KTP-01.png">
+                    @if (!IsSuccess)
+                    {
+                        <a id="myBtn" href="" @onclick="CheckEKTP" @onclick:preventDefault>
+                            <img class="pindai" src="../../assets/image/Pindai.png">
+                        </a>
+                    }
+                </div>
             </div>
-        </nav>
-        <!-- End Navbar -->
+        </div>
+    </div>
 
-        <div class="content">
-            <div class="container-fluid">
-                <div class="row">
-                    <div class="col-md-6">
-                        <div class="teks-title">Upgrade dan Ganti Kartu 4G</div>
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+    <footer>
+        <div class="footer-side1">
+            <span class="dot">1</span>
+            <span class="dot" id="dot-active">2</span>
+            <span class="dot">3</span>
+            <span class="dot">4</span>
+        </div>
+        <div class="footer-side2">
+            <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
+            <!-- <sup>Powered By </sup>Trilogi Persada -->
+        </div>
+    </footer>
+    @if (IsVisible)
+    {
+        <div id="myModal" class="modal">
 
-                        @if (!IsSuccess)
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        @if (intTryCount <= intTryLimit)
                         {
-                            <div id="proses-pindai">
-                                <div class="teks-center"> Letakkan <span style="font-weight: bold;">e-KTP</span> Anda pada Alat Pemindai</div>
-                                <div class="teks-footer"> Lalu tekan <span style="font-weight: bold;">"Pindai"</span></div>
-                            </div>
+                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> yang digunakan tidak sesuai dengan nomor yang terdaftar pada sistem MyGraPARI. Silahkan gunakan<span style="font-weight: bold;"> e-KTP </span>yang sesuai.</p>
+                            <button class="btn btn-danger modal-button" @onclick="CheckEKTP">OK</button>
                         }
                         else
                         {
-                            <div id="proses-berhasil">
-                                <div class="teks-center"> Proses Pindai e-Ktp Berhasil</div>
-                            </div>
+                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
+                            <button @onclick="@(()=>InvokeAsync(MenuUtama))" class="btn btn-danger modal-button" id="span1">OK</button>
                         }
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                     </div>
+                </div>
+            </div>
 
-                    <div class="col-md-6">
-                        <img class="ktp" src="../../assets/image/Scan_KTP-01.png">
-                        @if (!IsSuccess)
-                        {
-                            <a id="myBtn" href="" @onclick="CheckEKTP" @onclick:preventDefault>
-                                <img class="pindai" src="../../assets/image/Pindai.png">
-                            </a>
-                        }
+        </div>
+    }
+    @if (isLoading2)
+    {
+        <div id="myModal" class="modal">
+            <div class="modal-blank">
+                <img class="lds-spinner" src="../../assets/image/loader.gif">
+                <p><br>Mohon tunggu</p>
+                <p>proses sedang berlangsung...</p>
+            </div>
+        </div>
+    }
+    @if (isFPNoData)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-body">Silahkan menekan tombol OK <span style="font-weight:bold;">SETELAH</span> Anda mengangkat EKTP Anda dan meletakkan kembali kepada alat pemindai.</p>
+                        <button class="btn btn-danger modal-button" @onclick="FPConfirm">OK</button>
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+    @if (isFPNoDataConfirm)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-body">Apakah Anda telah mengangkat EKTP Anda dan meletakkan kembali kepada alat pemindai?</p>
+                        <button class="btn btn-danger modal-button" @onclick="FPUnConfirm">Tidak</button>
+                        <button class="btn btn-white modal-button" @onclick="FP2">Ya</button>
+                        <button class="btn btn-danger modal-button" @onclick="MenuUtamaCanceled">Batal</button>
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+    @if (isIdle)
+    {
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-body">
+                            Apakah Anda ingin menambah waktu lagi? <br />
+                            Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                        </p>
+                        <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                        <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
                     </div>
                 </div>
             </div>
         </div>
-
-        <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
-        <footer>
-            <div class="footer-side1">
-                <span class="dot">1</span>
-                <span class="dot" id="dot-active">2</span>
-                <span class="dot">3</span>
-                <span class="dot">4</span>
-            </div>
-            <div class="footer-side2">
-                <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
-                <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
-                <!-- <sup>Powered By </sup>Trilogi Persada -->
-            </div>
-        </footer>
-        @if (IsVisible)
-        {
-            <div id="myModal" class="modal">
-
-                <!-- Modal content -->
-                <div class="modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            @if (intTryCount <= intTryLimit)
-                            {
-                                <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> yang digunakan tidak sesuai dengan nomor yang terdaftar pada sistem MyGraPARI. Silahkan gunakan<span style="font-weight: bold;"> e-KTP </span>yang sesuai.</p>
-                                <button class="btn btn-danger modal-button" @onclick="CheckEKTP">OK</button>
-                            }
-                            else
-                            {
-                                <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
-                                <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
-                            }
-                            <!-- <button class="btn btn-light modal-button">Tidak</button> -->
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        }
-        @if (isLoading2)
-        {
-            <div id="myModal" class="modal">
-                <div class="modal-blank">
-                    <img class="lds-spinner" src="../../assets/image/loader.gif">
-                    <p><br>Mohon tunggu</p>
-                    <p>proses sedang berlangsung...</p>
-                </div>
-            </div>
-        }
-        @if (isFPNoData)
-        {
-            <div id="myModal" class="modal">
-
-                <!-- Modal content -->
-                <div class="modal-dialog-centered" role="document">
-                    <div class="modal-content">
-                        <div class="modal-body">
-                            <p class="text-body">Silahkan angkat EKTP Anda, kemudian letakkan kembali kepada alat pemindai.</p>
-                            <button class="btn btn-danger modal-button" @onclick="FP2">OK</button>
-                            <!-- <button class="btn btn-light modal-button">Tidak</button> -->
-                        </div>
-                    </div>
-                </div>
-
-            </div>
-        }
-    </div>
+    }
+</div>
 
 @code{
     private bool IsVisible = false;
@@ -151,18 +188,28 @@
     private bool isLoading2 = false;
     private bool isFPNoData = false;
     private bool isFPNoDataPush = true;
+    private bool isFPNoDataConfirm = false;
+    private bool isFPNoDataConfirmPush = true;
+    private bool isFPNoDataUnComfirmPush = false;
+
+    public string PCID = string.Empty;
+    public string CONF = string.Empty;
 
     public string _myURL = "";
     public string saveURL = "log/v1/save";
+
+    string CID;
+    string KID;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
 
     private IntPtr hContext = IntPtr.Zero;
     private bool translog = true;
-    byte[] pbPcid;
 
+    byte[] pbPcid;
     byte[] pbConf;
+    private CRT_Interface ektpC = new CRT_Interface();
 
     private async Task MenuUtama()
     {
@@ -172,9 +219,11 @@
             translog = false;
             IsVisible = false;
             isLoading2 = true;
+            InvokeAsync(StateHasChanged);
             trans.status = "01";
             trans.errorCode = "EKTP";
             await OurUtility.AuditTrail(trans, menu, cst);
+            isNotIdle = false;
             NavigateTo("/main");
         }
     }
@@ -186,10 +235,12 @@
             translog = false;
             IsVisible = false;
             isLoading2 = true;
+            InvokeAsync(StateHasChanged);
             trans.AddTrail("SCAN EKTP", "CANCELED", "02");
             trans.status = "02";
             trans.errorCode = "EKTP";
             await OurUtility.AuditTrail(trans, menu, cst);
+            isNotIdle = false;
             NavigateTo("/main");
         }
     }
@@ -204,22 +255,29 @@
             trans.status = "02";
             trans.errorCode = "EKTP";
             await OurUtility.AuditTrail(trans, menu, cst);
+            isNotIdle = false;
             NavigateTo("/UP/1");
         }
     }
     private void NavigateTo(string strURL)
     {
+        isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }
 
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
-        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
+        PCID = config.Read("EKTP", Config.PARAM_EKTP_PCID);
+        CONF = config.Read("EKTP", Config.PARAM_EKTP_CONF);
+        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(PCID, ","));
+        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(CONF, ","));
+        config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(0, 1);
+        config.ektpType = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(1);
         OurUtility.Write_Log("== Scan e-KTP Page", "step-action");
-        Switcher.UP("3000", config.usbEKTP);
-        await Task.Delay(3000);
+        counterTime = counterTreshold;
+        //Switcher.UP("3000", config.usbEKTP);
+        //await Task.Delay(3000);
     }
 
     private async Task CheckEKTP()
@@ -231,7 +289,7 @@
             {
                 await ScanKTP();
             }
-            else if (config.ektpType == "c")
+            else if(config.ektpType == "c")
             {
                 await ScanEKTPC();
             }
@@ -243,6 +301,7 @@
 
                 trans.errorCode = "EK - 001";
                 OurUtility.Write_Log("== Error : EK - 001", "step-action");
+                isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }
         }
@@ -254,13 +313,110 @@
     private async Task ScanEKTPC()
     {
 
+        int r = -999;
+        string errMsg = string.Empty;
+        Switcher.DOWN("500", config.usbEKTP);
+        await Task.Delay(500);
+        Switcher.UP("3000", config.usbEKTP);
+        await Task.Delay(3000);
+        UInt16 rf = 0;
+        UInt16 sam = 1;
+        if (intTryCount <= intTryLimit)
+        {
+            r = ektpC.StartEKTP(PCID, CONF, rf, sam);
+            if (r != 0)
+            {
+                if (r > 0 && r < 10)
+                    errMsg = "EK - 10" + r.ToString();
+                else
+                    errMsg = "EK - 1" + r.ToString();
+
+                trans.AddTrail("SCAN EKTP", errMsg, "01");
+                OurUtility.Write_Log("===== EKTP ERROR - " + errMsg, "step-action");
+                IsLoading = false;
+                if (intTryCount <= intTryLimit)
+                {
+                    IsVisible = true;
+                    intTryCount += 1;
+                }
+                else
+                {
+                    IsFail = true;
+                }
+                return;
+            }
+            else
+            {
+                byte[] demoGraphic = new byte[ektpC.ektpData.biolen];
+                for (int i = 0; i < ektpC.ektpData.biolen; i++)
+                {
+                    demoGraphic[i] = ektpC.ektpData.byteBio[i];
+                }
+                OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
+
+                ktp.demographic = demoGraphic;
+
+                if (cst.EKTPNumber == ktp.Id)
+                {
+                    ktp.minutiae1 = ektpC.ektpData.byteMinu1;
+                    ktp.minutiae2 = ektpC.ektpData.byteMinu2;
+                    ktp.minu1len = ektpC.ektpData.minu1len;
+                    ktp.minu2len = ektpC.ektpData.minu2len;
+
+                    trans.AddTrail("SCAN EKTP", ktp.Id, "00");
+                    IsLoading = false;
+                    IsSuccess = true;
+                    await Task.Delay(1000);
+                    isNotIdle = false;
+                    NavMan.NavigateTo("/UP/3");
+                    return;
+                }
+                else
+                {
+                    trans.AddTrail("SCAN EKTP", "NIK SALAH", "01");
+                    IsLoading = false;
+                    IsSuccess = false;
+                    if (intTryCount <= intTryLimit)
+                    {
+                        IsVisible = true;
+                        intTryCount += 1;
+                    }
+                    else
+                    {
+                        IsFail = true;
+                    }
+                    return;
+                }
+            }
+        }
     }
-    private async Task FP2()
+    private async Task FPConfirm()
     {
         if (isFPNoDataPush)
         {
             isFPNoDataPush = false;
             isFPNoData = false;
+            isFPNoDataConfirm = true;
+            isFPNoDataUnComfirmPush = true;
+        }
+    }
+    private async Task FPUnConfirm()
+    {
+        if (isFPNoDataUnComfirmPush)
+        {
+            isFPNoDataPush = true;
+            isFPNoData = true;
+            isFPNoDataConfirm = false;
+            isFPNoDataUnComfirmPush = false;
+        }
+    }
+    private async Task FP2()
+    {
+        if (isFPNoDataConfirmPush)
+        {
+            isFPNoDataConfirmPush = false;
+            isFPNoData = false;
+            isFPNoDataConfirm = false;
             int ret = -1;
             int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
             byte[] leftData = new byte[leftLen];
@@ -297,6 +453,7 @@
                 IsLoading = false;
                 IsSuccess = true;
                 await Task.Delay(1000);
+                isNotIdle = false;
                 NavMan.NavigateTo("/UP/3");
                 return;
             }
@@ -305,6 +462,10 @@
     //FIXME: Create as Service
     private async Task ScanKTP()
     {
+        Switcher.DOWN("500", config.usbEKTP);
+        await Task.Delay(500);
+        Switcher.UP("3000", config.usbEKTP);
+        await Task.Delay(3000);
         isFPNoDataPush = true;
         if (intTryCount <= intTryLimit)
         {
@@ -352,6 +513,10 @@
             //Switcher.UP("3000", config.usbEKTP);
             //await Task.Delay(3000);
             ktp.demographic = demoGraphic;
+            CID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber), System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber).Length);
+            KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
+            OurUtility.Write_Log("CID : " + CID, "step-action");
+            OurUtility.Write_Log("KID : " + KID, "step-action");
             IsVisible = false;
             IsNext = true;
 
@@ -379,10 +544,11 @@
 
                         OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
 
-                        trans.AddTrail("SCAN EKTP", ktp.Id, "00");
+                        trans.AddTrail("SCAN EKTP", cst.EKTPNumber + " " + KID, "00");
                         IsLoading = false;
                         IsSuccess = true;
                         await Task.Delay(1000);
+                        isNotIdle = false;
                         NavMan.NavigateTo("/UP/3");
                         return;
                     }
@@ -391,7 +557,7 @@
                 }
                 else
                 {
-                    trans.AddTrail("SCAN EKTP", "NIK SALAH", "01");
+                    trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "01");
                     IsLoading = false;
                     IsSuccess = false;
                     if (intTryCount <= intTryLimit)
@@ -411,37 +577,99 @@
 
     private void TimerElapsedHandler()
     {
+        isNotIdle = false;
         NavMan.NavigateTo("/UP/3");
     }
 
-    [Microsoft.AspNetCore.Components.Inject]
-
-    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
-
-    [Microsoft.AspNetCore.Components.Inject]
-
-    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
-
-    private bool timer = false;
-    //protected override void OnAfterRender(bool bFirstRender)
-    //{
-    //    if (bFirstRender)
-    //    {
-    //        timer = true;
-    //        theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
-
-    //        this.StateHasChanged();
-    //    }
-    //}
-
-    [Microsoft.JSInterop.JSInvokable]
-
-    public void theIdleTimeoutFired()
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
     {
-        if (timer)
+        do
         {
-            timer = false;
-            //NavMan.NavigateTo(" ");
+            await Task.Delay(1000);
+            //Console.WriteLine("Idle 2 Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            //Console.WriteLine("Time 2 Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            #region AfterRenderTimeOut
+            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
         }
     }
 }

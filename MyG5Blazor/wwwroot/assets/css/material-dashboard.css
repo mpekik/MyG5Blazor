@@ -3306,16 +3306,16 @@ select.form-control-lg:not([size]):not([multiple]),
     color: green;
 }
 
-.btn:hover,
+/*.btn:hover,
 .btn:focus {
     text-decoration: none;
-}
+}*/
 
-.btn:focus,
+/*.btn:focus,
 .btn.focus {
     outline: 0;
     box-shadow: 0 0 0 0.2rem rgba(33, 150, 243, 0.25);
-}
+}*/
 
 .btn.disabled,
 .btn:disabled {
@@ -9968,14 +9968,14 @@ a.text-dark:focus {
     will-change: box-shadow, transform;
 }
 
-    .btn:focus,
+    /*.btn:focus,
     .btn.focus,
     .btn:active:focus,
     .btn:active.focus,
     .btn.active:focus,
     .btn.active.focus {
         outline: 0;
-    }
+    }*/
 
     .btn.btn-primary {
         color: #fff;
@@ -10615,14 +10615,14 @@ a.text-dark:focus {
         box-shadow: 0 2px 2px 0 rgba(153, 153, 153, 0.14), 0 3px 1px -2px rgba(153, 153, 153, 0.2), 0 1px 5px 0 rgba(153, 153, 153, 0.12);
     }
 
-        .btn:hover,
+        /*.btn:hover,
         .btn.btn-default:hover {
             color: #fff;
             background-color: #919191;
             border-color: #7a7a7a;
-        }
+        }*/
 
-        .btn:focus,
+        /*.btn:focus,
         .btn.focus,
         .btn:hover,
         .btn.btn-default:focus,
@@ -10631,9 +10631,9 @@ a.text-dark:focus {
             color: rgb(255, 0, 0);
             background-color: #ffffff;
             border-color: #ff0000;
-        }
+        }*/
 
-        .btn:active,
+        /*.btn:active,
         .btn.active,
         .open > .btn.dropdown-toggle,
         .show > .btn.dropdown-toggle,
@@ -10645,9 +10645,9 @@ a.text-dark:focus {
             background-color: #919191;
             border-color: #7a7a7a;
             box-shadow: 0 2px 2px 0 rgba(153, 153, 153, 0.14), 0 3px 1px -2px rgba(153, 153, 153, 0.2), 0 1px 5px 0 rgba(153, 153, 153, 0.12);
-        }
+        }*/
 
-            .btn:active:hover,
+            /*.btn:active:hover,
             .btn:active:focus,
             .btn:active.focus,
             .btn.active:hover,
@@ -10674,7 +10674,7 @@ a.text-dark:focus {
                 color: #fff;
                 background-color: #919191;
                 border-color: #595959;
-            }
+            }*/
 
             .open > .btn.dropdown-toggle.bmd-btn-icon,
             .open > .btn.btn-default.dropdown-toggle.bmd-btn-icon {

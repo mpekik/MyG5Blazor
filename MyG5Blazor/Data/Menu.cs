@@ -50,6 +50,9 @@ namespace MyG5Blazor.Data
             public string _nominal { get; set; }
         }
 
+        public List<string> psbNomer = new List<string>();
+        public int psbIndex = 0;
+        public int pageIndex = 0;
         public List<MenuPSB> _menuPSB = new List<MenuPSB> ();
         public void AddMenuPSB (string header, string internet, string entertainment, string telpTsel, string telpLain, string smsTsel, string nominal)
         {

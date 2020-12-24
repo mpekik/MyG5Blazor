@@ -13,7 +13,7 @@
 @inject Costumer cst
 @inject Config config
 @inject Transaction trans
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent fixed-top ">
         <div class="container-fluid">
@@ -61,7 +61,7 @@
                     }
                 </div>
                 <div class="col-md-6">
-                    <img class="ktp" id="myBtn" @onclick="CheckFinger" src="../../assets/image/Scan_Finger-01.png">
+                    <img class="ktp" id="myBtn" src="../../assets/image/Scan_Finger-01.png">
                 </div>
             </div>
         </div>
@@ -115,6 +115,24 @@
             </div>
         </div>
     }
+    @if (isIdle)
+    {
+        <div id="myModal" class="modal">
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-body">
+                            Apakah Anda ingin menambah waktu lagi? <br />
+                            Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                        </p>
+                        <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                        <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    }
 </div>
 
 @code{
@@ -150,6 +168,11 @@
             trans.status = "01";
             trans.errorCode = "FINGERPRINT";
             await OurUtility.AuditTrail(trans, menu, cst);
+            isNotIdle = false;
+            if (config.ektpType == "c")
+            {
+                ektpCRT.CloseFPReader();
+            }
             NavigateTo("/main");
         }
     }
@@ -160,19 +183,32 @@
             translog = false;
             IsVisible = false;
             isLoading2 = true;
+            ektpCRT.isCapture = false;
             trans.AddTrail("SCAN FINGERPRINT", "CANCELED", "02");
             trans.status = "02";
             trans.errorCode = "FINGERPRINT";
             await OurUtility.AuditTrail(trans, menu, cst);
+            isNotIdle = false;
+            if (config.ektpType == "c")
+            {
+                ektpCRT.CloseFPReader();
+            }
             NavigateTo("/main");
         }
     }
     private async Task Back()
     {
+        ektpCRT.isCapture = false;
+        if (config.ektpType == "c")
+        {
+            ektpCRT.CloseFPReader();
+        }
+        isNotIdle = false;
         NavigateTo("/GK/2");
     }
     private void NavigateTo(string strURL)
     {
+        isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }
     private async Task CheckFinger()
@@ -197,6 +233,7 @@
 
                 trans.errorCode = "FP - 001";
                 OurUtility.Write_Log("== Error : FP - 001", "step-action");
+                isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }
         }
@@ -211,7 +248,8 @@
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
-        OurUtility.Write_Log("=== Step 3. FingerPrint Scan Page", "step-action");
+        OurUtility.Write_Log("== FingerPrint Scan Page", "step-action");
+        counterTime = counterTreshold;
         await CheckFinger();
     }
     private async Task FingerPrintScanC()
@@ -232,59 +270,68 @@
 
             trans.errorCode = "FP - 101";
             OurUtility.Write_Log("== Error : FP - 101", "step-action");
+            isNotIdle = false;
             NavMan.NavigateTo("/error");
             return;
         }
         await Task.Run(() => ektpCRT.FPReader());
-        await Task.Run(() => ektpCRT.StartCaptureFingerprint());
+        await Task.Run(() => ektpCRT.StartCaptureFingerprint()).ConfigureAwait(false);
         try
         {
-            while (!ektpCRT.isCaptured)
+            do
             {
-                Task.Delay(500);
-                byte[] feature = new byte[ektpCRT.ektpData.FPR.Length];
-                feature = ektpCRT.ektpData.FPR;
-
-                var result = dev.Verify(3, feature, ktp.minutiae1);
-
-                var result2 = dev.Verify(3, feature,ktp.minutiae2);
-
-                if (result.IsMatch || result2.IsMatch)
+                if (ektpCRT.isCaptured)
                 {
-                    trans.AddTrail("FINGERPRINT", "MATCH", "00");
+                    await ResetTimer();
+                    Task.Delay(500);
+                    byte[] feature = new byte[ektpCRT.ektpData.FPR.Length];
+                    feature = ektpCRT.ektpData.FPR;
 
-                    OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
-                    cst.EKTPNumber = ktp.Id;
-                    IsLoading = false;
-                    IsSuccess = true;
+                    bool result = false;
+                    result = ektpCRT.FPMatch(feature, ktp.minutiae1, ktp.minutiae2);
 
-                    Timer.SetTimer(1000);
-                    Timer.OnElapsed += TimerElapsedHandler;
-                    return;
-                }
-                else
-                {
-                    trans.AddTrail("FINGERPRINT", "NOT-MATCH", "01");
-                    OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
-
-                    intTryCount += 1;
-                    IsLoading = false;
-                    IsVisible = true;
-                    if (intTryCount > intTryLimit)
+                    if (result)
                     {
-                        IsFail = true;
+                        translog = false;
+                        trans.AddTrail("FINGERPRINT", "MATCH", "00");
+
+                        OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                        cst.EKTPNumber = ktp.Id;
+                        IsLoading = false;
+                        IsSuccess = true;
+
+                        Timer.SetTimer(1000);
+                        Timer.OnElapsed += TimerElapsedHandler;
+                        return;
+                    }
+                    else
+                    {
+                        trans.AddTrail("FINGERPRINT", "NOT-MATCH", "01");
+                        OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                        intTryCount += 1;
+                        IsLoading = false;
+                        IsVisible = true;
+                        if (intTryCount > intTryLimit)
+                        {
+                            IsFail = true;
+                        }
+                        return;
                     }
                 }
-            }
+            } while (true);
         }
         catch
         {
+            IsLoading = false;
+            IsFail = true;
             trans.AddTrail("READ EKTP", "FP - 002", "01");
             trans.status = "01";
             await OurUtility.AuditTrail(trans, menu, cst);
 
             trans.errorCode = "FP - 002";
             OurUtility.Write_Log("== Error : FP - 002", "step-action");
+            isNotIdle = false;
             NavMan.NavigateTo("/error");
             return;
         }
@@ -341,6 +388,7 @@
                 }
                 else
                 {
+                    await ResetTimer();
                     OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.MatchFingerPrint", "step-action");
 
                     OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Success", "step-action");
@@ -359,6 +407,7 @@
 
                     if (matched == 1)
                     {
+                        await ResetTimer();
                         trans.AddTrail("FINGERPRINT", "MATCH", "00");
 
                         OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
@@ -374,14 +423,17 @@
                     }
                     else
                     {
+                        await ResetTimer();
                         result = await Task.Run(() => Ektp_Sdk.MatchFingerPrint(engine, image, size,
-                                                        ktp.minutiae1, ktp.minu1len,
-                                                        ref score, ref matched, format)).ConfigureAwait(false);
+                                                    ktp.minutiae1, ktp.minu1len,
+                                                    ref score, ref matched, format)).ConfigureAwait(false);
                         if (matched == 1)
                         {
+                            await ResetTimer();
                             trans.AddTrail("FINGERPRINT", "MATCH", "00");
                             OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                             cst.EKTPNumber = ktp.Id;
+
                             //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
                             IsLoading = false;
                             IsSuccess = true;
@@ -398,6 +450,7 @@
                         }
                         else
                         {
+                            await ResetTimer();
                             trans.AddTrail("FINGERPRINT", "NOT-MATCH", "01");
                             OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
 
@@ -423,36 +476,100 @@
         OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
         cst.EKTPNumber = ktp.Id;
         //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+        isNotIdle = false;
         NavMan.NavigateTo("/GK/4");
     }
-    [Microsoft.AspNetCore.Components.Inject]
-
-    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
-
-    [Microsoft.AspNetCore.Components.Inject]
-
-    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
-
-    private bool timer = false;
-    protected override void OnAfterRender(bool bFirstRender)
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
         if (bFirstRender)
         {
-            timer = true;
-            theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
-
-            this.StateHasChanged();
+            #region AfterRenderTimeOut
+            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
         }
     }
-
-    [Microsoft.JSInterop.JSInvokable]
-
-    public void theIdleTimeoutFired()
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
     {
-        if (timer)
+        do
         {
-            timer = false;
-            //NavMan.NavigateTo(" ");
+            await Task.Delay(1000);
+            //Console.WriteLine("Idle 2 Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            //Console.WriteLine("Time 2 Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                isLoading2 = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
         }
     }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+
+
 }

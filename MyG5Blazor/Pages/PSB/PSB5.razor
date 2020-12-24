@@ -1,0 +1,149 @@
+﻿@page "/PSB/5"
+
+@using MyG5Blazor.Data
+
+@inject Costumer cst
+@inject IJSRuntime JSRuntime;
+@inject NavigationManager NavMan
+@inject Menu menu
+@inject Transaction trans
+@inject Config config
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="teks-title2">Berlangganan Kartu Halo</p>
+                    <div class="teks-top3" style="margin-top: 25%;">
+                        <p>Silakan masukkan 16 digit Nomor Kartu Keluarga Anda (NoKK)</p> <br>
+                        <p>Pastikan NoKK sesuai dengan eKTP yang Digunakan</p> <br>
+                    </div>
+                </div>
+
+                <div class="col-md-6">
+                    @if (strNumber == string.Empty)
+                    {
+                        <input style="width:90%" type="text" name="number" placeholder="No Kartu Keluarga" class="num-field" readonly>
+                    }
+                    else
+                    {
+                        <input style="width:90%" type="text" name="number" class="num-field" @bind="strNumber" readonly />
+                    }
+                    @if (isInput)
+                    {
+                        <div class="num-button">
+                            <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
+                            <button class="key-num btn" value="2" @onclick="@(() => InputPhoneNumber("2"))">2</button>
+                            <button class="key-num btn" value="3" @onclick="@(() => InputPhoneNumber("3"))">3</button>
+                            <button class="key-num btn" value="4" @onclick="@(() => InputPhoneNumber("4"))">4</button>
+                            <button class="key-num btn" value="5" @onclick="@(() => InputPhoneNumber("5"))">5</button>
+                            <button class="key-num btn" value="6" @onclick="@(() => InputPhoneNumber("6"))">6</button>
+                            <button class="key-num btn" value="7" @onclick="@(() => InputPhoneNumber("7"))">7</button>
+                            <button class="key-num btn" value="8" @onclick="@(() => InputPhoneNumber("8"))">8</button>
+                            <button class="key-num btn" value="9" @onclick="@(() => InputPhoneNumber("9"))">9</button>
+                            <button class="key-num btn btn-hapus" value="Hapus" @onclick="RemovePhoneNumber">Hapus</button>
+                            <button class="key-num btn" value="0" id="myBtnUndefine" @onclick="@(() => InputPhoneNumber("0"))">0</button>
+                            <button class="key-num btn btn-hapus" id="myBtn" value="ok" @onclick="OK">Ok</button>
+                        </div>
+                    }
+                    else if (isValid)
+                    {
+                        <p class="kk-valid">Nomor Kartu Keluarga Valid</p>
+                        <div class="checklist" style="margin-top: 5%; text-align:center;">
+                            <img src="../../assets/image/tanda_checklist.png" id="icon-succes" />
+                        </div>
+                    }
+                    <div class="button-down">
+                        <!-- <button class="btn-arrow" value="">Kembali</button>
+        <button class="btn-arrow" value="">Menu Utama</button> -->
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+<footer>
+    <div class="footer-side1">
+        <span class="dot2">1</span>
+        <span class="dot2">2</span>
+        <span class="dot2">3</span>
+        <span class="dot2">4</span>
+        <span class="dot2" id="dot-active">5</span>
+        <span class="dot2">6</span>
+        <span class="dot2">7</span>
+        <span class="dot2">8</span>
+        <span class="dot2">9</span>
+    </div>
+    <div class="footer-side2">
+        <button @onclick="@(()=>NavigateTo("/PSB/3"))" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu Utama</button>
+        <!-- <sup>Powered By </sup>Trilogi Persada -->
+    </div>
+</footer>
+
+@code
+{
+    private bool IsMethod = false;
+    private bool IsLoading = false;
+    private bool isSubmit = true;
+    private bool isValid = false;
+    private bool isInput = true;
+    private string strNumber = string.Empty;
+
+    protected override async Task OnInitializedAsync()
+    {
+    }
+
+    private void InputPhoneNumber(string strInput)
+    {
+        if(strNumber.Length<16)
+            strNumber += strInput;
+    }
+
+    private async Task OK()
+    {
+        if (strNumber.Length==16)
+        {
+            isInput = false;
+            isValid = true;
+
+            if(isValid)
+            {
+                await Task.Delay(5000);
+                NavigateTo("/PSB/6a");
+            }
+        }
+    }
+    private async Task MainMenu()
+    {
+        trans.AddTrail("GET PAYMENT METHOD", "BACK TO MAIN MENU", "CANCELED BY USER");
+        trans.status = "02";
+        //await OurUtility.AuditTrail(trans, menu, cst);
+        NavMan.NavigateTo("/main");
+    }
+
+    private void RemovePhoneNumber()
+    {
+        if (strNumber.Length > 0)
+            strNumber = strNumber.Substring(0, strNumber.Length - 1);
+    }
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+}

@@ -1,0 +1,312 @@
+﻿@page "/PSB/6a"
+
+@using MyG5Blazor.Data
+@using System.Linq;
+
+@inject IJSRuntime JSRuntime
+@inject Costumer cst
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Config config
+@inject Menu menu
+
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="teks-title">Berlangganan Kartu Halo</div>
+                    <div id="konfirmasi-teks" class="teks-status">Silakan Pilih Paket yang Anda Butuhkan</div>
+                    <div class="teks-center3">Batas Pemakaian akan Mengikuti<br>2x Harga Paket yang Anda Pilih</div>
+                    <div class="teks-bot">Penagihan Dilakukan pada Setiap<br> Tanggal 1 di Bulan Berikutnya</div>
+                </div>
+
+                <div class="col-md-6">
+                    <div class="form-input-data">
+                        <div class="col-md-12" style="margin-left: 1.5%;">
+                            <div class="form-group" style="display: flex;">
+                                @if (menuEnabled[0])
+                                {
+                                    <div class="card" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn" @onclick="@(()=>SelectPacket(0))">
+                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[0]</h4>
+                                        <div class="row">
+                                            <div class="col-md-6" style="display: flex;">
+                                                <p class="card-header nominal-kuota">@menuInternet[0]</p>
+                                                <p class="card-header giga-bytes">GB</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card-header detail-1">@menuEntertainment[0] GB<br>Lainnya</div>
+                                                <div class="card-header detail-2">Kuota Telepon dan SMS</div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body" style="background-color: white; border-radius: 8px;">
+                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[0]).ToString("N0")</h3>
+                                        </div>
+                                    </div>
+                                }
+                                @if (menuEnabled[1])
+                                {
+                                    <div @onclick="@(()=>SelectPacket(1))" class="card" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn2">
+                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[1]</h4>
+                                        <div class="row">
+                                            <div class="col-md-6" style="display: flex;">
+                                                <p class="card-header nominal-kuota">@menuInternet[1]</p>
+                                                <p class="card-header giga-bytes">GB</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card-header detail-1">@menuEntertainment[1] GB<br>Lainnya</div>
+                                                <div class="card-header detail-2">Kuota Telepon dan SMS</div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body" style="background-color: white; border-radius: 8px;">
+                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[1]).ToString("N0")</h3>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                            <div class="form-group" style="display: flex; margin-top: -3rem;">
+                                @if (menuEnabled[2])
+                                {
+                                    <div class="card" @onclick="@(()=>SelectPacket(2))" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn">
+                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[2]</h4>
+                                        <div class="row">
+                                            <div class="col-md-6" style="display: flex;">
+                                                <p class="card-header nominal-kuota">@menuInternet[2]</p>
+                                                <p class="card-header giga-bytes">GB</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card-header detail-1">@menuEntertainment[2] GB<br>Lainnya</div>
+                                                <div class="card-header detail-2">Kuota Telepon dan SMS</div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body" style="background-color: white; border-radius: 8px;">
+                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[2]).ToString("N0")</h3>
+                                        </div>
+                                    </div>
+                                }
+                                @if (menuEnabled[3])
+                                {
+                                    <div class="card" @onclick="@(()=>SelectPacket(3))" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn2">
+                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[3]</h4>
+                                        <div class="row">
+                                            <div class="col-md-6" style="display: flex;">
+                                                <p class="card-header nominal-kuota">@menuInternet[3]</p>
+                                                <p class="card-header giga-bytes">GB</p>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="card-header detail-1">@menuEntertainment[3] GB<br>Lainnya</div>
+                                                <div class="card-header detail-2">Kuota Telepon dan SMS</div>
+                                            </div>
+                                        </div>
+                                        <div class="card-body" style="background-color: white; border-radius: 8px;">
+                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[3]).ToString("N0")</h3>
+                                        </div>
+                                    </div>
+                                }
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+    <footer>
+        <div class="footer-side1">
+            <span class="dot2">1</span>
+            <span class="dot2">2</span>
+            <span class="dot2">3</span>
+            <span class="dot2">4</span>
+            <span class="dot2">5</span>
+            <span class="dot2" id="dot-active">6</span>
+            <span class="dot2">7</span>
+            <span class="dot2">8</span>
+            <span class="dot2">9</span>
+        </div>
+        <div class="footer-side2">
+            <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu Utama</button>
+            <!-- <sup>Powered By </sup>Trilogi Persada -->
+        </div>
+    </footer>
+</div>
+@if (isTimeOut)
+{
+    <div id="myModal" class="modal">
+
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body"><span style="font-weight: bold;">Sesi Anda akan segera berakhir.</span><br />Anda akan keluar dari sistem dalam <span style="font-weight: bold;"></span> detik.</p>
+                    <button class="btn btn-danger modal-button">OK</button>
+                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
+@if (isSelected)
+{
+    <div id="15gb" class="modal2">
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-nps">
+                <!-- <div class="modal-header">
+                  <span class="close">&times;</span>
+                </div> -->
+                <div class="modal-body" style="color: black;">
+                    <p class="text-header2">Rp @int.Parse(menuNominal[paramMenu]).ToString("N0")/bulan (@menuHeader[paramMenu])</p>
+                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
+                        <div class="col-md-1" style="border-bottom: 1px solid #eeeeee; padding-left:0px">
+                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
+                        </div>
+                        <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
+                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Internet</b>
+                        </div>
+                        <div class="col-md-5 teks-bold" style="text-align: right; border-bottom: 1px solid #eeeeee;">
+                            <p>@menuInternet[paramMenu] GB</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" style="margin-top: 3%; height: 62px; display: flex;">
+                        <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
+                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
+                        </div>
+                        <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
+                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Entertainment</b>
+                            <p style="font-size: 12px; line-height: 15px; font-style: italic; margin-right: -1rem;">
+                                Hooq, Bein Sport, MaxStream, Viu, HBO GO, Vidio,LangitMusik, JooX, Spotify,<br>
+                                Arena of Valor, Free Fire, LINE Get RICH, Mobile Legends, PUBG Mobile, Shell Fire
+                            </p>
+                        </div>
+                        <div class="col-md-2 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
+                            <p>@menuEntertainment[paramMenu] GB</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
+                        <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
+                            <img src="../../assets/image/icon_telepon.png" style="width: 90%;">
+                        </div>
+                        <div class="col-md-8" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
+                            <b class="teks-pop" style="font-size: 23px;  font-weight: bold;">Telepon Sesama Telkomsel</b>
+                        </div>
+                        <div class="col-md-3 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
+                            <p>@menuTelpTsel[paramMenu] Menit</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
+                        <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
+                            <img src="../../assets/image/icon_telepon.png" style="width: 90%;">
+                        </div>
+                        <div class="col-md-6" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
+                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Telepon Operator Lain</b>
+                        </div>
+                        <div class="col-md-5 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
+                            <p>@menuTelpLain[paramMenu] Menit</p>
+                        </div>
+                    </div>
+
+                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex; border-bottom: 1px solid #eeeeee;">
+                        <div class="col-md-1" style="padding-left: 0px">
+                            <img src="../../assets/image/icon_SMS.png" style="width: 90%;">
+                        </div>
+                        <div class="col-md-6" style="text-align: left;">
+                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">SMS Sesama Telkomsel</b>
+                        </div>
+                        <div class="col-md-5 teks-bold" style="text-align: right;">
+                            <p>@menuSMSTsel[paramMenu] SMS</p>
+                        </div>
+                    </div>
+                    <button class="btn btn-danger button-nps" value="" @onclick="OK">Lanjut</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>isSelected=false)" value="" style="width:100%; height:70px;">Batal</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+
+@code
+{
+    private string[] menuHeader = { "", "", "", "" };
+    private string[] menuInternet = { "", "", "", "" };
+    private string[] menuEntertainment = { "", "", "", "" };
+    private string[] menuTelpTsel = { "", "", "", "" };
+    private string[] menuTelpLain = { "", "", "", "" };
+    private string[] menuSMSTsel = { "", "", "", "" };
+    private string[] menuNominal = { "", "", "", "" };
+    private bool[] menuEnabled = { false, false, false, false };
+
+    private bool isTimeOut = false;
+    private bool isSelected = false;
+
+    private int paramMenu = 0;
+
+    protected override async Task OnInitializedAsync()
+    {
+        PopulateMenu();
+    }
+    private async Task OK()
+    {
+        await Task.Delay(5000);
+        NavigateTo("/PSB/6b");
+    }
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+    private void SelectPacket(int _index)
+    {
+        paramMenu = _index;
+        isSelected = true;
+    }
+    private void PopulateMenu()
+    {
+        for (int i = 0; i < menu._menuPSB.Count(); i++)
+        {
+            menuHeader[i] = menu._menuPSB[i]._Header;
+            menuInternet[i] = menu._menuPSB[i]._internet;
+            menuEntertainment[i] = menu._menuPSB[i]._entertainment;
+            menuTelpTsel[i] = menu._menuPSB[i]._telpTsel;
+            menuTelpLain[i] = menu._menuPSB[i]._telpLain;
+            menuSMSTsel[i] = menu._menuPSB[i]._smsTsel;
+            menuNominal[i] = menu._menuPSB[i]._nominal;
+            menuEnabled[i] = true;
+        }
+    }
+    private async Task MainMenu()
+    {
+        trans.AddTrail("CHOOSE NOMINAL", "BACK TO MAIN MENU", "CANCELED BY USER");
+        trans.status = "02";
+        await OurUtility.AuditTrail(trans, menu, cst);
+        NavMan.NavigateTo("/main");
+    }
+    private async Task Back()
+    {
+        NavMan.NavigateTo("/PSB/5");
+    }
+
+    protected override void OnAfterRender(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+
+        }
+    }
+}

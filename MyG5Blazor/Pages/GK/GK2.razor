@@ -8,10 +8,10 @@
 @inject Costumer cst
 @inject Config config
 @inject Transaction trans
-@inject Menu menu 
+@inject Menu menu
 @using MyG5Blazor.Data
 
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -104,7 +104,7 @@
                         else
                         {
                             <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
-                            <button @onclick="@MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
+                            <button @onclick="@(()=>InvokeAsync(MenuUtama))" class="btn btn-danger modal-button" id="span1">OK</button>
                         }
                         <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                     </div>
@@ -131,8 +131,27 @@
             <div class="modal-dialog-centered" role="document">
                 <div class="modal-content">
                     <div class="modal-body">
-                        <p class="text-body">Silahkan angkat EKTP Anda, kemudian letakkan kembali kepada alat pemindai.</p>
-                        <button class="btn btn-danger modal-button" @onclick="FP2">OK</button>
+                        <p class="text-body">Silahkan menekan tombol OK <span style="font-weight:bold;">SETELAH</span> Anda mengangkat EKTP Anda dan meletakkan kembali kepada alat pemindai.</p>
+                        <button class="btn btn-danger modal-button" @onclick="FPConfirm">OK</button>
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+    @if (isFPNoDataConfirm)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-body">Apakah Anda telah mengangkat EKTP Anda dan meletakkan kembali kepada alat pemindai?</p>
+                        <button class="btn btn-danger modal-button" @onclick="FPUnConfirm">Tidak</button>
+                        <button class="btn btn-white modal-button" @onclick="FP2">Ya</button>
+                        <button class="btn btn-danger modal-button" @onclick="MenuUtamaCanceled">Batal</button>
                         <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                     </div>
                 </div>
@@ -141,7 +160,24 @@
         </div>
     }
 </div>
-
+@if (isIdle)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code{
     private bool IsVisible = false;
     private bool IsLoading = false;
@@ -151,6 +187,9 @@
     private bool isLoading2 = false;
     private bool isFPNoData = false;
     private bool isFPNoDataPush = true;
+    private bool isFPNoDataConfirm = false;
+    private bool isFPNoDataConfirmPush = true;
+    private bool isFPNoDataUnComfirmPush = false;
 
     public string _myURL = "";
     public string saveURL = "log/v1/save";
@@ -164,6 +203,8 @@
 
     private CRT_Interface ektpC = new CRT_Interface();
 
+    string CID;
+    string KID;
     byte[] pbPcid;
 
     byte[] pbConf;
@@ -175,9 +216,11 @@
             translog = false;
             IsVisible = false;
             isLoading2 = true;
+            InvokeAsync(StateHasChanged);
             trans.status = "01";
             trans.errorCode = "EKTP";
             await OurUtility.AuditTrail(trans, menu, cst);
+            isNotIdle = false;
             NavigateTo("/main");
         }
     }
@@ -189,10 +232,12 @@
             translog = false;
             IsVisible = false;
             isLoading2 = true;
+            InvokeAsync(StateHasChanged);
             trans.AddTrail("SCAN EKTP", "CANCELED", "02");
             trans.status = "02";
             trans.errorCode = "EKTP";
             await OurUtility.AuditTrail(trans, menu, cst);
+            isNotIdle = false;
             NavigateTo("/main");
         }
     }
@@ -208,15 +253,38 @@
             trans.status = "02";
             trans.errorCode = "EKTP";
             await OurUtility.AuditTrail(trans, menu, cst);
+            isNotIdle = false;
             NavigateTo("/GK/1");
         }
     }
-    private async Task FP2()
+
+    private async Task FPConfirm()
     {
         if (isFPNoDataPush)
         {
             isFPNoDataPush = false;
             isFPNoData = false;
+            isFPNoDataConfirm = true;
+            isFPNoDataUnComfirmPush = true;
+        }
+    }
+    private async Task FPUnConfirm()
+    {
+        if (isFPNoDataUnComfirmPush)
+        {
+            isFPNoDataPush = true;
+            isFPNoData = true;
+            isFPNoDataConfirm = false;
+            isFPNoDataUnComfirmPush = false;
+        }
+    }
+    private async Task FP2()
+    {
+        if (isFPNoDataConfirmPush)
+        {
+            isFPNoDataConfirmPush = false;
+            isFPNoData = false;
+            isFPNoDataConfirm = false;
             int ret = -1;
             int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
             byte[] leftData = new byte[leftLen];
@@ -253,6 +321,7 @@
                 IsLoading = false;
                 IsSuccess = true;
                 await Task.Delay(1000);
+                isNotIdle = false;
                 NavMan.NavigateTo("/GK/3");
                 return;
             }
@@ -260,6 +329,7 @@
     }
     private void NavigateTo(string strURL)
     {
+        isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }
 
@@ -270,20 +340,25 @@
         CONF = config.Read("EKTP", Config.PARAM_EKTP_CONF);
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(PCID, ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(CONF, ","));
+        config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(0, 1);
+        config.ektpType = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(1);
         OurUtility.Write_Log("=== Step 2. Scan e-KTP Page", "step-action");
+        counterTime = counterTreshold;
         //Switcher.UP("3000", config.usbEKTP);
         //await Task.Delay(3000);
     }
 
     private async Task CheckEKTP()
     {
+        await ResetTimer();
         if (!IsLoading && !IsSuccess && !IsFail && !IsVisible)
         {
             IsLoading = true;
             if (config.ektpType == "a")
             {
                 await ScanKTP();
-            }else if(config.ektpType=="c")
+            }
+            else if (config.ektpType == "c")
             {
                 await ScanEKTPC();
             }
@@ -295,6 +370,7 @@
 
                 trans.errorCode = "EK - 001";
                 OurUtility.Write_Log("== Error : EK - 001", "step-action");
+                isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }
         }
@@ -306,17 +382,17 @@
     private async Task ScanEKTPC()
     {
         int r = -999;
-        string errMsg =string.Empty;
+        string errMsg = string.Empty;
         Switcher.DOWN("500", config.usbEKTP);
         await Task.Delay(500);
         Switcher.UP("3000", config.usbEKTP);
-        await Task.Delay(3000);
+        await Task.Delay(5000);
         UInt16 rf = 0;
         UInt16 sam = 1;
-        if(intTryCount<=intTryLimit)
+        if (intTryCount <= intTryLimit)
         {
-            r = ektpC.StartEKTP(PCID, CONF,rf,sam);
-            if(r!=0)
+            r = ektpC.StartEKTP(PCID, CONF, rf, sam);
+            if (r != 0)
             {
                 if (r > 0 && r < 10)
                     errMsg = "EK - 10" + r.ToString();
@@ -324,7 +400,7 @@
                     errMsg = "EK - 1" + r.ToString();
 
                 trans.AddTrail("SCAN EKTP", errMsg, "01");
-                OurUtility.Write_Log("===== EKTP ERROR - "+errMsg, "step-action");
+                OurUtility.Write_Log("===== EKTP ERROR - " + errMsg, "step-action");
                 IsLoading = false;
                 if (intTryCount <= intTryLimit)
                 {
@@ -348,7 +424,7 @@
 
                 ktp.demographic = demoGraphic;
 
-                if(cst.EKTPNumber==ktp.Id)
+                if (cst.EKTPNumber == ktp.Id)
                 {
                     ktp.minutiae1 = ektpC.ektpData.byteMinu1;
                     ktp.minutiae2 = ektpC.ektpData.byteMinu2;
@@ -359,6 +435,7 @@
                     IsLoading = false;
                     IsSuccess = true;
                     await Task.Delay(1000);
+                    isNotIdle = false;
                     NavMan.NavigateTo("/GK/3");
                     return;
                 }
@@ -388,7 +465,7 @@
         Switcher.DOWN("500", config.usbEKTP);
         await Task.Delay(500);
         Switcher.UP("3000", config.usbEKTP);
-        await Task.Delay(3000);
+        await Task.Delay(5000);
         isFPNoDataPush = true;
         if (intTryCount <= intTryLimit)
         {
@@ -436,6 +513,10 @@
             //Switcher.UP("3000", config.usbEKTP);
             //await Task.Delay(3000);
             ktp.demographic = demoGraphic;
+            CID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber), System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber).Length);
+            KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
+            OurUtility.Write_Log("CID : " + CID, "step-action");
+            OurUtility.Write_Log("KID : " + KID, "step-action");
             IsVisible = false;
             IsNext = true;
 
@@ -448,12 +529,13 @@
                 if (cst.EKTPNumber == ktp.Id)
                 {
                     OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card", "step-action");
-                    ret = await Task.Run(()=>Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(true);
+                    ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(true);
                     if (ret != 0 || leftLen == 0 || rightLen == 0)
                     {
                         isFPNoData = true;
                         return;
-                    }else if(ret==0)
+                    }
+                    else if (ret == 0)
                     {
                         ktp.minutiae1 = leftData;
                         ktp.minutiae2 = rightData;
@@ -462,10 +544,11 @@
 
                         OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
 
-                        trans.AddTrail("SCAN EKTP", ktp.Id, "00");
+                        trans.AddTrail("SCAN EKTP", cst.EKTPNumber + " " + KID, "00");
                         IsLoading = false;
                         IsSuccess = true;
                         await Task.Delay(1000);
+                        isNotIdle = false;
                         NavMan.NavigateTo("/GK/3");
                         return;
                     }
@@ -474,7 +557,7 @@
                 }
                 else
                 {
-                    trans.AddTrail("SCAN EKTP", "NIK SALAH", "01");
+                    trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "01");
                     IsLoading = false;
                     IsSuccess = false;
                     if (intTryCount <= intTryLimit)
@@ -494,37 +577,99 @@
 
     private void TimerElapsedHandler()
     {
+        isNotIdle = false;
         NavMan.NavigateTo("/GK/3");
     }
 
-    [Microsoft.AspNetCore.Components.Inject]
-
-    protected Microsoft.JSInterop.IJSRuntime theJavaScriptEngine { get; set; }
-
-    [Microsoft.AspNetCore.Components.Inject]
-
-    protected Microsoft.AspNetCore.Components.NavigationManager theNavigationManager { get; set; }
-
-    private bool timer = false;
-    //protected override void OnAfterRender(bool bFirstRender)
-    //{
-    //    if (bFirstRender)
-    //    {
-    //        timer = true;
-    //        theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 60000, true });
-
-    //        this.StateHasChanged();
-    //    }
-    //}
-
-    [Microsoft.JSInterop.JSInvokable]
-
-    public void theIdleTimeoutFired()
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
     {
-        if (timer)
+        do
         {
-            timer = false;
-            //NavMan.NavigateTo(" ");
+            await Task.Delay(1000);
+            //Console.WriteLine("Idle 2 Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            //Console.WriteLine("Time 2 Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            #region AfterRenderTimeOut
+            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
         }
     }
 }

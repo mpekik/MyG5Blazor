@@ -12,6 +12,7 @@ namespace MyG5Blazor.Data
         public string buID { get; set; }
         public string termID { get; set; }
         public string errorCode { get; set; }
+        public string serviceErrorCode { get; set; }
         public string mypersoResponse { get; set; }
         public string persoID { get; set; }
         public string paymentMethod => _payment[intPayment];
@@ -19,6 +20,13 @@ namespace MyG5Blazor.Data
         public long startTime { get; set; }
         public long endTime { get; set; }
        
+        public class PSBDetail
+        {
+            public string alamatEmail { get; set; }
+        }
+
+        public PSBDetail psbDetail = new PSBDetail();
+
         private string[] _payment = { "", "debit", "CASH", "cc" };
         public string bit = string.Empty;
         public string fee = string.Empty;
@@ -36,16 +44,20 @@ namespace MyG5Blazor.Data
         public string edcDate = string.Empty;
         public string edcTime = string.Empty;
         public string edcStatus = "FAILED";
+        public string edcEntryCode = string.Empty;
+        public string edcAmount = string.Empty;
+        public string edcTotalAmount = string.Empty;
+        public string edcRespCode = string.Empty;
+        public string edcRefNumber = string.Empty;
+        public string edcBillingNumber = string.Empty;
+        public string edcBalance = string.Empty;
+        public string edcTopUp = string.Empty;
+        public string edcExp = string.Empty;
+        public string edcInvoiceLA = string.Empty;
+        public string edcBankFiller = string.Empty;
         public string status = string.Empty;
         public string kip = "-";
         public int jumlah_kartu = 0;
-        public void SetTransaction(string strTransID, string strBUID, string strTermID,string strJenisTrans)
-        {
-            transID = strTransID;
-            buID = strBUID;
-            termID = strTermID;
-            jenisTrans = strJenisTrans;
-        }
         public void SetTransaction(string strTransID)
         {
             transID = strTransID;

@@ -1,0 +1,135 @@
+﻿@page "/PSB/8a"
+
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Threading.Tasks;
+@using MyG5Blazor.Data
+
+@inject Costumer cst
+@inject IJSRuntime JSRuntime
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Menu menu
+@inject Config config 
+
+<div class="main-panel bg-home">
+    <!-- Navbar -->
+    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+        <div class="container-fluid">
+            <div class="navbar-wrapper">
+                <div class="logo">
+                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                </div>
+                <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+            </div>
+        </div>
+    </nav>
+    <!-- End Navbar -->
+
+    <div class="content">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="teks-title">Berlangganan Kartu Halo</div>
+                    <div id="">
+                        <div class="teks-center"> Pilih Metode Pembayaran </div>
+                    </div>
+                </div>
+                <div class="col-md-6" style="text-align: center;">
+                    @*@if (config.edc == "1")
+                    {*@
+                        <img @onclick="@(() => SetPaymentMethod(1))" id="" class="pembayaran" src="../../assets/image/Bayar_Debit.png">
+                    @*}
+                    @if (config.cash == "1")
+                    {*@
+                        <img @onclick="@(() => SetPaymentMethod(2))" id="" class="pembayaran" src="../../assets/image/Bayar_Tunai.png">
+                    @*}
+                    @if (config.edc == "1")
+                    {*@
+                        <img @onclick="@(() => SetPaymentMethod(3))" id="" class="pembayaran" src="../../assets/image/Bayar_Kredit.png">
+                    @*}*@
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+    <footer>
+        <div class="footer-side1">
+            <span class="dot2">1</span>
+            <span class="dot2">2</span>
+            <span class="dot2">3</span>
+            <span class="dot2">4</span>
+            <span class="dot2">5</span>
+            <span class="dot2">6</span>
+            <span class="dot2">7</span>
+            <span class="dot2" id="dot-active">8</span>
+            <span class="dot2">9</span>
+        </div>
+        <div class="footer-side2">
+            <button @onclick="@(() => NavigateTo("/PSB/7b"))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu<br>Utama</button>
+            <!-- <sup>Powered By </sup>Trilogi Persada -->
+        </div>
+    </footer>
+</div>
+@if (isLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
+@code
+{
+    private bool IsInvalid = false;
+    private bool isLoading = false;
+    //public string _myURL = "https://mygrapari.telkomsel.co.id/trilogi/";
+    public string _myURL = string.Empty;
+
+    public string serviceURL = "bayar-halo/v1/get-bill";
+    private string _termID = string.Empty;
+    private string msg = string.Empty;
+    private string errorcode = string.Empty;
+    private string strMsgError = string.Empty;
+    private int intTotalTagihan = 0;
+    private bool translog = true;
+
+    protected override async Task OnInitializedAsync()
+    {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        cst.ClearTagihan();
+    }
+
+    private void SetPaymentMethod(int _intMPembayaran)
+    {
+        cst.intMPembayaran = _intMPembayaran;
+        trans.intPayment = _intMPembayaran;
+        
+        NavigateTo("/PSB/8b");
+    }
+
+    private async Task MainMenu()
+    {
+        if (translog)
+        {
+            translog = false;
+            isLoading = true;
+            trans.AddTrail("PAYMENT METHOD", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavMan.NavigateTo("/main");
+        }
+    }
+    private void NavigateTo(string strURL)
+    {
+        NavMan.NavigateTo(strURL);
+    }
+
+}

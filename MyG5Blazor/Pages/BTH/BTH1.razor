@@ -214,11 +214,11 @@
             IsVisible = false;
             isLoading = true;
 
-            //byte[] image = OurUtility.CaptureImage();
+            byte[] image = OurUtility.CaptureImage();
             string imageBytesStr;
-            //if(image!=null)
-            //    imageBytesStr = Convert.ToBase64String(image);
-            //else
+            if(image!=null)
+                imageBytesStr = Convert.ToBase64String(image);
+            else
             imageBytesStr = "";
 
             cst.PhoneNumber = "62" + strNumber.Substring(1);
@@ -233,9 +233,9 @@
             string myURL = _myURL + serviceURL;
 
             OurUtility.Write_Log("== Check Phone Number", "step-action");
-            //OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
+            OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-            ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+            //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
             if (strResult != "")
             {
                 try
@@ -266,9 +266,7 @@
                         }
                         else
                         {
-                            string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
-                            string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                            OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                             trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                         }
                         trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
@@ -290,7 +288,7 @@
                 }
                 catch (Exception ex)
                 {
-                    trans.errorCode = strResult;
+                    trans.errorCode = "Exception Error";
                     OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                     NavMan.NavigateTo("/error");
                 }

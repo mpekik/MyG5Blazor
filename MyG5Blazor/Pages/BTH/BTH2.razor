@@ -137,9 +137,9 @@
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Get Bill", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-        ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "")
         {
             try
@@ -175,9 +175,7 @@
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusCode"));
-                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("GET BILL", cst.strMPembayaran, "01");
@@ -201,7 +199,7 @@
             }
             catch (Exception ex)
             {
-                trans.errorCode = strResult;
+                trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("GET BILL", cst.strMPembayaran, "01");
                 trans.status = "01";

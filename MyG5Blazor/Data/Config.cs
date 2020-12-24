@@ -90,7 +90,7 @@ namespace MyG5Blazor.Data
         //Util
         public const string PARAM_CASH_COLLECTED = "cash.collected";
 
-        public const int ektpThreshold = 30;
+        public const int ektpThreshold = 20;
         private FileIniDataParser iniFile = new FileIniDataParser();
         private FileIniDataParser iniFileIP = new FileIniDataParser();
         private FileIniDataParser iniFileUtil = new FileIniDataParser();

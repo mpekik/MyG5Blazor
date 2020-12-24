@@ -25,104 +25,74 @@
     <!-- End Navbar -->
 
     <div class="content">
-        <div class="container-fluid">
-            <div class="row">
-                <div class="col-md-6">
-                    <div class="teks-title">Berlangganan Kartu Halo</div>
-                    <div id="konfirmasi-teks" class="teks-status">Silakan Pilih Paket yang Anda Butuhkan</div>
-                    <div class="teks-center3">Batas Pemakaian akan Mengikuti<br>2x Harga Paket yang Anda Pilih</div>
-                    <div class="teks-bot">Penagihan Dilakukan pada Setiap<br> Tanggal 1 di Bulan Berikutnya</div>
+        <div class="row">
+            <div class="col-md-6">
+                <p class="teks-title2">Berlangganan KartuHalo</p>
+                <div class="teks-top3" style="line-height: 3rem;">
+                    <p>Masukkan Alamat Email Anda yang Aktif</p> <br>
+                    <p><b class="teks-bold"> Hindari </b>Penggunaan Email:</p>
+                    <li>Yahoo.com</li>
+                    <li>Yahoo.co.id</li>
+                    <li>Ymail.com</li>
+                    <li>Rocketmail.com</li>
+                </div>
+            </div>
+
+            <div class="col-md-6" style="text-align: center;">
+                <div class="text-primary">
+                    <input type="text" name="number" class="num-field-email" @bind="inputEmail">
                 </div>
 
-                <div class="col-md-6">
-                    <div class="form-input-data">
-                        <div class="col-md-12" style="margin-left: 1.5%;">
-                            <div class="form-group" style="display: flex;">
-                                @if (menuEnabled[0])
-                                {
-                                    <div class="card" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn" @onclick="@(()=>SelectPacket(0))">
-                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[0]</h4>
-                                        <div class="row">
-                                            <div class="col-md-6" style="display: flex;">
-                                                <p class="card-header nominal-kuota">@menuInternet[0]</p>
-                                                <p class="card-header giga-bytes">GB</p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="card-header detail-1">@menuEntertainment[0] GB<br>Lainnya</div>
-                                                <div class="card-header detail-2">Kuota Telepon dan SMS</div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[0]).ToString("N0")</h3>
-                                        </div>
-                                    </div>
-                                }
-                                @if (menuEnabled[1])
-                                {
-                                    <div class="card" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn2">
-                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[1]</h4>
-                                        <div class="row">
-                                            <div class="col-md-6" style="display: flex;">
-                                                <p class="card-header nominal-kuota">@menuInternet[1]</p>
-                                                <p class="card-header giga-bytes">GB</p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="card-header detail-1">@menuEntertainment[1] GB<br>Lainnya</div>
-                                                <div class="card-header detail-2">Kuota Telepon dan SMS</div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[1]).ToString("N0")</h3>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                            <div class="form-group" style="display: flex; margin-top: -3rem;">
-                                @if (menuEnabled[2])
-                                {
-                                    <div class="card" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn">
-                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[2]</h4>
-                                        <div class="row">
-                                            <div class="col-md-6" style="display: flex;">
-                                                <p class="card-header nominal-kuota">@menuInternet[2]</p>
-                                                <p class="card-header giga-bytes">GB</p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="card-header detail-1">@menuEntertainment[2] GB<br>Lainnya</div>
-                                                <div class="card-header detail-2">Kuota Telepon dan SMS</div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[2]).ToString("N0")</h3>
-                                        </div>
-                                    </div>
-                                }
-                                @if (menuEnabled[3])
-                                {
-                                    <div class="card" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn2">
-                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[3]</h4>
-                                        <div class="row">
-                                            <div class="col-md-6" style="display: flex;">
-                                                <p class="card-header nominal-kuota">@menuInternet[3]</p>
-                                                <p class="card-header giga-bytes">GB</p>
-                                            </div>
-                                            <div class="col-md-6">
-                                                <div class="card-header detail-1">@menuEntertainment[3] GB<br>Lainnya</div>
-                                                <div class="card-header detail-2">Kuota Telepon dan SMS</div>
-                                            </div>
-                                        </div>
-                                        <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[3]).ToString("N0")</h3>
-                                        </div>
-                                    </div>
-                                }
-                            </div>
-                            <div class="" style="text-align: center;">
-                                <button class="btn btn-danger btn-right2" onclick="buttonOk()" id="btn-ok" value="">Pilihan Berikutnya</button>
-                            </div>
-                        </div>
-                    </div>
+                <div class="num-button2" style="margin-top: 5%;">
+                    <button class="key-num2 btn" value="1" @onclick="@(() => InsertCharField("1"))">1</button>
+                    <button class="key-num2 btn" value="2" @onclick="@(() => InsertCharField("2"))">2</button>
+                    <button class="key-num2 btn" value="3" @onclick="@(() => InsertCharField("3"))">3</button>
+                    <button class="key-num2 btn" value="4" @onclick="@(() => InsertCharField("4"))">4</button>
+                    <button class="key-num2 btn" value="5" @onclick="@(() => InsertCharField("5"))">5</button>
+                    <button class="key-num2 btn" value="6" @onclick="@(() => InsertCharField("6"))">6</button>
+                    <button class="key-num2 btn" value="7" @onclick="@(() => InsertCharField("7"))">7</button>
+                    <button class="key-num2 btn" value="8" @onclick="@(() => InsertCharField("8"))">8</button>
+                    <button class="key-num2 btn" value="9" @onclick="@(() => InsertCharField("9"))">9</button>
+                    <button class="key-num2 btn" value="0" @onclick="@(() => InsertCharField("0"))">0</button>
+
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("q"))">Q</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("w"))">W</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("e"))">E</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("r"))">R</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("t"))">T</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("y"))">Y</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("u"))">U</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("i"))">I</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("o"))">O</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("p"))">P</b></button>
+
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("a"))">A</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("s"))">S</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("d"))">D</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("f"))">F</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("g"))">G</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("h"))">H</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("j"))">J</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("k"))">K</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("l"))">L</b></button><br>
+
+                    <button class="key-num3 btn" style="opacity:0%;" disabled><b class="teks-bold"></b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("z"))">Z</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("x"))">X</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("c"))">C</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("v"))">V</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("b"))">B</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("n"))">N</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("m"))">M</b></button>
+                    <button class="key-num4 btn"><b class="teks-bold" @onclick="DeleteCharField">HAPUS</b></button>
+
+                    <button class="key-num2 btn" value="1" @onclick="@(() => InsertCharField("@"))"><b class="teks-bold">&#64</b></button>
+                    <button class="key-num2 btn" value="3" @onclick="@(() => InsertCharField("_"))">_</button>
+                    <button class="key-num2 btn" value="4" @onclick="@(() => InsertCharField("."))">.</button>
+                    <button class="key-num6 btn" value="5" @onclick="@(() => InsertCharField(".com"))"><b class="teks-bold">.com</b></button>
+                    <button class="key-num6 btn" value="6" @onclick="@(() => InsertCharField(".co.id"))"><b class="teks-bold">.co.id</b></button>
                 </div>
+                <button class="btn btn-danger btn-right3" id="myBtn1" style="margin-top: 7%;" @onclick="Lanjut">Lanjut</button>
             </div>
         </div>
     </div>
@@ -164,145 +134,88 @@
 
     </div>
 }
-@if (isSelected)
+@if (isForbidden)
 {
-    <div id="15gb" class="modal2">
-        <div class="modal-dialog-centered" role="document">
-            <div class="modal-nps">
-                <!-- <div class="modal-header">
-                  <span class="close">&times;</span>
-                </div> -->
-                <div class="modal-body" style="color: black;">
-                    <p class="text-header2">Rp 100.000/bulan (Halo Kick Gold)</p>
-                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
-                        <div class="col-md-1" style="border-bottom: 1px solid #eeeeee; padding-left:0px">
-                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
-                        </div>
-                        <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Internet</b>
-                        </div>
-                        <div class="col-md-5 teks-bold" style="text-align: right; border-bottom: 1px solid #eeeeee;">
-                            <p>15 GB</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12" style="margin-top: 3%; height: 62px; display: flex;">
-                        <div class="col-md-1" style="        border-bottom: 1px solid #eeeeee;
-        padding-left: 0px
-">
-                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
-                        </div>
-                        <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Entertainment</b>
-                            <p style="font-size: 12px; line-height: 15px; font-style: italic; margin-left: -0.6rem; margin-right: -1rem;">
-                                Hooq, Bein Sport, MaxStream, Viu, HBO GO, Vidio,LangitMusik, JooX, Spotify,<br>
-                                Arena of Valor, Free Fire, LINE Get RICH, Mobile Legends, PUBG Mobile, Shell Fire
-                            </p>
-                        </div>
-                        <div class="col-md-2 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
-                            <p>15 GB</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
-                        <div class="col-md-1" style="        border-bottom: 1px solid #eeeeee;
-        padding-left: 0px
-">
-                            <img src="../../assets/image/icon_telepon.png" style="width: 90%;">
-                        </div>
-                        <div class="col-md-8" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="margin-left: -1rem; font-size: 23px;  font-weight: bold;">Telepon Sesama Telkomsel</b>
-                        </div>
-                        <div class="col-md-3 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
-                            <p>100 Menit</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
-                        <div class="col-md-1" style="        border-bottom: 1px solid #eeeeee;
-        padding-left: 0px
-">
-                            <img src="../../assets/image/icon_telepon.png" style="width: 100%;">
-                        </div>
-                        <div class="col-md-6" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px; margin-left: -2rem; font-weight: bold;">Telepon Operator Lain</b>
-                        </div>
-                        <div class="col-md-5 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
-                            <p>40 Menit</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex; border-bottom: 1px solid #eeeeee;">
-                        <div class="col-md-1" style="padding-left: 0px">
-                            <img src="../../assets/image/icon_SMS.png" style="width: 100%;">
-                        </div>
-                        <div class="col-md-6" style="text-align: left;">
-                            <b class="teks-pop" style="font-size: 23px; margin-left: -2rem; font-weight: bold;">SMS Sesama Telkomsel</b>
-                        </div>
-                        <div class="col-md-5 teks-bold" style="text-align: right;">
-                            <p>200 SMS</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex; color: red;">
-                        <div class="col-md-7" style="text-align: left;">
-                            <b class="teks-pop" style="font-size: 23px; margin-left: -1rem; font-weight: bold;">Rp Pembayaran di Muka</b>
-                        </div>
-                        <div class="col-md-5 teks-bold" style="text-align: right;">
-                            <p>Rp 300.000</p>
-                        </div>
-                    </div>
-                    <button class="btn btn-danger button-nps" value="">Lanjut</button>
-                    <button class="btn btn-light modal-button" @onclick="@(()=>isSelected=false)" value="">Batal</button>
-                </div>
+<div id="gagal-3x" class="modal">
+    <!-- Modal content -->
+    <div class="modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-body">
+                <p class="text-body2">
+                    Maaf, email yang Anda masukkan tidak valid.<br>
+                    Silakan masukkan alamat email lain.<br>
+                    <b class="teks-bold">Hindari </b>penggunaan email yahoo.com, yahoo.co.id, ymail.com, dan rocketmail.com.
+                </p>
+                <button @onclick="(() => isForbidden = false)" class="btn btn-danger modal-button" id="span1">OK</button>
             </div>
         </div>
     </div>
+</div>
 }
 
 @code
 {
-    private string[] menuHeader = { "", "", "", "" };
-    private string[] menuInternet = { "", "", "", "" };
-    private string[] menuEntertainment = { "", "", "", "" };
-    private string[] menuTelpTsel = { "", "", "", "" };
-    private string[] menuTelpLain = { "", "", "", "" };
-    private string[] menuSMSTsel = { "", "", "", "" };
-    private string[] menuNominal = { "", "", "", "" };
-    private bool[] menuEnabled = { false, false, false, false };
-
     private bool isTimeOut = false;
     private bool isSelected = false;
 
-    private int paramMenu = 0;
+    private string inputEmail = string.Empty;
 
+    private bool isForbidden = false;
+
+    private string[] forbiddenDomain = { "yahoo.com", "yahoo.co.id", "ymail.com", "rocketmail.com" };
     protected override async Task OnInitializedAsync()
     {
-        PopulateMenu();
-    }
 
+    }
+    private async Task Lanjut()
+    {
+        if (inputEmail.Contains("@"))
+        {
+            string domainEmail = inputEmail.Substring(inputEmail.IndexOf("@") + 1);
+            if (domainEmail.Contains("."))
+            {
+                if (!CekEmail())
+                {
+                    isForbidden = true;
+                }
+                else
+                {
+                    trans.psbDetail.alamatEmail = inputEmail;
+                    NavigateTo("/PSB/2a");
+                }
+            }
+            else
+            {
+                isForbidden = true;
+            }
+        }
+        else
+        {
+            isForbidden = true;
+        }
+    }
+    private bool CekEmail()
+    {
+        string subEmail = inputEmail.Substring(inputEmail.IndexOf("@")+1);
+        foreach(string fd in forbiddenDomain)
+        {
+            if (subEmail == fd)
+                return false;
+        }
+        return true;
+    }
+    private void InsertCharField(string _input)
+    {
+        inputEmail += _input;
+    }
+    private void DeleteCharField()
+    {
+        if (inputEmail.Length > 0)
+            inputEmail = inputEmail.Substring(0, inputEmail.Length - 1);
+    }
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);
-    }
-    private void SelectPacket(int _index)
-    {
-        paramMenu = _index;
-        isSelected = true;
-    }
-    private void PopulateMenu()
-    {
-        for (int i = 0; i < menu._menuPSB.Count(); i++)
-        {
-            menuHeader[i] = menu._menuPSB[i]._Header;
-            menuInternet[i] = menu._menuPSB[i]._internet;
-            menuEntertainment[i] = menu._menuPSB[i]._entertainment;
-            menuTelpTsel[i] = menu._menuPSB[i]._telpTsel;
-            menuTelpLain[i] = menu._menuPSB[i]._telpLain;
-            menuSMSTsel[i] = menu._menuPSB[i]._smsTsel;
-            menuNominal[i] = menu._menuPSB[i]._nominal;
-            menuEnabled[i] = true;
-        }
     }
     private async Task MainMenu()
     {
@@ -320,80 +233,6 @@
     {
         if (bFirstRender)
         {
-            //timer = true;
-            //theJavaScriptEngine.InvokeAsync<System.Object>("setupUserIdleTimer", new object[] { Microsoft.JSInterop.DotNetObjectReference.Create(this), 10000, true });
-
-            //this.StateHasChanged();
-
         }
     }
-    /*
-    <div class="card" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn">
-                                    <h4 class="card-header" style="font-weight: bold; color: red;">Halo Kick Gold</h4>
-                                    <div class="row">
-                                        <div class="col-md-6" style="display: flex;">
-                                            <p class="card-header nominal-kuota">15</p>
-                                            <p class="card-header giga-bytes">GB</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="card-header detail-1">15 GB<br>Lainnya</div>
-                                            <div class="card-header detail-2">Kuota Telepon dan SMS</div>
-                                        </div>
-                                    </div>
-                                    <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                        <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp 100.000</h3>
-                                    </div>
-                                </div>
-                                <div class="card" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn2">
-                                    <h4 class="card-header" style="font-weight: bold; color: red;">Halo Kick Gold</h4>
-                                    <div class="row">
-                                        <div class="col-md-6" style="display: flex;">
-                                            <p class="card-header nominal-kuota">25</p>
-                                            <p class="card-header giga-bytes">GB</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="card-header detail-1">25 GB<br>Lainnya</div>
-                                            <div class="card-header detail-2">Kuota Telepon dan SMS</div>
-                                        </div>
-                                    </div>
-                                    <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                        <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp 150.000</h3>
-                                    </div>
-                                </div>
-
-    <div class="card" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn3">
-                                    <h4 class="card-header" style="font-weight: bold; color: red;">Halo Kick Platinum</h4>
-                                    <div class="row">
-                                        <div class="col-md-6" style="display: flex;">
-                                            <p class="card-header nominal-kuota">50</p>
-                                            <p class="card-header giga-bytes">GB</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="card-header detail-1">50 GB<br>Lainnya</div>
-                                            <div class="card-header detail-2">Kuota Telepon dan SMS</div>
-                                        </div>
-                                    </div>
-                                    <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                        <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp 300.000</h3>
-                                    </div>
-                                </div>
-
-                                <div class="card" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn4">
-                                    <h4 class="card-header" style="font-weight: bold; color: red;">Halo Kick Platinum</h4>
-                                    <div class="row">
-                                        <div class="col-md-6" style="display: flex;">
-                                            <p class="card-header nominal-kuota">100</p>
-                                            <p class="card-header giga-bytes">GB</p>
-                                        </div>
-                                        <div class="col-md-6">
-                                            <div class="card-header detail-1">100 GB<br>Lainnya</div>
-                                            <div class="card-header detail-2">Kuota Telepon dan SMS</div>
-                                        </div>
-                                    </div>
-                                    <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                        <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp 550.000</h3>
-                                    </div>
-                                </div>
-    */
-
 }

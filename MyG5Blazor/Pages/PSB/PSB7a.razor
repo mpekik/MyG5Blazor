@@ -1,0 +1,158 @@
+﻿@page "/PSB/7a"
+
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System.Net.Http;
+@using System.Text;
+@using System;
+@using System.Threading.Tasks;
+@using MyG5Blazor.Data
+@using System.Drawing.Printing
+@using System.Drawing
+@using System.IO
+
+@inject IJSRuntime JSRuntime
+@inject Costumer cst
+@inject NavigationManager NavMan
+@inject Transaction trans
+@inject Config config
+@inject Menu menu
+    <div class="bg-edc-process">
+        <div class="main-panel bg-edc-process">
+            <!-- Navbar -->
+            <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+                <div class="container-fluid">
+                    <div class="navbar-wrapper">
+                        <div class="logo">
+                            <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                        </div>
+                        <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+                    </div>
+
+
+                    <form class="navbar-form">
+                    </form>
+                </div>
+            </nav>
+            <!-- End Navbar -->
+
+            <div class="content">
+                <div class="container-fluid">
+                    <div class="row">
+                        <div class="col-md-12">
+                            <div class="teks-title">Berlangganan Kartu Halo</div>
+                            <div class="teks-title4 text-center">Konfirmasi Data Pelanggan</div>
+                            <table style="font-size: 22pt; line-height: 45px; margin-top: 2%; color: black;">
+                                <tr>
+                                    <td>NIK</td>
+                                    <td>&ensp; : </td>
+                                    <td>&nbsp; 302932814381</td>
+                                </tr>
+                                <tr>
+                                    <td>Nama</td>
+                                    <td>&nbsp; :</td>
+                                    <td>&nbsp; Jajang Nurjaman</td>
+                                </tr>
+                                <tr>
+                                    <td> Nomor kartuHalo</td>
+                                    <td>&ensp; :</td>
+                                    <td>&ensp; 08122173773</td>
+                                </tr>
+                                <tr>
+                                    <td>Harga Paket</td>
+                                    <td>&ensp; :</td>
+                                    <td>&ensp; Rp 550.000 per bulan (Halo Kick Platinum)</td>
+                                </tr>
+                                <tr>
+                                    <td>Informasi Paket</td>
+                                    <td>&ensp; :</td>
+                                    <td>&ensp; 100GB Data + 100 GB Entertainment + Kuota Telepon dan SMS</td>
+                                </tr>
+                                <tr>
+                                    <td>Periode Penagihan</td>
+                                    <td>&ensp; :</td>
+                                    <td>&ensp; Tanggal 1 di Bulan Berikutnya</td>
+                                </tr>
+                                <tr>
+                                    <td>Batas Pemakaian</td>
+                                    <td>&ensp; :</td>
+                                    <td>&ensp; Rp 1.100.000 (2x Harga Paket)</td>
+                                </tr>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+        </div>
+    </div>
+    <footer style="display: flex;">
+        <div id="footer-side1" class="col-md-4" style="background-color:transparent;">
+            <div style="margin-left: -1rem; margin-right: -2rem;">
+                <span style="margin:5px;" class="dot2">1</span>
+                <span style="margin:5px;" class="dot2">2</span>
+                <span style="margin:5px;" class="dot2">3</span>
+                <span style="margin:5px;" class="dot2">4</span>
+                <span style="margin:5px;" class="dot2">5</span>
+                <span style="margin:5px;" class="dot2">6</span>
+                <span style="margin:5px;" class="dot2" id="dot-active">7</span>
+                <span style="margin:5px;" class="dot2">8</span>
+                <span style="margin:5px;" class="dot2">9</span>
+            </div>
+        </div>
+        <div class="col-md-4">
+            <button @onclick="Lanjut" class="btn btn-danger button-nps" style="bottom: 10%;" id="myBtn1">Lanjut</button>
+        </div>
+        <div id="footer-side2" class="col-md-4">
+            <div style="margin-left: -8rem; margin-right: -8rem;">
+                <button @onclick="@(()=>NavMan.NavigateTo("/main"))" class="btn-arrow btn" value="">Kembali</button>
+                <button @onclick="@(()=>NavMan.NavigateTo("/main"))" class="btn-arrow btn" value="">Menu Utama</button>
+                <!-- <sup>Powered By </sup>Trilogi Persada -->
+            </div>
+        </div>
+</footer>
+    @if (isTimeOut)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        <p class="text-body"><span style="font-weight: bold;">Sesi Anda akan segera berakhir.</span><br />Anda akan keluar dari sistem dalam <span style="font-weight: bold;"></span> detik.</p>
+                        <button class="btn btn-danger modal-button">Lanjutkan Sesi</button>
+                        <button class="btn btn-white modal-button">Selesai</button>
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+    @if (isLoading)
+    {
+        <div id="myModal" class="modal">
+            <div class="modal-blank">
+                <img class="lds-spinner" src="../../assets/image/loader.gif">
+                <p><br>Mohon tunggu</p>
+                <p>proses sedang berlangsung...</p>
+            </div>
+        </div>
+    }
+    @code{
+        private bool isLoading = false;
+        private bool isTimeOut = false;
+        protected override async Task OnAfterRenderAsync(bool bFirstRender)
+        {
+            if (bFirstRender)
+            {
+            
+            }
+        }
+
+        private void Lanjut()
+        {
+            NavMan.NavigateTo("/PSB/7b");
+        }
+
+    }

@@ -319,7 +319,7 @@
         private string password = string.Empty;
         private string isTextfield = "1";
 
-        private string[] StylePNG = { "margin-left: 10%;", "margin-left: 5%;", "margin-left: 10%; margin-top: 5%;", "margin-left: 5%; margin-top: 5%;" };
+        private string[] StylePNG = { "margin-left: 10%;", "margin-left: 5%;", "margin-left: 10%; margin-top: 5%;", "margin-left: 5%; margin-top: 5%;", "margin-left: 10%; margin-top: 10%;" };
 
         private string authorizedLevel = string.Empty;
         private bool isAuthorized = false;
@@ -584,7 +584,7 @@
                 }
                 catch (Exception ex)
                 {
-                    trans.errorCode = ex.Message;
+                    trans.errorCode = "Exception Error";
                     OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
                     NavMan.NavigateTo("/errorlogin");
                 }
