@@ -1,4 +1,4 @@
-﻿@page "/PSB/6a"
+﻿@page "/PSB/3a"
 
 @using MyG5Blazor.Data
 @using System.Linq;
@@ -129,10 +129,10 @@
         <div class="footer-side1">
             <span class="dot2">1</span>
             <span class="dot2">2</span>
-            <span class="dot2">3</span>
+            <span class="dot2" id="dot-active">3</span>
             <span class="dot2">4</span>
             <span class="dot2">5</span>
-            <span class="dot2" id="dot-active">6</span>
+            <span class="dot2">6</span>
             <span class="dot2">7</span>
             <span class="dot2">8</span>
             <span class="dot2">9</span>
@@ -244,6 +244,7 @@
 
 @code
 {
+    private string[] menuPoolName = { "", "", "", "" };
     private string[] menuHeader = { "", "", "", "" };
     private string[] menuInternet = { "", "", "", "" };
     private string[] menuEntertainment = { "", "", "", "" };
@@ -251,6 +252,7 @@
     private string[] menuTelpLain = { "", "", "", "" };
     private string[] menuSMSTsel = { "", "", "", "" };
     private string[] menuNominal = { "", "", "", "" };
+    private string[] menuHargaAwal = { "", "", "", "" };
     private bool[] menuEnabled = { false, false, false, false };
 
     private bool isTimeOut = false;
@@ -265,7 +267,18 @@
     private async Task OK()
     {
         await Task.Delay(5000);
-        NavigateTo("/PSB/6b");
+        trans.psbDetail.selectedPaket = menuPoolName[paramMenu];
+        foreach(var pp in menu._menuPSB)
+        {
+            if(trans.psbDetail.selectedPaket == pp._poolName)
+            {
+                trans.psbDetail.PaketPSB = pp;
+                int tempBatasPemakaian = int.Parse(trans.psbDetail.PaketPSB._nominal);
+                trans.psbDetail.batasPemakaian = (tempBatasPemakaian * 2).ToString();
+                break;
+            }
+        }
+        NavigateTo("/PSB/3b");
     }
     private void NavigateTo(string strURL)
     {
@@ -280,6 +293,7 @@
     {
         for (int i = 0; i < menu._menuPSB.Count(); i++)
         {
+            menuPoolName[i] = menu._menuPSB[i]._poolName;
             menuHeader[i] = menu._menuPSB[i]._Header;
             menuInternet[i] = menu._menuPSB[i]._internet;
             menuEntertainment[i] = menu._menuPSB[i]._entertainment;
@@ -287,6 +301,7 @@
             menuTelpLain[i] = menu._menuPSB[i]._telpLain;
             menuSMSTsel[i] = menu._menuPSB[i]._smsTsel;
             menuNominal[i] = menu._menuPSB[i]._nominal;
+            menuHargaAwal[i] = menu._menuPSB[i]._hargaAwal;
             menuEnabled[i] = true;
         }
     }
@@ -299,7 +314,7 @@
     }
     private async Task Back()
     {
-        NavMan.NavigateTo("/PSB/5");
+        NavMan.NavigateTo("/PSB/1b");
     }
 
     protected override void OnAfterRender(bool bFirstRender)

@@ -419,6 +419,7 @@
         strCOM = strCOM + config.Read("EDC", Config.PARAM_EDC_PORT);
         MetodePembayaran = cst.intMPembayaran;
         intBill = cst.intTagihan;
+        InvokeAsync(StateHasChanged);
         //intAccBill = 10000;
         //intMinus = intBill - intAccBill;
         switch (MetodePembayaran)
@@ -893,9 +894,11 @@
             edc.Clear();
             edc.serialPort = new SerialPort();
             edc.serialPort.PortName = serialPortName;
+
             //edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
             do
             {
+                OurUtility.Write_Log("== Payment EDC : " + edc.serialPort.PortName + " " + tagihan + " "+_transType+" "+invoice +" "+billing+" "+mPemabayaran, "step-action");
                 edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
                 await Task.Delay(2000);
@@ -933,7 +936,7 @@
         }
         catch (Exception ex)
         {
-            //Console.WriteLine(ex.Message);
+            OurUtility.Write_Log("== Error EDC : "+ex.Message, "step-action");
         }
     }
 
@@ -1087,6 +1090,7 @@
             trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
         }
     }
+
     CPayout Payout = new CPayout();
     Global global = new Global();
     int inttotal = 0;

@@ -42,8 +42,8 @@
                         <div class="col-md-12">
                             <div class="teks-title">Berlangganan Kartu Halo</div>
                             <div class="teks-title4 text-center">Syarat dan Ketentuan</div>
-                            <div class="col-md-12 mb-4" style="padding-right: 65px; padding-left: 65px;">
-                                <div class="card example-1 scrollbar-ripe-malinka" style="text-align: center;">
+                            <div class="col-md-12 mb-4" style="padding-right: 65px; padding-left: 65px;margin-bottom:5px;">
+                                <div class="card example-1 scrollbar-ripe-malinka" style="text-align: center; margin-bottom:10px;">
                                     <div class="card-body" style="max-height:300px;overflow-y:scroll;">
                                         <h4 id="section1"><strong>Berisi tulisan tentang syarat dan ketentuan</strong></h4>
                                         <p>
@@ -78,11 +78,17 @@
                                 </div>
                             </div>
                             <div style="margin-left: 6.5%;">
-                                <input type="checkbox" class="form-check-input" id="terms_and_conditions" value="1" onclick="terms_changed(this)" style="width: 30px; height: 30px;" @bind="isSetuju">
-                                <label class="form-check-label" for="exampleCheck1" style="margin-left: 2%; color: black; font-size: 14pt;">
+                                <input type="checkbox" class="form-check-input" id="terms_and_conditions" value="1" onclick="terms_changed(this)" style="width: 20px; height: 20px;" @bind="trans.psbDetail.isTC">
+                                <label class="form-check-label" for="exampleCheck1" style="margin-left: 2%; color: black; font-size: 12pt;">
                                     Dengan ini saya telah membaca, memahami, dan menyetujui hal-hal yang tercantum pada syarat dan ketentuan yang berlaku terkait<br>
                                     proses berlanggan kartuHalo melalui mesin MyGraPARI
                                 </label>
+                                <br /><input type="checkbox" class="form-check-input" id="terms_and_conditions" value="1" onclick="terms_changed(this)" style="width: 20px; height: 20px;" @bind="trans.psbDetail.isEbill">
+                                <label class="form-check-label" for="exampleCheck1" style="margin-left: 2%; color: black; font-size: 12pt;">
+                                    Dengan ini saya bersedia menerima asi SMS broadcast, e-mail, atau sejenisnya dari Telkomsel yang berisi<br /> informasi layanan dan/atau produk Telkomsel dan mitranya
+                                </label>
+                                
+
                             </div>
                         </div>
                     </div>
@@ -106,7 +112,7 @@
             </div>
         </div>
         <div class="col-md-4">
-            <button @onclick="Lanjut" class="btn btn-danger button-nps" style="bottom: 10%;" id="myBtn1" disabled="@(!isSetuju)">Lanjut</button>
+            <button @onclick="Lanjut" class="btn btn-danger button-nps" style="bottom: 10%;" id="myBtn1" disabled="@(!trans.psbDetail.isTC)">Lanjut</button>
         </div>
         <div id="footer-side2" class="col-md-4">
             <div style="margin-left: -8rem; margin-right: -8rem;">
@@ -147,8 +153,9 @@
     @code{
         private bool isLoading = false;
         private bool isTimeOut = false;
-        private bool isSetuju = false;
-        
+        private bool isTC = false;
+        private bool isEbill = false;
+
         protected override async Task OnAfterRenderAsync(bool bFirstRender)
         {
             if (bFirstRender)

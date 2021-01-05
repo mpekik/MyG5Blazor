@@ -2,6 +2,11 @@
 
 @using MyG5Blazor.Data
 @using System.Linq;
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System;
+@using System.Threading.Tasks;
+@using System.Net.Http;
 
 @inject IJSRuntime JSRuntime
 @inject Costumer cst
@@ -16,7 +21,7 @@
         <div class="container-fluid">
             <div class="navbar-wrapper">
                 <div class="logo">
-                    <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
+                    <img @onclick="(()=>InvokeAsync(emailDev))" src="../../assets/image/Logo/Logo_MyGraPARI.png" />
                 </div>
                 <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
             </div>
@@ -136,68 +141,98 @@
 }
 @if (isForbidden)
 {
-<div id="gagal-3x" class="modal">
-    <!-- Modal content -->
-    <div class="modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <p class="text-body2">
-                    Maaf, email yang Anda masukkan tidak valid.<br>
-                    Silakan masukkan alamat email lain.<br>
-                    <b class="teks-bold">Hindari </b>penggunaan email yahoo.com, yahoo.co.id, ymail.com, dan rocketmail.com.
-                </p>
-                <button @onclick="(() => isForbidden = false)" class="btn btn-danger modal-button" id="span1">OK</button>
+    <div id="gagal-3x" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body2">
+                        Maaf, email yang Anda masukkan tidak valid.<br>
+                        Silakan masukkan alamat email lain.<br>
+                        <b class="teks-bold">Hindari </b>penggunaan email yahoo.com, yahoo.co.id, ymail.com, dan rocketmail.com.
+                    </p>
+                    <button @onclick="(() => InvokeAsync(Forbidden))" class="btn btn-danger modal-button" id="span1">OK</button>
+                </div>
             </div>
         </div>
     </div>
-</div>
 }
-
+@if (isLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
 @code
 {
+    private async Task emailDev()
+    {
+        inputEmail = "marcellus.pekik@gmail.com";
+    }
     private bool isTimeOut = false;
     private bool isSelected = false;
-
+    private bool isLanjut = true;
+    private bool isLoading = false;
     private string inputEmail = string.Empty;
-
+    private string _myURL = string.Empty;
+    private string serviceURL = "psb-halo/v1/get-otp-email";
     private bool isForbidden = false;
 
     private string[] forbiddenDomain = { "yahoo.com", "yahoo.co.id", "ymail.com", "rocketmail.com" };
     protected override async Task OnInitializedAsync()
     {
-
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
     }
     private async Task Lanjut()
     {
-        if (inputEmail.Contains("@"))
+        if (isLanjut)
         {
-            string domainEmail = inputEmail.Substring(inputEmail.IndexOf("@") + 1);
-            if (domainEmail.Contains("."))
+            isLoading = true;
+            isLanjut = false;
+            if (inputEmail.Contains("@"))
             {
-                if (!CekEmail())
+                string domainEmail = inputEmail.Substring(inputEmail.IndexOf("@") + 1);
+                if (domainEmail.Contains("."))
                 {
-                    isForbidden = true;
+                    if (!CekEmail())
+                    {
+                        isLoading = false;
+                        isForbidden = true;
+                    }
+                    else
+                    {
+                        trans.psbDetail.alamatEmail = inputEmail;
+                        OurUtility.Write_Log("Input Email:" + trans.psbDetail.alamatEmail, "step-action");
+                        trans.AddTrail("INPUT EMAIL", trans.psbDetail.alamatEmail, "00");
+                        await RequestOTP();
+                    }
                 }
                 else
                 {
-                    trans.psbDetail.alamatEmail = inputEmail;
-                    NavigateTo("/PSB/2a");
+                    isLoading = false;
+                    isForbidden = true;
                 }
             }
             else
             {
+                isLoading = false;
                 isForbidden = true;
             }
         }
-        else
-        {
-            isForbidden = true;
-        }
+    }
+    private async Task Forbidden()
+    {
+        isLanjut = true;
+        isForbidden = false;
     }
     private bool CekEmail()
     {
-        string subEmail = inputEmail.Substring(inputEmail.IndexOf("@")+1);
-        foreach(string fd in forbiddenDomain)
+        string subEmail = inputEmail.Substring(inputEmail.IndexOf("@") + 1);
+        foreach (string fd in forbiddenDomain)
         {
             if (subEmail == fd)
                 return false;
@@ -217,6 +252,66 @@
     {
         NavMan.NavigateTo(strURL);
     }
+    private async Task RequestOTP()
+    {
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"transactionId\": \"" + trans.transID + "\"," +
+            "\"email\": \"" + trans.psbDetail.alamatEmail + "\"" +
+               "}";
+        string myURL = _myURL + serviceURL;
+        OurUtility.Write_Log("Request OTP", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+
+        if (strResult != "" || strResult != "Forbidden" || strResult != "NotFound" || strResult != "BadRequest" || strResult != "InternalServerError")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    isLoading = false;
+                    NavigateTo("/PSB/2a");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Request OTP", trans.psbDetail.alamatEmail, "01");
+                    trans.status = "01";
+                    await OurUtility.AuditTrail(trans, menu, cst);
+                    //isNotIdle = false;
+                    isLoading = false;
+                    NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    isLoading = false;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                isLoading = false;
+                trans.AddTrail("Request OTP", "Exception Error", "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //isNotIdle = false;
+                NavMan.NavigateTo("/error");
+            }
+        }
+    }
     private async Task MainMenu()
     {
         trans.AddTrail("CHOOSE NOMINAL", "BACK TO MAIN MENU", "CANCELED BY USER");
@@ -226,7 +321,7 @@
     }
     private async Task Back()
     {
-        NavMan.NavigateTo("/PSB/1a");
+        NavMan.NavigateTo("/PSB/1");
     }
 
     protected override void OnAfterRender(bool bFirstRender)

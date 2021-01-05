@@ -477,9 +477,11 @@
             {
                 OurUtility.Write_Log("== Login Berhasil", "step-action");
                 menu.userName = userName;
-                isNotAuthorized = false;
-                isAuthorized = true;
+                //isNotAuthorized = false;
+                //isAuthorized = true;
+                menu.AddMainMenu("PSB HALO", "psb-halo/v1/init", "Menu_Berlangganan_kartuHalo.png", "PSB", "margin-left: 10%;");
                 authorizedLevel = "1";
+                NavigateTo("/main");
             }
             else
             {

@@ -23,6 +23,18 @@ namespace MyG5Blazor.Data
         public class PSBDetail
         {
             public string alamatEmail { get; set; }
+            public string otp { get; set; }
+            public string nik { get; set; }
+            public string nama { get; set; }
+            public string tglLahir { get; set; }
+            public string nokk { get; set; }
+            public string selectedPaket { get; set; }
+            public Menu.MenuPSB PaketPSB = new Menu.MenuPSB();
+            public string patternNumber { get; set; }
+            public string selectedNumber { get; set; }
+            public string batasPemakaian { get; set; }
+            public bool isTC { get; set; } = false;
+            public bool isEbill { get; set; } = false;
         }
 
         public PSBDetail psbDetail = new PSBDetail();

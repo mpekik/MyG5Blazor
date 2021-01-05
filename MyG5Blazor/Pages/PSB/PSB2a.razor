@@ -12,8 +12,8 @@
 @inject Costumer cst
 @inject NavigationManager NavMan
 @inject Transaction trans
-@inject Config config 
-@inject Menu menu 
+@inject Config config
+@inject Menu menu
 <div class="main-panel bg-home">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -67,7 +67,7 @@
                     </div>
                     <div class="button-down">
                         <!-- <button class="btn-arrow" value="">Kembali</button>
-        <button class="btn-arrow" value="">Menu Utama</button> -->
+                        <button class="btn-arrow" value="">Menu Utama</button> -->
                     </div>
                 </div>
             </div>
@@ -108,7 +108,7 @@
                         Mohon cek kembali kode verifikasi yang Anda terima.
                     </p>
                     <p style="font-size: 25pt; font-weight: bold;"></p>
-                    <button class="btn btn-danger modal-button"@onclick="InvalidOK">OK</button>
+                    <button class="btn btn-danger modal-button" @onclick="InvalidOK">OK</button>
                 </div>
             </div>
         </div>
@@ -125,15 +125,36 @@
         </div>
     </div>
 }
+@if (isVisible)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">@((MarkupString)strMsgError)</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => isVisible = false)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 
 @code{
+
     private bool isVisible = false;
     private bool isLoading = false;
     private bool isValid = false;
     private bool isInvalid = false;
     private bool isOTPError = false;
+    private bool isPopUp = false;
 
     private string otp = string.Empty;
+    private string _myURL = string.Empty;
+    private string serviceURL = "psb-halo/v1/get-otp-email";
+    private string cekOTPURL = "psb-halo/v1/otp-email-validation";
+    private string getPaket = "psb-halo/v1/package";
+    private string strMsgError = "";
 
     private int counterTime;
     private int counterTreshold = 60;
@@ -147,13 +168,13 @@
             await Task.Delay(1000);
             counterTime = counterTime - 1;
             InvokeAsync(StateHasChanged);
-            if (counterTime<1)
+            if (counterTime < 1)
             {
                 kirimUlang = false;
                 InvokeAsync(StateHasChanged);
                 return;
             }
-        } while (counterTime>0);
+        } while (counterTime > 0);
     }
 
     protected override async Task OnAfterRenderAsync(bool bFirstRender)
@@ -169,19 +190,95 @@
     protected override async Task OnInitializedAsync()
     {
         counterTime = counterTreshold;
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
     }
 
+    private async Task RequestOTP()
+    {
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"transactionId\": \"" + trans.transID + "\"," +
+            "\"email\": \"" + trans.psbDetail.alamatEmail + "\"" +
+               "}";
+        string myURL = _myURL + serviceURL;
+        OurUtility.Write_Log("Request OTP", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+
+        if (strResult != "" || strResult != "Forbidden" || strResult != "NotFound" || strResult != "BadRequest" || strResult != "InternalServerError")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    isLoading = false;
+                    trans.AddTrail("Request OTP", trans.psbDetail.alamatEmail, "00");
+
+                    NavigateTo("/PSB/2a");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Request OTP", trans.psbDetail.alamatEmail, "01");
+                    trans.status = "01";
+                    await OurUtility.AuditTrail(trans, menu, cst);
+                    //isNotIdle = false;
+                    isLoading = false;
+                    NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    isLoading = false;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                isLoading = false;
+                trans.AddTrail("Request OTP", "Exception Error", "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //isNotIdle = false;
+                NavMan.NavigateTo("/error");
+            }
+        }
+        else
+        {
+            isLoading = false;
+            trans.AddTrail("Request OTP", "Hit Webservice Error : "+strResult, "01");
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            trans.errorCode = "Hit Webservice Error: " + strResult;
+            OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+            //isNotIdle = false;
+            NavMan.NavigateTo("/error");
+        }
+    }
     private async Task KirimUlang()
     {
         kirimUlang = true;
         counterTime = counterTreshold;
         await Task.Run(() => OTPTime()).ConfigureAwait(false);
 
+        await RequestOTP();
     }
 
     private void InputPhoneNumber(string strInput)
     {
-        if(otp.Length<6)
+        if (otp.Length < 6)
             otp += strInput;
     }
 
@@ -200,21 +297,101 @@
     {
         isLoading = true;
         await Task.Delay(5000);
-        isValid = true;
-        isInvalid = false;
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"transactionId\": \"" + trans.transID + "\"," +
+            "\"email\": \"" + trans.psbDetail.alamatEmail + "\"," +
+            "\"token\": \"" + trans.psbDetail.otp + "\"" +
+               "}";
+        string myURL = _myURL + cekOTPURL;
+        OurUtility.Write_Log("Request OTP", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+
+        if (strResult != "" || strResult != "Forbidden" || strResult != "NotFound" || strResult != "BadRequest" || strResult != "InternalServerError")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    isLoading = false;
+                    isValid = true;
+                    isInvalid = false;
+                    trans.AddTrail("Validasi OTP", "Validasi Sukses", "00");
+                    //NavigateTo("/PSB/2a");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Validasi OTP", trans.errorCode, "01");
+                    trans.status = "01";
+                    await OurUtility.AuditTrail(trans, menu, cst);
+                    //isNotIdle = false;
+                    isLoading = false;
+                    isInvalid = true;
+                    isValid = false;
+                    //NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    trans.AddTrail("Validasi OTP", "", "02");
+                    isLoading = false;
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                    isVisible = false;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                isLoading = false;
+                trans.AddTrail("Validasi OTP","Exception Error" , "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //isNotIdle = false;
+                NavigateTo("/error");
+            }
+        }
+        else
+        {
+            isLoading = false;
+            trans.AddTrail("Valiasi OTP", "Hit Webservice Error", "01");
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            trans.errorCode = "Exception Error";
+            OurUtility.Write_Log("== Error : Hit Webservice Error", "step-action");
+            //isNotIdle = false;
+            NavigateTo("/error");
+        }
     }
     private async Task Ok()
     {
-        if(otp.Length==6)
+        if (otp.Length == 6)
         {
+            trans.psbDetail.otp = otp;
             await CekOTP();
-            if(isValid)
+            if (isValid)
             {
-                NavigateTo("/PSB/3");
-            }else if(isInvalid)
+                await GetPaket();
+                //NavigateTo("/PSB/3");
+            }
+            else if (isInvalid)
             {
                 NavigateTo("/main");
-            }else if(isOTPError)
+            }
+            else if (isOTPError)
             {
                 NavigateTo("/error");
             }
@@ -226,5 +403,87 @@
         isValid = false;
         isInvalid = false;
         isOTPError = false;
+    }
+    private async Task GetPaket()
+    {
+        isLoading = true;
+        await Task.Delay(5000);
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"transactionId\": \"" + trans.transID + "\"" +
+               "}";
+        string myURL = _myURL + getPaket;
+        OurUtility.Write_Log("Request OTP", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+
+        if (strResult != "" || strResult != "Forbidden" || strResult != "NotFound" || strResult != "BadRequest" || strResult != "InternalServerError")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    trans.AddTrail("Get Paket PSB", "", "00");
+                    foreach ((var pp, Int32 i) in jobjResult.SelectToken("paket").Select((pp, i) => (pp, i)))
+                    {
+
+                        menu.AddMenuPSB(pp.SelectToken("poolName").ToString(), pp.SelectToken("packageName").ToString(), pp.SelectToken("quotaInternet").ToString(), pp.SelectToken("quotaEntertainment").ToString(), pp.SelectToken("quotaTelepon").ToString(), pp.SelectToken("quotaTeleponLain").ToString(), pp.SelectToken("quotaSms").ToString(), pp.SelectToken("harga").ToString(), pp.SelectToken("hargaAwal").ToString());
+                    }
+                    NavigateTo("/PSB/3a");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Get Paket PSB", "", "01");
+                    trans.status = "01";
+                    await OurUtility.AuditTrail(trans, menu, cst);
+                    //isNotIdle = false;
+                    isLoading = false;
+                    NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    isLoading = false;
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                    trans.AddTrail("Validasi NIK & NOKK", "NIK : " + trans.psbDetail.nik + ", NOKK : " + trans.psbDetail.nokk, "02");
+
+                    isPopUp = false;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                isLoading = false;
+                trans.AddTrail("Get Paket PSB", "Exception Error ", "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //isNotIdle = false;
+                NavigateTo("/error");
+            }
+        }
+        else
+        {
+            isLoading = false;
+            trans.AddTrail("Get Paket PSB", "Hit Webservice Error : " + strResult, "01");
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            trans.errorCode = "Hit Webservice Error : " + strResult;
+            OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+            //isNotIdle = false;
+            NavigateTo("/error");
+        }
     }
 }

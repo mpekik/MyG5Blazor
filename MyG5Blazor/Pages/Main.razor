@@ -248,6 +248,7 @@
                     trans.SetTransaction((string)jobjResult["config"].SelectToken("apiBuid"), (string)jobjResult["terminal"].SelectToken("terminalId"), strTrans);
                     config.Terminal((string)jobjResult["terminal"].SelectToken("terminalId"), (string)jobjResult["terminal"].SelectToken("terminalDesc"), (string)jobjResult["terminal"].SelectToken("terminalLocation"), (string)jobjResult["terminal"].SelectToken("area"), (string)jobjResult["terminal"].SelectToken("regional"), (string)jobjResult["terminal"].SelectToken("unitId"), (string)jobjResult["terminal"].SelectToken("unitName"));
                     config.ConfigIn((string)jobjResult["config"].SelectToken("menuConfigId"), (string)jobjResult["config"].SelectToken("maxRetryPerso"), (string)jobjResult["config"].SelectToken("tidEdc"), (string)jobjResult["config"].SelectToken("midEdc"), (string)jobjResult["config"].SelectToken("snEdc"), (string)jobjResult["config"].SelectToken("buid"), (string)jobjResult["config"].SelectToken("uid"), (string)jobjResult["config"].SelectToken("cardDispenser"), (string)jobjResult["config"].SelectToken("bahasa"), (string)jobjResult["config"].SelectToken("edcStatus"), (string)jobjResult["config"].SelectToken("cashStatus"));
+                    trans.SetTransaction((string)jobjResult["transaction"].SelectToken("transactionId"));
                     OurUtility.Write_Log("== BUID : " + trans.buID + ", Terminal ID : " + trans.termID + ", Event : " + trans.jenisTrans + " {Success}", "step-action");
 
                     NavMan.NavigateTo(strURL);

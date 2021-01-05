@@ -41,29 +41,43 @@ namespace MyG5Blazor.Data
         
         public class MenuPSB
         {
+            public string _poolName { get; set; }
             public string _Header { get; set; }
             public string _internet { get; set; }
+            public string _satuanInternet { get; set; }
             public string _entertainment { get; set; }
+            public string _satuanEntertainment { get; set; }
             public string _telpTsel { get; set; }
+            public string _satuanTelpTsel { get; set; }
             public string _telpLain { get; set; }
+            public string _satuanTelpLain { get; set; }
             public string _smsTsel { get; set; }
+            public string _satuanSMSTsel { get; set; }
             public string _nominal { get; set; }
+            public string _hargaAwal { get; set; }
         }
 
         public List<string> psbNomer = new List<string>();
         public int psbIndex = 0;
         public int pageIndex = 0;
         public List<MenuPSB> _menuPSB = new List<MenuPSB> ();
-        public void AddMenuPSB (string header, string internet, string entertainment, string telpTsel, string telpLain, string smsTsel, string nominal)
+        public void AddMenuPSB (string pool, string header, string internet, string entertainment, string telpTsel, string telpLain, string smsTsel, string nominal, string hargaAwal)
         {
             MenuPSB menuPSB = new MenuPSB();
+            menuPSB._poolName = pool;
             menuPSB._Header = header;
-            menuPSB._internet = internet;
-            menuPSB._entertainment = entertainment;
-            menuPSB._telpTsel = telpTsel;
-            menuPSB._telpLain = telpLain;
-            menuPSB._smsTsel = smsTsel;
-            menuPSB._nominal = nominal;
+            menuPSB._internet = internet.Substring(0,internet.Length - 3);
+            menuPSB._satuanInternet= internet.Substring(internet.Length - 3);
+            menuPSB._entertainment = entertainment.Substring(0, entertainment.Length - 3);
+            menuPSB._satuanEntertainment = entertainment.Substring(entertainment.Length - 3);
+            menuPSB._telpTsel = telpTsel.Substring(0, telpTsel.Length - 6);
+            menuPSB._satuanTelpTsel = telpTsel.Substring(telpTsel.Length - 6);
+            menuPSB._telpLain = telpLain.Substring(0, telpLain.Length - 6);
+            menuPSB._satuanTelpLain = telpLain.Substring(telpLain.Length - 6);
+            menuPSB._smsTsel = smsTsel.Substring(0, smsTsel.Length - 4);
+            menuPSB._satuanSMSTsel = smsTsel.Substring(smsTsel.Length - 4);
+            menuPSB._nominal = int.Parse(nominal).ToString();
+            menuPSB._hargaAwal = int.Parse(hargaAwal).ToString();
             _menuPSB.Add(menuPSB);
         }
         public class MenuPulsa

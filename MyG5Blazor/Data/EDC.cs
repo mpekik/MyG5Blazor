@@ -262,11 +262,20 @@ namespace MyG5Blazor.Data
                             //Console.WriteLine("Repeat : "+intTry);
                                 mre.Set();
                         }
+                    }else
+                    {
+                        serialPort.Close();
+                        dataSplit = dataRespond.Substring(dataRespond.IndexOf("BNI"));
+                        OurUtility.Write_Log("dataSplit = " +dataSplit, "step-action");
+
+                        intTry += 1;
+                        mre.Set();
                     }
                 }
                 else if (dataRespond.Contains("\x15"))
                 {
                     serialPort.Close();
+                    OurUtility.Write_Log("EDC NAK", "step-action");
                     //Console.WriteLine("EDC NAK");
                     mre.Set();
                     intTry = 4;
@@ -275,56 +284,69 @@ namespace MyG5Blazor.Data
         }
         public void SendCommand(string amount, SerialPort port, string type, string invoice, string billing, string account_type)
         {
-            string stx = "02";
-            string ecr = "424E49"; // BNI;
-            string ecr_messsage = string.Empty;
-            string etx = "03";
-            string lrc = "00";
+            try
+            {
+                OurUtility.Write_Log("EDC 1", "step-action");
+                string stx = "02";
+                string ecr = "424E49"; // BNI;
+                string ecr_messsage = string.Empty;
+                string etx = "03";
+                string lrc = "00";
 
-            dataRespond = string.Empty;
+                dataRespond = string.Empty;
 
-            serialPort.Close();
+                serialPort.Close();
+                OurUtility.Write_Log("EDC 2", "step-action");
+                string request_TransactionType = string.Empty;
+                string request_Amount = string.Empty;
+                string request_InvoiceNumber = string.Empty;
+                string request_BillingNumber = string.Empty;
+                string request_AccountType = string.Empty;
+                string request_BankFiller = string.Empty;
 
-            string request_TransactionType = string.Empty;
-            string request_Amount = string.Empty;
-            string request_InvoiceNumber = string.Empty;
-            string request_BillingNumber = string.Empty;
-            string request_AccountType = string.Empty;
-            string request_BankFiller = string.Empty;
+                request_TransactionType = type;
+                request_Amount = HexaAmount(amount);
+                request_InvoiceNumber = HexaInvoice(invoice);
+                request_BillingNumber = HexaBilling(billing);
+                request_AccountType = "3" + account_type;
+                request_BankFiller = HexaBankFiller("");
 
-            request_TransactionType = type;
-            request_Amount = HexaAmount(amount);
-            request_InvoiceNumber = HexaInvoice(invoice);
-            request_BillingNumber = HexaBilling(billing);
-            request_AccountType = "3" + account_type;
-            request_BankFiller = HexaBankFiller("");
+                ecr_messsage = request_TransactionType
+                    + request_Amount
+                    + request_InvoiceNumber
+                    + request_BillingNumber
+                    + request_AccountType
+                    + request_BankFiller;
 
-            ecr_messsage = request_TransactionType
-                + request_Amount
-                + request_InvoiceNumber
-                + request_BillingNumber
-                + request_AccountType
-                + request_BankFiller;
+                string data = stx
+                    + ecr
+                    + ecr_messsage
+                    + etx
+                    + lrc;
+                OurUtility.Write_Log("EDC 3", "step-action");
+                byte[] data2 = StringToByteArray(data);
+                OurUtility.Write_Log(ByteArrayToString(data2), "step-action");
+                byte[] data2_with_lrc = LRC(data2);
+                OurUtility.Write_Log(ByteArrayToString(data2_with_lrc), "step-action");
 
-            string data = stx
-                + ecr
-                + ecr_messsage
-                + etx
-                + lrc;
+                serialPort.PortName = port.PortName;
+                OurUtility.Write_Log("EDC C " + serialPort.PortName, "step-action");
+                serialPort.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
+                OurUtility.Write_Log("EDC D", "step-action");
 
-            byte[] data2 = StringToByteArray(data);
-            byte[] data2_with_lrc = LRC(data2);
+                //Console.WriteLine("1");
+                serialPort.Open();
+                OurUtility.Write_Log("EDC E "+serialPort.IsOpen.ToString(), "step-action");
 
-            serialPort.PortName = port.PortName;
-            serialPort.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
-
-            //Console.WriteLine("1");
-            serialPort.Open();
-
-            serialPort.Write(data2_with_lrc, 0, data2_with_lrc.Length);
-            //Console.WriteLine("2");
-   
-            //serialPort.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
+                serialPort.Write(data2_with_lrc, 0, data2_with_lrc.Length);
+                //Console.WriteLine("2");
+                OurUtility.Write_Log("EDC 4", "step-action");
+                //serialPort.DataReceived += new SerialDataReceivedEventHandler(port_DataReceived);
+            }
+            catch(Exception ex)
+            {
+                OurUtility.Write_Log("Error EDC : "+ex.Message, "step-action");
+            }
         }
 
         public void DummyPaymentSuccess()

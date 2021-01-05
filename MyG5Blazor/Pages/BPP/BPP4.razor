@@ -111,72 +111,67 @@
                         }
                     case 2:
                         {
-            <div class="col-md-6">
-                <div class="teks-title">Beli Pulsa Prabayar</div>
-                @if (!IsFail && !IsSuccess)
-                {
-                    @if (inttotal < intBill)
-                    {
-                        <div id="teks-silakan">
-                            <div class="teks-top"> Silakan Masukan Uang Kertas pada Alat Penerima Uang Tunai secara Lembar per Lembar </div>
-                        </div>
-                        <div id="teks-pastikan">
-                            <div class="teks-center" style="margin-top: 32%;"> Pastikan Pembayaran Menggunakan <br> Uang Kertas Minimal Pecahan Rp 10.000 </div>
-                        </div>
-                        <div id="bayar2">
-                            <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">
-                                Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian
-                                <br /> <span style="font-weight:normal; font-style:italic;">Seluruh uang yang masuk ke mesin akan menjadi pulsa</span>
-                            </div>
-                        </div>
-                    }
-                    else if (inttotal > intBill)
-                    {
-                        <div id="teks-silakan">
-                            <div class="teks-top"> Terdapat kelebihan pembayaran sebesar<br> <span style="font-weight:bold;">Rp @lebihPembayaran.ToString("N0")</span> </div>
-                        </div>
-                        <div id="teks-pastikan">
-                            <div class="teks-center" style="text-transform: uppercase; font-weight: bold; margin-top: 32%; line-height: 1;"> MESIN INI TIDAK MENGELUARKAN <br> KEMBALIAN </div>
-                        </div>
-                        <div id="bayar2">
-                            <div class="teks-bot" style="font-weight: bold; margin-top: 49%; line-height: 1;">
-                                Pulsa sebesar <span style="color:red">Rp @inttotal.ToString("N0")</span> akan<br> ditambahkan ke nomor @nomorHP
-                            </div>
-                        </div>
-                    }
-                    else
-                    {
-                        <div id="teks-sudah-sesuai">
-                            <div class="teks-center" style="margin-top: 38%;"> Uang yang Anda Masukkan Sudah Sesuai dengan Jumlah yang Harus Dibayarkan </div>
-                        </div>
-                    }
+                            <div class="col-md-6">
+                                <div class="teks-title">Beli Pulsa Prabayar</div>
+                                @if (!IsFail && !IsSuccess)
+                                {
+                                    @if (inttotal < intBill)
+                                    {
+                                        <div id="teks-silakan">
+                                            <div class="teks-top"> Silakan Masukan Uang Kertas pada Alat Penerima Uang Tunai secara Lembar per Lembar </div>
+                                        </div>
+                                        <div id="teks-pastikan">
+                                            <div class="teks-center" style="margin-top: 32%;"> Pastikan Pembayaran Menggunakan <br> Uang Kertas Minimal Pecahan Rp 10.000 </div>
+                                        </div>
+                                        <div id="bayar2">
+                                            <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 49%; line-height: 1;">
+                                                Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian
+                                                <br /> <span style="font-weight:normal; font-style:italic;">Seluruh uang yang masuk ke mesin akan menjadi pulsa</span>
+                                            </div>
+                                        </div>
+                                    }
+                                    else if (inttotal > intBill)
+                                    {
+                                        <div id="teks-silakan">
+                                            <div class="teks-top"> Terdapat kelebihan pembayaran sebesar<br> <span style="font-weight:bold;">Rp @lebihPembayaran.ToString("N0")</span> </div>
+                                        </div>
+                                        <div id="teks-pastikan">
+                                            <div class="teks-center" style="text-transform: uppercase; font-weight: bold; margin-top: 32%; line-height: 1;"> MESIN INI TIDAK MENGELUARKAN <br> KEMBALIAN </div>
+                                        </div>
+                                        <div id="bayar2">
+                                            <div class="teks-bot" style="font-weight: bold; margin-top: 49%; line-height: 1;">
+                                                Pulsa sebesar <span style="color:red">Rp @inttotal.ToString("N0")</span> akan<br> ditambahkan ke nomor @nomorHP
+                                            </div>
+                                        </div>
+                                    }
+                                    else
+                                    {
+                                        <div id="teks-sudah-sesuai">
+                                            <div class="teks-center" style="margin-top: 38%;"> Uang yang Anda Masukkan Sudah Sesuai dengan Jumlah yang Harus Dibayarkan </div>
+                                        </div>
+                                    }
 
-                }
-                else if (IsFail)
-                {
-                    <div id="status-pay" class="teks-status2">Proses Pembelian Pulsa Prabayar <br><b class="red">Tidak Berhasil</b></div>
-                    <div id="nominal-pay" class="teks-center"> Silakan Ambil Struk Transaksi dan <br> Hubungi Kasir GraPARI untuk Bantuan</div>
-                }
-                else if (IsSuccess)
-                {
-                    <div class="col-md-6">
-                        <div class="teks-title">Beli Pulsa Prabayar</div>
-                        <div id="status-pay" class="teks-top teks-bold">Proses Pembelian Pulsa Prabayar <b class="green">Berhasil</b></div>
-                        <div id="teks-pastikan">
-                            <div class="teks-center" style="margin-top: 32%;"> Terima kasih telah melakukan pengisian ulang pulsa senilai <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b> </div>
-                        </div>
-                        <div id="bayar2">
-                            <div class="teks-bot" style="margin-top: 49%; line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @sisaPulsa.ToString("N0")</b></div>
-                        </div>
-                    </div>
+                                 }
+                                 else if (IsFail)
+                                 {
+                                    <div id="status-pay" class="teks-status2">Proses Pembelian Pulsa Prabayar <br><b class="red">Tidak Berhasil</b></div>
+                                    <div id="nominal-pay" class="teks-center"> Silakan Ambil Struk Transaksi dan <br> Hubungi Kasir GraPARI untuk Bantuan</div>
+                                 }
+                                 else if (IsSuccess)
+                                 {
+                                    <div class="col-md-6">
+                                        <div class="teks-title">Beli Pulsa Prabayar</div>
+                                        <div id="status-pay" class="teks-top teks-bold">Proses Pembelian Pulsa Prabayar <b class="green">Berhasil</b></div>
+                                        <div id="teks-pastikan">
+                                            <div class="teks-center" style="margin-top: 32%;"> Terima kasih telah melakukan pengisian ulang pulsa senilai <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b> </div>
+                                        </div>
+                                        <div id="bayar2">
+                                            <div class="teks-bot" style="margin-top: 49%; line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @sisaPulsa.ToString("N0")</b></div>
+                                        </div>
+                                    </div>
 
-                    <div class="col-md-6">
-                        <div id="image-pulsa" class="image-center2">
-                            <img src="../../assets/image/Logo/pulsa-prabayar.png" alt="" width="450px" height="280px">
-                        </div>
-                    </div>
-                }
-            </div>
+                                 }
+                            </div>
 
                             <div class="col-md-6" id="proses-bill">
                                 @if (!IsFail && !IsSuccess)
@@ -268,7 +263,7 @@
                             }
                             break;
                         }
-                }
+                 }
             </div>
         </div>
     </div>
@@ -1031,7 +1026,7 @@
                                     "\"edc\" : {" +
                                     "\"responseCode\" : \"" + edc.respondCode + "\"," +
                                     "\"ecr\" : \"" + trans.ecr + "\"," +
-                                    "\"sn\" : \"" + config.snEdc + "\"" +
+                                    "\"sn\" : \"" + config.snEdc + "\"}" +
                                     "}";
         }
         else
@@ -1077,9 +1072,7 @@
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
-                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");

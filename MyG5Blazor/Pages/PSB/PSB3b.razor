@@ -1,6 +1,12 @@
-﻿@page "/PSB/6b"
+﻿@page "/PSB/3b"
 
 @using MyG5Blazor.Data
+@using System.Linq;
+@using Newtonsoft.Json;
+@using Newtonsoft.Json.Linq;
+@using System;
+@using System.Threading.Tasks;
+@using System.Net.Http;
 
 @inject Costumer cst
 @inject IJSRuntime JSRuntime;
@@ -55,7 +61,7 @@
                         <button class="key-num btn" value="9" @onclick="@(() => InputPhoneNumber("9"))">9</button>
                         <button class="key-num btn btn-hapus" value="Hapus" @onclick="RemovePhoneNumber">Hapus</button>
                         <button class="key-num btn" value="0" id="myBtnUndefine" @onclick="@(() => InputPhoneNumber("0"))">0</button>
-                        <button class="key-num btn btn-hapus" id="myBtn" value="ok" @onclick="@(()=>OkOnClick(true))">Ok</button>
+                        <button class="key-num btn btn-hapus" id="myBtn" value="ok" @onclick="@(()=>InvokeAsync(OkOnClick))">Ok</button>
                     </div>
                     <div class="button-down">
                         <!-- <button class="btn-arrow" value="">Kembali</button>
@@ -72,31 +78,29 @@
     <div class="footer-side1">
         <span class="dot2">1</span>
         <span class="dot2">2</span>
-        <span class="dot2">3</span>
+        <span class="dot2" id="dot-active">3</span>
         <span class="dot2">4</span>
         <span class="dot2">5</span>
-        <span class="dot2" id="dot-active">6</span>
+        <span class="dot2">6</span>
         <span class="dot2">7</span>
         <span class="dot2">8</span>
         <span class="dot2">9</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="@(()=>NavigateTo("/PSB/6a"))" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="@(()=>NavigateTo("/PSB/3a"))" class="btn-arrow btn" value="">Kembali</button>
         <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
-@if (IsVisible)
+@if (isPopUp)
 {
     <div id="myModal" class="modal">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Anda akan melakukan <span style="font-weight: bold;">Ganti Kartu Hilang/Rusak</span> untuk nomor :</p>
-                    <p style="font-size: 25pt; font-weight: bold;">@strNumber</p>
-                    <button @onclick="CheckNumber" class="btn btn-danger modal-button">Lanjut</button>
-                    <button class="btn btn-light modal-button" @onclick="@(()=>OkOnClick(false))">Batal</button>
+                    <p class="text-body">@((MarkupString)strMsgError)</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => isPopUp = false)">OK</button>
                 </div>
             </div>
         </div>
@@ -107,37 +111,34 @@
     private bool IsMethod = false;
     private bool IsVisible = false;
     private bool IsInvalid = false;
-    private bool IsLoading = false;
+    private bool isLoading = false;
     private bool isSubmit = true;
+    private bool isPopUp = false;
 
     private string strNumber = string.Empty;
+    private string _myURL = string.Empty;
+    private string getNomor = "psb-halo/v1/list-postpaid-numbers";
+    private string strMsgError = string.Empty;
 
     protected override async Task OnInitializedAsync()
     {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        menu.psbNomer.Clear();
     }
 
     private void InputPhoneNumber(string strInput)
     {
-        if(strNumber.Length<4)
+        if (strNumber.Length < 4)
             strNumber += strInput;
     }
 
-    private void OkOnClick(bool visiblestatus)
+    private async Task OkOnClick()
     {
-        if (visiblestatus)
+        if (strNumber.Length > 0 && strNumber.Length < 5)
         {
-            if (strNumber.Length > 0 && strNumber.Length < 5)
-            {
-                IsVisible = visiblestatus;
-            }
+            trans.psbDetail.patternNumber = strNumber;
+            await GetNomor();
         }
-        else
-        {
-            IsVisible = visiblestatus;
-            IsInvalid = visiblestatus;
-
-        }
-        isSubmit = true;
     }
     private async Task MainMenu()
     {
@@ -171,29 +172,93 @@
             NavMan.NavigateTo(strURL);
         }
     }
+    private async Task GetNomor()
+    {
+        isLoading = true;
+        await Task.Delay(5000);
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"transactionId\": \"" + trans.transID + "\"," +
+            "\"poolName\": \"" + trans.psbDetail.selectedPaket + "\"," +
+            "\"pattern\": \"" + trans.psbDetail.patternNumber + "\"" +
+               "}";
+        string myURL = _myURL + getNomor;
+        OurUtility.Write_Log("Get List Number", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+
+        if (strResult != "" || strResult == "Forbidden" || strResult == "NotFound")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    trans.AddTrail("Get List Number", "Pattern : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "00");
+                    foreach ((var num, Int32 i) in jobjResult.SelectToken("numbers").Select((pp, i) => (pp, i)))
+                    {
+                        menu.psbNomer.Add(num.ToString());
+                    }
+                    menu.psbIndex = menu.psbNomer.Count();
+                    NavigateTo("/PSB/3c");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Get List Number", "Pattern : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "01");
+                    trans.status = "01";
+                    await OurUtility.AuditTrail(trans, menu, cst);
+                    //isNotIdle = false;
+                    isLoading = false;
+                    NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    isLoading = false;
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                    trans.AddTrail("Get List Number", "Pattern : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "02");
+
+                    isPopUp = false;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                isLoading = false;
+                trans.AddTrail("Get List Number", "Exception Error ", "01");
+                trans.status = "01";
+                await OurUtility.AuditTrail(trans, menu, cst);
+
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //isNotIdle = false;
+                NavMan.NavigateTo("/error");
+            }
+        }
+        else
+        {
+            isLoading = false;
+            trans.AddTrail("Get List Number", "Hit Webservice Error : " + strResult, "01");
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+
+            trans.errorCode = "Hit Webservice Error : " + strResult;
+            OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+            //isNotIdle = false;
+            NavMan.NavigateTo("/error");
+        }
+    }
     private void CheckNumber()
     {
-        menu.psbNomer.Add("081134567" + strNumber);
-        menu.psbNomer.Add("082134567" + strNumber);
-        menu.psbNomer.Add("081176543" + strNumber);
-        menu.psbNomer.Add("082176543" + strNumber);
-        menu.psbNomer.Add("081198765" + strNumber);
-        menu.psbNomer.Add("082198765" + strNumber);
-
-        menu.psbNomer.Add("081156789" + strNumber);
-        menu.psbNomer.Add("082156789" + strNumber);
-        menu.psbNomer.Add("081101234" + strNumber);
-        menu.psbNomer.Add("082101234" + strNumber);
-        menu.psbNomer.Add("081154637" + strNumber);
-        menu.psbNomer.Add("082154637" + strNumber);
-
-        menu.psbNomer.Add("081156781" + strNumber);
-        menu.psbNomer.Add("082156781" + strNumber);
-        menu.psbNomer.Add("081101232" + strNumber);
-        menu.psbNomer.Add("082101232" + strNumber);
-        menu.psbNomer.Add("081154633" + strNumber);
-        menu.psbNomer.Add("082154633" + strNumber);
         menu.psbIndex = menu.psbNomer.Count();
-        NavigateTo("/PSB/6c");
+        NavigateTo("/PSB/3c");
     }
 }

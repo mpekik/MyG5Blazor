@@ -46,27 +46,27 @@
                                 <tr>
                                     <td>NIK</td>
                                     <td>&ensp; : </td>
-                                    <td>&nbsp; 302932814381</td>
+                                    <td>&nbsp; @trans.psbDetail.nik</td>
                                 </tr>
                                 <tr>
                                     <td>Nama</td>
                                     <td>&nbsp; :</td>
-                                    <td>&nbsp; Jajang Nurjaman</td>
+                                    <td>&nbsp; @trans.psbDetail.nama</td>
                                 </tr>
                                 <tr>
                                     <td> Nomor kartuHalo</td>
                                     <td>&ensp; :</td>
-                                    <td>&ensp; 08122173773</td>
+                                    <td>&ensp; @trans.psbDetail.selectedNumber</td>
                                 </tr>
                                 <tr>
                                     <td>Harga Paket</td>
                                     <td>&ensp; :</td>
-                                    <td>&ensp; Rp 550.000 per bulan (Halo Kick Platinum)</td>
+                                    <td>&ensp; Rp @trans.psbDetail.PaketPSB._nominal per bulan (@trans.psbDetail.PaketPSB._Header)</td>
                                 </tr>
                                 <tr>
                                     <td>Informasi Paket</td>
                                     <td>&ensp; :</td>
-                                    <td>&ensp; 100GB Data + 100 GB Entertainment + Kuota Telepon dan SMS</td>
+                                    <td>&ensp; @trans.psbDetail.PaketPSB._internet @trans.psbDetail.PaketPSB._satuanInternet Data + @trans.psbDetail.PaketPSB._entertainment @trans.psbDetail.PaketPSB._satuanEntertainment Entertainment + Kuota Telepon dan SMS</td>
                                 </tr>
                                 <tr>
                                     <td>Periode Penagihan</td>
@@ -76,7 +76,7 @@
                                 <tr>
                                     <td>Batas Pemakaian</td>
                                     <td>&ensp; :</td>
-                                    <td>&ensp; Rp 1.100.000 (2x Harga Paket)</td>
+                                    <td>&ensp; Rp @trans.psbDetail.batasPemakaian (2x Harga Paket)</td>
                                 </tr>
                             </table>
                         </div>
@@ -105,7 +105,7 @@
         </div>
         <div id="footer-side2" class="col-md-4">
             <div style="margin-left: -8rem; margin-right: -8rem;">
-                <button @onclick="@(()=>NavMan.NavigateTo("/main"))" class="btn-arrow btn" value="">Kembali</button>
+                <button @onclick="@(()=>NavigateTo("/PSB/6"))" class="btn-arrow btn" value="">Kembali</button>
                 <button @onclick="@(()=>NavMan.NavigateTo("/main"))" class="btn-arrow btn" value="">Menu Utama</button>
                 <!-- <sup>Powered By </sup>Trilogi Persada -->
             </div>
@@ -146,13 +146,17 @@
         {
             if (bFirstRender)
             {
-            
+
             }
         }
 
         private void Lanjut()
         {
-            NavMan.NavigateTo("/PSB/7b");
+            NavigateTo("/PSB/7b");
         }
 
+        private void NavigateTo(string strURL)
+        {
+            NavMan.NavigateTo(strURL);
+        }
     }
