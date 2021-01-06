@@ -419,7 +419,7 @@
         strCOM = strCOM + config.Read("EDC", Config.PARAM_EDC_PORT);
         MetodePembayaran = cst.intMPembayaran;
         intBill = cst.intTagihan;
-        InvokeAsync(StateHasChanged);
+        StateHasChanged();
         //intAccBill = 10000;
         //intMinus = intBill - intAccBill;
         switch (MetodePembayaran)
@@ -438,6 +438,12 @@
                         await Task.Delay(2000);
                         intAccBill = intBill;
                         await Payment("");
+
+                        string msg = string.Empty;
+                        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
+                        Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+
                         if (resultPayment == "00")
                         {
                             trans.edcStatus = "SUCCESS";
@@ -449,8 +455,6 @@
 
                             //TimerCES.SetTimer(5000);
                             //TimerCES.OnElapsed += TimerElapsedHandlerCES;
-
-                            await Print();
 
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN TAGIHAN VIA DEBIT BERHASIL";
@@ -468,7 +472,8 @@
                             //IsVoid = true;
                             IsFail = true;
                             strInvoice = trans.edcTrace;
-                            await Task.Delay(2000);
+                            StateHasChanged();
+                            await Task.Delay(200);
                             if (trans.edcresp == "00")
                             {
 
@@ -476,8 +481,9 @@
                                 IsVoid = true;
                                 OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
                                 Void();
+                                IsLoading = false;
+                                StateHasChanged();
                             }
-                            await Print();
                             trans.status = "01";
                             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
@@ -552,6 +558,10 @@
                         await Task.Delay(2000);
                         intAccBill = intBill;
                         await Payment("");
+                        string msg = string.Empty;
+                        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
+                        Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
                         if (resultPayment == "00")
                         {
                             trans.edcStatus = "SUCCESS";
@@ -559,7 +569,6 @@
                             IsSuccess = true;
                             //Console.WriteLine("Payment Success");
                             await Task.Delay(2000);
-                            await Print();
                             //await CheckNPS("");
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN TAGIHAN VIA CC BERHASIL";
@@ -585,8 +594,9 @@
                                 OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
 
                                 Void();
+                                IsLoading = false;
+                                StateHasChanged();
                             }
-                            await Print();
                             trans.status = "01";
                             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
@@ -625,6 +635,10 @@
         resultCash = "00";
 
         await Payment("");
+        string msg = string.Empty;
+        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
+        Printer.PrintHalo(trans, cst, config, logoTsel, ref msg); await CheckNPS("");
         //Console.WriteLine("inttotal = " + inttotal);
         StateHasChanged();
         if (resultPayment == "00")
@@ -634,8 +648,6 @@
             IsSuccess = true;
             //Console.WriteLine("Payment Success");
             await Task.Delay(2000);
-            await Print();
-            await CheckNPS("");
             trans.status = "00";
             trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
@@ -648,7 +660,6 @@
         {
             IsLoading = false;
             IsFail = true;
-            await Print();
             trans.status = "01";
             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
             await OurUtility.AuditTrail(trans, menu, cst);
@@ -673,12 +684,16 @@
             IsTunaiExit = true;
             isTunaiComplete = false;
             IsFail = true;
-            await Print();
             trans.AddTrail("PAYMENT CASH", "Paid Ammount:" + intAccBill.ToString(), "02");
             Payout.DisableValidator();
             Payout.SSPComms.CloseComPort();
 
             await Payment("");
+            string msg = string.Empty;
+            string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
+            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg); await CheckNPS("");
+
             Task.Delay(500);
 
             trans.kip = "Pembayaran tidak dilanjutkan, terminal id:" + menu.terminalId;
@@ -718,7 +733,7 @@
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != "")
+        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
             {
@@ -740,9 +755,7 @@
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
-                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
@@ -888,6 +901,7 @@
     {
         try
         {
+            InvokeAsync(StateHasChanged);
             OurUtility.Write_Log("== Payment Via EDC", "step-action");
             string _transType = "01";
             cst.intTagihanTerbayar = intBill;
@@ -898,26 +912,15 @@
             //edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
             do
             {
+                await Task.Delay(200);
                 OurUtility.Write_Log("== Payment EDC : " + edc.serialPort.PortName + " " + tagihan + " "+_transType+" "+invoice +" "+billing+" "+mPemabayaran, "step-action");
                 edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
-                await Task.Delay(2000);
-                if (edc.respondCode == "00")
-                {
-                    OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
-                    trans.AddTrail("PAYMENT EDC", edc.respondCode, "00");
-
-                    trans.ecr = edc.ecr;
-                    trans.edcresp = edc.respondCode;
-                    IsLoading = true;
-                    pageClass = "main-panel bg-home";
-                    return;
-                }
                 //edc.mre.WaitOne();
             } while (!edc.mre.WaitOne());
             //} while (edc.intTry < 3);
             trans.ecr = edc.ecr;
-            trans.edcresp = edc.respondCode;
+            trans.edcresp = trans.ecr.Substring(146, 2);
             trans.edcTid = trans.ecr.Substring(2, 8);
             trans.edcMid = trans.ecr.Substring(10, 15);
             trans.edcBatch = trans.ecr.Substring(25, 6);
@@ -932,6 +935,23 @@
             trans.edcDate = trans.ecr.Substring(128, 6);
             trans.edcTime = trans.ecr.Substring(134, 6);
             trans.edcApproval = trans.ecr.Substring(140, 6);
+            await Task.Delay(200);
+            if (trans.edcresp == "00")
+            {
+                OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
+                trans.AddTrail("PAYMENT EDC", edc.respondCode, "00");
+
+                string msg = string.Empty;
+                string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+
+                IsLoading = true;
+                pageClass = "main-panel bg-home";
+            }else
+            {
+                OurUtility.Write_Log("== Payment Via EDC Failed", "step-action");
+                trans.AddTrail("PAYMENT EDC", edc.respondCode, "01");
+            }
             //Console.WriteLine(trans.edcresp);
         }
         catch (Exception ex)
@@ -943,55 +963,61 @@
     private async Task Void(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
     {
         string _transType = "02";
+        OurUtility.Write_Log("EDC VOID", "step-action");
         edc.Clear();
         edc.serialPort = new SerialPort();
         edc.serialPort.PortName = serialPortName;
         edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
         do
         {
-            await Task.Delay(2000);
-            if (edc.respondCode == "00")
-            {
-                IsVoided = true;
-                trans.edcStatus = "VOIDED";
-                OurUtility.Write_Log("== Payment Voided", "step-action");
-                trans.AddTrail("VOID EDC", edc.respondCode, "00");
-
-                break;
-            }
-            if (edc.intTry > intTryLimit)
-                break;
-
+            await Task.Delay(200);
             edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
             //Console.WriteLine(edc.respondCode);
 
         } while (!edc.mre.WaitOne());
-        trans.ecr = edc.ecr;
-        trans.edcresp = edc.respondCode;
+        trans.ecrVoid = edc.ecr;
+        trans.edcRespVoid = trans.ecrVoid.Substring(146, 2);
 
-        trans.edcTid = trans.ecr.Substring(2, 8);
-        trans.edcMid = trans.ecr.Substring(10, 15);
-        trans.edcBatch = trans.ecr.Substring(25, 6);
-        trans.edcIssuer = trans.ecr.Substring(31, 15);
-        trans.edcRefNo = trans.ecr.Substring(46, 6);
-        trans.edcTrace = trans.ecr.Substring(52, 6);
-        if (trans.ecr.Length > 100)
+        trans.edcTid = trans.ecrVoid.Substring(2, 8);
+        trans.edcMid = trans.ecrVoid.Substring(10, 15);
+        trans.edcBatch = trans.ecrVoid.Substring(25, 6);
+        trans.edcIssuer = trans.ecrVoid.Substring(31, 15);
+        trans.edcRefNo = trans.ecrVoid.Substring(46, 6);
+        trans.edcTrace = trans.ecrVoid.Substring(52, 6);
+        trans.edcCardNo = trans.ecrVoid.Substring(83, 19);
+        trans.edcCardName = trans.ecrVoid.Substring(102, 26);
+        trans.edcDate = trans.ecrVoid.Substring(128, 6);
+        trans.edcTime = trans.ecrVoid.Substring(134, 6);
+        trans.edcApproval = trans.ecrVoid.Substring(140, 6);
+        trans.edcRefNumber = trans.ecrVoid.Substring(148, 12);
+        trans.edcBillingNumber = trans.ecrVoid.Substring(160, 16);
+        trans.edcBalance = trans.ecrVoid.Substring(176, 12);
+        trans.edcTopUp = trans.ecrVoid.Substring(188, 19);
+        trans.edcExp = trans.ecrVoid.Substring(207, 6);
+        trans.edcInvoiceLA = trans.ecrVoid.Substring(213, 10);
+        trans.edcBankFiller = trans.ecrVoid.Substring(223);
+
+        await Task.Delay(200);
+        if (trans.edcRespVoid == "00")
         {
-            trans.edcCardNo = trans.ecr.Substring(83, 19);
-            trans.edcCardName = trans.ecr.Substring(102, 26);
-            trans.edcDate = trans.ecr.Substring(128, 6);
-            trans.edcTime = trans.ecr.Substring(134, 6);
-            trans.edcApproval = trans.ecr.Substring(140, 6);
+            IsVoided = true;
+            trans.edcStatus = "VOIDED";
+            OurUtility.Write_Log("== Payment Voided", "step-action");
+            trans.AddTrail("VOID EDC", trans.edcRespVoid, "00");
 
-            trans.edcRefNumber = trans.ecr.Substring(148, 12);
-            trans.edcBillingNumber = trans.ecr.Substring(160, 16);
-            trans.edcBalance = trans.ecr.Substring(176, 12);
-            trans.edcTopUp = trans.ecr.Substring(188, 19);
-            trans.edcExp = trans.ecr.Substring(207, 6);
-            trans.edcInvoiceLA = trans.ecr.Substring(213, 10);
-            trans.edcBankFiller = trans.ecr.Substring(223);
+            string msg = string.Empty;
+            string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
+            Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
         }
+        else
+        {
+            OurUtility.Write_Log("== Void Failed", "step-action");
+            trans.AddTrail("VOID EDC", trans.edcRespVoid, "01");
+
+        }
+
     }
 
     private async Task Payment(string strURL)
@@ -1036,13 +1062,14 @@
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != "" || strResult!="NotFound" || strResult != "InternalServerError" || strResult != "BadRequest")
+        if (strResult != "" && strResult!="NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
             {
                 IsLoading = false;
                 JObject jobjResult = JObject.Parse(strResult);
                 resultPayment = (string)jobjResult["transaction"].SelectToken("statusCode");
+                trans.resultPayment = resultPayment;
 
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
@@ -1078,6 +1105,8 @@
             }
             catch (Exception ex)
             {
+                trans.resultPayment = "03";
+
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
@@ -1085,6 +1114,8 @@
         }
         else
         {
+            trans.resultPayment = "04";
+
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
@@ -1207,6 +1238,7 @@
         }
         return false;
     }
+    #region printOld
     private async Task Print()
     {
         int height = 0;
@@ -1220,7 +1252,7 @@
         string footer = prtContent.FOOTER(trans, cst, config);
         bool result = Printer.Print(config, header, content, logoTsel, footer, ref msg);
     }
-
+    #endregion
     private void TimerElapsedHandler()
     {
         NavMan.NavigateTo("/main");

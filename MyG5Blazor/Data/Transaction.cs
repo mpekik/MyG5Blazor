@@ -19,7 +19,7 @@ namespace MyG5Blazor.Data
         public int intPayment { get; set; }
         public long startTime { get; set; }
         public long endTime { get; set; }
-       
+       public string resultPayment { get; set; }
         public class PSBDetail
         {
             public string alamatEmail { get; set; }
@@ -43,6 +43,7 @@ namespace MyG5Blazor.Data
         public string bit = string.Empty;
         public string fee = string.Empty;
         public string ecr = string.Empty;
+        public string ecrVoid = string.Empty;
         public string edcTrace = string.Empty;
         public string edcApproval = string.Empty;
         public string edcresp = string.Empty;
@@ -59,7 +60,7 @@ namespace MyG5Blazor.Data
         public string edcEntryCode = string.Empty;
         public string edcAmount = string.Empty;
         public string edcTotalAmount = string.Empty;
-        public string edcRespCode = string.Empty;
+        public string edcRespVoid = string.Empty;
         public string edcRefNumber = string.Empty;
         public string edcBillingNumber = string.Empty;
         public string edcBalance = string.Empty;

@@ -398,7 +398,7 @@
         {
             config.vers = config.ReadUtil("MyGraPARI", Config.PARAM_ADMIN_RELEASE);
             config.Write("MyGraPARI", Config.PARAM_ADMIN_RELEASE, config.vers);
-            vers = config.Read("MyGraPARI", Config.PARAM_ADMIN_RELEASE);
+            vers = config.vers;
         }
         [Microsoft.AspNetCore.Components.Inject]
 

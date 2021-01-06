@@ -163,5 +163,17 @@ namespace MyG5Blazor.Data
 
             return contents;
         }
+
+        public string EDCPay(Transaction trx, Costumer cst, Config cfg)
+        {
+            DateTime dtNow = DateTime.Now;
+
+            string contents = "DATE : " + dtNow.ToString("dd-MM-yyyy") + "\tTIME : " + dtNow.ToString("HH:mm:ss") + "\n" +
+                "TID : " + trx.edcTid + "\tMID : " + trx.edcMid + "\n" +
+                "SN : " + cfg.snEdc + "\n" +
+                "\n";
+
+            return contents;
+        }
     }
 }

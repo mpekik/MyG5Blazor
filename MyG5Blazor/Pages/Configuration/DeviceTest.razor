@@ -53,6 +53,10 @@
                     <button @onclick="CheckEKTP" class="btn-arrow-red btn">EKTP</button>
                     <button @onclick="CheckFinger" class="btn-arrow-red btn">Finger Print</button>
                     <button @onclick="FingerPrintAratek" class="btn-arrow-red btn">Test All</button>
+
+                    <button @onclick="PrintEDCPay" class="btn-arrow-red btn">Print Pay</button>
+                    <button @onclick="PrintEDCVoid" class="btn-arrow-red btn">Print Void</button>
+                    <button @onclick="PrintStruk" class="btn-arrow-red btn">Print Struk</button>
                 </div>
                 <div class="col-md-6" style="text-align: left;">
 
@@ -327,37 +331,35 @@
         edc.serialPort.DataReceived += new SerialDataReceivedEventHandler(edc.port_DataReceived);
         do
         {
-            await Task.Delay(2000);
-            if (edc.respondCode == "00")
-            {
-                //IsVoided = true;
-                //trans.edcStatus = "VOIDED";
-                //OurUtility.Write_Log("== Payment Voided", "step-action");
-                //trans.AddTrail("VOID EDC", edc.respondCode, "00");
-
-                break;
-            }
-            //if (edc.intTry > intTryLimit)
-            //break;
-
             edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
-            //(edc.respondCode);
-
         } while (!edc.mre.WaitOne());
-        trans.ecr = edc.ecr;
-        trans.edcresp = edc.respondCode;
-        trans.edcApproval = trans.ecr.Substring(140, 6);
-        trans.edcTid = trans.ecr.Substring(2, 8);
-        trans.edcMid = trans.ecr.Substring(10, 15);
-        trans.edcBatch = trans.ecr.Substring(25, 6);
-        trans.edcIssuer = trans.ecr.Substring(31, 15);
-        trans.edcTrace = trans.ecr.Substring(52, 6);
-        trans.edcRefNo = trans.ecr.Substring(46, 6);
-        trans.edcCardNo = trans.ecr.Substring(83, 19);
-        trans.edcCardName = trans.ecr.Substring(102, 26);
-        trans.edcDate = trans.ecr.Substring(128, 6);
-        trans.edcTime = trans.ecr.Substring(134, 6);
+        trans.ecrVoid = edc.ecr;
+        trans.edcRespVoid = trans.ecrVoid.Substring(146, 2);
+
+        trans.edcTid = trans.ecrVoid.Substring(2, 8);
+        trans.edcMid = trans.ecrVoid.Substring(10, 15);
+        trans.edcBatch = trans.ecrVoid.Substring(25, 6);
+        trans.edcIssuer = trans.ecrVoid.Substring(31, 15);
+        trans.edcRefNo = trans.ecrVoid.Substring(46, 6);
+        trans.edcTrace = trans.ecrVoid.Substring(52, 6);
+        trans.edcEntryCode = trans.ecrVoid.Substring(58, 1);
+        trans.edcAmount = trans.ecrVoid.Substring(59, 12);
+        trans.edcTotalAmount = trans.ecrVoid.Substring(71, 12);
+        trans.edcCardNo = trans.ecrVoid.Substring(83, 19);
+        trans.edcCardName = trans.ecrVoid.Substring(102, 26);
+        trans.edcDate = trans.ecrVoid.Substring(128, 6);
+        trans.edcTime = trans.ecrVoid.Substring(134, 6);
+        trans.edcApproval = trans.ecrVoid.Substring(140, 6);
+
+        if (trans.edcRespVoid=="00")
+        {
+            Console.WriteLine("Void Sukses");
+            string msg = string.Empty;
+            string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
+            Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
+        }
     }
     private string strTrace = "";
     private async Task Payment()
@@ -385,35 +387,35 @@
             {
                 edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
-                await Task.Delay(2000);
-                if (edc.respondCode == "00")
-                {
-                    //OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
-                    //trans.AddTrail("PAYMENT EDC", edc.respondCode, "00");
-
-                    trans.ecr = edc.ecr;
-                    trans.edcresp = edc.respondCode;
-                    IsLoading = true;
-                    //pageClass = "main-panel bg-home";
-                    return;
-                }
                 //edc.mre.WaitOne();
             } while (!edc.mre.WaitOne());
             //} while (edc.intTry < 3);
             trans.ecr = edc.ecr;
-            trans.edcresp = edc.respondCode;
-            trans.edcApproval = trans.ecr.Substring(140, 6);
+            trans.edcresp = trans.ecr.Substring(146,2);
             trans.edcTid = trans.ecr.Substring(2, 8);
             trans.edcMid = trans.ecr.Substring(10, 15);
             trans.edcBatch = trans.ecr.Substring(25, 6);
             trans.edcIssuer = trans.ecr.Substring(31, 15);
-            trans.edcTrace = trans.ecr.Substring(52, 6);
             trans.edcRefNo = trans.ecr.Substring(46, 6);
+            trans.edcTrace = trans.ecr.Substring(52, 6);
+            trans.edcEntryCode = trans.ecr.Substring(58, 1);
+            trans.edcAmount = trans.ecr.Substring(59, 12);
+            trans.edcTotalAmount = trans.ecr.Substring(71, 12);
             trans.edcCardNo = trans.ecr.Substring(83, 19);
             trans.edcCardName = trans.ecr.Substring(102, 26);
             trans.edcDate = trans.ecr.Substring(128, 6);
             trans.edcTime = trans.ecr.Substring(134, 6);
+            trans.edcApproval = trans.ecr.Substring(140, 6);
             strTrace = trans.edcTrace;
+
+            if(trans.edcresp=="00")
+            {
+                Console.WriteLine("Pay Sukses");
+                string msg = string.Empty;
+                string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+
+            }
             //(trans.edcresp);
         }
         catch (Exception ex)
@@ -930,4 +932,29 @@
     {
 
     }
+
+    private async Task PrintEDCPay()
+    {
+        string msg = string.Empty;
+        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
+        Printer.PrintEDCPay(trans,cst,config,logoTsel,ref msg);
+    }
+
+    private async Task PrintEDCVoid()
+    {
+        string msg = string.Empty;
+        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
+        Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
+    }
+    private async Task PrintStruk()
+    {
+        string msg = string.Empty;
+        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
+        cst.PhoneNumber = "628119153366";
+        Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+    }
+
 }

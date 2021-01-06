@@ -213,7 +213,9 @@
 
             IsVisible = false;
             isLoading = true;
+            InvokeAsync(StateHasChanged);
 
+            await Task.Delay(200);
             byte[] image = OurUtility.CaptureImage();
             string imageBytesStr;
             if(image!=null)
