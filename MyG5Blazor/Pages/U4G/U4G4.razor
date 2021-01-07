@@ -349,7 +349,7 @@
                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                         //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                        if (strResult != "")
+                        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest" && strResult != "Forbidden")
                         {
                             try
                             {
@@ -384,7 +384,7 @@
                                             OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                                             //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                                            if (strResult != "" || strResult != "NotFound" || strResult != "Forbidden")
+                                            if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest" && strResult != "Forbidden")
                                             {
                                                 JObject jobjResult2 = JObject.Parse(strResult);
                                                 if ((string)jobjResult2["transaction"].SelectToken("statusCode") == "00")
@@ -536,7 +536,7 @@
                         {
                             trans.AddTrail("PERSO", trans.persoID, "01");
                             OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
-                            trans.errorCode = strResult;
+                            trans.errorCode = "Hit WebService Error : " + strResult;
                             isError = true;
                             return;
                         }
@@ -638,7 +638,7 @@
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
         //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != "")
+        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest" && strResult != "Forbidden")
         {
             try
             {
@@ -687,7 +687,7 @@
         }
         else
         {
-            trans.errorCode = strResult;
+            trans.errorCode = "Hit WebService Error : " + strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             //NavMan.NavigateTo("/error");
         }

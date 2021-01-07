@@ -261,10 +261,8 @@
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
             ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
-            if (strResult != "")
+            if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest" && strResult != "Forbidden")
             {
-                if (strResult != "Forbidden")
-                {
                     try
                     {
                         //Parse HTTP Request Result to JObject
@@ -330,18 +328,10 @@
                         isNotIdle = false;
                         NavMan.NavigateTo("/error");
                     }
-                }
-                else
-                {
-                    trans.errorCode = strResult;
-                    OurUtility.Write_Log("== Error : " + strResult, "step-action");
-                    isNotIdle = false;
-                    NavMan.NavigateTo("/error");
-                }
             }
             else
             {
-                trans.errorCode = strResult;
+                trans.errorCode = "Hit WebService Error : " + strResult;
                 OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
                 isNotIdle = false;
                 NavMan.NavigateTo("/error");

@@ -344,7 +344,8 @@ namespace MyG5Blazor.Data
 
             string _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
             string saveURL = "log/v1/save";
-            
+
+            string errorReason = string.Empty;
             trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
 
             auditTrail = auditTrail + "[ ";
@@ -357,6 +358,7 @@ namespace MyG5Blazor.Data
                     "\"result\" : \"" + at._result + "\"" +
                     "},";
                 stepTrail += 1;
+                errorReason = at._data;
             }
             auditTrail = auditTrail.Remove(auditTrail.Length - 1);
 
@@ -368,7 +370,7 @@ namespace MyG5Blazor.Data
                     "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
                     "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
                     "\"status\" : \"" + trans.status + "\"," +
-                    "\"description\" : \"" + trans.errorCode + "\"," +
+                    "\"description\" : \"" + trans.errorCode + " : " + errorReason + "\"," +
                     "\"jumlahKartu\" : \"" + trans.jumlah_kartu + "\"," +
                     "\"kip\" : \"" + trans.kip + "\"" +
                     "}, \"auditTrail\" : " + auditTrail + "]}";

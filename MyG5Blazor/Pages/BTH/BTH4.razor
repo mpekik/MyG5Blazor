@@ -413,6 +413,9 @@
     private string resultPayment = string.Empty;
     private string resultCash = "01";
 
+    string msg = string.Empty;
+    string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
+
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -439,11 +442,6 @@
                         intAccBill = intBill;
                         await Payment("");
 
-                        string msg = string.Empty;
-                        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
-
-                        Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
-
                         if (resultPayment == "00")
                         {
                             trans.edcStatus = "SUCCESS";
@@ -451,10 +449,16 @@
                             IsFail = false;
                             IsSuccess = true;
                             //Console.WriteLine("Payment Success");
-                            await Task.Delay(2000);
+                            await Task.Delay(200);
 
-                            //TimerCES.SetTimer(5000);
-                            //TimerCES.OnElapsed += TimerElapsedHandlerCES;
+                            if (trans.edcresp == "00")
+                            {
+                                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+                            }
+
+                            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+
+                            await CheckNPS("");
 
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN TAGIHAN VIA DEBIT BERHASIL";
@@ -487,6 +491,17 @@
                             trans.status = "01";
                             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
+                            if (trans.edcresp == "00")
+                            {
+                                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+                            }
+
+                            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+
+                            if (trans.edcRespVoid == "00")
+                            {
+                                Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
+                            }
 
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -558,22 +573,29 @@
                         await Task.Delay(2000);
                         intAccBill = intBill;
                         await Payment("");
-                        string msg = string.Empty;
-                        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
-                        Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
                         if (resultPayment == "00")
                         {
                             trans.edcStatus = "SUCCESS";
                             IsLoading = false;
                             IsSuccess = true;
                             //Console.WriteLine("Payment Success");
-                            await Task.Delay(2000);
-                            //await CheckNPS("");
+                            await Task.Delay(200);
+
+                            if (trans.edcresp == "00")
+                            {
+                                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+                            }
+
+                            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+
+                            await CheckNPS("");
+
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN TAGIHAN VIA CC BERHASIL";
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
+
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
@@ -600,6 +622,18 @@
                             trans.status = "01";
                             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
+
+                            if (trans.edcresp == "00")
+                            {
+                                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+                            }
+
+                            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+
+                            if (trans.edcRespVoid == "00")
+                            {
+                                Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
+                            }
 
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -635,10 +669,7 @@
         resultCash = "00";
 
         await Payment("");
-        string msg = string.Empty;
-        string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
-        Printer.PrintHalo(trans, cst, config, logoTsel, ref msg); await CheckNPS("");
         //Console.WriteLine("inttotal = " + inttotal);
         StateHasChanged();
         if (resultPayment == "00")
@@ -646,8 +677,12 @@
             trans.edcStatus = "SUCCESS";
             IsLoading = false;
             IsSuccess = true;
+
+            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+            await CheckNPS("");
+
             //Console.WriteLine("Payment Success");
-            await Task.Delay(2000);
+            await Task.Delay(200);
             trans.status = "00";
             trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
@@ -660,6 +695,9 @@
         {
             IsLoading = false;
             IsFail = true;
+
+            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+
             trans.status = "01";
             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
             await OurUtility.AuditTrail(trans, menu, cst);
@@ -689,8 +727,6 @@
             Payout.SSPComms.CloseComPort();
 
             await Payment("");
-            string msg = string.Empty;
-            string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
             Printer.PrintHalo(trans, cst, config, logoTsel, ref msg); await CheckNPS("");
 
@@ -916,9 +952,7 @@
                 OurUtility.Write_Log("== Payment EDC : " + edc.serialPort.PortName + " " + tagihan + " "+_transType+" "+invoice +" "+billing+" "+mPemabayaran, "step-action");
                 edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
-                //edc.mre.WaitOne();
             } while (!edc.mre.WaitOne());
-            //} while (edc.intTry < 3);
             trans.ecr = edc.ecr;
             trans.edcresp = trans.ecr.Substring(146, 2);
             trans.edcTid = trans.ecr.Substring(2, 8);
@@ -939,24 +973,21 @@
             if (trans.edcresp == "00")
             {
                 OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
-                trans.AddTrail("PAYMENT EDC", edc.respondCode, "00");
-
-                string msg = string.Empty;
-                string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
-                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+                trans.AddTrail("PAYMENT EDC", trans.edcresp, "00");
 
                 IsLoading = true;
                 pageClass = "main-panel bg-home";
             }else
             {
                 OurUtility.Write_Log("== Payment Via EDC Failed", "step-action");
-                trans.AddTrail("PAYMENT EDC", edc.respondCode, "01");
+                trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
             }
             //Console.WriteLine(trans.edcresp);
         }
         catch (Exception ex)
         {
             OurUtility.Write_Log("== Error EDC : "+ex.Message, "step-action");
+            trans.AddTrail("PAYMENT EDC", ex.Message, "01");
         }
     }
 
@@ -972,8 +1003,6 @@
         {
             await Task.Delay(200);
             edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
-
-            //Console.WriteLine(edc.respondCode);
 
         } while (!edc.mre.WaitOne());
         trans.ecrVoid = edc.ecr;
@@ -1005,19 +1034,12 @@
             trans.edcStatus = "VOIDED";
             OurUtility.Write_Log("== Payment Voided", "step-action");
             trans.AddTrail("VOID EDC", trans.edcRespVoid, "00");
-
-            string msg = string.Empty;
-            string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
-
-            Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
         }
         else
         {
             OurUtility.Write_Log("== Void Failed", "step-action");
             trans.AddTrail("VOID EDC", trans.edcRespVoid, "01");
-
         }
-
     }
 
     private async Task Payment(string strURL)
@@ -1036,7 +1058,7 @@
                                     "\"fee\" : \"" + trans.fee + "\"," +
                                     "\"bit61\" : \"" + trans.bit + "\"," +
                                     "\"edc\" : {" +
-                                    "\"responseCode\" : \"" + edc.respondCode + "\"," +
+                                    "\"responseCode\" : \"" + trans.edcresp + "\"," +
                                     "\"ecr\" : \"" + trans.ecr + "\"," +
                                     "\"sn\" : \"" + config.snEdc + "\"}" +
                                     "}";

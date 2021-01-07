@@ -262,7 +262,7 @@
             ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
 
-            if (strResult != "" || strResult != "Forbidden" || strResult != "NotFound")
+            if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
             {
                 try
                 {

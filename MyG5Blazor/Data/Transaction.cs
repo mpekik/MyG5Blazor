@@ -96,6 +96,8 @@ namespace MyG5Blazor.Data
             bit = string.Empty;
             fee = string.Empty;
             ecr = string.Empty;
+            ecrVoid = string.Empty;
+            edcRespVoid = string.Empty;
             edcTrace = string.Empty;
             edcApproval = string.Empty;
             edcresp = string.Empty;

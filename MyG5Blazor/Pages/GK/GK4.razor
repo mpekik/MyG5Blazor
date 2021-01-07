@@ -252,7 +252,7 @@
 
         if (cardStock == "")
         {
-            isFail = true; 
+            isFail = true;
             trans.AddTrail("GET STOCK", "CD - 004", "01");
             trans.status = "01";
             trans.errorCode = "CARD DISPENSER";
@@ -310,7 +310,7 @@
                 {
 
                     if (!cds.Start(ref errorcode, strCOM, ref msg))
-                    { 
+                    {
                         OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
                     }
                     else
@@ -350,7 +350,7 @@
                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                         //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                        if (strResult != "")
+                        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
                         {
                             try
                             {
@@ -385,7 +385,7 @@
                                             OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                                             //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                                            if (strResult != "" || strResult != "NotFound" || strResult != "Forbidden")
+                                            if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
                                             {
                                                 JObject jobjResult2 = JObject.Parse(strResult);
                                                 if ((string)jobjResult2["transaction"].SelectToken("statusCode") == "00")
@@ -483,7 +483,7 @@
                                         OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                                         trans.serviceErrorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
-                                        if ((string)jobjResult["transaction"].SelectToken("errorCode") == "303018") 
+                                        if ((string)jobjResult["transaction"].SelectToken("errorCode") == "303018")
                                         {
                                             trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
                                             //OurUtility.AuditTrail(trans, menu, cst);
@@ -642,7 +642,7 @@
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
         //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != "")
+        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
             {
