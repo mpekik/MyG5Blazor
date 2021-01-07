@@ -614,7 +614,7 @@ namespace MyG5Blazor.Data
                 Offset = Offset + lineheight8;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
 
-                int countMasked = _trx.edcCardNo.Length - 4;
+                int countMasked = _trx.edcCardNo.Length - 7;
                 string cardMasked = "************" + _trx.edcCardNo.Substring(countMasked);
                 e.Graphics.DrawString("CARD NO"
                               , font8, brush, layout, formatLeft);
@@ -859,7 +859,7 @@ namespace MyG5Blazor.Data
                 Offset = Offset + lineheight8;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
 
-                int countMasked = _trx.edcCardNo.Length - 4;
+                int countMasked = _trx.edcCardNo.Length - 7;
                 string cardMasked = "************" + _trx.edcCardNo.Substring(countMasked);
                 e.Graphics.DrawString("CARD NO"
                               , font8, brush, layout, formatLeft);
