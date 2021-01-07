@@ -159,17 +159,13 @@
                                  }
                                  else if (IsSuccess)
                                  {
-                                    <div class="col-md-6">
-                                        <div class="teks-title">Beli Pulsa Prabayar</div>
-                                        <div id="status-pay" class="teks-top teks-bold">Proses Pembelian Pulsa Prabayar <b class="green">Berhasil</b></div>
+                                    <div id="status-pay" class="teks-top teks-bold">Proses Pembelian Pulsa Prabayar <b class="green">Berhasil</b></div>
                                         <div id="teks-pastikan">
-                                            <div class="teks-center" style="margin-top: 32%;"> Terima kasih telah melakukan pengisian ulang pulsa senilai <b style="font-weight:bold;">Rp @intBill.ToString("N0")</b> </div>
+                                            <div class="teks-center"> Terima kasih telah melakukan pengisian ulang pulsa senilai <b style="font-weight:bold;">Rp @cst.intTagihanTerbayar.ToString("N0")</b> </div>
                                         </div>
                                         <div id="bayar2">
-                                            <div class="teks-bot" style="margin-top: 49%; line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @sisaPulsa.ToString("N0")</b></div>
+                                            <div class="teks-bot" style="line-height: 1;">Sisa pulsa Anda kini menjadi <b style="font-weight:bold;">Rp @sisaPulsa.ToString("N0")</b></div>
                                         </div>
-                                    </div>
-
                                  }
                             </div>
 
@@ -236,11 +232,6 @@
                                     </div>
                                 </div>
 
-                                <div class="col-md-6">
-                                    <div id="image-pulsa" class="image-center2">
-                                        <img src="../../assets/image/Logo/pulsa-prabayar.png" alt="" width="450px" height="280px">
-                                    </div>
-                                </div>
                             }
                             else if (IsFail)
                             {
@@ -530,7 +521,6 @@
                                 OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
                                 Void();
                             }
-                            await Print();
                             trans.status = "01";
                             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
@@ -717,7 +707,7 @@
                 resultCash = "01";
 
             //await Task.Delay(5000);
-            resultPayment = "00";
+            //resultPayment = "00";
             await Payment("");
             //Console.WriteLine("inttotal = " + inttotal);
             StateHasChanged();
@@ -769,7 +759,7 @@
     }
     private async Task VoidService()
     {
-        IsLoading = true;
+        //IsLoading = true;
         string myJson = string.Empty;
         string apiURL = "transaction/v1/void";
 
@@ -1088,9 +1078,9 @@
             myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                 "\"terminalId\" : \"" + trans.termID + "\"," +
                 "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
-                "\"amount\" : \"" + cst.intTagihan + "\"," +
+                "\"amount\" : \"" + cst.intTagihanTerbayar + "\"," +
                 "\"accountId\" : \"" + cst.accountId + "\"," +
-                "\"submitAmount\" : \"" + cst.intTagihan + "\"," +
+                "\"submitAmount\" : \"" + cst.intTagihanTerbayar + "\"," +
                 "\"lembarUang\" : \"" + cst.intUangCount + "\"," +
                                     "\"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
                                     "\"fee\" : \"" + trans.fee + "\"," +
@@ -1110,7 +1100,7 @@
             {
                 JObject jobjResult = JObject.Parse(strResult);
                 resultPayment = (string)jobjResult["transaction"].SelectToken("statusCode");
-
+                trans.resultPayment = resultPayment;
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");

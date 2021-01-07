@@ -112,6 +112,7 @@ namespace MyG5Blazor.Data
             edcTime = string.Empty;
             edcStatus = "FAILED";
             status = string.Empty;
+            resultPayment = string.Empty;
             jumlah_kartu = 0;
             kip = "-";
             _auditTrail.Clear();
