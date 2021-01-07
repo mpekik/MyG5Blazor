@@ -438,7 +438,8 @@
                     {
                         OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
                         IsLoading = true;
-                        await Task.Delay(2000);
+                        StateHasChanged();
+                        await Task.Delay(200);
                         intAccBill = intBill;
                         await Payment("");
 
@@ -449,6 +450,7 @@
                             IsFail = false;
                             IsSuccess = true;
                             //Console.WriteLine("Payment Success");
+                            StateHasChanged();
                             await Task.Delay(200);
 
                             if (trans.edcresp == "00")
@@ -579,6 +581,7 @@
                             trans.edcStatus = "SUCCESS";
                             IsLoading = false;
                             IsSuccess = true;
+                            StateHasChanged();
                             //Console.WriteLine("Payment Success");
                             await Task.Delay(200);
 
@@ -607,7 +610,8 @@
                             //IsVoid = true;
                             IsFail = true;
                             strInvoice = trans.edcTrace;
-                            await Task.Delay(2000);
+                            StateHasChanged();
+                            await Task.Delay(200);
                             if (trans.edcresp == "00")
                             {
 
