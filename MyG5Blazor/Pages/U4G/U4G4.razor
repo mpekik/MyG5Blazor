@@ -513,7 +513,7 @@
                                 }
                                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                                 {
-                                    trans.AddTrail("GET STRING PANJANG", "", "01");
+                                    trans.AddTrail("GET STRING PANJANG", "", "02");
                                     trans.errorCode = "SUDAH 4G";
                                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                                     isLoading = false;
