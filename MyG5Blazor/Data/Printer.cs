@@ -581,6 +581,11 @@ namespace MyG5Blazor.Data
                 Offset = Offset + lineheight10;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
 
+                e.Graphics.DrawString(_trx.transID
+                              , font8, brush, layout, formatCenter);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
                 e.Graphics.DrawString("_____________________________________"
                               , font8UnderLine, brush, layout, formatCenter);
                 Offset = Offset + lineheight8;
@@ -609,10 +614,10 @@ namespace MyG5Blazor.Data
                 Offset = Offset + lineheight8;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
 
-                e.Graphics.DrawString("SN"
+                e.Graphics.DrawString("CARD NO"
                               , font8, brush, layout, formatLeft);
                 layout = new RectangleF(new PointF(_startX+50, _startY + Offset), layoutSize);
-                e.Graphics.DrawString(": " + _cfg.snEdc
+                e.Graphics.DrawString(": " + _trx.edcCardNo
                               , font8, brush, layout, formatLeft);
                 Offset = Offset + lineheight8;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
@@ -819,6 +824,11 @@ namespace MyG5Blazor.Data
                 Offset = Offset + lineheight10;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
 
+                e.Graphics.DrawString(_trx.transID
+                              , font8, brush, layout, formatCenter);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
                 e.Graphics.DrawString("_____________________________________"
                               , font8UnderLine, brush, layout, formatCenter);
                 Offset = Offset + lineheight8;
@@ -830,6 +840,9 @@ namespace MyG5Blazor.Data
                 e.Graphics.DrawString("TIME : " + _dtNow.ToString("HH:mm:ss")
                               , font8, brush, layout, formatRight);
                 Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+                
+                Offset = Offset + lineheight6;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
 
                 e.Graphics.DrawString("TID"
@@ -844,10 +857,10 @@ namespace MyG5Blazor.Data
                 Offset = Offset + lineheight8;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
 
-                e.Graphics.DrawString("SN : " + _cfg.snEdc
+                e.Graphics.DrawString("CARD NO"
                               , font8, brush, layout, formatLeft);
                 layout = new RectangleF(new PointF(_startX + 50, _startY + Offset), layoutSize);
-                e.Graphics.DrawString(": " + _cfg.snEdc
+                e.Graphics.DrawString(": " + _trx.edcCardNo
                               , font8, brush, layout, formatLeft);
                 Offset = Offset + lineheight8;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
