@@ -204,7 +204,7 @@
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
 
-        if (strResult != "" || strResult != "Forbidden" || strResult != "NotFound" || strResult != "BadRequest" || strResult != "InternalServerError")
+        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError")
         {
             try
             {
@@ -214,7 +214,7 @@
                     isLoading = false;
                     trans.AddTrail("Request OTP", trans.psbDetail.alamatEmail, "00");
 
-                    NavigateTo("/PSB/2a");
+                    NavigateTo("/PSB/3a");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
@@ -307,7 +307,7 @@
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
 
-        if (strResult != "" || strResult != "Forbidden" || strResult != "NotFound" || strResult != "BadRequest" || strResult != "InternalServerError")
+        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError")
         {
             try
             {
@@ -416,7 +416,8 @@
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
 
-        if (strResult != "" || strResult != "Forbidden" || strResult != "NotFound" || strResult != "BadRequest" || strResult != "InternalServerError")
+        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
+            strResult != "BadRequest" && strResult != "InternalServerError")
         {
             try
             {
@@ -427,7 +428,13 @@
                     foreach ((var pp, Int32 i) in jobjResult.SelectToken("paket").Select((pp, i) => (pp, i)))
                     {
 
-                        menu.AddMenuPSB(pp.SelectToken("poolName").ToString(), pp.SelectToken("packageName").ToString(), pp.SelectToken("quotaInternet").ToString(), pp.SelectToken("quotaEntertainment").ToString(), pp.SelectToken("quotaTelepon").ToString(), pp.SelectToken("quotaTeleponLain").ToString(), pp.SelectToken("quotaSms").ToString(), pp.SelectToken("harga").ToString(), pp.SelectToken("hargaAwal").ToString());
+                        menu.AddMenuPSB2(pp.SelectToken("poolName").ToString(), pp.SelectToken("packageName").ToString(),
+                            pp.SelectToken("offerId").ToString(), pp.SelectToken("bid").ToString(),
+                            pp.SelectToken("offerName").ToString(), pp.SelectToken("varianName").ToString(),
+                            pp.SelectToken("harga").ToString(), pp.SelectToken("hargaAwal").ToString(),
+                            pp.SelectToken("dataAllnet").ToString(), pp.SelectToken("dataRoaming").ToString(),
+                            pp.SelectToken("dataContent").ToString(), pp.SelectToken("voiceSms").ToString(),
+                            pp.SelectToken("dataSubscription").ToString(), pp.SelectToken("buCode").ToString());
                     }
                     NavigateTo("/PSB/3a");
                 }

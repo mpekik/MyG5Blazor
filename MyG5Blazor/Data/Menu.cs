@@ -38,7 +38,7 @@ namespace MyG5Blazor.Data
         public string[] AssetsPNG = { "Menu_Bayar_Tagihan.png", "Menu_Upgrade4G.png", "Menu_Beli_Pulsa.png", "Menu_Ganti_kartu.png" };
         public string[] apiURL = { "bayar-halo/v1/init", "upgrade-4g/v1/init", "isi-pulsa/v1/init", "ganti-kartu/v1/init" };
         public string[] stringMenu = { "1", "1", "1", "1", "1" };
-        
+
         public class MenuPSB
         {
             public string _poolName { get; set; }
@@ -53,10 +53,28 @@ namespace MyG5Blazor.Data
             public string _satuanTelpLain { get; set; }
             public string _smsTsel { get; set; }
             public string _satuanSMSTsel { get; set; }
-            public string _nominal { get; set; }
+            public string _harga { get; set; }
             public string _hargaAwal { get; set; }
-        }
 
+            public string _packageName { get; set; }
+            public string _offerId { get; set; }
+            public string _bid { get; set; }
+            public string _offerName { get; set; }
+            public string _varianName { get; set; }
+            public string _dataAllnet { get; set; }
+            public string _dataRoaming { get; set; }
+            public string _dataContent { get; set; }
+            public string _voiceSms { get; set; }
+            public string _dataSubscription { get; set; }
+            public string _buCode { get; set; }
+        }
+        public void ClearPSB()
+        {
+            psbIndex = 0;
+            pageIndex = 0;
+            psbNomer.Clear();
+            _menuPSB.Clear();
+        }
         public List<string> psbNomer = new List<string>();
         public int psbIndex = 0;
         public int pageIndex = 0;
@@ -66,18 +84,40 @@ namespace MyG5Blazor.Data
             MenuPSB menuPSB = new MenuPSB();
             menuPSB._poolName = pool;
             menuPSB._Header = header;
-            menuPSB._internet = internet.Substring(0,internet.Length - 3);
-            menuPSB._satuanInternet= internet.Substring(internet.Length - 3);
-            menuPSB._entertainment = entertainment.Substring(0, entertainment.Length - 3);
-            menuPSB._satuanEntertainment = entertainment.Substring(entertainment.Length - 3);
-            menuPSB._telpTsel = telpTsel.Substring(0, telpTsel.Length - 6);
-            menuPSB._satuanTelpTsel = telpTsel.Substring(telpTsel.Length - 6);
-            menuPSB._telpLain = telpLain.Substring(0, telpLain.Length - 6);
-            menuPSB._satuanTelpLain = telpLain.Substring(telpLain.Length - 6);
-            menuPSB._smsTsel = smsTsel.Substring(0, smsTsel.Length - 4);
-            menuPSB._satuanSMSTsel = smsTsel.Substring(smsTsel.Length - 4);
-            menuPSB._nominal = int.Parse(nominal).ToString();
+            menuPSB._internet = internet;//.Substring(0,internet.Length - 3);
+            //menuPSB._satuanInternet= internet.Substring(internet.Length - 3);
+            menuPSB._entertainment = entertainment;//.Substring(0, entertainment.Length - 3);
+            //menuPSB._satuanEntertainment = entertainment.Substring(entertainment.Length - 3);
+            menuPSB._telpTsel = telpTsel;//.Substring(0, telpTsel.Length - 6);
+            //menuPSB._satuanTelpTsel = telpTsel.Substring(telpTsel.Length - 6);
+            menuPSB._telpLain = telpLain;//.Substring(0, telpLain.Length - 6);
+            //menuPSB._satuanTelpLain = telpLain.Substring(telpLain.Length - 6);
+            menuPSB._smsTsel = smsTsel;//.Substring(0, smsTsel.Length - 4);
+            //menuPSB._satuanSMSTsel = smsTsel.Substring(smsTsel.Length - 4);
+            menuPSB._harga = int.Parse(nominal).ToString();
             menuPSB._hargaAwal = int.Parse(hargaAwal).ToString();
+            _menuPSB.Add(menuPSB);
+        }
+
+        public void AddMenuPSB2(string poolName, string packageName, string offerId, string bid, 
+            string offerName, string varianName, string harga, string hargaAwal, string dataAllnet, 
+            string dataRoaming, string dataContent, string voiceSms, string dataSubscription, string buCode)
+        {
+            MenuPSB menuPSB = new MenuPSB();
+            menuPSB._poolName = poolName;
+            menuPSB._packageName = packageName;
+            menuPSB._offerId = offerId;
+            menuPSB._bid = bid;
+            menuPSB._offerName = offerName;
+            menuPSB._varianName = varianName;
+            menuPSB._harga = int.Parse(harga).ToString();
+            menuPSB._hargaAwal = int.Parse(hargaAwal).ToString();
+            menuPSB._dataAllnet = dataAllnet;
+            menuPSB._dataRoaming = dataRoaming;
+            menuPSB._dataContent = dataContent;
+            menuPSB._voiceSms = voiceSms;
+            menuPSB._dataSubscription = dataSubscription;
+            menuPSB._buCode = buCode;
             _menuPSB.Add(menuPSB);
         }
         public class MenuPulsa

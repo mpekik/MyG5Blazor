@@ -35,6 +35,8 @@ namespace MyG5Blazor.Data
             public string batasPemakaian { get; set; }
             public bool isTC { get; set; } = false;
             public bool isEbill { get; set; } = false;
+            public string selectedBuCode { get; set; }
+            public string reserveId { get; set; }
         }
 
         public PSBDetail psbDetail = new PSBDetail();
@@ -115,6 +117,7 @@ namespace MyG5Blazor.Data
             resultPayment = string.Empty;
             jumlah_kartu = 0;
             kip = "-";
+            psbDetail = new PSBDetail();
             _auditTrail.Clear();
         }
 

@@ -594,20 +594,104 @@
         }
     }
 
-    private async Task CheckPerso()
+    private bool MoveToICC()
     {
-        if (!isLoading && !isSuccess && !isFail && !isVisible)
+        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
         {
-            isLoading = true;
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " + errorcode + "message: " + msg, "step-action");
+            return false;
         }
-        else if (isLoading && !isSuccess)
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card", "step-action");
+        if (!cds.MoveTo_IC_Card(ref errorcode, ref msg))
         {
-            isLoading = false;
-            if (intTryCount <= intTryLimit)
-                intTryCount += 1;
-            else
-                isFail = true;
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card, Failed " + errorcode + " message : " + msg, "step-action");
+            return false;
         }
+        trans.AddTrail("MOVE TO ICC", "", "00");
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return true;
+    }
+
+    private bool MoveToTheFront()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
+        if (!cds.MoveTo_The_Front(ref errorcode, ref msg))
+        {
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed", "step-action");
+            return false;
+        }
+
+        trans.AddTrail("MOVE TO FRONT", "", "00");
+        stock = stock - 1;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
+
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return true;
+    }
+
+    private bool MoveToBin()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
+        if (!cds.MoveTo_Bin(ref errorcode, ref msg))
+        {
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin, Failed " + errorcode + " message : " + msg, "step-action");
+            return false;
+        }
+
+        trans.AddTrail("MOVE TO BIN", "", "00");
+        stock = stock - 1;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
+
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return true;
+    }
+
+    private async Task<bool> CardReaderScan()
+    {
+        bool ret = false;
+
+        OurUtility.Write_Log("=== Card Reader Scan IC", "step-action");
+        Card_Reader cdr = new Card_Reader();
+        OurUtility.Write_Log("==== 1. Card_Reader.Read", "step-action");
+        if (await Task.Run(() => cdr.Read(readerName, ref p_icc_id, ref msg)).ConfigureAwait(true))
+        {
+            ret = true;
+            cdr.DisconnectedCard();
+        }
+        return ret;
     }
 
     private void InputNPS1(string strInput)
@@ -695,106 +779,6 @@
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             //NavMan.NavigateTo("/error");
         }
-    }
-
-    private bool MoveToICC()
-    {
-        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
-        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
-        {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " + errorcode + "message: " + msg, "step-action");
-            return false;
-        }
-        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
-        cds.Initialize(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card", "step-action");
-        if (!cds.MoveTo_IC_Card(ref errorcode, ref msg))
-        {
-            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card, Failed " + errorcode + " message : " + msg, "step-action");
-            return false;
-        }
-        trans.AddTrail("MOVE TO ICC", "", "00");
-        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        return true;
-    }
-
-    private bool MoveToTheFront()
-    {
-        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
-        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
-        {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
-            return false;
-        }
-        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
-        cds.Initialize(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
-        if (!cds.MoveTo_The_Front(ref errorcode, ref msg))
-        {
-            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed", "step-action");
-            return false;
-        }
-
-        trans.AddTrail("MOVE TO FRONT", "", "00");
-        stock = stock - 1;
-        trans.jumlah_kartu = stock;
-        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
-
-        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        return true;
-    }
-
-    private bool MoveToBin()
-    {
-        OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
-        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
-        {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
-            return false;
-        }
-        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
-        cds.Initialize(ref errorcode, ref msg);
-        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
-        if(!cds.MoveTo_Bin(ref errorcode, ref msg))
-        {
-            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin, Failed " + errorcode + " message : " + msg, "step-action");
-            return false;
-        }
-
-        trans.AddTrail("MOVE TO BIN", "", "00");
-        stock = stock - 1;
-        trans.jumlah_kartu = stock;
-        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
-
-        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
-        cds.Stop(ref msg);
-        return true;
-    }
-
-    private async Task<bool> CardReaderScan()
-    {
-        bool ret = false;
-
-        OurUtility.Write_Log("=== Card Reader Scan IC", "step-action");
-        Card_Reader cdr = new Card_Reader();
-        OurUtility.Write_Log("==== 1. Card_Reader.Read", "step-action");
-        if (await Task.Run(() => cdr.Read(readerName, ref p_icc_id, ref msg)).ConfigureAwait(true))
-        {
-            ret = true;
-            cdr.DisconnectedCard();
-        }
-        return ret;
     }
 
     private async Task Print()

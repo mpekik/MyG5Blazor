@@ -188,7 +188,7 @@
     private void Nominal(int intNominal)
     {
         cst.intTagihan = intNominal;
-        trans.AddTrail("CHOOSE NOMINAL", cst.intTagihan.ToString(), "SUCCESS");
+        trans.AddTrail("CHOOSE NOMINAL", cst.intTagihan.ToString(), "00");
         NavMan.NavigateTo("/IP/3");
     }
     private async Task PopulatePulsa()
@@ -207,14 +207,14 @@
     }
     private async Task MainMenu()
     {
-        trans.AddTrail("CHOOSE NOMINAL", "BACK TO MAIN MENU", "CANCELED BY USER");
+        trans.AddTrail("CHOOSE NOMINAL", "BACK TO MAIN MENU", "02");
         trans.status = "02";
         await OurUtility.AuditTrail(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
     private async Task Back()
     {
-        trans.AddTrail("CHOOSE NOMINAL", "BACK TO INPUT NUMBER", "CANCELED BY USER");
+        trans.AddTrail("CHOOSE NOMINAL", "BACK TO INPUT NUMBER", "02");
         trans.status = "02";
         await OurUtility.AuditTrail(trans, menu, cst);
         NavMan.NavigateTo("/IP/1");

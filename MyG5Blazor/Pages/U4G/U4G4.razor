@@ -570,7 +570,7 @@
                 }
                 else
                 {
-                    trans.AddTrail("GET SN", "", "01");
+                    trans.AddTrail("MOVE TO FRONT", "CD - 001", "01");
                     trans.status = "01";
                     trans.errorCode = "CARD DISPENSER";
                     await OurUtility.AuditTrail(trans, menu, cst);

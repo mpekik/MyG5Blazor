@@ -44,7 +44,7 @@
                                         <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[0]</h4>
                                         <div class="row">
                                             <div class="col-md-6" style="display: flex;">
-                                                <p class="card-header nominal-kuota">@menuInternet[0]</p>
+                                                <p class="card-header nominal-kuota">@menuDataAllNet[0]</p>
                                                 <p class="card-header giga-bytes">GB</p>
                                             </div>
                                             <div class="col-md-6">
@@ -241,22 +241,45 @@
         </div>
     </div>
 }
+@if (isLoading)
+{
+    <div id="myModal" class="modal">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
 
 @code
 {
-    private string[] menuPoolName = { "", "", "", "" };
-    private string[] menuHeader = { "", "", "", "" };
-    private string[] menuInternet = { "", "", "", "" };
-    private string[] menuEntertainment = { "", "", "", "" };
-    private string[] menuTelpTsel = { "", "", "", "" };
-    private string[] menuTelpLain = { "", "", "", "" };
-    private string[] menuSMSTsel = { "", "", "", "" };
-    private string[] menuNominal = { "", "", "", "" };
-    private string[] menuHargaAwal = { "", "", "", "" };
-    private bool[] menuEnabled = { false, false, false, false };
+    private string[] menuPoolName = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuHeader = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuInternet = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuEntertainment = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuTelpTsel = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuTelpLain = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuSMSTsel = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuNominal = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuHargaAwal = { "", "", "", "", "", "", "", "", "", "" };
+
+    private string[] menuPackageName = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuOfferId = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuBid = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuOfferName = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuVarianName = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuDataAllNet = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuDataRoaming = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuDataContent = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuVoiceSms = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuDataSubscription = { "", "", "", "", "", "", "", "", "", "" };
+
+    private bool[] menuEnabled = { false, false, false, false, false, false, false, false, false, false };
 
     private bool isTimeOut = false;
     private bool isSelected = false;
+    private bool isLoading = false;
 
     private int paramMenu = 0;
 
@@ -268,12 +291,13 @@
     {
         await Task.Delay(5000);
         trans.psbDetail.selectedPaket = menuPoolName[paramMenu];
-        foreach(var pp in menu._menuPSB)
+        //trans.psbDetail.selectedBuCode = menuBid[paramMenu];
+        foreach (var pp in menu._menuPSB)
         {
-            if(trans.psbDetail.selectedPaket == pp._poolName)
+            if (trans.psbDetail.selectedPaket == pp._poolName)
             {
                 trans.psbDetail.PaketPSB = pp;
-                int tempBatasPemakaian = int.Parse(trans.psbDetail.PaketPSB._nominal);
+                int tempBatasPemakaian = int.Parse(trans.psbDetail.PaketPSB._harga);
                 trans.psbDetail.batasPemakaian = (tempBatasPemakaian * 2).ToString();
                 break;
             }
@@ -294,14 +318,25 @@
         for (int i = 0; i < menu._menuPSB.Count(); i++)
         {
             menuPoolName[i] = menu._menuPSB[i]._poolName;
-            menuHeader[i] = menu._menuPSB[i]._Header;
-            menuInternet[i] = menu._menuPSB[i]._internet;
-            menuEntertainment[i] = menu._menuPSB[i]._entertainment;
-            menuTelpTsel[i] = menu._menuPSB[i]._telpTsel;
-            menuTelpLain[i] = menu._menuPSB[i]._telpLain;
-            menuSMSTsel[i] = menu._menuPSB[i]._smsTsel;
-            menuNominal[i] = menu._menuPSB[i]._nominal;
+            menuHeader[i] = menu._menuPSB[i]._packageName;
+            //menuInternet[i] = menu._menuPSB[i]._internet;
+            //menuEntertainment[i] = menu._menuPSB[i]._entertainment;
+            //menuTelpTsel[i] = menu._menuPSB[i]._telpTsel;
+            //menuTelpLain[i] = menu._menuPSB[i]._telpLain;
+            //menuSMSTsel[i] = menu._menuPSB[i]._smsTsel;
+            menuNominal[i] = menu._menuPSB[i]._harga;
             menuHargaAwal[i] = menu._menuPSB[i]._hargaAwal;
+
+            menuOfferId[i] = menu._menuPSB[i]._offerId;
+            menuBid[i] = menu._menuPSB[i]._bid;
+            menuOfferName[i] = menu._menuPSB[i]._offerName;
+            menuVarianName[i] = menu._menuPSB[i]._varianName;
+            menuDataAllNet[i] = menu._menuPSB[i]._dataAllnet;
+            menuDataRoaming[i] = menu._menuPSB[i]._dataRoaming;
+            menuDataContent[i] = menu._menuPSB[i]._dataContent;
+            menuVoiceSms[i] = menu._menuPSB[i]._voiceSms;
+            menuDataSubscription[i] = menu._menuPSB[i]._dataSubscription;
+
             menuEnabled[i] = true;
         }
     }
