@@ -1,4 +1,4 @@
-﻿@page "/PSB/8b"
+﻿@page "/PSB/9a"
 
 @using MyG5Blazor.Data 
 
@@ -7,6 +7,7 @@
 @inject NavigationManager NavMan
 @inject Transaction trans
 @inject Menu menu
+@inject Config cfg
 
     <div class="main-panel bg-home">
         <!-- Navbar -->
@@ -26,11 +27,11 @@
             <div class="container-fluid">
                 <div class="row">
                     <div class="col-md-6">
-                        <div class="teks-title">Berlangganan Kartu Halo</div>
+                        <div class="teks-title">Berlangganan KartuHalo</div>
                         <div id="teks-konfirmasi">
                             <div class="teks-status"> Konfirmasi Pembayaran Proses<br> Berlangganan KartuHalo</div>
                         </div>
-                        @if (false)
+                        @if (trans.intPayment==2)
                         {
                         <div id="info">
                             <div class="teks-footer2" style="font-weight: bold;">
@@ -47,22 +48,22 @@
                                     <tr>
                                         <td>Nomor</td>
                                         <td> &emsp;&emsp; : </td>
-                                        <td>&emsp;<span style="font-weight: bold;">081388889999</span></td>
+                                        <td>&emsp;<span style="font-weight: bold;">0<span>@trans.psbDetail.selectedNumber.Substring(2)</span></span></td>
                                     </tr>
                                     <tr>
                                         <td>Nominal</td>
                                         <td>&emsp;&emsp; : </td>
-                                        <td>&emsp;<span style="font-weight: bold;">Rp 54.321</span></td>
+                                        <td>&emsp;<span style="font-weight: bold;">Rp @trans.psbDetail.PaketPSB._hargaAwal</span></td>
                                     </tr>
                                     <tr>
                                         <td>Paket</td>
                                         <td>&emsp;&emsp; : </td>
-                                        <td>&emsp;<span style="font-weight: bold;">Halo Kick Platinum</span></td>
+                                        <td>&emsp;<span style="font-weight: bold;">@trans.psbDetail.PaketPSB._offerName</span></td>
                                     </tr>
                                     <tr>
                                         <td>Metode Bayar</td>
                                         <td>&emsp;&emsp; : </td>
-                                        <td>&emsp;<span style="font-weight: bold;">Tunai (Uang Pas)</span></td>
+                                        <td>&emsp;<span style="font-weight: bold;">@trans.paymentMethod</span></td>
                                     </tr>
                                 </table>
                                 <button class="btn btn-danger btn-right" onclick="buttonOk()" id="btn-ok" value="">OK</button>
@@ -83,14 +84,14 @@
                 <span class="dot2">5</span>
                 <span class="dot2">6</span>
                 <span class="dot2">7</span>
-                <span class="dot2" id="dot-active">8</span>
-                <span class="dot2">9</span>
+                <span class="dot2">8</span>
+                <span class="dot2" id="dot-active">9</span>
             </div>
             <div class="footer-side2">
 
                 <button @onclick="@(() => NavigateTo("/PSB/8a"))" class="btn-arrow btn" value="">Kembali</button>
 
-                <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu<br>Utama</button>
+                <button @onclick="MainMenuCanceled" class="btn-arrow btn" value="">Menu<br>Utama</button>
                 <!-- <sup>Powered By </sup>Trilogi Persada -->
             </div>
         </footer>
@@ -115,7 +116,7 @@
     private string strTotalTagihan => intTotalTagihan.ToString();
     protected override async Task OnInitializedAsync()
     {
-        //TotalTagihan();
+
     }
 
     private void buttonOk()
@@ -128,15 +129,7 @@
         cst.intTagihan = intNominal;
     }
 
-    private void TotalTagihan()
-    {
-        foreach (dynamic t in cst.GetlistTagihan)
-        {
-            intTotalTagihan += t._intTagihan;
-        }
-        cst.intTagihan = intTotalTagihan;
-    }
-    private async Task MainMenu()
+    private async Task MainMenuCanceled()
     {
         if (translog)
         {
@@ -149,6 +142,7 @@
             NavMan.NavigateTo("/main");
         }
     }
+    
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);

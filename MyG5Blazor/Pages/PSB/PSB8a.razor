@@ -219,7 +219,7 @@
 
                         string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                         "\"terminalId\" : \"" + menu.terminalId + "\"," +
-                                        "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                                        "\"noHp\" : \"" + trans.psbDetail.selectedNumber + "\"," +
                                         "\"buid\" : \"" + config.apiBuid + "\"," +
                                         "\"serialNumber\" : \"" + p_icc_id + "\"" +
                                         "}";
@@ -228,7 +228,8 @@
                         OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                         //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
+                        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" &&
+                            strResult != "BadRequest" && strResult != "Forbidden")
                         {
                             try
                             {
@@ -257,13 +258,14 @@
                                             myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                             "\"terminalId\" : \"" + trans.termID + "\"," +
                                             "\"persoId\" : \"" + trans.persoID + "\" ," +
-                                            "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                                            "\"noHp\" : \"" + trans.psbDetail.selectedNumber + "\"," +
                                             "\"persoStatus\" : \"2\"}";
                                             OurUtility.Write_Log("=== Update Perso Status", "step-action");
                                             OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                                             //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
-                                            if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
+                                            if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
+            strResult != "BadRequest" && strResult != "InternalServerError")
                                             {
                                                 JObject jobjResult2 = JObject.Parse(strResult);
                                                 if ((string)jobjResult2["transaction"].SelectToken("statusCode") == "00")
