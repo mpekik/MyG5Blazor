@@ -581,26 +581,32 @@
                 }
                 else
                 {
+                    isError = true;
+                    isSuccess = false;
+                    isFail = false;
                     trans.AddTrail("MOVE TO IC", "CD - 001", "01");
                     trans.status = "01";
                     trans.errorCode = "CARD DISPENSER";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    //await OurUtility.AuditTrail(trans, menu, cst);
                     OurUtility.Write_Log("=== Card Dispenser Error", "step-action");
                     trans.errorCode = "CD - 001";
-                    NavigateTo("/error");
-                    break;
+                    //NavigateTo("/error");
+                    return;
                 }
             }
             else
             {
+                isError = true;
+                isSuccess = false;
+                isFail = false;
                 trans.AddTrail("GET STOCK", "", "01");
                 trans.status = "01";
                 trans.errorCode = "KARTU HABIS";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                //await OurUtility.AuditTrail(trans, menu, cst);
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
-                NavigateTo("/error");
-                break;
+                //NavigateTo("/error");
+                return;
             }
         }
     }
