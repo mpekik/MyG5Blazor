@@ -208,9 +208,10 @@
                     //ToDO if Reader error
                     if (await CardReaderScan())
                     {
-                        trans.AddTrail("GET SN", p_icc_id, "00");
+                        trans.AddTrail("GET SN","SN Kartu : " + p_icc_id, "00");
                         if (p_icc_id.Substring(2, 2) == "62")
                         {
+                            await Task.Run(() => MoveToRFCard());
                             await Task.Run(() => MoveToBin());
                             if (intTryCount < intTryLimit)
                             {
@@ -307,7 +308,8 @@
                                             }
                                             else
                                             {
-                                                trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "01");
+                                                trans.AddTrail("UPDATE BERHASIL PERSO","Perso Id : " + trans.persoID, "01");
+                                                await Task.Run(() => MoveToRFCard());
                                                 if (!await Task.Run(() => MoveToBin()))
                                                 {
                                                     isSuccess = false;
@@ -327,8 +329,9 @@
                                         }
                                         else
                                         {
-                                            trans.AddTrail("PERSO", trans.persoID, "01");
+                                            trans.AddTrail("PERSO", "Perso Id : " + trans.persoID, "01");
                                             trans.mypersoResponse = msg;
+                                            await Task.Run(() => MoveToRFCard());
                                             await Task.Run(() => MoveToBin());
 
                                             myURL = _myURL + updateURL;
@@ -355,6 +358,7 @@
                                     else
                                     {
                                         trans.AddTrail("GET STRING PANJANG", "", "01");
+                                        await Task.Run(() => MoveToRFCard());
                                         await Task.Run(() => MoveToBin());
                                         if (intTryCount < intTryLimit)
                                             intTryCount += 1;
@@ -389,6 +393,7 @@
                                     }
                                     trans.status = "01";
                                     trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
+                                    await Task.Run(() => MoveToRFCard());
                                     if (!await Task.Run(() => MoveToBin()))
                                     {
                                         isSuccess = false;
@@ -440,6 +445,7 @@
                     {
                         trans.status = "01";
                         trans.AddTrail("GET SN", "CR - 001", "01");
+                        await Task.Run(() => MoveToRFCard());
                         if (!await Task.Run(() => MoveToBin()))
                         {
                             isSuccess = false;
@@ -539,7 +545,32 @@
         cds.Stop(ref msg);
         return true;
     }
+    private bool MoveToRFCard()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To The RF Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_RF", "step-action");
+        if (!cds.MoveTo_RF_Card(ref errorcode, ref msg))
+        {
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToRFCard, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== " + msg, "step-action");
+        trans.AddTrail("MOVE TO RF", "", "00");
 
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return true;
+    }
     private bool MoveToBin()
     {
         OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
