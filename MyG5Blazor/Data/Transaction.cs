@@ -15,6 +15,8 @@ namespace MyG5Blazor.Data
         public string serviceErrorCode { get; set; }
         public string mypersoResponse { get; set; }
         public string persoID { get; set; }
+        private string[] arrayMPembayaran = { "", "Kartu Debit (Ber Pin)", "Tunai (Uang Pas)", "Kartu Kredit (Ber Pin)" };
+        public string strMPembayaran => arrayMPembayaran[intPayment];
         public string paymentMethod => _payment[intPayment];
         public int intPayment { get; set; }
         public long startTime { get; set; }

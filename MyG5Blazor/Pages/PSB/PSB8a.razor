@@ -137,7 +137,7 @@
         cst.intMPembayaran = _intMPembayaran;
         trans.intPayment = _intMPembayaran;
 
-        #region Payment
+        #region Perso
         //if (cardStock == "")
         //{
         //    isFail = true;
@@ -159,16 +159,12 @@
         //    isLoading = false;
         //    trans.status = "01";
         //    await OurUtility.AuditTrail(trans, menu, cst);
-        //    NavMan.NavigateTo("/error");
+        //    NavigateTo("/error");
         //}
         //else if (isSuccess)
         //{
         //    isLoading = false;
-        //    trans.status = "00";
-        //    trans.errorCode = "BERHASIL GANTI KARTU HILANG/RUSAK";
-        //    trans.kip = "Berhasil, terminal id:" + menu.terminalId;
-        //    NavigateTo("/PSB/8b");
-
+        //    NavigateTo("/PSB/9a");
         //}
         //else if (isFail)
         //{
@@ -178,27 +174,7 @@
         //}
         #endregion
 
-        #region Perso
-        await MyPerso();
-        #endregion
-        if (isError)
-        {
-            isLoading = false;
-            trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
-            NavigateTo("/error");
-        }
-        else if (isSuccess)
-        {
-            isLoading = false;
-            NavigateTo("/PSB/9a");
-        }
-        else if (isFail)
-        {
-            isLoading = false;
-            trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
-        }
+        NavigateTo("/PSB/9a");
     }
 
     private async Task MyPerso()
