@@ -2061,6 +2061,7 @@ namespace MyG5Blazor.Data
             }
             return bmp;
         }
+
         public async Task FPReader()
         {
             try

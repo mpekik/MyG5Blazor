@@ -96,7 +96,6 @@
 
     private string cardStock = string.Empty;
 
-    public string serviceURL = "bayar-halo/v1/get-bill";
     private string _termID = string.Empty;
     private string msg = string.Empty;
     private string errorcode = string.Empty;
@@ -108,6 +107,7 @@
     private string p_icc_id = string.Empty;
     private string persoURL = "psb-halo/v1/perso";
     private string updateURL = "psb-halo/v1/update-perso";
+    private string nomerTes = "628116833737";
 
     private int intTotalTagihan = 0;
     private int stock = 0;
@@ -135,44 +135,52 @@
         cst.intMPembayaran = _intMPembayaran;
         trans.intPayment = _intMPembayaran;
 
-        if (cardStock == "")
-        {
-            isFail = true;
-            trans.AddTrail("GET STOCK", "CD - 004", "01");
-            trans.status = "01";
-            trans.errorCode = "CARD DISPENSER";
-            await OurUtility.AuditTrail(trans, menu, cst);
-            trans.errorCode = "CD - 004";
-            OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
-            NavigateTo("/error");
-            return;
-        }
-        stock = Int32.Parse(cardStock);
-        OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
-        isLoading = true;
-        await MyPerso();
-        if (isError)
-        {
-            isLoading = false;
-            trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
-            NavMan.NavigateTo("/error");
-        }
-        else if (isSuccess)
-        {
-            isLoading = false;
-            trans.status = "00";
-            trans.errorCode = "BERHASIL GANTI KARTU HILANG/RUSAK";
-            trans.kip = "Berhasil, terminal id:" + menu.terminalId;
-            NavigateTo("/PSB/8b");
+        #region Payment
+        //if (cardStock == "")
+        //{
+        //    isFail = true;
+        //    trans.AddTrail("GET STOCK", "CD - 004", "01");
+        //    trans.status = "01";
+        //    trans.errorCode = "CARD DISPENSER";
+        //    await OurUtility.AuditTrail(trans, menu, cst);
+        //    trans.errorCode = "CD - 004";
+        //    OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
+        //    NavigateTo("/error");
+        //    return;
+        //}
+        //stock = Int32.Parse(cardStock);
+        //OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
+        //isLoading = true;
+        //await MyPerso();
+        //if (isError)
+        //{
+        //    isLoading = false;
+        //    trans.status = "01";
+        //    await OurUtility.AuditTrail(trans, menu, cst);
+        //    NavMan.NavigateTo("/error");
+        //}
+        //else if (isSuccess)
+        //{
+        //    isLoading = false;
+        //    trans.status = "00";
+        //    trans.errorCode = "BERHASIL GANTI KARTU HILANG/RUSAK";
+        //    trans.kip = "Berhasil, terminal id:" + menu.terminalId;
+        //    NavigateTo("/PSB/8b");
 
-        }
-        else if (isFail)
-        {
-            isLoading = false;
-            trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
-        }
+        //}
+        //else if (isFail)
+        //{
+        //    isLoading = false;
+        //    trans.status = "01";
+        //    await OurUtility.AuditTrail(trans, menu, cst);
+        //}
+        #endregion
+
+        #region Perso
+        await MyPerso();
+        #endregion
+
+        NavigateTo("/PSB/9a");
     }
 
     private async Task MyPerso()
@@ -217,9 +225,12 @@
                         }
                         string myURL = _myURL + persoURL;
 
+                        trans.transID = "X002210112174958427984287";
+                        config.apiBuid = "2503";
+
                         string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                         "\"terminalId\" : \"" + menu.terminalId + "\"," +
-                                        "\"noHp\" : \"" + trans.psbDetail.selectedNumber + "\"," +
+                                        "\"noHp\" : \"" + nomerTes + "\"," +
                                         "\"buid\" : \"" + config.apiBuid + "\"," +
                                         "\"serialNumber\" : \"" + p_icc_id + "\"" +
                                         "}";

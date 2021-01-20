@@ -364,12 +364,29 @@
     private string strTrace = "";
     private async Task Payment()
     {
-        string strInvoice = "1";
-        string strBilling = "2";
-        string strBill = "1000";
-        int MetodePembayaran = 1;
-        string strCOM = "COM" + config.Read("EDC", Config.PARAM_EDC_PORT);
-        await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+        //string strInvoice = "1";
+        //string strBilling = "2";
+        //string strBill = "1000";
+        //int MetodePembayaran = 1;
+        //string strCOM = "COM" + config.Read("EDC", Config.PARAM_EDC_PORT);
+        //await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+
+        trans.ecr = "0106115899000100206181158000001DEBITGOLD      000011000001D000005000000000005000000537176******8170                             210115085239362841000000000000110000000000000000000000000000                   000000                                                                                        ";
+        trans.edcresp = trans.ecr.Substring(146, 2);
+        trans.edcTid = trans.ecr.Substring(2, 8);
+        trans.edcMid = trans.ecr.Substring(10, 15);
+        trans.edcBatch = trans.ecr.Substring(25, 6);
+        trans.edcIssuer = trans.ecr.Substring(31, 15);
+        trans.edcRefNo = trans.ecr.Substring(46, 6);
+        trans.edcTrace = trans.ecr.Substring(52, 6);
+        trans.edcEntryCode = trans.ecr.Substring(58, 1);
+        trans.edcAmount = trans.ecr.Substring(59, 12);
+        trans.edcTotalAmount = trans.ecr.Substring(71, 12);
+        trans.edcCardNo = trans.ecr.Substring(83, 19);
+        trans.edcCardName = trans.ecr.Substring(102, 26);
+        trans.edcDate = trans.ecr.Substring(128, 6);
+        trans.edcTime = trans.ecr.Substring(134, 6);
+        trans.edcApproval = trans.ecr.Substring(140, 6);
     }
 
     private async Task Pay(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)

@@ -905,10 +905,6 @@
                     }
                     trans.AddTrail("CES", "", "01");
 
-                    //                    IsLoading = false;
-                    //                  IsVisible = false;
-                    //                IsInvalid = true;
-                    //NavMan.NavigateTo("/error");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                 {
@@ -1112,9 +1108,7 @@
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
-                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("errorCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");

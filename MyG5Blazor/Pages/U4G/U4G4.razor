@@ -324,9 +324,10 @@
                     //ToDO if Reader error
                     if (await CardReaderScan())
                     {
-                        trans.AddTrail("GET SN", p_icc_id, "00");
+                        trans.AddTrail("GET SN", "SN Kartu : " + p_icc_id, "00");
                         if (p_icc_id.Substring(2, 2) == "62")
                         {
+                            await Task.Run(() => MoveToRFCard());
                             await Task.Run(() => MoveToBin());
                             if (intTryCount < intTryLimit)
                             {
@@ -336,6 +337,7 @@
                             else
                             {
                                 isFail = true;
+                                trans.errorCode = "PERSO GAGAL";
                                 return;
                             }
                         }
@@ -365,7 +367,7 @@
                                     if (strPanjang != null)
                                     {
                                         trans.persoID = (string)jobjResult["perso"].SelectToken("persoId");
-                                        trans.AddTrail("GET STRING PANJANG", trans.persoID, "00");
+                                        trans.AddTrail("GET STRING PANJANG", "Perso Id : " + trans.persoID, "00");
                                         if (!cds.Start(ref errorcode, strCOM, ref msg))
                                         {
                                             OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
@@ -378,7 +380,7 @@
                                         if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
                                         {
                                             myURL = _myURL + updateURL;
-                                            trans.AddTrail("PERSO", trans.persoID, "00");
+                                            trans.AddTrail("PERSO", "Perso Id : " + trans.persoID, "00");
                                             myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
                                         "\"terminalId\" : \"" + trans.termID + "\"," +
                                         "\"persoId\" : \"" + trans.persoID + "\" ," +
@@ -393,9 +395,9 @@
                                                 JObject jobjResult2 = JObject.Parse(strResult);
                                                 if ((string)jobjResult2["transaction"].SelectToken("statusCode") == "00")
                                                 {
-                                                    trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "00");
-
+                                                    trans.AddTrail("UPDATE BERHASIL PERSO","Perso Id : " + trans.persoID, "00");
                                                     isLoading = false;
+
                                                     if (!await Task.Run(() => MoveToTheFront()))
                                                     {
                                                         isSuccess = false;
@@ -408,7 +410,8 @@
                                                         OurUtility.Write_Log("=== Card Dispenser Error, Move To Front", "step-action");
                                                         trans.errorCode = "CD - 002";
                                                         //NavigateTo("/error");
-                                                    }else
+                                                    }
+                                                    else
                                                     {
                                                         isSuccess = true;
                                                     }
@@ -418,7 +421,9 @@
                                             }
                                             else
                                             {
-                                                trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "01");
+                                                trans.AddTrail("UPDATE BERHASIL PERSO","Perso id : " + trans.persoID, "01");
+                                                trans.errorCode = "PERSO GAGAL";
+                                                await Task.Run(() => MoveToRFCard());
                                                 if (!await Task.Run(() => MoveToBin()))
                                                 {
                                                     isSuccess = false;
@@ -427,7 +432,7 @@
                                                     trans.status = "01";
                                                     //await OurUtility.AuditTrail(trans, menu, cst);
                                                     OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
-                                                    trans.errorCode = "CD - 004";
+                                                    trans.errorCode = "CD - 003";
                                                     //NavigateTo("/error");
                                                 }
                                                 trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
@@ -438,8 +443,10 @@
                                         }
                                         else
                                         {
-                                            trans.AddTrail("PERSO", trans.persoID, "01");
+                                            trans.AddTrail("PERSO", "Perso Id : " + trans.persoID, "01");
                                             trans.mypersoResponse = msg;
+
+                                            await Task.Run(() => MoveToRFCard());
                                             await Task.Run(() => MoveToBin());
 
                                             myURL = _myURL + updateURL;
@@ -451,7 +458,7 @@
                                             OurUtility.Write_Log("=== Update Perso Status", "step-action");
                                             OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-                                            trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "00");
+                                            trans.AddTrail("UPDATE GAGAL PERSO","Perso Id : " + trans.persoID, "00");
                                             //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                             if (intTryCount < intTryLimit)
                                                 intTryCount += 1;
@@ -459,19 +466,23 @@
                                             {
                                                 isFail = true;
                                                 trans.kip = "Perso gagal, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
+                                                trans.errorCode = "PERSO GAGAL";
                                                 return;
                                             }
                                         }
                                     }
                                     else
                                     {
-                                        trans.AddTrail("GET STRING PANJANG", "", "01");
+                                        trans.AddTrail("GET STRING PANJANG", "GET STRING PANJANG ERROR", "01");
+                                        await Task.Run(() => MoveToRFCard());
                                         await Task.Run(() => MoveToBin());
                                         if (intTryCount < intTryLimit)
                                             intTryCount += 1;
                                         else
                                         {
+                                            isLoading = false;
                                             isFail = true;
+                                            trans.errorCode = "PERSO GAGAL";
                                             return;
                                         }
                                     }
@@ -483,6 +494,7 @@
                                     {
                                         OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                                        trans.serviceErrorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                                         if ((string)jobjResult["transaction"].SelectToken("errorCode") == "303018")
                                         {
                                             trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
@@ -496,13 +508,15 @@
                                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                                     }
+                                    trans.status = "01";
                                     trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
+
+                                    await Task.Run(() => MoveToRFCard());
                                     if (!await Task.Run(() => MoveToBin()))
                                     {
                                         isSuccess = false;
                                         isError = true;
                                         trans.AddTrail("MOVE TO BIN", "", "01");
-                                        trans.status = "01";
                                         OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
                                         trans.errorCode = "CD - 003";
                                         return;
@@ -511,6 +525,7 @@
                                         intTryCount += 1;
                                     else
                                     {
+                                        isLoading = false;
                                         isFail = true;
                                         return;
                                     }
@@ -529,7 +544,7 @@
                             }
                             catch (Exception ex)
                             {
-                                trans.AddTrail("PERSO", trans.persoID, "01");
+                                trans.AddTrail("GET STRING PANJANG","Exception Error", "01");
                                 OurUtility.Write_Log("=== Status Code : " + ex.Message + " {Error}", "step-action");
                                 trans.errorCode = "Exception Error";
                                 isError = true;
@@ -538,7 +553,7 @@
                         }
                         else
                         {
-                            trans.AddTrail("PERSO", trans.persoID, "01");
+                            trans.AddTrail("GET STRING PANJANG", "Hit WebService Error", "01");
                             OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                             trans.errorCode = "Hit WebService Error : " + strResult;
                             isError = true;
@@ -547,13 +562,14 @@
                     }
                     else
                     {
+                        trans.status = "01";
                         trans.AddTrail("GET SN", "CR - 001", "01");
+                        await Task.Run(() => MoveToRFCard());
                         if (!await Task.Run(() => MoveToBin()))
                         {
                             isSuccess = false;
                             isError = true;
                             trans.AddTrail("MOVE TO BIN", "", "01");
-                            trans.status = "01";
                             OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
                             trans.errorCode = "CD - 003";
                             return;
@@ -570,7 +586,7 @@
                 }
                 else
                 {
-                    trans.AddTrail("MOVE TO FRONT", "CD - 001", "01");
+                    trans.AddTrail("MOVE TO IC", "CD - 001", "01");
                     trans.status = "01";
                     trans.errorCode = "CARD DISPENSER";
                     await OurUtility.AuditTrail(trans, menu, cst);
@@ -751,7 +767,32 @@
         cds.Stop(ref msg);
         return true;
     }
+    private bool MoveToRFCard()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To The RF Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_RF", "step-action");
+        if (!cds.MoveTo_RF_Card(ref errorcode, ref msg))
+        {
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToRFCard, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== " + msg, "step-action");
+        trans.AddTrail("MOVE TO RF", "", "00");
 
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return true;
+    }
     private bool MoveToBin()
     {
         OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");

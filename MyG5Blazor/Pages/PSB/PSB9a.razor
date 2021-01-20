@@ -48,7 +48,7 @@
                                     <tr>
                                         <td>Nomor</td>
                                         <td> &emsp;&emsp; : </td>
-                                        <td>&emsp;<span style="font-weight: bold;">0<span>@trans.psbDetail.selectedNumber.Substring(2)</span></span></td>
+                                        <td>&emsp;<span style="font-weight: bold;">@trans.psbDetail.selectedNumber</span></td>
                                     </tr>
                                     <tr>
                                         <td>Nominal</td>
@@ -142,7 +142,7 @@
             NavMan.NavigateTo("/main");
         }
     }
-    
+
     private void NavigateTo(string strURL)
     {
         NavMan.NavigateTo(strURL);
