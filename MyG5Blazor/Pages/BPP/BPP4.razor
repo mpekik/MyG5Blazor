@@ -1115,6 +1115,7 @@
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
                     sisaPulsa = int.Parse((string)jobjResult.SelectToken("amount"));
+                    trans.pulsaSerialNumber = (string)jobjResult.SelectToken("serialNumber");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
