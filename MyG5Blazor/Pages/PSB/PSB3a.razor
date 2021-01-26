@@ -28,7 +28,7 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="teks-title">Berlangganan Kartu Halo</div>
+                    <div class="teks-title">Berlangganan KartuHalo</div>
                     <div id="konfirmasi-teks" class="teks-status">Silakan Pilih Paket yang Anda Butuhkan</div>
                     <div class="teks-center3">Batas Pemakaian akan Mengikuti<br>2x Harga Paket yang Anda Pilih</div>
                     <div class="teks-bot">Penagihan Dilakukan pada Setiap<br> Tanggal 1 di Bulan Berikutnya</div>
@@ -38,36 +38,36 @@
                     <div class="form-input-data">
                         <div class="col-md-12" style="margin-left: 1.5%;">
                             <div class="form-group" style="display: flex;">
-                                @if (menuEnabled[0])
+                                @if (menuEnabled[0 + menu.packageIndex])
                                 {
-                                    <div class="card" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn" @onclick="@(()=>SelectPacket(0))">
-                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[0]</h4>
+                                    <div class="card" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn" @onclick="@(()=>SelectPacket(0+menu.packageIndex))">
+                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuVarianName[0 + menu.packageIndex]</h4>
                                         <div class="row">
                                             <div class="col-md-6" style="display: flex;">
-                                                <p class="card-header nominal-kuota">@menuDataAllNet[0]</p>
-                                                <p class="card-header giga-bytes">GB</p>
+                                                <p class="card-header nominal-kuota">@menuViewDataAllNet[0 + menu.packageIndex]</p>
+                                                <p class="card-header giga-bytes">@menuSatuanDataAllNet[0 + menu.packageIndex]</p>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="card-header detail-1">@menuEntertainment[0] GB<br>Lainnya</div>
+                                                <div class="card-header detail-1">&nbsp;<br>&nbsp;</div>
                                                 <div class="card-header detail-2">Kuota Telepon dan SMS</div>
                                             </div>
                                         </div>
                                         <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[0]).ToString("N0")</h3>
+                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[0 + menu.packageIndex]).ToString("N0")</h3>
                                         </div>
                                     </div>
                                 }
-                                @if (menuEnabled[1])
+                                @if (menuEnabled[1 + menu.packageIndex])
                                 {
-                                    <div @onclick="@(()=>SelectPacket(1))" class="card" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn2">
-                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[1]</h4>
+                                    <div @onclick="@(()=>SelectPacket(1+menu.packageIndex))" class="card" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn2">
+                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuVarianName[1 + menu.packageIndex]</h4>
                                         <div class="row">
                                             <div class="col-md-6" style="display: flex;">
-                                                <p class="card-header nominal-kuota">@menuInternet[1]</p>
-                                                <p class="card-header giga-bytes">GB</p>
+                                                <p class="card-header nominal-kuota">@menuViewDataAllNet[1 + menu.packageIndex]</p>
+                                                <p class="card-header giga-bytes">@menuSatuanDataAllNet[1 + menu.packageIndex]</p>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="card-header detail-1">@menuEntertainment[1] GB<br>Lainnya</div>
+                                                <div class="card-header detail-1">&nbsp;<br>&nbsp;</div>
                                                 <div class="card-header detail-2">Kuota Telepon dan SMS</div>
                                             </div>
                                         </div>
@@ -78,45 +78,52 @@
                                 }
                             </div>
                             <div class="form-group" style="display: flex; margin-top: -3rem;">
-                                @if (menuEnabled[2])
+                                @if (menuEnabled[2 + menu.packageIndex])
                                 {
-                                    <div class="card" @onclick="@(()=>SelectPacket(2))" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn">
-                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[2]</h4>
+                                    <div class="card" @onclick="@(()=>SelectPacket(2+ menu.packageIndex))" style="width: 18.5rem; background-color: #F1F1F1; cursor: pointer;" id="myBtn">
+                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuVarianName[2 + menu.packageIndex]</h4>
                                         <div class="row">
                                             <div class="col-md-6" style="display: flex;">
-                                                <p class="card-header nominal-kuota">@menuInternet[2]</p>
-                                                <p class="card-header giga-bytes">GB</p>
+                                                <p class="card-header nominal-kuota">@menuViewDataAllNet[2 + menu.packageIndex]</p>
+                                                <p class="card-header giga-bytes">@menuSatuanDataAllNet[2 + menu.packageIndex]</p>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="card-header detail-1">@menuEntertainment[2] GB<br>Lainnya</div>
+                                                <div class="card-header detail-1">&nbsp;<br>&nbsp;</div>
                                                 <div class="card-header detail-2">Kuota Telepon dan SMS</div>
                                             </div>
                                         </div>
                                         <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[2]).ToString("N0")</h3>
+                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[2 + menu.packageIndex]).ToString("N0")</h3>
                                         </div>
                                     </div>
                                 }
-                                @if (menuEnabled[3])
+                                @if (menuEnabled[3 + menu.packageIndex])
                                 {
-                                    <div class="card" @onclick="@(()=>SelectPacket(3))" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn2">
-                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuHeader[3]</h4>
+                                    <div class="card" @onclick="@(()=>SelectPacket(3+ menu.packageIndex))" style="width: 18.5rem; background-color: #F1F1F1; margin-left: 1rem; cursor: pointer;" id="myBtn2">
+                                        <h4 class="card-header" style="font-weight: bold; color: red;">@menuVarianName[3 + menu.packageIndex]</h4>
                                         <div class="row">
                                             <div class="col-md-6" style="display: flex;">
-                                                <p class="card-header nominal-kuota">@menuInternet[3]</p>
-                                                <p class="card-header giga-bytes">GB</p>
+                                                <p class="card-header nominal-kuota">@menuViewDataAllNet[3 + menu.packageIndex]</p>
+                                                <p class="card-header giga-bytes">@menuSatuanDataAllNet[3 + menu.packageIndex]</p>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="card-header detail-1">@menuEntertainment[3] GB<br>Lainnya</div>
+                                                @*<div class="card-header detail-1">@menuEntertainment[3] GB<br>Lainnya</div>*@
+                                                <div class="card-header detail-1">&nbsp;<br>&nbsp;</div>
                                                 <div class="card-header detail-2">Kuota Telepon dan SMS</div>
                                             </div>
                                         </div>
                                         <div class="card-body" style="background-color: white; border-radius: 8px;">
-                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[3]).ToString("N0")</h3>
+                                            <h3 class="card-title" style="font-weight: bold; text-align: center; color: red;">Rp @int.Parse(menuNominal[3 + menu.packageIndex]).ToString("N0")</h3>
                                         </div>
                                     </div>
                                 }
                             </div>
+                            @if (menu.psbIndex > 4)
+                            {
+                                <div class="form-group" style="display: flex;">
+                                    <button class="btn btn-danger btn-right3"style="width:100%;" @onclick="NextIndex" id="btn-ok" value="">Pilihan Berikutnya</button>
+                                </div>
+                            }
                         </div>
                     </div>
                 </div>
@@ -170,56 +177,71 @@
                   <span class="close">&times;</span>
                 </div> -->
                 <div class="modal-body" style="color: black;">
-                    <p class="text-header2">Rp @int.Parse(menuNominal[paramMenu]).ToString("N0")/bulan (@menuHeader[paramMenu])</p>
+                    <p class="text-header2">Rp @int.Parse(menuNominal[paramMenu]).ToString("N0")/bulan (@menuVarianName[paramMenu])</p>
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee; padding-left:0px">
                             <img src="../../assets/image/icon_internet.png" style="width: 90%;">
                         </div>
                         <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Internet</b>
+                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data All Net</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right; border-bottom: 1px solid #eeeeee;">
-                            <p>@menuInternet[paramMenu] GB</p>
+                            <p>@menuDataAllNet[paramMenu]</p>
+                        </div>
+                    </div>
+                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
+                        <div class="col-md-1" style="border-bottom: 1px solid #eeeeee; padding-left:0px">
+                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
+                        </div>
+                        <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
+                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data Roaming</b>
+                        </div>
+                        <div class="col-md-5 teks-bold" style="text-align: right; border-bottom: 1px solid #eeeeee;">
+                            <p>@menuDataRoaming[paramMenu]@menuSatuanDataAllRoaming[paramMenu]</p>
                         </div>
                     </div>
 
-                    <div class="col-md-12" style="margin-top: 3%; height: 62px; display: flex;">
+                    <div class="col-md-12" style="margin-top: 3%; height: 40px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
                             <img src="../../assets/image/icon_internet.png" style="width: 90%;">
                         </div>
                         <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Entertainment</b>
+                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data Content</b>
                             <p style="font-size: 12px; line-height: 15px; font-style: italic; margin-right: -1rem;">
-                                Hooq, Bein Sport, MaxStream, Viu, HBO GO, Vidio,LangitMusik, JooX, Spotify,<br>
-                                Arena of Valor, Free Fire, LINE Get RICH, Mobile Legends, PUBG Mobile, Shell Fire
+                                @menuDataContent[paramMenu]
                             </p>
                         </div>
                         <div class="col-md-2 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
-                            <p>@menuEntertainment[paramMenu] GB</p>
+
                         </div>
                     </div>
 
+                    @if (menuDataSubscription[paramMenu] != "-")
+                    {
+                        <div class="col-md-12" style="margin-top: 3%; height: 40px; display: flex;">
+                            <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
+                                <img src="../../assets/image/icon_internet.png" style="width: 90%;">
+                            </div>
+                            <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
+                                <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data Subscription</b>
+                                <p style="font-size: 12px; line-height: 15px; font-style: italic; margin-right: -1rem;">
+                                    @menuDataSubscription[paramMenu]
+                                </p>
+                            </div>
+                            <div class="col-md-2 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
+
+                            </div>
+                        </div>
+                    }
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
                             <img src="../../assets/image/icon_telepon.png" style="width: 90%;">
                         </div>
                         <div class="col-md-8" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px;  font-weight: bold;">Telepon Sesama Telkomsel</b>
+                            <b class="teks-pop" style="font-size: 23px;  font-weight: bold;">Telepon</b>
                         </div>
                         <div class="col-md-3 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
-                            <p>@menuTelpTsel[paramMenu] Menit</p>
-                        </div>
-                    </div>
-
-                    <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
-                        <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
-                            <img src="../../assets/image/icon_telepon.png" style="width: 90%;">
-                        </div>
-                        <div class="col-md-6" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Telepon Operator Lain</b>
-                        </div>
-                        <div class="col-md-5 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
-                            <p>@menuTelpLain[paramMenu] Menit</p>
+                            <p>@menuTelp[paramMenu]Menit</p>
                         </div>
                     </div>
 
@@ -228,12 +250,13 @@
                             <img src="../../assets/image/icon_SMS.png" style="width: 90%;">
                         </div>
                         <div class="col-md-6" style="text-align: left;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">SMS Sesama Telkomsel</b>
+                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">SMS</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right;">
-                            <p>@menuSMSTsel[paramMenu] SMS</p>
+                            <p>@menuSMS[paramMenu]SMS</p>
                         </div>
                     </div>
+
                     <button class="btn btn-danger button-nps" value="" @onclick="OK">Lanjut</button>
                     <button class="btn btn-light modal-button" @onclick="@(()=>isSelected=false)" value="" style="width:100%; height:70px;">Batal</button>
                 </div>
@@ -270,10 +293,15 @@
     private string[] menuOfferName = { "", "", "", "", "", "", "", "", "", "" };
     private string[] menuVarianName = { "", "", "", "", "", "", "", "", "", "" };
     private string[] menuDataAllNet = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuSatuanDataAllNet = { "", "", "", "", "", "", "", "", "", "" };
     private string[] menuDataRoaming = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuSatuanDataAllRoaming = { "", "", "", "", "", "", "", "", "", "" };
     private string[] menuDataContent = { "", "", "", "", "", "", "", "", "", "" };
     private string[] menuVoiceSms = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuTelp = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuSMS = { "", "", "", "", "", "", "", "", "", "" };
     private string[] menuDataSubscription = { "", "", "", "", "", "", "", "", "", "" };
+    private string[] menuViewDataAllNet = { "", "", "", "", "", "", "", "", "", "" };
 
     private bool[] menuEnabled = { false, false, false, false, false, false, false, false, false, false };
 
@@ -282,10 +310,26 @@
     private bool isLoading = false;
 
     private int paramMenu = 0;
+    private int pageIndex = 0;
 
     protected override async Task OnInitializedAsync()
     {
         PopulateMenu();
+    }
+    private void NextIndex()
+    {
+        if (menu.packageIndex + 4 < menu._menuPSB.Count())
+        {
+            menu.packageIndex += 4;
+            //PopulateMenu();
+            StateHasChanged();
+        }
+        else
+        {
+            menu.packageIndex = 0;
+            StateHasChanged();
+        }
+
     }
     private async Task OK()
     {
@@ -332,9 +376,14 @@
             menuOfferName[i] = menu._menuPSB[i]._offerName;
             menuVarianName[i] = menu._menuPSB[i]._varianName;
             menuDataAllNet[i] = menu._menuPSB[i]._dataAllnet;
+            menuSatuanDataAllNet[i] = menu._menuPSB[i]._satuanDataAllnet;
             menuDataRoaming[i] = menu._menuPSB[i]._dataRoaming;
+            menuSatuanDataAllRoaming[i] = menu._menuPSB[i]._satuanDataRoaming;
             menuDataContent[i] = menu._menuPSB[i]._dataContent;
             menuVoiceSms[i] = menu._menuPSB[i]._voiceSms;
+            menuViewDataAllNet[i] = menu._menuPSB[i]._viewDataAllNet;
+            menuTelp[i] = menuVoiceSms[i].Substring(0, menuVoiceSms[i].IndexOf("minutes") - 1);
+            menuSMS[i] = menuVoiceSms[i].Substring(menuVoiceSms[i].IndexOf("+")+2, menuVoiceSms[i].IndexOf("SMS") - menuVoiceSms[i].IndexOf("+") - 3);
             menuDataSubscription[i] = menu._menuPSB[i]._dataSubscription;
 
             menuEnabled[i] = true;

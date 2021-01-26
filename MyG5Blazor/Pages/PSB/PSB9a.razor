@@ -66,7 +66,7 @@
                                         <td>&emsp;<span style="font-weight: bold;">@trans.strMPembayaran</span></td>
                                     </tr>
                                 </table>
-                                <button class="btn btn-danger btn-right" onclick="buttonOk()" id="btn-ok" value="">OK</button>
+                                <button class="btn btn-danger btn-right" @onclick="buttonOk" id="btn-ok" value="">OK</button>
                             </div>
                         </div>
                     </div>
@@ -121,7 +121,7 @@
 
     private void buttonOk()
     {
-        IsLanjut = !IsLanjut;
+        NavigateTo("/psb/9b");
     }
 
     private void Nominal(int intNominal)
@@ -139,7 +139,7 @@
             trans.status = "02";
             trans.kip = "Pembayaran tidak dilanjutkan, terminal id:" + menu.terminalId;
             await OurUtility.AuditTrail(trans, menu, cst);
-            NavMan.NavigateTo("/main");
+            NavigateTo("/main");
         }
     }
 

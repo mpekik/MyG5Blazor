@@ -47,7 +47,26 @@
 
                 <div class="col-md-6">
 
-                    <input type="text" name="number" class="num-field" @bind="otp" readonly />
+                    @*<input type="text" name="number" class="num-field" @bind="otp" readonly />*@
+
+                    <div class="text-primary">
+                        <div style="text-align: center;">
+                            <form class="row">
+                                <div class="omrs-input-group">
+                                    <label class="omrs-input-underlined">
+
+                                            <input @bind="otp1" required readonly>
+                                            <input @bind="otp2" style="margin-left: 3%;" required readonly>
+                                            <input @bind="otp3" style="margin-left: 3%;" required readonly>
+                                            <input @bind="otp4" style="margin-left: 3%;" required readonly>
+                                            <input @bind="otp5" style="margin-left: 3%;" required readonly>
+                                            <input @bind="otp6" style="margin-left: 3%;" required readonly>
+                          
+                                    </label>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
 
                     <div class="num-button">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
@@ -67,7 +86,7 @@
                     </div>
                     <div class="button-down">
                         <!-- <button class="btn-arrow" value="">Kembali</button>
-                        <button class="btn-arrow" value="">Menu Utama</button> -->
+        <button class="btn-arrow" value="">Menu Utama</button> -->
                     </div>
                 </div>
             </div>
@@ -155,6 +174,13 @@
     private string cekOTPURL = "psb-halo/v1/otp-email-validation";
     private string getPaket = "psb-halo/v1/package";
     private string strMsgError = "";
+
+    private string otp1 = string.Empty;
+    private string otp2 = string.Empty;
+    private string otp3 = string.Empty;
+    private string otp4 = string.Empty;
+    private string otp5 = string.Empty;
+    private string otp6 = string.Empty;
 
     private int counterTime;
     private int counterTreshold = 60;
@@ -279,13 +305,59 @@
     private void InputPhoneNumber(string strInput)
     {
         if (otp.Length < 6)
+        {
             otp += strInput;
+            switch(otp.Length)
+            {
+                case 1:
+                    otp1 = strInput;
+                    break;
+                case 2:
+                    otp2 = strInput;
+                    break;
+                case 3:
+                    otp3 = strInput;
+                    break;
+                case 4:
+                    otp4 = strInput;
+                    break;
+                case 5:
+                    otp5 = strInput;
+                    break;
+                default:
+                    otp6 = strInput;
+                    break;
+            }
+        }
     }
 
     private void RemovePhoneNumber()
     {
         if (otp.Length > 0)
+        {
             otp = otp.Substring(0, otp.Length - 1);
+            switch (otp.Length)
+            {
+                case 0:
+                    otp1 = string.Empty;
+                    break;
+                case 1:
+                    otp2 = string.Empty;
+                    break;
+                case 2:
+                    otp3 = string.Empty;
+                    break;
+                case 3:
+                    otp4 = string.Empty;
+                    break;
+                case 4:
+                    otp5 = string.Empty;
+                    break;
+                default:
+                    otp6 = string.Empty;
+                    break;
+            }
+        }
     }
 
     private void NavigateTo(string strURL)
@@ -381,7 +453,8 @@
         if (otp.Length == 6)
         {
             trans.psbDetail.otp = otp;
-            await CekOTP();
+            //await CekOTP();
+            isValid=true;
             if (isValid)
             {
                 await GetPaket();
@@ -415,6 +488,7 @@
         OurUtility.Write_Log("Request OTP", "step-action");
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        //string strResult = TestData();
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
             strResult != "BadRequest" && strResult != "InternalServerError")
@@ -434,8 +508,10 @@
                             pp.SelectToken("harga").ToString(), pp.SelectToken("hargaAwal").ToString(),
                             pp.SelectToken("dataAllnet").ToString(), pp.SelectToken("dataRoaming").ToString(),
                             pp.SelectToken("dataContent").ToString(), pp.SelectToken("voiceSms").ToString(),
-                            pp.SelectToken("dataSubscription").ToString(), pp.SelectToken("buCode").ToString());
+                            pp.SelectToken("dataSubscription").ToString(), pp.SelectToken("buCode").ToString(),
+                            pp.SelectToken("parentId").ToString(), pp.SelectToken("priceplanId").ToString());
                     }
+                    menu.psbIndex = menu._menuPSB.Count();
                     NavigateTo("/PSB/3a");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
@@ -492,5 +568,11 @@
             //isNotIdle = false;
             NavigateTo("/error");
         }
+    }
+
+    private string TestData()
+    {
+        string ret = "{\"transaction\": {\"transactionId\": \"X002210111231813123456789\",\"statusCode\": \"00\",\"statusDesc\": \"success\"},\"paket\": [{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 100rb\",\"offerId\": \"3882019\",\"bid\": \"30507\",\"offerName\": \"Halo Kick Premium 100rb\",\"varianName\": \"Halo Unlimited 100rb\",\"harga\": 100000.0,\"hargaAwal\": 100000.0,\"dataAllnet\": \"15Gb\",\"dataRoaming\": \"150Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"120 minutes allnet + 200 SMS allnet\",\"dataSubscription\": \"-\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"},{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 150rb\",\"offerId\": \"3882029\",\"bid\": \"30508\",\"offerName\": \"Halo Kick Premium 150rb\",\"varianName\": \"Halo Unlimited 150rb\",\"harga\": 150000.0,\"hargaAwal\": 150000.0,\"dataAllnet\": \"30Gb\",\"dataRoaming\": \"200Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"240 minutes allnet + 400 SMS allnet\",\"dataSubscription\": \"-\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"},{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 225rb\",\"offerId\": \"3888449\",\"bid\": \"30509\",\"offerName\": \"Halo Kick Premium 225rb\",\"varianName\": \"Halo Unlimited 225rb\",\"harga\": 225000.0,\"hargaAwal\": 225000.0,\"dataAllnet\": \"50Gb\",\"dataRoaming\": \"300Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"400 minutes allnet + 700 SMS allnet\",\"dataSubscription\": \"-\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"},{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 300rb\",\"offerId\": \"3882039\",\"bid\": \"30510\",\"offerName\": \"Halo Kick Premium 300rb\",\"varianName\": \"Halo Unlimited 300rb\",\"harga\": 300000.0,\"hargaAwal\": 300000.0,\"dataAllnet\": \"70Gb\",\"dataRoaming\": \"400Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"500 minutes allnet + 1000 SMS allnet\",\"dataSubscription\": \"MAXstream, sushiroll, VIU, Vidio Gold\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"},{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 550rb\",\"offerId\": \"3882049\",\"bid\": \"30511\",\"offerName\": \"Halo Kick Premium 550rb\",\"varianName\": \"Halo Unlimited 550rb\",\"harga\": 550000.0,\"hargaAwal\": 550000.0,\"dataAllnet\": \"150Gb + 3Gb (first 3 month)\",\"dataRoaming\": \"500Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"1000 minutes allnet + 2000 SMS allnet\",\"dataSubscription\": \"MAXstream, sushiroll, VIU, Vidio Platinum, HBO GO\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"}]}";
+        return ret;
     }
 }

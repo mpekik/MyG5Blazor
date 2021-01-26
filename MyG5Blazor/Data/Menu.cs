@@ -62,22 +62,30 @@ namespace MyG5Blazor.Data
             public string _offerName { get; set; }
             public string _varianName { get; set; }
             public string _dataAllnet { get; set; }
+            public string _viewDataAllNet { get; set; }
+            public string _satuanDataAllnet { get; set; }
             public string _dataRoaming { get; set; }
+            public string _satuanDataRoaming { get; set; }
             public string _dataContent { get; set; }
             public string _voiceSms { get; set; }
             public string _dataSubscription { get; set; }
             public string _buCode { get; set; }
+
+            public string _parentId { get; set; }
+            public string _pricePlanId { get; set; }
         }
         public void ClearPSB()
         {
             psbIndex = 0;
             pageIndex = 0;
+            packageIndex = 0;
             psbNomer.Clear();
             _menuPSB.Clear();
         }
         public List<string> psbNomer = new List<string>();
         public int psbIndex = 0;
         public int pageIndex = 0;
+        public int packageIndex = 0;
         public List<MenuPSB> _menuPSB = new List<MenuPSB> ();
         public void AddMenuPSB (string pool, string header, string internet, string entertainment, string telpTsel, string telpLain, string smsTsel, string nominal, string hargaAwal)
         {
@@ -101,7 +109,8 @@ namespace MyG5Blazor.Data
 
         public void AddMenuPSB2(string poolName, string packageName, string offerId, string bid, 
             string offerName, string varianName, string harga, string hargaAwal, string dataAllnet, 
-            string dataRoaming, string dataContent, string voiceSms, string dataSubscription, string buCode)
+            string dataRoaming, string dataContent, string voiceSms, string dataSubscription, string buCode,
+            string parentId, string pricePlanId)
         {
             MenuPSB menuPSB = new MenuPSB();
             menuPSB._poolName = poolName;
@@ -113,11 +122,34 @@ namespace MyG5Blazor.Data
             menuPSB._harga = int.Parse(harga).ToString();
             menuPSB._hargaAwal = int.Parse(hargaAwal).ToString();
             menuPSB._dataAllnet = dataAllnet;
-            menuPSB._dataRoaming = dataRoaming;
+            if (dataAllnet.Contains("Gb"))
+            {
+                menuPSB._viewDataAllNet = dataAllnet.Substring(0, dataAllnet.IndexOf("Gb"));
+                menuPSB._satuanDataAllnet = "GB";
+            }
+            else if (dataAllnet.Contains("GB"))
+            {
+                menuPSB._viewDataAllNet = dataAllnet.Substring(0, dataAllnet.IndexOf("GB"));
+                menuPSB._satuanDataAllnet = "GB";
+            }
+            else if (dataAllnet.Contains("Mb"))
+            {
+                menuPSB._viewDataAllNet = dataAllnet.Substring(0, dataAllnet.IndexOf("Mb"));
+                menuPSB._satuanDataAllnet = "MB";
+            }
+            else if (dataAllnet.Contains("MB"))
+            {
+                menuPSB._viewDataAllNet = dataAllnet.Substring(0, dataAllnet.IndexOf("MB"));
+                menuPSB._satuanDataAllnet = "MB";
+            }
+            menuPSB._dataRoaming = dataRoaming.Substring(0,dataRoaming.Length-2);
+            menuPSB._satuanDataRoaming = dataRoaming.Substring(dataRoaming.Length - 2);
             menuPSB._dataContent = dataContent;
             menuPSB._voiceSms = voiceSms;
             menuPSB._dataSubscription = dataSubscription;
             menuPSB._buCode = buCode;
+            menuPSB._parentId = parentId;
+            menuPSB._pricePlanId = pricePlanId;
             _menuPSB.Add(menuPSB);
         }
         public class MenuPulsa

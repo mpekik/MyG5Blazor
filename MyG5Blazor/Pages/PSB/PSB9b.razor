@@ -83,7 +83,7 @@
                             else if (IsFail)
                             {
                                 <div class="col-md-6">
-                                    <div class="teks-title">Bayar Tagihan KartuHalo</div>
+                                    <div class="teks-title">Berlangganan KartuHalo</div>
                                     <div id="status-pay" class="teks-center teks-bold">
                                         Proses Pembayaran Tagihan KartuHalo<br> <b class="red">FAILED</b><br><br>
                                         @if (IsVoid)
@@ -111,13 +111,13 @@
                                         <div class="teks-top"> Silakan Masukan Uang Kertas pada Alat Penerima Uang Tunai secara Lembar per Lembar </div>
                                     </div>
                                     <div id="teks-pastikan">
-                                        <div class="teks-center" style="margin-top: 32%;"> Pastikan Pembayaran Menggunakan <br> Uang Kertas Minimal Pecahan Rp 10.000 </div>
+                                        <div class="teks-center" style="margin-top: 30%;"> Pastikan Pembayaran Menggunakan <br> Uang Kertas Minimal Pecahan Rp 10.000 </div>
                                     </div>
                                     <div id="bayar2">
                                         <div class="teks-bot" style="text-transform: uppercase; font-weight: bold; margin-top: 45%; line-height: 1;">Bayar Dengan Uang Pas, Mesin <br> Ini tidak mengeluarkan kembalian</div>
                                     </div>
                                     <div id="bayar3">
-                                        <div class="teks-bot2" style="text-transform: uppercase; font-weight: bold; margin-top: 70%;">NILAI DARI KELEBIHAN PEMBAYARAN SECARA OTOMATIS AKAN MENGURANGI TAGIHAN KARTUHALO ANDA DI BULAN BERIKUTNYA.</div>
+                                        <div class="teks-bot2" style="text-transform: uppercase; font-weight: bold; margin-top: 60%;">NILAI DARI KELEBIHAN PEMBAYARAN SECARA OTOMATIS AKAN MENGURANGI TAGIHAN KARTUHALO ANDA DI BULAN BERIKUTNYA.</div>
                                     </div>
                                 }
                                 @if (IsVisible2)
@@ -134,7 +134,7 @@
                                 }
                                 else if (IsSuccess)
                                 {
-                                    <div class="teks-title">Bayar Tagihan KartuHalo</div>
+                                    <div class="teks-title">Berlangganan KartuHalo</div>
                                     <div id="status-pay" class="teks-center teks-bold">Proses Pembayaran Tagihan KartuHalo<br> <b class="green">Berhasil</b></div>
 
                                 }
@@ -228,10 +228,15 @@
 
     <footer>
         <div class="footer-side1">
-            <span class="dot">1</span>
-            <span class="dot">2</span>
-            <span class="dot">3</span>
-            <span class="dot" id="dot-active">4</span>
+            <span class="dot2">1</span>
+            <span class="dot2">2</span>
+            <span class="dot2">3</span>
+            <span class="dot2">4</span>
+            <span class="dot2">5</span>
+            <span class="dot2">6</span>
+            <span class="dot2">7</span>
+            <span class="dot2">8</span>
+            <span class="dot2" id="dot-active">9</span>
         </div>
         <div class="footer-side2">
             @if (MetodePembayaran == 2 && !IsFail && !IsSuccess)
@@ -250,7 +255,7 @@
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>tagihan kartuHalo. Jika Anda keluar dari menu ini,<br>seluruh uang yang Anda masukkan dapat diambil di<br>Kasir GraPARI dengan menunjukkan struk dari<br>MyGraPARI.</p>
+                    <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>berlangganan kartuHalo. Jika Anda keluar dari menu ini,<br>seluruh uang yang Anda masukkan dapat diambil di<br>Kasir GraPARI dengan menunjukkan struk dari<br>MyGraPARI.</p>
                     <button class="btn btn-danger modal-button" @onclick="TunaiExitFail" id="btn-lanjut">Lanjut</button>
                     <button @onclick="@(()=>IsExit = false)" class="btn btn-light modal-button">Batal</button>
                 </div>
@@ -418,10 +423,12 @@
 
     protected override async Task OnInitializedAsync()
     {
+        trans.psbDetail.statusPayment = "01";
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         strCOM = strCOM + config.Read("EDC", Config.PARAM_EDC_PORT);
         MetodePembayaran = cst.intMPembayaran;
-        intBill = cst.intTagihan;
+        trans.psbDetail.PaketPSB._hargaAwal = "100000";
+        intBill = int.Parse(trans.psbDetail.PaketPSB._hargaAwal);
         StateHasChanged();
         //intAccBill = 10000;
         //intMinus = intBill - intAccBill;
@@ -433,6 +440,7 @@
 
                     //TODO Integrate with EDC Debit Card
                     await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+
                     pageClass = "main-panel bg-home";
                     if (edc.intTry < 3)
                     {
@@ -545,21 +553,22 @@
                         logamount = 0;
                     }
                     await Task.Delay(2000);
-                    await MainLoop(logbank,logamount);
-                    intAccBill = Payout.total;
-                    cst.intUangCount = Payout.uangCount;
-                    cst.intTagihanTerbayar = Payout.total;
+                    //await MainLoop(logbank,logamount);
+                    //intAccBill = Payout.total;
+                    //cst.intUangCount = Payout.uangCount;
+                    //cst.intTagihanTerbayar = Payout.total;
                     //logamount = logamount + Payout.total;
                     //logbank = logbank + Payout.uangCount;
                     //config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
                     //config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
-                    if (!IsTunaiExit)
-                    {
-                        intMinus = intAccBill - intBill;
-                        isTunaiComplete = true;
-                        break;
-                    }
-                    else { break; }
+                    //if (!IsTunaiExit)
+                    //{
+                    //    intMinus = intAccBill - intBill;
+                    //    isTunaiComplete = true;
+                    //    break;
+                    //}
+                    //else { break; }
+                    break;
                 }
             case 3:
                 {
@@ -671,6 +680,7 @@
     {
         isTunaiComplete = false;
         resultCash = "00";
+        trans.psbDetail.statusPayment = "00";
 
         await Payment("");
 
@@ -721,6 +731,7 @@
             cst.intTagihanTerbayar = Payout.total;
             cst.intUangCount = Payout.uangCount;
             resultCash = "01";
+            trans.psbDetail.statusPayment = "01";
 
             IsExit = false;
             IsTunaiExit = true;
@@ -976,6 +987,7 @@
             await Task.Delay(200);
             if (trans.edcresp == "00")
             {
+                trans.psbDetail.statusPayment = "00";
                 OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
                 trans.AddTrail("PAYMENT EDC", trans.edcresp, "00");
 
@@ -983,6 +995,7 @@
                 pageClass = "main-panel bg-home";
             }else
             {
+                trans.psbDetail.statusPayment = "01";
                 OurUtility.Write_Log("== Payment Via EDC Failed", "step-action");
                 trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
             }
@@ -1050,17 +1063,34 @@
     {
         IsLoading = true;
         string myJson = string.Empty;
+        string payment = string.Empty;
+
+        string psbDetail = "{ \"noHp\" : \"" + trans.psbDetail.selectedNumber + "\"," +
+                "\"priceplanId\" : \"" + trans.psbDetail.PaketPSB._pricePlanId + "\"," +
+                "\"offerId\" : \"" + trans.psbDetail.PaketPSB._offerId + "\"," +
+                "\"parrentId\" : \"" + trans.psbDetail.PaketPSB._parentId + "\"," +
+                "\"poolName\" : \"" + trans.psbDetail.PaketPSB._poolName + "\"," +
+                "\"isAgree\" : \"" + trans.psbDetail.isTC.ToString() + "\"," +
+                                    "\"isAgreeEbill\" : \"" + trans.psbDetail.isEbill.ToString() + "\"," +
+                                    "\"idReservation\" : \"" + trans.psbDetail.reserveId + "\"," +
+                                    "\"persoId\" : \"" + trans.persoID + "\"}";
+
+        string customerProfile = "{ \"namaLengkap\" : \"" + trans.psbDetail.nama + "\"," +
+                "\"noKtp\" : \"" + trans.psbDetail.nik + "\"," +
+                "\"noKk\" : \"" + trans.psbDetail.nokk + "\"," +
+                "\"tempatLahir\" : \"" + trans.psbDetail.ektpData.PlaceOfBirth + "\"," +
+                "\"tanggalLahir\" : \"" + trans.psbDetail.tglLahir + "\"," +
+                "\"alamat\" : \"" + trans.psbDetail.ektpData.Address + "\"," +
+                                    "\"kota\" : \"" + trans.psbDetail.ektpData.City + "\"," +
+                                    "\"propinsi\" : \"" + trans.psbDetail.ektpData.Province + "\"," +
+                                    "\"email\" : \"" + trans.psbDetail.alamatEmail + "\"}";
+
         if (MetodePembayaran == 1 || MetodePembayaran == 3)
         {
-            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                "\"terminalId\" : \"" + trans.termID + "\"," +
-                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
-                "\"amount\" : \"" + cst.intTagihan + "\"," +
-                "\"accountId\" : \"" + cst.accountId + "\"," +
-                "\"submitAmount\" : \"" + strBill + "\"," +
-                                    "\"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
-                                    "\"fee\" : \"" + trans.fee + "\"," +
-                                    "\"bit61\" : \"" + trans.bit + "\"," +
+            payment = "{ \"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
+                                    "\"amount\" : \"" + trans.psbDetail.PaketPSB._hargaAwal + "\"," +
+                                    "\"submitAmount\" : \"" + trans.psbDetail.PaketPSB._hargaAwal + "\"," +
+                                    "\"statusPayment\" : \"" + trans.psbDetail.statusPayment + "\"," +
                                     "\"edc\" : {" +
                                     "\"responseCode\" : \"" + trans.edcresp + "\"," +
                                     "\"ecr\" : \"" + trans.ecr + "\"," +
@@ -1069,19 +1099,21 @@
         }
         else
         {
-            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-                "\"terminalId\" : \"" + trans.termID + "\"," +
-                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
-                "\"amount\" : \"" + cst.intTagihan + "\"," +
-                "\"accountId\" : \"" + cst.accountId + "\"," +
-                "\"submitAmount\" : \"" + strAccBill + "\"," +
-                "\"lembarUang\" : \"" + cst.intUangCount + "\"," +
-                                    "\"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
-                                    "\"fee\" : \"" + trans.fee + "\"," +
-                                    "\"responseCode\" : \"" + resultCash + "\"," +
-                                    "\"bit48\" : \"" + trans.bit + "\"" +
+            payment = "{ \"paymentMethod\" : \"" + trans.paymentMethod + "\"," +
+                                    "\"amount\" : \"" + trans.psbDetail.PaketPSB._hargaAwal + "\"," +
+                                    "\"submitAmount\" : \"" + strAccBill + "\"," +
+                                    "\"statusPayment\" : \"" + trans.psbDetail.statusPayment + "\"," +
+                                    "\"lembarUang\" : \"" + cst.intUangCount + "\"" +
                                     "}";
         }
+
+        myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                "\"terminalId\" : \"" + trans.termID + "\"," +
+                "\"psbDetail\" : " + psbDetail + "," +
+                "\"customerProfile\" : " + customerProfile + "," +
+                "\"payment\" : " + payment + "}" +
+                "}";
+
         string myURL = _myURL + serviceURL;
 
         OurUtility.Write_Log("== Payment", "step-action");

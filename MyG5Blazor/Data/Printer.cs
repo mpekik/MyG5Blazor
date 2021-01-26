@@ -1193,16 +1193,19 @@ namespace MyG5Blazor.Data
 
                 if (_trx.jenisTrans == "IP")
                 {
-                    e.Graphics.DrawString("SN"
-                                  , font8, brush, layout, formatLeft);
-                    layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
-                    e.Graphics.DrawString(":"
-                                  , font8, brush, layout, formatLeft);
-                    layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
-                    e.Graphics.DrawString(_trx.pulsaSerialNumber
-                                  , font8Bold, brush, layout, formatLeft);
-                    Offset = Offset + lineheight8;
-                    layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+                    if (_trx.pulsaSerialNumber != string.Empty && _trx.pulsaSerialNumber != "" && _trx.pulsaSerialNumber != null)
+                    {
+                        e.Graphics.DrawString("SN"
+                                      , font8, brush, layout, formatLeft);
+                        layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                        e.Graphics.DrawString(":"
+                                      , font8, brush, layout, formatLeft);
+                        layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                        e.Graphics.DrawString(_trx.pulsaSerialNumber
+                                      , font8Bold, brush, layout, formatLeft);
+                        Offset = Offset + lineheight8;
+                        layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+                    }
                 }
 
                 Offset = Offset + lineheight8;

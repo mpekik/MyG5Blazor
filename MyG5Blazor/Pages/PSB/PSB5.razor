@@ -309,7 +309,11 @@
 
                         OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                         //cst.EKTPNumber = ktp.Id;
+                        trans.psbDetail.ektpData = ktp;
                         trans.psbDetail.nik = ktp.Id;
+                        trans.psbDetail.nama = ktp.Name;
+                        trans.psbDetail.tglLahir = ktp.DateOfBirth;
+                        
                         isLoading = false;
                         IsSuccess = true;
 
@@ -422,7 +426,12 @@
                         trans.AddTrail("FINGERPRINT", "MATCH", "00");
 
                         OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                        trans.psbDetail.ektpData = ktp;
+                        trans.psbDetail.nik = ktp.Id;
                         cst.EKTPNumber = ktp.Id;
+                        trans.psbDetail.nama = ktp.Name;
+                        trans.psbDetail.tglLahir = ktp.DateOfBirth;
+
                         isLoading = false;
                         IsSuccess = true;
                         OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
@@ -445,6 +454,7 @@
                             trans.psbDetail.nik = ktp.Id;
                             trans.psbDetail.nama = ktp.Name;
                             trans.psbDetail.tglLahir = ktp.DateOfBirth;
+                            trans.psbDetail.ektpData = ktp;
 
                             //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
                             isLoading = false;

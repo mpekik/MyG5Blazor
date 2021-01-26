@@ -33,6 +33,7 @@ namespace MyG5Blazor.Data
             public string nokk { get; set; }
             public string selectedPaket { get; set; }
             public Menu.MenuPSB PaketPSB = new Menu.MenuPSB();
+            public Ektp_Data ektpData = new Ektp_Data();
             public string patternNumber { get; set; }
             public string selectedNumber { get; set; }
             public string batasPemakaian { get; set; }
@@ -40,6 +41,7 @@ namespace MyG5Blazor.Data
             public bool isEbill { get; set; } = false;
             public string selectedBuCode { get; set; }
             public string reserveId { get; set; }
+            public string statusPayment { get; set; }
         }
 
         public PSBDetail psbDetail = new PSBDetail();
