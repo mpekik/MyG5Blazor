@@ -88,8 +88,8 @@
         </div>
         <div id="footer-side2" class="col-md-4">
             <div style="margin-left: -8rem; margin-right: -8rem;">
-                <button @onclick="@(()=>NavMan.NavigateTo("/PSB/7a"))" class="btn-arrow btn" value="">Kembali</button>
-                <button @onclick="@(()=>NavMan.NavigateTo("/main"))" class="btn-arrow btn" value="">Menu Utama</button>
+                <button @onclick="@(()=>Back())" class="btn-arrow btn" value="">Kembali</button>
+                <button @onclick="@(()=>MainMenu())" class="btn-arrow btn" value="">Menu Utama</button>
                 <!-- <sup>Powered By </sup>Trilogi Persada -->
             </div>
         </div>
@@ -127,18 +127,141 @@
         private bool isTimeOut = false;
         private bool isTC = false;
         private bool isEbill = false;
+        private bool isPopUp = false;
+
+        private string releaseNumberService = "psb-halo/v1/release-number";
+        private string _myURL = string.Empty;
+        private string strMsgError = string.Empty;
 
         protected override async Task OnAfterRenderAsync(bool bFirstRender)
         {
             if (bFirstRender)
             {
-            
+
             }
+        }
+        protected override async Task OnInitializedAsync()
+        {
+            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        }
+
+        private async Task Back()
+        {
+            NavigateTo("/psb/7a");
         }
 
         private void Lanjut()
         {
+            if(trans.psbDetail.isTC)
+            {
+                trans.psbDetail.strTC = "1";
+            }else
+            {
+                trans.psbDetail.strTC = "0";
+            }
+
+            if(trans.psbDetail.isEbill)
+            {
+                trans.psbDetail.strEbill = "1";
+            }else
+            {
+                trans.psbDetail.strEbill = "0";
+            }
+
             NavMan.NavigateTo("/PSB/8a");
         }
+        private async Task MainMenu()
+        {
 
+            trans.AddTrail("KONFIRMASI DATA", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await ReleaseNumber();
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+            NavMan.NavigateTo("/main");
+        }
+
+        private async Task ReleaseNumber()
+        {
+            isLoading = true;
+            await Task.Delay(500);
+            string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+                "\"transactionId\": \"" + trans.transID + "\"," +
+                "\"poolName\": \"" + trans.psbDetail.PaketPSB._poolName + "\"," +
+                "\"noHp\": \"" + trans.psbDetail.selectedNumber + "\"" +
+                   "}";
+            string myURL = _myURL + releaseNumberService;
+            OurUtility.Write_Log("Release Number", "step-action");
+            //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+            string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+
+            if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
+                strResult != "BadRequest" && strResult != "InternalServerError")
+            {
+                try
+                {
+                    JObject jobjResult = JObject.Parse(strResult);
+                    if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                    {
+                        trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "00");
+                        NavigateTo("/PSB/4");
+                    }
+                    else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                    {
+                        if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                        {
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                        }
+                        else
+                        {
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                        }
+                        trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
+                        trans.status = "01";
+                        await OurUtility.AuditTrailPSB(trans, menu, cst);
+                        //isNotIdle = false;
+                        isLoading = false;
+                        NavigateTo("/error");
+                    }
+                    else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                    {
+                        isLoading = false;
+                        strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                        trans.AddTrail("Release Number", "Number : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "02");
+
+                        isPopUp = false;
+                        return;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    isLoading = false;
+                    trans.AddTrail("Release Number", "Exception Error ", "01");
+                    trans.status = "01";
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                    trans.errorCode = "Exception Error";
+                    OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                    //isNotIdle = false;
+                    NavMan.NavigateTo("/error");
+                }
+            }
+            else
+            {
+                isLoading = false;
+                trans.AddTrail("Release Number", "Hit Webservice Error : " + strResult, "01");
+                trans.status = "01";
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                trans.errorCode = "Hit Webservice Error : " + strResult;
+                OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+                //isNotIdle = false;
+                NavMan.NavigateTo("/error");
+            }
+        }
+        private void NavigateTo(string strURL)
+        {
+            NavMan.NavigateTo(strURL);
+        }
     }

@@ -38,7 +38,9 @@ namespace MyG5Blazor.Data
             public string selectedNumber { get; set; }
             public string batasPemakaian { get; set; }
             public bool isTC { get; set; } = false;
+            public string strTC { get; set; } = "0";
             public bool isEbill { get; set; } = false;
+            public string strEbill { get; set; } = "0";
             public string selectedBuCode { get; set; }
             public string reserveId { get; set; }
             public string statusPayment { get; set; }

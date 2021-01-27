@@ -391,9 +391,9 @@
     }
     private async Task MainMenu()
     {
-        trans.AddTrail("CHOOSE NOMINAL", "BACK TO MAIN MENU", "CANCELED BY USER");
+        trans.AddTrail("CHOOSE PACKAGE", "BACK TO MAIN MENU", "02");
         trans.status = "02";
-        await OurUtility.AuditTrail(trans, menu, cst);
+        await OurUtility.AuditTrailPSB(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
     private async Task Back()

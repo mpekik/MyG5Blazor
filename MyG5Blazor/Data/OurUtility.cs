@@ -380,6 +380,49 @@ namespace MyG5Blazor.Data
             string strResult2 = await OurUtility.PostCallAPI(myURL2, myJson2,menu);
             OurUtility.Write_Log("== Response Trans Log : " + strResult2, "step-action");
         }
+        public static async Task AuditTrailPSB(Transaction trans, Menu menu, Costumer cst)
+        {
+            string auditTrail = string.Empty;
+            int stepTrail = 1;
+
+            string _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+            string saveURL = "psb-halo/v1/save-log";
+
+            string errorReason = string.Empty;
+            trans.endTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+
+            auditTrail = auditTrail + "[ ";
+            foreach (dynamic at in trans._auditTrail)
+            {
+                auditTrail = auditTrail +
+                    "{ \"step\" : \"" + stepTrail + "\"," +
+                    "\"action\" : \"" + at._action + "\"," +
+                    "\"data\" : \"" + at._data + "\"," +
+                    "\"result\" : \"" + at._result + "\"" +
+                    "},";
+                stepTrail += 1;
+                errorReason = at._data;
+            }
+            auditTrail = auditTrail.Remove(auditTrail.Length - 1);
+
+            string myJson2 = "{ \"transaction\" : " +
+                "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                "\"terminalId\" : \"" + menu.terminalId + "\"," +
+                "\"transactionType\" : \"" + trans.jenisTrans + "\"," +
+                    "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                    "\"startTime\" : \"" + trans.startTime.ToString() + "\"," +
+                    "\"endTime\" : \"" + trans.endTime.ToString() + "\"," +
+                    "\"status\" : \"" + trans.status + "\"," +
+                    "\"description\" : \"" + trans.errorCode + " : " + errorReason + "\"," +
+                    "\"jumlahKartu\" : \"" + trans.jumlah_kartu + "\"," +
+                    "\"kip\" : \"" + trans.kip + "\"" +
+                    "}, \"auditTrail\" : " + auditTrail + "]}";
+            string myURL2 = _myURL + saveURL;
+
+            OurUtility.Write_Log("== Request Trans Log : " + myJson2, "step-action");
+            string strResult2 = await OurUtility.PostCallAPI(myURL2, myJson2, menu);
+            OurUtility.Write_Log("== Response Trans Log : " + strResult2, "step-action");
+        }
         public static async Task<string> PostCallAPI(string url, string jsonString, Menu menu)
         {
             string secret = OurUtility.RandomString(10);

@@ -149,7 +149,9 @@
     private bool isInit = true;
     private bool isPopUp = false;
 
+    private string releaseNumberService = "psb-halo/v1/release-number";
     private string cekBlackListURL = "psb-halo/v1/check-blacklist";
+
     private string strMsgError = string.Empty;
     private int intTryCount = 1;
     private int intTryLimit = 3;
@@ -169,16 +171,99 @@
     {
         if (translog)
         {
+
             isLoading = false;
             translog = false;
             IsVisible = false;
             isLoading2 = true;
+            await ReleaseNumber();
             trans.status = "01";
             trans.errorCode = "FINGERPRINT";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
             NavigateTo("/main");
         }
     }
+    private async Task ReleaseNumber()
+    {
+        isLoading = true;
+        await Task.Delay(5000);
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"transactionId\": \"" + trans.transID + "\"," +
+            "\"poolName\": \"" + trans.psbDetail.PaketPSB._poolName + "\"," +
+            "\"noHp\": \"" + trans.psbDetail.selectedNumber + "\"" +
+               "}";
+        string myURL = _myURL + releaseNumberService;
+        OurUtility.Write_Log("Release Number", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+
+        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
+            strResult != "BadRequest" && strResult != "InternalServerError")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "00");
+                    NavigateTo("/PSB/4");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
+                    trans.status = "01";
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
+                    //isNotIdle = false;
+                    isLoading = false;
+                    NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    isLoading = false;
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                    trans.AddTrail("Release Number", "Number : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "02");
+
+                    isPopUp = false;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                isLoading = false;
+                trans.AddTrail("Release Number", "Exception Error ", "01");
+                trans.status = "01";
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //isNotIdle = false;
+                NavMan.NavigateTo("/error");
+            }
+        }
+        else
+        {
+            isLoading = false;
+            trans.AddTrail("Release Number", "Hit Webservice Error : " + strResult, "01");
+            trans.status = "01";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+            trans.errorCode = "Hit Webservice Error : " + strResult;
+            OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+            //isNotIdle = false;
+            NavMan.NavigateTo("/error");
+        }
+    }
+
     private async Task MenuUtamaCanceled()
     {
         if (translog)
@@ -186,10 +271,11 @@
             translog = false;
             IsVisible = false;
             isLoading2 = true;
+            await ReleaseNumber();
             trans.AddTrail("SCAN FINGERPRINT", "CANCELED", "02");
             trans.status = "02";
             trans.errorCode = "FINGERPRINT";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
             NavigateTo("/main");
         }
     }
@@ -246,7 +332,7 @@
             {
                 trans.AddTrail("READ EKTP", "FP - 001", "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "FP - 001";
                 OurUtility.Write_Log("== Error : FP - 001", "step-action");
@@ -281,7 +367,7 @@
         {
             trans.AddTrail("READ EKTP", "FP - 101", "01");
             trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "FP - 101";
             OurUtility.Write_Log("== Error : FP - 101", "step-action");
@@ -313,7 +399,7 @@
                         trans.psbDetail.nik = ktp.Id;
                         trans.psbDetail.nama = ktp.Name;
                         trans.psbDetail.tglLahir = ktp.DateOfBirth;
-                        
+
                         isLoading = false;
                         IsSuccess = true;
 
@@ -345,7 +431,7 @@
             IsFail = true;
             trans.AddTrail("READ EKTP", "FP - 002", "01");
             trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "FP - 002";
             OurUtility.Write_Log("== Error : FP - 002", "step-action");
@@ -546,7 +632,7 @@
                     }
                     trans.AddTrail("Cek BlackList NIK", trans.psbDetail.nik, "01");
                     trans.status = "01";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading2 = false;
                     NavigateTo("/error");
@@ -566,7 +652,7 @@
                 isLoading = false;
                 trans.AddTrail("Cek BlackList Nik", "Exception Error ", "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
@@ -578,7 +664,7 @@
             isLoading = false;
             trans.AddTrail("Cek BlackList Nik", "Hit Webservice Error : " + strResult, "01");
             trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error : " + strResult;
             OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");

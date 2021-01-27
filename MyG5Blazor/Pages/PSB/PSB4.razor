@@ -190,7 +190,7 @@
             await ReleaseNumber();
             trans.status = "01";
             trans.errorCode = "EKTP";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
             NavigateTo("/main");
         }
     }
@@ -206,7 +206,7 @@
             trans.AddTrail("SCAN EKTP", "CANCELED", "02");
             trans.status = "02";
             trans.errorCode = "EKTP";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
             NavigateTo("/main");
         }
     }
@@ -222,7 +222,7 @@
             trans.AddTrail("SCAN EKTP", "CANCELED", "02");
             trans.status = "02";
             trans.errorCode = "EKTP";
-            NavigateTo("/PSB/3c");
+            NavigateTo("/PSB/3b");
         }
     }
 
@@ -334,7 +334,7 @@
             {
                 trans.AddTrail("READ EKTP", "EK - 001", "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "EK - 001";
                 OurUtility.Write_Log("== Error : EK - 001", "step-action");
@@ -545,7 +545,7 @@
                     }
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
                     trans.status = "01";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
                     NavigateTo("/error");
@@ -565,7 +565,7 @@
                 isLoading = false;
                 trans.AddTrail("Release Number", "Exception Error ", "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
@@ -578,7 +578,7 @@
             isLoading = false;
             trans.AddTrail("Release Number", "Hit Webservice Error : " + strResult, "01");
             trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error : " + strResult;
             OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");

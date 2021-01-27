@@ -108,8 +108,8 @@
         <span class="dot2">9</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="@(()=>NavigateTo("/main"))" class="btn-arrow btn" value="">Kembali</button>
-        <button @onclick="@(()=>NavigateTo("/main"))" class="btn-arrow btn" value="">Menu Utama</button>
+        <button @onclick="@(()=>NavigateTo("/psb/1b"))" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="@(()=>MainMenu())" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
@@ -256,7 +256,7 @@
                     }
                     trans.AddTrail("Request OTP", trans.psbDetail.alamatEmail, "01");
                     trans.status = "01";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
                     NavigateTo("/error");
@@ -272,7 +272,7 @@
                 isLoading = false;
                 trans.AddTrail("Request OTP", "Exception Error", "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
@@ -285,7 +285,7 @@
             isLoading = false;
             trans.AddTrail("Request OTP", "Hit Webservice Error : "+strResult, "01");
             trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error: " + strResult;
             OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
@@ -406,7 +406,7 @@
                     }
                     trans.AddTrail("Validasi OTP", trans.errorCode, "01");
                     trans.status = "01";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
                     isInvalid = true;
@@ -427,7 +427,7 @@
                 isLoading = false;
                 trans.AddTrail("Validasi OTP","Exception Error" , "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
@@ -440,7 +440,7 @@
             isLoading = false;
             trans.AddTrail("Valiasi OTP", "Hit Webservice Error", "01");
             trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Exception Error";
             OurUtility.Write_Log("== Error : Hit Webservice Error", "step-action");
@@ -487,8 +487,8 @@
         string myURL = _myURL + getPaket;
         OurUtility.Write_Log("Request OTP", "step-action");
         //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //string strResult = TestData();
+        //string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        string strResult = TestData();
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
             strResult != "BadRequest" && strResult != "InternalServerError")
@@ -528,7 +528,7 @@
                     }
                     trans.AddTrail("Get Paket PSB", "", "01");
                     trans.status = "01";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
                     NavigateTo("/error");
@@ -548,7 +548,7 @@
                 isLoading = false;
                 trans.AddTrail("Get Paket PSB", "Exception Error ", "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
@@ -561,7 +561,7 @@
             isLoading = false;
             trans.AddTrail("Get Paket PSB", "Hit Webservice Error : " + strResult, "01");
             trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error : " + strResult;
             OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
@@ -574,5 +574,12 @@
     {
         string ret = "{\"transaction\": {\"transactionId\": \"X002210111231813123456789\",\"statusCode\": \"00\",\"statusDesc\": \"success\"},\"paket\": [{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 100rb\",\"offerId\": \"3882019\",\"bid\": \"30507\",\"offerName\": \"Halo Kick Premium 100rb\",\"varianName\": \"Halo Unlimited 100rb\",\"harga\": 100000.0,\"hargaAwal\": 100000.0,\"dataAllnet\": \"15Gb\",\"dataRoaming\": \"150Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"120 minutes allnet + 200 SMS allnet\",\"dataSubscription\": \"-\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"},{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 150rb\",\"offerId\": \"3882029\",\"bid\": \"30508\",\"offerName\": \"Halo Kick Premium 150rb\",\"varianName\": \"Halo Unlimited 150rb\",\"harga\": 150000.0,\"hargaAwal\": 150000.0,\"dataAllnet\": \"30Gb\",\"dataRoaming\": \"200Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"240 minutes allnet + 400 SMS allnet\",\"dataSubscription\": \"-\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"},{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 225rb\",\"offerId\": \"3888449\",\"bid\": \"30509\",\"offerName\": \"Halo Kick Premium 225rb\",\"varianName\": \"Halo Unlimited 225rb\",\"harga\": 225000.0,\"hargaAwal\": 225000.0,\"dataAllnet\": \"50Gb\",\"dataRoaming\": \"300Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"400 minutes allnet + 700 SMS allnet\",\"dataSubscription\": \"-\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"},{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 300rb\",\"offerId\": \"3882039\",\"bid\": \"30510\",\"offerName\": \"Halo Kick Premium 300rb\",\"varianName\": \"Halo Unlimited 300rb\",\"harga\": 300000.0,\"hargaAwal\": 300000.0,\"dataAllnet\": \"70Gb\",\"dataRoaming\": \"400Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"500 minutes allnet + 1000 SMS allnet\",\"dataSubscription\": \"MAXstream, sushiroll, VIU, Vidio Gold\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"},{\"poolName\": \"002GNSSC\",\"buCode\": \"002GNSAT\",\"packageName\": \"Halo Kick Premium 550rb\",\"offerId\": \"3882049\",\"bid\": \"30511\",\"offerName\": \"Halo Kick Premium 550rb\",\"varianName\": \"Halo Unlimited 550rb\",\"harga\": 550000.0,\"hargaAwal\": 550000.0,\"dataAllnet\": \"150Gb + 3Gb (first 3 month)\",\"dataRoaming\": \"500Mb\",\"dataContent\": \"Unlimited Daily Apps FUP 3GB / 1 Mbps\",\"voiceSms\": \"1000 minutes allnet + 2000 SMS allnet\",\"dataSubscription\": \"MAXstream, sushiroll, VIU, Vidio Platinum, HBO GO\",\"priceplanId\": \"2760843\",\"parentId\": \"3289394\"}]}";
         return ret;
+    }
+    private async Task MainMenu()
+    {
+        trans.AddTrail("INPUT OTP", "BACK TO MAIN MENU", "02");
+        trans.status = "02";
+        await OurUtility.AuditTrailPSB(trans, menu, cst);
+        NavMan.NavigateTo("/main");
     }
 }

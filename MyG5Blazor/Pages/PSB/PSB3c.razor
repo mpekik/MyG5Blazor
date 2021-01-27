@@ -186,9 +186,9 @@
 
     private async Task MainMenu()
     {
-        trans.AddTrail("GET PAYMENT METHOD", "BACK TO MAIN MENU", "CANCELED BY USER");
+        trans.AddTrail("CHOOSE NUMBER", "BACK TO MAIN MENU", "02");
         trans.status = "02";
-        //await OurUtility.AuditTrail(trans, menu, cst);
+        await OurUtility.AuditTrailPSB(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
     //private void PopulateNumber()
@@ -249,7 +249,7 @@
                     }
                     trans.AddTrail("Reserve Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.selectedPaket, "01");
                     trans.status = "01";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
                     NavigateTo("/error");
@@ -269,7 +269,7 @@
                 isLoading = false;
                 trans.AddTrail("Reserve Number", "Exception Error ", "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
@@ -282,7 +282,7 @@
             isLoading = false;
             trans.AddTrail("Reserve Number", "Hit Webservice Error : " + strResult, "01");
             trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error : " + strResult;
             OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");

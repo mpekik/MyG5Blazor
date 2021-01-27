@@ -1245,5 +1245,290 @@ namespace MyG5Blazor.Data
         {
             Process_DocumentHalo(e);
         }
+
+        public static bool PrintPSB(Transaction trx, Costumer cst, Config cfg, string logTsel, ref string p_message)
+        {
+            bool result = false;
+
+            _dtNow = DateTime.Now;
+            _trx = trx;
+            _cst = cst;
+            _cfg = cfg;
+            _logoTsel = logTsel;
+
+            formatCenter.Alignment = StringAlignment.Center;
+            formatRight.Alignment = StringAlignment.Far;
+            formatLeft.Alignment = StringAlignment.Near;
+
+            p_message = string.Empty;
+            font_family = "Arial";
+            font_size = 8;
+
+            try
+            {
+                int margin_top = 5;
+                int margin_bottom = 5;
+                int margin_left = 5;
+                int margin_right = 5;
+                int height = 0;
+                Margins margin = new Margins(margin_left, margin_right, margin_top, margin_bottom);
+                PrintDocument document = DocumentPSB(ref height);
+
+                document.Print();
+
+                int printed_height = (int)(height * PIXEL_TO_MM) + margin_top + margin_bottom;
+
+                // Case khusus
+                if (printed_height < 85)
+                {
+                    printed_height = 85;
+                }
+
+                // Stop Paper berkurang
+                Paper.Decrease(printed_height, ref _cfg);
+
+                result = true;
+            }
+            catch (Exception ex)
+            {
+                p_message = ex.Message;
+            }
+
+            return result;
+
+        }
+
+        public static PrintDocument DocumentPSB(ref int p_height)
+        {
+            PrintDocument result = null;
+
+            try
+            {
+                p_height = Process_DocumentPSB(null);
+
+                PrinterSettings settings = new PrinterSettings();
+                result = new PrintDocument();
+                result.DefaultPageSettings = GetPrinterPageInfo(settings.PrinterName);
+                //result.DefaultPageSettings.PaperSize = new PaperSize("Custom", 320, p_height);
+                result.PrintPage += new PrintPageEventHandler(PrintPage_HandlerPSB);
+
+                try
+                {
+                    result.PrinterSettings.PrinterName = settings.PrinterName; // get DefaultPrinter from Windows
+                }
+                catch { }
+            }
+            catch
+            {
+                result = null;
+            }
+
+            return result;
+        }
+        private static int Process_DocumentPSB(PrintPageEventArgs e)
+        {
+            int result = 0;
+
+            string _jenisTrx = string.Empty;
+            string _statusTrx = string.Empty;
+
+            _jenisTrx = "BERLANGGANAN HALO";
+
+            if (_trx.resultPayment == "00")
+            {
+                _statusTrx = "BERHASIL";
+            }
+            else
+            {
+                _statusTrx = "GAGAL";
+            }
+            float _startX = 20;
+            float _startY = leading;
+            float Offset = 0;
+
+            SizeF layoutSize = new SizeF(280 - Offset * 2, lineheight14);
+
+            Brush brush = Brushes.Black;
+            try
+            {
+                Font font = new Font(font_family, font_size);
+                float fontHeight = font.GetHeight();
+
+                Image img = Image.FromFile(_logoTsel);
+                if (e != null)
+                    e.Graphics.DrawImage(img, (e.PageBounds.Width - img.Width) / 2,
+                         0,
+                         img.Width,
+                         img.Height);
+
+                Offset = img.Height + 4;
+                Offset = Offset + lineheight8;
+                RectangleF layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString(_cfg.terminalDesc
+                              , font10, brush, layout, formatCenter);
+                Offset = Offset + lineheight10;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString(_cfg.terminalLocation
+                              , font10, brush, layout, formatCenter);
+                Offset = Offset + lineheight10;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString(_jenisTrx
+                              , font10, brush, layout, formatCenter);
+                Offset = Offset + lineheight10;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("_____________________________________"
+                              , font8UnderLine, brush, layout, formatCenter);
+                Offset = Offset + lineheight6;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("DATE : " + _dtNow.ToString("dd-MM-yyyy")
+                              , font8, brush, layout, formatLeft);
+
+                e.Graphics.DrawString("TIME : " + _dtNow.ToString("HH:mm:ss")
+                              , font8, brush, layout, formatRight);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                Offset = Offset + lineheight6;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("TRANSACTION ID"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(":"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(_trx.transID
+                              , font8, brush, layout, formatLeft);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("MSISDN"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(":"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(_cst.phoneNumberMasked
+                              , font8, brush, layout, formatLeft);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("TERMINAL ID"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(":"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(_trx.termID
+                              , font8, brush, layout, formatLeft);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("METODE BAYAR"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(":"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(_cst.strMPembayaran
+                              , font8, brush, layout, formatLeft);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("NOMINAL TAGIHAN"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(":"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                e.Graphics.DrawString("Rp " + _cst.intTagihan.ToString("N0")
+                              , font8, brush, layout, formatLeft);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("NOMINAL DIBAYARKAN"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(":"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                e.Graphics.DrawString("Rp " + _cst.intTagihanTerbayar.ToString("N0")
+                              , font8, brush, layout, formatLeft);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("STATUS TRANSAKSI"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(":"
+                              , font8, brush, layout, formatLeft);
+                layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                e.Graphics.DrawString(_statusTrx
+                              , font8Bold, brush, layout, formatLeft);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                if (_trx.jenisTrans == "IP")
+                {
+                    if (_trx.pulsaSerialNumber != string.Empty && _trx.pulsaSerialNumber != "" && _trx.pulsaSerialNumber != null)
+                    {
+                        e.Graphics.DrawString("SN"
+                                      , font8, brush, layout, formatLeft);
+                        layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                        e.Graphics.DrawString(":"
+                                      , font8, brush, layout, formatLeft);
+                        layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                        e.Graphics.DrawString(_trx.pulsaSerialNumber
+                                      , font8Bold, brush, layout, formatLeft);
+                        Offset = Offset + lineheight8;
+                        layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+                    }
+                }
+
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("TERIMA KASIH TELAH MENGGUNAKAN"
+                              , font8, brush, layout, formatCenter);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("LAYANAN JASA MYGRAPARI TELKOMSEL"
+                              , font8, brush, layout, formatCenter);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                e.Graphics.DrawString("SIMPAN BUKTI STRUK INI"
+                              , font8, brush, layout, formatCenter);
+                Offset = Offset + lineheight8;
+                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                //Offset = Offset + (int)fontHeight + 4;
+                result = (int)(_startY + Offset - lineheight10);
+
+                if (e != null)
+                {
+
+                }
+            }
+            catch { }
+
+            return result;
+        }
+        private static void PrintPage_HandlerPSB(object sender, PrintPageEventArgs e)
+        {
+            Process_DocumentHalo(e);
+        }
     }
 }
