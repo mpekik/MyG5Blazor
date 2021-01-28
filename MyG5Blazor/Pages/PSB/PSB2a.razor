@@ -480,6 +480,7 @@
     private async Task GetPaket()
     {
         isLoading = true;
+        menu._menuPSB.Clear();
         await Task.Delay(5000);
         string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
             "\"transactionId\": \"" + trans.transID + "\"" +

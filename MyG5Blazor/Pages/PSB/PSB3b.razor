@@ -185,6 +185,7 @@
     private async Task GetNomor()
     {
         isLoading = true;
+        menu.psbNomer.Clear();
         InvokeAsync(StateHasChanged);
         await Task.Delay(200);
         string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +

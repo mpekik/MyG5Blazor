@@ -144,6 +144,31 @@
 
         </div>
     }
+    @if (IsVisible)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        @if (intTryCount <= intTryLimit)
+                        {
+                            <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;">e-KTP</span> Anda, pastikan alat <br />pemindai dalam keadaan bersih</p>
+                            <button class="btn btn-danger modal-button" @onclick="CheckEKTP">OK</button>
+                        }
+                        else
+                        {
+                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
+                            <button @onclick="@(()=>InvokeAsync(MenuUtama))" class="btn btn-danger modal-button" id="span1">OK</button>
+                        }
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
 </div>
 
 @code{
@@ -159,6 +184,7 @@
     private bool isFPNoDataConfirmPush = true;
     private bool isFPNoDataUnComfirmPush = false;
     private bool isPopUp = false;
+    private bool isNumberReleased = false;
 
     public string _myURL = "";
     public string saveURL = "log/v1/save";
@@ -188,10 +214,14 @@
             IsVisible = false;
             isLoading2 = true;
             await ReleaseNumber();
-            trans.status = "01";
-            trans.errorCode = "EKTP";
-            await OurUtility.AuditTrailPSB(trans, menu, cst);
-            NavigateTo("/main");
+            if (isNumberReleased)
+            {
+                trans.status = "01";
+                trans.errorCode = "EKTP";
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                NavigateTo("/main");
+            }
         }
     }
     private async Task MenuUtamaCanceled()
@@ -347,7 +377,7 @@
             }
             else if (isFail)
             {
-                await ReleaseNumber();
+                //await ReleaseNumber();
                 await MenuUtama();
             }
         }
@@ -545,6 +575,7 @@
                     }
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
                     trans.status = "01";
+                    trans.errorCode = "EKTP";
                     await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
@@ -565,6 +596,7 @@
                 isLoading = false;
                 trans.AddTrail("Release Number", "Exception Error ", "01");
                 trans.status = "01";
+                trans.errorCode = "EKTP";
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
@@ -578,6 +610,7 @@
             isLoading = false;
             trans.AddTrail("Release Number", "Hit Webservice Error : " + strResult, "01");
             trans.status = "01";
+            trans.errorCode = "EKTP";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error : " + strResult;
