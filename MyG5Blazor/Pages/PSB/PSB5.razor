@@ -152,6 +152,12 @@
     private string releaseNumberService = "psb-halo/v1/release-number";
     private string cekBlackListURL = "psb-halo/v1/check-blacklist";
 
+    string temp = string.Empty;
+    string tanggal = string.Empty;
+    string tahun = string.Empty;
+    string bulan = string.Empty;
+    string output = string.Empty;
+
     private string strMsgError = string.Empty;
     private int intTryCount = 1;
     private int intTryLimit = 3;
@@ -398,10 +404,12 @@
 
                         OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                         //cst.EKTPNumber = ktp.Id;
+                        temp = ktp.DateOfBirth;
+
                         trans.psbDetail.ektpData = ktp;
                         trans.psbDetail.nik = ktp.Id;
                         trans.psbDetail.nama = ktp.Name;
-                        trans.psbDetail.tglLahir = ktp.DateOfBirth;
+                        trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
 
                         isLoading = false;
                         IsSuccess = true;
@@ -516,7 +524,7 @@
                         trans.psbDetail.nik = ktp.Id;
                         cst.EKTPNumber = ktp.Id;
                         trans.psbDetail.nama = ktp.Name;
-                        trans.psbDetail.tglLahir = ktp.DateOfBirth;
+                        trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
 
                         isLoading = false;
                         IsSuccess = true;
@@ -536,7 +544,7 @@
 
                             trans.psbDetail.nik = ktp.Id;
                             trans.psbDetail.nama = ktp.Name;
-                            trans.psbDetail.tglLahir = ktp.DateOfBirth;
+                            trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
                             trans.psbDetail.ektpData = ktp;
 
                             //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");

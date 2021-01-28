@@ -453,8 +453,8 @@
         if (otp.Length == 6)
         {
             trans.psbDetail.otp = otp;
-            //await CekOTP();
-            isValid=true;
+            await CekOTP();
+            //isValid=true;
             if (isValid)
             {
                 await GetPaket();

@@ -28,7 +28,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        tt();
+        await StringToDate();
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
@@ -127,6 +127,31 @@
             aTimer.Stop();
             aTimer.Dispose();
             aTimer = null;
+        }
+    }
+    private async Task StringToDate()
+    {
+        string input = "20-8-2000";
+        string temp = input;
+        string tanggal = temp.Substring(0, temp.IndexOf("-"));
+        string tahun = string.Empty;
+        string bulan = string.Empty;
+        string output = string.Empty;
+
+        if (tanggal.Length < 3)
+        {
+            if (tanggal.Length == 1)
+            {
+                tanggal = "0" + tanggal;
+            }
+            temp = temp.Substring(temp.IndexOf("-") + 1);
+            bulan = temp.Substring(0, temp.IndexOf("-"));
+            if (bulan.Length == 1)
+            {
+                bulan = "0" + bulan;
+            }
+            tahun = temp.Substring(temp.IndexOf("-") + 1);
+            output = tahun + "-" + bulan + "-" + tanggal;
         }
     }
 }

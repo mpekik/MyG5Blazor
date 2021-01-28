@@ -234,7 +234,7 @@
         string subEmail = inputEmail.Substring(inputEmail.IndexOf("@") + 1);
         foreach (string fd in forbiddenDomain)
         {
-            if (subEmail == fd)
+            if (subEmail.ToLower() == fd)
                 return false;
         }
         return true;

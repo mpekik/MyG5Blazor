@@ -423,6 +423,32 @@ namespace MyG5Blazor.Data
             string strResult2 = await OurUtility.PostCallAPI(myURL2, myJson2, menu);
             OurUtility.Write_Log("== Response Trans Log : " + strResult2, "step-action");
         }
+        public static async Task<string> ConvertTanggalKTP(string input)
+        {
+            string temp = input;
+            string tanggal = temp.Substring(0, temp.IndexOf("-"));
+            string tahun = string.Empty;
+            string bulan = string.Empty;
+            string output = string.Empty;
+
+            if (tanggal.Length < 3)
+            {
+                if (tanggal.Length == 1)
+                {
+                    tanggal = "0" + tanggal;
+                }
+                temp = temp.Substring(temp.IndexOf("-") + 1);
+                bulan = temp.Substring(0, temp.IndexOf("-"));
+                if (bulan.Length == 1)
+                {
+                    bulan = "0" + bulan;
+                }
+                tahun = temp.Substring(temp.IndexOf("-") + 1);
+                output = tahun + "-" + bulan + "-" + tanggal;
+            }
+
+            return output;
+        }
         public static async Task<string> PostCallAPI(string url, string jsonString, Menu menu)
         {
             string secret = OurUtility.RandomString(10);
