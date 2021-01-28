@@ -507,7 +507,7 @@
             OurUtility.Write_Log("== Request API : " + myJson, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
             OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-            if (strResult != "")
+            if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
             {
                 try
                 {
@@ -611,7 +611,7 @@
             OurUtility.Write_Log("== Request API : " + myJson, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
             OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-            if (strResult != "")
+            if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
             {
                 try
                 {

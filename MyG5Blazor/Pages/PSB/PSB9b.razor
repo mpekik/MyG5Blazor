@@ -475,7 +475,7 @@
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA DEBIT BERHASIL";
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
-                            await OurUtility.AuditTrail(trans, menu, cst);
+                            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -502,7 +502,7 @@
                             }
                             trans.status = "01";
                             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
-                            await OurUtility.AuditTrail(trans, menu, cst);
+                            await OurUtility.AuditTrailPSB(trans, menu, cst);
                             if (trans.edcresp == "00")
                             {
                                 Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
@@ -527,7 +527,7 @@
                         OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
                         trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
                         trans.status = "01";
-                        await OurUtility.AuditTrail(trans, menu, cst);
+                        await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                         //Console.WriteLine("Payment Failed");
                     }
@@ -608,7 +608,7 @@
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA CC BERHASIL";
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
-                            await OurUtility.AuditTrail(trans, menu, cst);
+                            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                             Timer.SetTimer(20000);
                             Timer.OnElapsed += TimerElapsedHandler;
@@ -636,7 +636,7 @@
                             }
                             trans.status = "01";
                             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
-                            await OurUtility.AuditTrail(trans, menu, cst);
+                            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                             if (trans.edcresp == "00")
                             {
@@ -662,7 +662,7 @@
                         OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
                         trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
                         trans.status = "01";
-                        await OurUtility.AuditTrail(trans, menu, cst);
+                        await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                         //Console.WriteLine("Payment Failed");
                     }
@@ -702,7 +702,7 @@
             trans.status = "00";
             trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA CASH BERHASIL";
             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
@@ -716,7 +716,7 @@
 
             trans.status = "01";
             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
@@ -752,7 +752,7 @@
             trans.kip = "Pembayaran tidak dilanjutkan, terminal id:" + menu.terminalId;
             trans.status = "02";
             trans.errorCode = "CANCELED";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             Timer.SetTimer(20000);
             Timer.OnElapsed += TimerElapsedHandler;
@@ -881,7 +881,7 @@
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != "")
+        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
             {
@@ -1077,15 +1077,21 @@
                                     "\"idReservation\" : \"" + trans.psbDetail.reserveId + "\"," +
                                     "\"persoId\" : \"" + trans.persoID + "\"}";
 
+        //trans.psbDetail.ektpData.PlaceOfBirth = "JAKARTA";
+        //trans.psbDetail.ektpData.Address = "KP. KANDANG";
+        //trans.psbDetail.ektpData.Gender = "LAKI-LAKI";
+        //trans.psbDetail.ektpData.City = "JAKARTA SELATAN";
+        //trans.psbDetail.ektpData.Province = "DKI JAKARTA";
+
         string customerProfile = "{ \"namaLengkap\" : \"" + trans.psbDetail.nama + "\"," +
                 "\"noKtp\" : \"" + trans.psbDetail.nik + "\"," +
                 "\"noKk\" : \"" + trans.psbDetail.nokk + "\"," +
-                "\"tempatLahir\" : \"" + trans.psbDetail.ektpData.PlaceOfBirth + "\"," +
+                "\"tempatLahir\" : \"" + "JAKARTA" + "\"," +
                 "\"tanggalLahir\" : \"" + trans.psbDetail.tglLahir + "\"," +
-                "\"alamat\" : \"" + trans.psbDetail.ektpData.Address + "\"," +
-                "\"jenisKelamin\" : \"" + trans.psbDetail.ektpData.Gender + "\"," +
-                                    "\"kota\" : \"" + trans.psbDetail.ektpData.City + "\"," +
-                                    "\"propinsi\" : \"" + trans.psbDetail.ektpData.Province + "\"," +
+                "\"alamat\" : \"" + "KP. KANDANG" + "\"," +
+                "\"jenisKelamin\" : \"" + "LAKI-LAKI" + "\"," +
+                                    "\"kota\" : \"" + "JAKARTA SELATAN" + "\"," +
+                                    "\"propinsi\" : \"" + "DKI JAKARTA" + "\"," +
                                     "\"email\" : \"" + trans.psbDetail.alamatEmail + "\"}";
 
         if (MetodePembayaran == 1 || MetodePembayaran == 3)
@@ -1114,7 +1120,7 @@
                 "\"terminalId\" : \"" + trans.termID + "\"," +
                 "\"psbDetail\" : " + psbDetail + "," +
                 "\"customerProfile\" : " + customerProfile + "," +
-                "\"payment\" : " + payment + "}" +
+                "\"payment\" : " + payment +
                 "}";
 
         string myURL = _myURL + serviceURL;

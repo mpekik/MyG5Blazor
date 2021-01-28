@@ -248,7 +248,7 @@
                     trans.errorCode = "Exception Error";
                     OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                     //isNotIdle = false;
-                    NavMan.NavigateTo("/error");
+                    NavigateTo("/error");
                 }
             }
             else
@@ -261,7 +261,7 @@
                 trans.errorCode = "Hit Webservice Error : " + strResult;
                 OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
                 //isNotIdle = false;
-                NavMan.NavigateTo("/error");
+                NavigateTo("/error");
             }
         }
     }

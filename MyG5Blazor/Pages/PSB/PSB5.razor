@@ -295,37 +295,40 @@
             IsVisible = false;
             if (config.ektpType == "a")
             {
-                //await FingerPrintScan();
+                await FingerPrintScan();
 
-                await Task.Delay(6000);
-                isLoading = false;
-                IsSuccess = true;
+                //await Task.Delay(6000);
+                //isLoading = false;
+                //IsSuccess = true;
                 InvokeAsync(StateHasChanged);
-                await Task.Delay(2000);
+                //await Task.Delay(2000);
 
                 if (IsSuccess)
                 {
-                    trans.psbDetail.nik = "3174093010890006";
-                    trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
-                    trans.psbDetail.tglLahir = "1989-10-30";
+                    //trans.psbDetail.nik = "3174093010890006";
+                    //trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
+                    //trans.psbDetail.tglLahir = "1989-10-30";
 
                     await CekBlackList();
                 }
             }
             else if (config.ektpType == "c")
             {
-                //await FingerPrintScanC();
+                await FingerPrintScanC();
                 //isLoading = true;
-                await Task.Delay(6000);
-                isLoading = false;
-                IsSuccess = true;
-                await Task.Delay(2000);
+                //await Task.Delay(6000);
+                //isLoading = false;
+                //IsSuccess = true;
+                //await Task.Delay(2000);
 
-                trans.psbDetail.nik = "3174093010890006";
-                trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
-                trans.psbDetail.tglLahir = "1989-10-30";
+                if (IsSuccess)
+                {
+                    //trans.psbDetail.nik = "3174093010890006";
+                    //trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
+                    //trans.psbDetail.tglLahir = "1989-10-30";
 
-                await CekBlackList();
+                    await CekBlackList();
+                }
                 //NavigateTo("/PSB/5");
             }
             else
@@ -402,9 +405,6 @@
 
                         isLoading = false;
                         IsSuccess = true;
-
-                        Timer.SetTimer(1000);
-                        Timer.OnElapsed += TimerElapsedHandler;
 
                         return;
                     }
@@ -522,10 +522,7 @@
                         IsSuccess = true;
                         OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
                         result = Ektp_Sdk.CloseReader(reader);
-
-                        Timer.SetTimer(1000);
-                        Timer.OnElapsed += TimerElapsedHandler;
-                        //break;
+                        return;
                     }
                     else
                     {
@@ -552,9 +549,7 @@
                             //OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
                             //Switcher.DOWN("500",config.usbEKTP);
 
-                            Timer.SetTimer(1000);
-                            Timer.OnElapsed += TimerElapsedHandler;
-                            //break;
+                            return;
                         }
                         else
                         {
