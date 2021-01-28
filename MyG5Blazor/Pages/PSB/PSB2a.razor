@@ -418,7 +418,7 @@
                     trans.AddTrail("Validasi OTP", "", "02");
                     isLoading = false;
                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
-                    isVisible = false;
+                    isVisible = true;
                     return;
                 }
             }

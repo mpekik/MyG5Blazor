@@ -418,6 +418,7 @@
                     }
                     else
                     {
+                        IsSuccess = false;
                         trans.AddTrail("FINGERPRINT", "NOT-MATCH", "01");
                         OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
 

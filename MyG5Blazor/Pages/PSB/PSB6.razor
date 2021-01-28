@@ -226,7 +226,7 @@
                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     trans.AddTrail("Validasi NIK & NOKK", "NIK : " + trans.psbDetail.nik + ", NOKK : " + trans.psbDetail.nokk, "02");
 
-                    isPopUp = false;
+                    isPopUp = true;
                     return;
                 }
             }
