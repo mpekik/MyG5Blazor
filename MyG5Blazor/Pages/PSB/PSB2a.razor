@@ -229,6 +229,7 @@
         OurUtility.Write_Log("Request OTP", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError")
         {
@@ -378,6 +379,7 @@
         OurUtility.Write_Log("Request OTP", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError")
         {
@@ -494,9 +496,10 @@
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         //string strResult = TestData();
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
-            strResult != "BadRequest" && strResult != "InternalServerError")
+        strResult != "BadRequest" && strResult != "InternalServerError")
         {
             try
             {

@@ -187,8 +187,8 @@
             "\"noKk\": \"" + trans.psbDetail.nokk + "\"" +
                "}";
         string myURL = _myURL + cekNokk;
-        OurUtility.Write_Log("Request OTP", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("Validasi NoKK", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError")
@@ -289,11 +289,12 @@
                "}";
         string myURL = _myURL + releaseNumberService;
         OurUtility.Write_Log("Release Number", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
-            strResult != "BadRequest" && strResult != "InternalServerError")
+        strResult != "BadRequest" && strResult != "InternalServerError")
         {
             try
             {

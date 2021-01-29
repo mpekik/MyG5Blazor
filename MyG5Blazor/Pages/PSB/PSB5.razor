@@ -200,11 +200,12 @@
                "}";
         string myURL = _myURL + releaseNumberService;
         OurUtility.Write_Log("Release Number", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
-            strResult != "BadRequest" && strResult != "InternalServerError")
+        strResult != "BadRequest" && strResult != "InternalServerError")
         {
             try
             {
@@ -606,9 +607,10 @@
             "\"tanggalLahir\": \"" + trans.psbDetail.tglLahir + "\"" +
                "}";
         string myURL = _myURL + cekBlackListURL;
-        OurUtility.Write_Log("Request OTP", "step-action");
+        OurUtility.Write_Log("Validasi NIK", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError")
         {
@@ -644,10 +646,12 @@
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                 {
                     isLoading2 = false;
+                    isLoading = true;
+                    IsSuccess = false;
                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     trans.AddTrail("Cek BlackList NIK", trans.psbDetail.nik, "02");
 
-                    isPopUp = false;
+                    isPopUp = true;
                     return;
                 }
             }
