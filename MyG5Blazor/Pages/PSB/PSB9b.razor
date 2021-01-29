@@ -1086,12 +1086,12 @@
         string customerProfile = "{ \"namaLengkap\" : \"" + trans.psbDetail.nama + "\"," +
                 "\"noKtp\" : \"" + trans.psbDetail.nik + "\"," +
                 "\"noKk\" : \"" + trans.psbDetail.nokk + "\"," +
-                "\"tempatLahir\" : \"" + "JAKARTA" + "\"," +
+                "\"tempatLahir\" : \"" + trans.psbDetail.ektpData.PlaceOfBirth + "\"," +
                 "\"tanggalLahir\" : \"" + trans.psbDetail.tglLahir + "\"," +
-                "\"alamat\" : \"" + "KP. KANDANG" + "\"," +
-                "\"jenisKelamin\" : \"" + "LAKI-LAKI" + "\"," +
-                                    "\"kota\" : \"" + "JAKARTA SELATAN" + "\"," +
-                                    "\"propinsi\" : \"" + "DKI JAKARTA" + "\"," +
+                "\"alamat\" : \"" + trans.psbDetail.ektpData.Address + "\"," +
+                "\"jenisKelamin\" : \"" + trans.psbDetail.ektpData.Gender + "\"," +
+                                    "\"kota\" : \"" + trans.psbDetail.ektpData.City + "\"," +
+                                    "\"propinsi\" : \"" + trans.psbDetail.ektpData.Province + "\"," +
                                     "\"email\" : \"" + trans.psbDetail.alamatEmail + "\"}";
 
         if (MetodePembayaran == 1 || MetodePembayaran == 3)

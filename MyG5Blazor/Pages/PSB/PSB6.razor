@@ -171,6 +171,10 @@
                 NavigateTo("/PSB/7a");
                 //await GetPaket();
             }
+        }else if(strNumber.Length<16)
+        {
+            strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK<\\span> yang Anda gunakan tidak sesuai dengan <br>eKTP. Mohon periksa kembali NoKK yang digunakan.";
+            isPopUp = true;
         }
     }
     private async Task CekNOKK()

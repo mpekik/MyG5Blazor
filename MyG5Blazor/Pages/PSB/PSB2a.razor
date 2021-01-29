@@ -468,6 +468,10 @@
             {
                 NavigateTo("/error");
             }
+        }else if(otp.Length<6)
+        {
+            strMsgError = "Maaf, kode verifikasi yang Anda masukkan tidak valid.\nMohon cek kembali kode verifikasi yang Anda terima.";
+            isVisible = true;
         }
     }
     private async Task InvalidOK()
