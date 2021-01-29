@@ -173,7 +173,7 @@
             }
         }else if(strNumber.Length<16)
         {
-            strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK<\\span> yang Anda gunakan tidak sesuai dengan <br>eKTP. Mohon periksa kembali NoKK yang digunakan.";
+            strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> yang Anda gunakan tidak sesuai dengan <br>eKTP. Mohon periksa kembali NoKK yang digunakan.";
             isPopUp = true;
         }
     }
@@ -211,6 +211,15 @@
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                        if (trans.errorCode == "303002")
+                        {
+                            isLoading = false;
+                            strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> yang Anda gunakan tidak sesuai dengan <br>eKTP. Mohon periksa kembali NoKK yang digunakan.";
+                            trans.AddTrail("Validasi NIK & NOKK", "NIK : " + trans.psbDetail.nik + ", NOKK : " + trans.psbDetail.nokk, "02");
+
+                            isPopUp = true;
+                            return;
+                        }
                     }
                     else
                     {
@@ -300,6 +309,7 @@
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+
                     }
                     else
                     {
