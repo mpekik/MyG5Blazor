@@ -221,7 +221,7 @@
             if(image!=null)
                 imageBytesStr = Convert.ToBase64String(image);
             else
-            imageBytesStr = "";
+                imageBytesStr = "";
 
             cst.PhoneNumber = "62" + strNumber.Substring(1);
 
@@ -237,7 +237,7 @@
             OurUtility.Write_Log("== Check Phone Number", "step-action");
             OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-            //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
             if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
             {
                 try
@@ -290,15 +290,15 @@
                 }
                 catch (Exception ex)
                 {
-                    trans.errorCode = "Exception Error";
-                    OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                    trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+                    OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
                     NavMan.NavigateTo("/error");
                 }
             }
             else
             {
-                trans.errorCode = strResult;
-                OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+                trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+                OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
                 NavMan.NavigateTo("/error");
             }
         }

@@ -191,7 +191,7 @@
                    "}";
             string myURL = _myURL + releaseNumberService;
             OurUtility.Write_Log("Release Number", "step-action");
-            //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+            OurUtility.Write_Log("== Request API : " + myJson, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
 
             if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
@@ -250,12 +250,12 @@
             else
             {
                 isLoading = false;
-                trans.AddTrail("Release Number", "Hit Webservice Error : " + strResult, "01");
+                trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult+"}", "01");
                 trans.status = "01";
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-                trans.errorCode = "Hit Webservice Error : " + strResult;
-                OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+                trans.errorCode = "Hit Webservice Error {" + strResult+"}";
+                OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult+"}", "step-action");
                 //isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }

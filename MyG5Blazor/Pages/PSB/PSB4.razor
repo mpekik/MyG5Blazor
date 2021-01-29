@@ -608,13 +608,13 @@
         else
         {
             isLoading = false;
-            trans.AddTrail("Release Number", "Hit Webservice Error : " + strResult, "01");
+            trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             trans.errorCode = "EKTP";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-            trans.errorCode = "Hit Webservice Error : " + strResult;
-            OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+            trans.errorCode = "Hit Webservice Error {" + strResult+"}";
+            OurUtility.Write_Log("== Hit Webservice Error {" + strResult+"}", "step-action");
             //isNotIdle = false;
             NavMan.NavigateTo("/error");
         }

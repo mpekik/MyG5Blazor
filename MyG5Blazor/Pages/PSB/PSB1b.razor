@@ -169,10 +169,10 @@
 }
 @code
 {
-    private async Task emailDev()
-    {
-        inputEmail = "marcellus.pekik@gmail.com";
-    }
+        private async Task emailDev()
+        {
+            inputEmail = "marcellus.pekik@gmail.com";
+        }
     private bool isTimeOut = false;
     private bool isSelected = false;
     private bool isLanjut = true;
@@ -310,6 +310,17 @@
                 //isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }
+        }else
+        {
+            isLoading = false;
+            trans.AddTrail("Request OTP", "Hit Webservice Error {" + strResult+"}", "01");
+            trans.status = "01";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+            trans.errorCode = "Hit Webservice Error {" + strResult+"}";
+            OurUtility.Write_Log("== Hit Webservice Error : {" + strResult + "}", "step-action");
+            //isNotIdle = false;
+            NavigateTo("/error");
         }
     }
     private async Task MainMenu()

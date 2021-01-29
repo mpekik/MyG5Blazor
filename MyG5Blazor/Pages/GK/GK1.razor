@@ -259,7 +259,7 @@
 
             //Call HTTP Request
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-            ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
 
             if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
@@ -331,8 +331,8 @@
             }
             else
             {
-                trans.errorCode = strResult;
-                OurUtility.Write_Log("== Error : Hit WebService {Error} " + strResult, "step-action");
+                trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+                OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
                 isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }

@@ -139,7 +139,7 @@
         OurUtility.Write_Log("== Get Bill", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -210,8 +210,8 @@
         }
         else
         {
-            trans.errorCode = strResult;
-            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             trans.AddTrail("GET BILL", cst.strMPembayaran, "01");
             trans.status = "01";
             await OurUtility.AuditTrail(trans, menu, cst);

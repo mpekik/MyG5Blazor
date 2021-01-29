@@ -772,7 +772,7 @@
         OurUtility.Write_Log("== VOID Payment", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -816,8 +816,8 @@
         }
         else
         {
-            trans.errorCode = strResult;
-            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
         }
     }
@@ -867,7 +867,7 @@
         //OurUtility.Write_Log("== URL API : " + myURL, "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        ////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -926,8 +926,8 @@
         }
         else
         {
-            trans.errorCode = strResult;
-            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             trans.AddTrail("CES", "", "01");
 
             //NavMan.NavigateTo("/error");
@@ -1083,7 +1083,7 @@
         OurUtility.Write_Log("== Payment", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult!="NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -1136,8 +1136,8 @@
         {
             trans.resultPayment = "04";
 
-            trans.errorCode = strResult;
-            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
         }
     }
