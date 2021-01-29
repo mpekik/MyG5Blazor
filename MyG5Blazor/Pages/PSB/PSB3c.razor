@@ -231,7 +231,7 @@
                 JObject jobjResult = JObject.Parse(strResult);
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    trans.psbDetail.reserveId = (string)jobjResult["transaction"].SelectToken("id");
+                    trans.psbDetail.reserveId = (string)jobjResult.SelectToken("idReservation");
                     trans.AddTrail("Reserve Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.selectedPaket, "00");
                     NavigateTo("/PSB/4");
                 }
