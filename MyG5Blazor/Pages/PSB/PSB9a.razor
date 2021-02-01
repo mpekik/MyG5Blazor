@@ -8,6 +8,7 @@
 @inject Transaction trans
 @inject Menu menu
 @inject Config config
+@inject Card_Dispenser cds
 
     <div class="main-panel bg-home">
         <!-- Navbar -->
@@ -66,7 +67,7 @@
                                         <td>&emsp;<span style="font-weight: bold;">@trans.strMPembayaran</span></td>
                                     </tr>
                                 </table>
-                                <button class="btn btn-danger btn-right" @onclick="buttonOk" id="btn-ok" value="">OK</button>
+                                <button class="btn btn-danger btn-right" @onclick="(()=>InvokeAsync(buttonOk))" id="btn-ok" value="">OK</button>
                             </div>
                         </div>
                     </div>
@@ -113,23 +114,82 @@
     private bool translog = true;
     private bool isLoading = false;
     private bool isPopUp = false;
+    private bool isFail = false;
+    private bool isError = false;
+    private bool isSuccess = false;
+    private bool IsInvalid = false;
 
     private int intTotalTagihan = 0;
+    private int stock = 4;
+    private int intTryCount = 1;
+    private int intTryLimit = 3;
 
     private string strTotalTagihan => intTotalTagihan.ToString();
 
     private string _myURL = string.Empty;
     private string releaseNumberService = "psb-halo/v1/release-number";
     private string strMsgError = string.Empty;
+    private string msg = string.Empty;
+    private string errorcode = string.Empty;
+    private string mypersoexe = string.Empty;
+    private string strCOM = "COM";
+    private string readerName = string.Empty;
+    private string strPanjang = string.Empty;
+    private string p_icc_id = string.Empty;
+    private string cardStock = string.Empty;
+    private string persoURL = "psb-halo/v1/perso";
+    private string updateURL = "psb-halo/v1/update-perso";
 
     protected override async Task OnInitializedAsync()
     {
+        mypersoexe = config.Read("Dispenser", Config.PARAM_PERSO_EXE);
+        strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
+        readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
+
     }
 
-    private void buttonOk()
+    private async Task buttonOk()
     {
-        NavigateTo("/psb/9b");
+        #region Perso
+        if (cardStock == "")
+        {
+            isFail = true;
+            trans.AddTrail("GET STOCK", "CD - 004", "01");
+            trans.status = "01";
+            trans.errorCode = "CARD DISPENSER";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            trans.errorCode = "CD - 004";
+            OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
+            NavigateTo("/error");
+            return;
+        }
+        stock = Int32.Parse(cardStock);
+        OurUtility.Write_Log("== Step 4. Perso Page", "step-action");
+        isLoading = true;
+        await MyPerso();
+        if (isError)
+        {
+            isLoading = false;
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            NavigateTo("/error");
+        }
+        else if (isSuccess)
+        {
+            isLoading = false;
+            NavigateTo("/PSB/9b");
+        }
+        else if (isFail)
+        {
+            isLoading = false;
+            trans.status = "01";
+            await OurUtility.AuditTrail(trans, menu, cst);
+            await Task.Delay(15000);
+            NavigateTo("/main");
+        }
+        #endregion
     }
 
     private void Nominal(int intNominal)
@@ -235,5 +295,434 @@
             //isNotIdle = false;
             NavMan.NavigateTo("/error");
         }
+    }
+    private async Task MyPerso()
+    {
+        while (intTryCount <= intTryLimit)
+        {
+            if (stock > 0)
+            {
+                Switcher.DOWN("500", config.usbEKTP);
+                await Task.Delay(500);
+                Switcher.UP("3000", config.usbCardReader);
+                await Task.Delay(3000);
+                if (await Task.Run(() => MoveToICC()))
+                {
+
+                    if (!cds.Start(ref errorcode, strCOM, ref msg))
+                    {
+                        OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("==== Card_Dispenser.Start, Success", "step-action");
+                        cds.Stop(ref msg);
+                    }
+                    //ToDO if Reader error
+                    if (await CardReaderScan())
+                    {
+                        trans.AddTrail("GET SN", "SN Kartu : " + p_icc_id, "00");
+                        if (p_icc_id.Substring(2, 2) == "62")
+                        {
+                            await Task.Run(() => MoveToRFCard());
+                            await Task.Run(() => MoveToBin());
+                            if (intTryCount < intTryLimit)
+                            {
+                                intTryCount += 1;
+                                continue;
+                            }
+                            else
+                            {
+                                isFail = true;
+                                await ReleaseNumber();
+                                return;
+                            }
+                        }
+                        string myURL = _myURL + persoURL;
+
+                        //trans.transID = "X002210112174958427984287";
+                        //config.apiBuid = "2503";
+
+                        string myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                        "\"terminalId\" : \"" + menu.terminalId + "\"," +
+                                        "\"noHp\" : \"" + trans.psbDetail.selectedNumber + "\"," +
+                                        "\"buid\" : \"" + config.apiBuid + "\"," +
+                                        "\"serialNumber\" : \"" + p_icc_id + "\"" +
+                                        "}";
+
+                        //OurUtility.Write_Log("=== URL : " + myURL, "step-action");
+                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+                        OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" &&
+                            strResult != "BadRequest" && strResult != "Forbidden")
+                        {
+                            try
+                            {
+                                JObject jobjResult = JObject.Parse(strResult);
+                                trans.transID = (string)jobjResult["transaction"].SelectToken("transactionId");
+                                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                                {
+                                    strPanjang = (string)jobjResult["perso"].SelectToken("message");
+                                    if (strPanjang != null)
+                                    {
+                                        trans.persoID = (string)jobjResult["perso"].SelectToken("persoId");
+                                        trans.AddTrail("GET STRING PANJANG", trans.persoID, "00");
+                                        if (!cds.Start(ref errorcode, strCOM, ref msg))
+                                        {
+                                            OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
+                                        }
+                                        else
+                                        {
+                                            OurUtility.Write_Log("==== Card_Dispenser.Start, Success", "step-action");
+                                            cds.Stop(ref msg);
+                                        }
+                                        if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
+                                        {
+                                            myURL = _myURL + updateURL;
+                                            trans.AddTrail("PERSO", trans.persoID, "00");
+                                            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                            "\"terminalId\" : \"" + trans.termID + "\"," +
+                                            "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                            "\"noHp\" : \"" + trans.psbDetail.selectedNumber + "\"," +
+                                            "\"persoStatus\" : \"2\"}";
+                                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                            if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
+            strResult != "BadRequest" && strResult != "InternalServerError")
+                                            {
+                                                JObject jobjResult2 = JObject.Parse(strResult);
+                                                if ((string)jobjResult2["transaction"].SelectToken("statusCode") == "00")
+                                                {
+                                                    trans.AddTrail("UPDATE PERSO SUCCESS", trans.persoID, "00");
+                                                    isLoading = false;
+                                                    isSuccess = true;
+
+                                                    return;
+                                                }
+                                            }
+                                            else
+                                            {
+                                                trans.AddTrail("UPDATE BERHASIL PERSO", "Perso Id : " + trans.persoID, "01");
+                                                await Task.Run(() => MoveToRFCard());
+                                                if (!await Task.Run(() => MoveToBin()))
+                                                {
+                                                    isSuccess = false;
+                                                    isError = true;
+                                                    trans.AddTrail("MOVE TO BIN", "", "01");
+                                                    trans.status = "01";
+                                                    //await OurUtility.AuditTrail(trans, menu, cst);
+                                                    OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
+                                                    trans.errorCode = "CD - 003";
+                                                    //NavigateTo("/error");
+                                                }
+                                                trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
+                                                isLoading = false;
+                                                isFail = true;
+                                                await ReleaseNumber();
+                                                return;
+                                            }
+                                        }
+                                        else
+                                        {
+                                            trans.AddTrail("PERSO", "Perso Id : " + trans.persoID, "01");
+                                            trans.mypersoResponse = msg;
+                                            await Task.Run(() => MoveToRFCard());
+                                            await Task.Run(() => MoveToBin());
+
+                                            myURL = _myURL + updateURL;
+                                            myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+                                                "\"terminalId\" : \"" + trans.termID + "\"," +
+                                                "\"persoId\" : \"" + trans.persoID + "\" ," +
+                                                "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
+                                                "\"persoStatus\" : \"4\"}";
+                                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+                                            trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "00");
+                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                            if (intTryCount < intTryLimit)
+                                                intTryCount += 1;
+                                            else
+                                            {
+                                                isFail = true;
+                                                trans.kip = "Perso gagal, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
+                                                await ReleaseNumber();
+                                                return;
+                                            }
+                                        }
+                                    }
+                                    else
+                                    {
+                                        trans.AddTrail("GET STRING PANJANG", "", "01");
+                                        await Task.Run(() => MoveToRFCard());
+                                        await Task.Run(() => MoveToBin());
+                                        if (intTryCount < intTryLimit)
+                                            intTryCount += 1;
+                                        else
+                                        {
+                                            isLoading = false;
+                                            isFail = true;
+                                            await ReleaseNumber();
+                                            return;
+                                        }
+                                    }
+
+                                }
+                                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                                {
+                                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                                    {
+                                        OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                                        trans.serviceErrorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                                        if ((string)jobjResult["transaction"].SelectToken("errorCode") == "303018")
+                                        {
+                                            trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
+                                            //OurUtility.AuditTrail(trans, menu, cst);
+                                            isFail = true;
+                                            await ReleaseNumber();
+                                            return;
+                                        }
+                                    }
+                                    else
+                                    {
+                                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                                    }
+                                    trans.status = "01";
+                                    trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
+                                    await Task.Run(() => MoveToRFCard());
+                                    if (!await Task.Run(() => MoveToBin()))
+                                    {
+                                        isSuccess = false;
+                                        isError = true;
+                                        trans.AddTrail("MOVE TO BIN", "", "01");
+                                        OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
+                                        trans.errorCode = "CD - 003";
+                                        await ReleaseNumber();
+                                        return;
+                                    }
+                                    if (intTryCount < intTryLimit)
+                                        intTryCount += 1;
+                                    else
+                                    {
+                                        isLoading = false;
+                                        isFail = true;
+                                        await ReleaseNumber();
+                                        return;
+                                    }
+                                }
+                                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                                {
+                                    trans.AddTrail("GET STRING PANJANG", "", "02");
+                                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                                    isLoading = false;
+                                    //IsVisible = false;
+                                    IsInvalid = true;
+                                    isFail = true;
+                                    await ReleaseNumber();
+                                    return;
+                                }
+                            }
+                            catch (Exception ex)
+                            {
+                                trans.AddTrail("PERSO", trans.persoID, "01");
+                                OurUtility.Write_Log("=== Status Code : " + ex.Message + " {Error}", "step-action");
+                                trans.errorCode = "Exception Error";
+                                isError = true;
+                                await ReleaseNumber();
+                                return;
+                            }
+                        }
+                        else
+                        {
+                            trans.AddTrail("PERSO", trans.persoID, "01");
+                            OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
+                            trans.errorCode = strResult;
+                            isError = true;
+                            await ReleaseNumber();
+                            return;
+                        }
+                    }
+                    else
+                    {
+                        trans.status = "01";
+                        trans.AddTrail("GET SN", "CR - 001", "01");
+                        await Task.Run(() => MoveToRFCard());
+                        if (!await Task.Run(() => MoveToBin()))
+                        {
+                            isSuccess = false;
+                            isError = true;
+                            trans.AddTrail("MOVE TO BIN", "", "01");
+                            OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
+                            trans.errorCode = "CD - 003";
+                            await ReleaseNumber();
+                            return;
+                        }
+                        if (intTryCount < intTryLimit)
+                            intTryCount += 1;
+                        else
+                        {
+                            trans.errorCode = "FAILED GET SN";
+                            isFail = true;
+                            await ReleaseNumber();
+                            return;
+                        }
+                    }
+                }
+                else
+                {
+                    trans.AddTrail("GET SN", "", "01");
+                    trans.status = "01";
+                    trans.errorCode = "CARD DISPENSER";
+                    await OurUtility.AuditTrail(trans, menu, cst);
+                    OurUtility.Write_Log("=== Card Dispenser Error", "step-action");
+                    trans.errorCode = "CD - 001";
+                    await ReleaseNumber();
+                    NavigateTo("/error");
+                    break;
+                }
+            }
+            else
+            {
+                trans.AddTrail("GET STOCK", "", "01");
+                trans.status = "01";
+                trans.errorCode = "KARTU HABIS";
+                await OurUtility.AuditTrail(trans, menu, cst);
+                OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
+                trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
+                await ReleaseNumber();
+                NavigateTo("/error");
+                break;
+            }
+        }
+    }
+
+    private bool MoveToICC()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " + errorcode + "message: " + msg, "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card", "step-action");
+        if (!cds.MoveTo_IC_Card(ref errorcode, ref msg))
+        {
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card, Failed " + errorcode + " message : " + msg, "step-action");
+            return false;
+        }
+        trans.AddTrail("MOVE TO ICC", "", "00");
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return true;
+    }
+
+    private bool MoveToTheFront()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
+        if (!cds.MoveTo_The_Front(ref errorcode, ref msg))
+        {
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed", "step-action");
+            return false;
+        }
+
+        trans.AddTrail("MOVE TO FRONT", "", "00");
+        stock = stock - 1;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
+
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return true;
+    }
+    private bool MoveToRFCard()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To The RF Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_RF", "step-action");
+        if (!cds.MoveTo_RF_Card(ref errorcode, ref msg))
+        {
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToRFCard, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== " + msg, "step-action");
+        trans.AddTrail("MOVE TO RF", "", "00");
+
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return true;
+    }
+    private bool MoveToBin()
+    {
+        OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        {
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            return false;
+        }
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        cds.Initialize(ref errorcode, ref msg);
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
+        if (!cds.MoveTo_Bin(ref errorcode, ref msg))
+        {
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin, Failed " + errorcode + " message : " + msg, "step-action");
+            return false;
+        }
+
+        trans.AddTrail("MOVE TO BIN", "", "00");
+        stock = stock - 1;
+        trans.jumlah_kartu = stock;
+        config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
+
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        cds.Stop(ref msg);
+        return true;
+    }
+
+    private async Task<bool> CardReaderScan()
+    {
+        bool ret = false;
+
+        OurUtility.Write_Log("=== Card Reader Scan IC", "step-action");
+        Card_Reader cdr = new Card_Reader();
+        OurUtility.Write_Log("==== 1. Card_Reader.Read", "step-action");
+        if (await Task.Run(() => cdr.Read(readerName, ref p_icc_id, ref msg)).ConfigureAwait(true))
+        {
+            ret = true;
+            cdr.DisconnectedCard();
+        }
+        return ret;
     }
 }
