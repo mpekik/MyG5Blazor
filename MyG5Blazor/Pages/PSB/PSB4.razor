@@ -392,6 +392,8 @@
         string errMsg = string.Empty;
         Switcher.DOWN("500", config.usbEKTP);
         await Task.Delay(500);
+        Switcher.DOWN("500", "2");
+        await Task.Delay(500);
         Switcher.UP("3000", config.usbEKTP);
         await Task.Delay(3000);
         UInt16 rf = 0;
