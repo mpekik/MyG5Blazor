@@ -304,6 +304,8 @@
         {
             isInit = false;
             IsVisible = false;
+            InvokeAsync(StateHasChanged);
+            await Task.Delay(100);
             if (config.ektpType == "a")
             {
                 await FingerPrintScan();
