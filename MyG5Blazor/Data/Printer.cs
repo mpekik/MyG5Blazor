@@ -1528,7 +1528,7 @@ namespace MyG5Blazor.Data
         }
         private static void PrintPage_HandlerPSB(object sender, PrintPageEventArgs e)
         {
-            Process_DocumentHalo(e);
+            Process_DocumentPSB(e);
         }
     }
 }
