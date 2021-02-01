@@ -425,6 +425,7 @@
     private string resultPayment = string.Empty;
     private string resultCash = "01";
     private string cardStock = string.Empty;
+    private string cdCOM = "COM";
 
     string msg = string.Empty;
     string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
@@ -438,6 +439,7 @@
         trans.psbDetail.PaketPSB._hargaAwal = "100000";
         intBill = int.Parse(trans.psbDetail.PaketPSB._hargaAwal);
         cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
+        cdCOM = cdCOM + config.Read("Dispenser", Config.PARAM_EDC_PORT);
 
         if (cardStock == "")
         {
@@ -1218,6 +1220,9 @@
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
+                await Task.Run(() => MoveToRFCard());
+                await Task.Run(() => MoveToBin());
+
                 await ReleaseNumber();
             }
         }
@@ -1228,6 +1233,9 @@
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
+            await Task.Run(() => MoveToRFCard());
+            await Task.Run(() => MoveToBin());
+
             await ReleaseNumber();
         }
     }
@@ -1459,7 +1467,7 @@
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        if (!cds.Start(ref errorcode, cdCOM, ref msg))
         {
             OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
             return false;
@@ -1488,7 +1496,7 @@
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        if (!cds.Start(ref errorcode, cdCOM, ref msg))
         {
             OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
             return false;
@@ -1514,7 +1522,7 @@
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
-        if (!cds.Start(ref errorcode, strCOM, ref msg))
+        if (!cds.Start(ref errorcode, cdCOM, ref msg))
         {
             OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
             return false;

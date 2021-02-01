@@ -1413,7 +1413,7 @@ namespace MyG5Blazor.Data
                 e.Graphics.DrawString(":"
                               , font8, brush, layout, formatLeft);
                 layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
-                e.Graphics.DrawString(_cst.phoneNumberMasked
+                e.Graphics.DrawString(_trx.psbDetail.selectedNumber
                               , font8, brush, layout, formatLeft);
                 Offset = Offset + lineheight8;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
