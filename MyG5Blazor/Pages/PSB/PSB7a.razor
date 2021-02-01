@@ -208,7 +208,7 @@
                     if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                     {
                         trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "00");
-                        NavigateTo("/PSB/4");
+                        //NavigateTo("/PSB/4");
                     }
                     else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                     {
