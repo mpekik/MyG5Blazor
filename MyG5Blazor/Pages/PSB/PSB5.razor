@@ -296,16 +296,15 @@
     }
     private async Task CheckFinger()
     {
-        Switcher.DOWN("500", "2");
-        await Task.Delay(500);
-        Switcher.UP("3000", "2");
-        await Task.Delay(3000);
         if (IsVisible || isInit)
         {
             isInit = false;
             IsVisible = false;
-            InvokeAsync(StateHasChanged);
-            await Task.Delay(100);
+            StateHasChanged();
+            Switcher.DOWN("500", "2");
+            await Task.Delay(500);
+            Switcher.UP("3000", "2");
+            await Task.Delay(3000);
             if (config.ektpType == "a")
             {
                 await FingerPrintScan();
