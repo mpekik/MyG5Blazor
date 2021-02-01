@@ -300,11 +300,11 @@
         {
             isInit = false;
             IsVisible = false;
-            StateHasChanged();
-            Switcher.DOWN("500", "2");
-            await Task.Delay(500);
-            Switcher.UP("3000", "2");
-            await Task.Delay(3000);
+            //StateHasChanged();
+            //Switcher.DOWN("500", "2");
+            //await Task.Delay(500);
+            //Switcher.UP("3000", "2");
+            //await Task.Delay(3000);
             if (config.ektpType == "a")
             {
                 await FingerPrintScan();
@@ -326,12 +326,19 @@
             }
             else if (config.ektpType == "c")
             {
-                await FingerPrintScanC();
+                //await FingerPrintScanC();
                 //isLoading = true;
                 //await Task.Delay(6000);
-                //isLoading = false;
-                //IsSuccess = true;
-                //await Task.Delay(2000);
+                temp = ktp.DateOfBirth;
+
+                trans.psbDetail.ektpData = ktp;
+                trans.psbDetail.nik = ktp.Id;
+                trans.psbDetail.nama = ktp.Name;
+                trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
+
+                isLoading = false;
+                IsSuccess = true;
+                await Task.Delay(2000);
 
                 if (IsSuccess)
                 {
