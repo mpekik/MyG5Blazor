@@ -492,7 +492,7 @@
                                 Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+                            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
 
                             await CheckNPS("");
 
@@ -535,7 +535,7 @@
                                 Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+                            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
 
                             if (trans.edcRespVoid == "00")
                             {
@@ -628,7 +628,7 @@
                                 Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+                            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
 
                             await CheckNPS("");
 
@@ -670,7 +670,7 @@
                                 Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+                            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
 
                             if (trans.edcRespVoid == "00")
                             {
@@ -721,7 +721,7 @@
             isLoading = false;
             IsSuccess = true;
 
-            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
             await CheckNPS("");
 
             //Console.WriteLine("Payment Success");
@@ -739,7 +739,7 @@
             isLoading = false;
             IsFail = true;
 
-            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
+            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
 
             trans.status = "01";
             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
@@ -772,7 +772,7 @@
 
             await Payment("");
 
-            Printer.PrintHalo(trans, cst, config, logoTsel, ref msg); await CheckNPS("");
+            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg); await CheckNPS("");
 
             Task.Delay(500);
 
