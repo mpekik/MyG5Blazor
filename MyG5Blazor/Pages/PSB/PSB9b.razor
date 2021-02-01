@@ -439,7 +439,7 @@
         trans.psbDetail.PaketPSB._hargaAwal = "20000";
         intBill = int.Parse(trans.psbDetail.PaketPSB._hargaAwal);
         cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
-        cdCOM = cdCOM + config.Read("Dispenser", Config.PARAM_EDC_PORT);
+        cdCOM = cdCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
 
         if (cardStock == "")
         {
