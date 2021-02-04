@@ -9,12 +9,12 @@
 @using System.Net.Http;
 
 @inject Costumer cst
-@inject IJSRuntime JSRuntime;
+@inject IJSRuntime JSRuntime
 @inject NavigationManager NavMan
 @inject Menu menu
 @inject Transaction trans
 @inject Config config
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" style="z-index:1;">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -103,7 +103,7 @@
 </footer>
 @if (isLoading)
 {
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal" style="z-index:999;">
         <div class="modal-blank">
             <img class="lds-spinner" src="../../assets/image/loader.gif">
             <p><br>Mohon tunggu</p>
@@ -113,7 +113,7 @@
 }
 @if (isPopUp)
 {
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal" style="z-index:999;">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -129,8 +129,8 @@
 {
     private async Task nokkDev()
     {
-        //strNumber = "3174090501093309";
-        strNumber = "3375031004070002";
+        strNumber = "3174090501093309";
+        //strNumber = "3375031004070002";
     }
     private bool IsMethod = false;
     private bool isLoading = false;

@@ -14,7 +14,7 @@
 @inject Menu menu
 @inject Transaction trans
 @inject Config config
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" style="z-index:1;">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -56,11 +56,17 @@
                         {
                             @if (i == 0 || i == 6 || i == 12)
                             {
-                                <button @onclick="@(()=> PickNomer(populateNumber[0]))" class="btn-pilih-no btn" value="">@populateNumber[0]</button>
+                               @if (boolNumber[i])
+                               {
+                                <button @onclick="@(() => PickNomer(populateNumber[0]))" class="btn-pilih-no btn" value="">@populateNumber[0]</button>
+                               }
                             }
                             @if (i == 1 || i == 7 || i == 13)
                             {
-                                <button @onclick="@(()=> PickNomer(populateNumber[1]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[1]</button>
+                                @if (boolNumber[i])
+                                {
+                                <button @onclick="@(() => PickNomer(populateNumber[1]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[1]</button>
+                                }
                             }
                         }
                     </div>
@@ -69,27 +75,38 @@
                         {
                             @if (i == 2 || i == 8 || i == 14)
                             {
-                                <button @onclick="@(()=> PickNomer(populateNumber[2]))" class="btn-pilih-no btn" value="">@populateNumber[2]</button>
+                                @if (boolNumber[i])
+                                {
+                                <button @onclick="@(() => PickNomer(populateNumber[2]))" class="btn-pilih-no btn" value="">@populateNumber[2]</button>
+                                }
                             }
                             @if (i == 3 || i == 9 || i == 15)
                             {
-                                <button @onclick="@(()=> PickNomer(populateNumber[3]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[3]</button>
+                                @if (boolNumber[i])
+                                {
+                                <button @onclick="@(() => PickNomer(populateNumber[3]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[3]</button>
+                                }
                             }
-                        }
+                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
                         @for (int i = menu.pageIndex + 4; i < menu.pageIndex + 6; i++)
                         {
+
                             @if (i == 4 || i == 10 || i == 16)
-                            {
-                                <button @onclick="@(()=> PickNomer(@populateNumber[4]))" class="btn-pilih-no btn" value="">@populateNumber[4]</button>
-                            }
+                            {@if (boolNumber[i])
+                                {
+                                    <button @onclick="@(() => PickNomer(@populateNumber[4]))" class="btn-pilih-no btn" value="">@populateNumber[4]</button>
+                                }                            }
                             @if (i == 5 || i == 11 || i == 17)
                             {
-                                <button @onclick="@(()=> PickNomer(populateNumber[5]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[5]</button>
-                            }
+                                @if (boolNumber[i])
+                                {
+                                <button @onclick="@(() => PickNomer(populateNumber[5]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[5]</button>
+                                    }
+                                }
                         }
-                    </div>
+                        </div>
                 </div>
             </div>
         </div>
@@ -117,7 +134,7 @@
 </footer>
 @if (isLoading)
 {
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal" style="z-index:999;">
         <div class="modal-blank">
             <img class="lds-spinner" src="../../assets/image/loader.gif">
             <p><br>Mohon tunggu</p>
@@ -140,6 +157,7 @@
     private string reserveNumberService = "psb-halo/v1/reserve-number";
     private string strMsgError = string.Empty;
 
+    private bool[] boolNumber = { false, false, false, false, false,false };
     private string[] populateNumber = { "", "", "", "", "", "" };
     private int pageIndex = 0;
     private int inputIndex = 0;
@@ -161,10 +179,24 @@
 
     private void PopulateNumber()
     {
-        for(int i=0;i<6;i++)
+        boolNumber = new bool[] { false,false,false,false,false,false };
+        if (menu.psbNomer.Count() > 6)
+        { for (int i = 0; i < 6; i++)
+            {
+                boolNumber[i] = true;
+                populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
+                StateHasChanged();
+            }
+        }
+        else
         {
-            populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
-            StateHasChanged();
+            for(int i=0;i<menu.psbNomer.Count();i++)
+            {
+                boolNumber[i] = true;
+                populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
+                StateHasChanged();
+
+            }
         }
     }
     private void SetPaymentMethod(int _intMPembayaran)
@@ -181,6 +213,8 @@
     private async Task PickNomer(string _nomer)
     {
         trans.psbDetail.selectedNumber = _nomer;
+        isLoading = true;
+        InvokeAsync(StateHasChanged);
         await ReserveNumber();
     }
 
@@ -212,7 +246,8 @@
     private async Task ReserveNumber()
     {
         isLoading = true;
-        await Task.Delay(5000);
+        StateHasChanged();
+        await Task.Delay(500);
         string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
             "\"transactionId\": \"" + trans.transID + "\"," +
             "\"buCode\": \"" + trans.psbDetail.PaketPSB._buCode + "\"," +

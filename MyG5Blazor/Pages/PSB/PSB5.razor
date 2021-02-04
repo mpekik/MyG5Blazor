@@ -17,7 +17,7 @@
 @inject Costumer cst
 @inject Config config
 @inject Transaction trans
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" style="z-index:1;">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent fixed-top ">
         <div class="container-fluid">
@@ -90,56 +90,56 @@
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
-    @if (IsVisible)
-    {
-        <div id="myModal" class="modal">
-            <!-- Modal content -->
-            <div class="modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        @if (intTryCount <= intTryLimit)
-                        {
-                            <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;"> Jari Telunjuk Kanan/Kiri </span>Anda, pastikan alat pemindai dalam keadaan bersih.</p>
-                            <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
-                        }
-                        else
-                        {
-                            <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>tidak sesuai dengan eKTP yang digunakan. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
-                            <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
-                        }
-                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
-                    </div>
-                </div>
-            </div>
 
-        </div>
-    }
-    @if (isLoading2)
-    {
-        <div id="myModal" class="modal">
-            <div class="modal-blank">
-                <img class="lds-spinner" src="../../assets/image/loader.gif">
-                <p><br>Mohon tunggu</p>
-                <p>proses sedang berlangsung...</p>
-            </div>
-        </div>
-    }
-    @if (isPopUp)
-    {
-        <div id="myModal" class="modal">
-            <!-- Modal content -->
-            <div class="modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <p class="text-body">@((MarkupString)strMsgError)</p>
-                        <button class="btn btn-danger modal-button" @onclick="@(() => isPopUp = false)">OK</button>
-                    </div>
-                </div>
-            </div>
-        </div>
-    }
 </div>
+@if (IsVisible)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    @if (intTryCount <= intTryLimit)
+                    {
+                        <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;"> Jari Telunjuk Kanan/Kiri </span>Anda, pastikan alat pemindai dalam keadaan bersih.</p>
+                        <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
+                    }
+                    else
+                    {
+                        <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>tidak sesuai dengan eKTP yang digunakan. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
+                        <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
+                    }
+                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                </div>
+            </div>
+        </div>
 
+    </div>
+}
+@if (isLoading2)
+{
+    <div id="myModal" class="modal" style="z-index:999;">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
+@if (isPopUp)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">@((MarkupString)strMsgError)</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => isPopUp = false)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code{
     private bool IsVisible = false;
     private bool isLoading = true;
@@ -307,7 +307,7 @@
             //await Task.Delay(3000);
             if (config.ektpType == "a")
             {
-                await FingerPrintScan();
+                //await FingerPrintScan();
 
                 //await Task.Delay(6000);
                 //isLoading = false;
@@ -317,9 +317,9 @@
 
                 if (IsSuccess)
                 {
-                    //trans.psbDetail.nik = "3174093010890006";
-                    //trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
-                    //trans.psbDetail.tglLahir = "1989-10-30";
+                    trans.psbDetail.nik = "3174093010890006";
+                    trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
+                    trans.psbDetail.tglLahir = "1989-10-30";
 
                     await CekBlackList();
                 }
@@ -329,22 +329,28 @@
                 //await FingerPrintScanC();
                 //isLoading = true;
                 //await Task.Delay(6000);
-                temp = ktp.DateOfBirth;
+                //temp = ktp.DateOfBirth;
 
-                trans.psbDetail.ektpData = ktp;
-                trans.psbDetail.nik = ktp.Id;
-                trans.psbDetail.nama = ktp.Name;
-                trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
+                //trans.psbDetail.ektpData = ktp;
+                //trans.psbDetail.nik = ktp.Id;
+                //trans.psbDetail.nama = ktp.Name;
+                //trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
 
                 isLoading = false;
                 IsSuccess = true;
+                intTryCount += 1;
+                //IsVisible = true;
+                if (intTryCount > intTryLimit)
+                {
+                    IsFail = true;
+                }
                 await Task.Delay(2000);
 
                 if (IsSuccess)
                 {
-                    //trans.psbDetail.nik = "3174093010890006";
-                    //trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
-                    //trans.psbDetail.tglLahir = "1989-10-30";
+                    trans.psbDetail.nik = "3174093010890006";
+                    trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
+                    trans.psbDetail.tglLahir = "1989-10-30";
 
                     await CekBlackList();
                 }
@@ -680,15 +686,16 @@
                 //isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }
-        }else
+        }
+        else
         {
             isLoading = false;
-            trans.AddTrail("Cek BlackList Nik", "Hit Webservice Error {" + strResult+"}", "01");
+            trans.AddTrail("Cek BlackList Nik", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-            trans.errorCode = "Hit Webservice Error {" + strResult+"}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult+"}", "step-action");
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavMan.NavigateTo("/error");
         }

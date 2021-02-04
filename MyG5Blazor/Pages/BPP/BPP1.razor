@@ -289,7 +289,7 @@
                         }
                         menu._menuPulsa.Sort(delegate (Menu.MenuPulsa x, Menu.MenuPulsa y)
                         {
-                            return x._nominal.CompareTo(y._nominal);
+                            return x._harga.CompareTo(y._harga);
                         });
                         //Add Step To Audit Trail List
                         trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "00");

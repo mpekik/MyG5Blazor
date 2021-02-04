@@ -136,7 +136,7 @@
 
 @if (isLoading)
 {
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal" style="z-index:1;">
         <div class="modal-blank">
             <img class="lds-spinner" src="../../assets/image/loader.gif">
             <p><br>Mohon tunggu</p>
@@ -241,7 +241,6 @@
                     isLoading = false;
                     trans.AddTrail("Request OTP", trans.psbDetail.alamatEmail, "00");
 
-                    NavigateTo("/PSB/3a");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {

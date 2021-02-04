@@ -6,6 +6,7 @@
 @inject Costumer cst
 @inject Config config
 @inject Transaction trans 
+@inject Menu menu 
 @using MyG5Blazor.Data
 
 <h1>Counter</h1>
@@ -13,7 +14,7 @@
 <p>Id: @ktp.Id</p>
 <p>Nama: @ktp.Name</p>
 <p>Card SN : @p_icc_id</p>
-<button class="btn btn-primary" @onclick="TestString">Click me</button>
+<button class="btn btn-primary" @onclick="ReleaseNumber">Click me</button>
 
 @code {
     private int currentCount = 0;
@@ -21,14 +22,92 @@
     private string readerName = string.Empty;
     private string p_icc_id = string.Empty;
     private string msg = string.Empty;
-
+    private bool isLoading = false;
+    private string _myURL = string.Empty;
+    private string releaseNumberService = "psb-halo/v1/release-number";
+    private string strMsgError = string.Empty;
+    private bool isPopUp = false;
     byte[] pbPcid;
 
     byte[] pbConf;
+    private async Task ReleaseNumber()
+    {
+        isLoading = true;
+        menu.terminalId = "T9999999";
+        menu.tokenId = "123456";
+        await Task.Delay(500);
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"transactionId\": \"" + "X002210202151731171511724" + "\"," +
+            "\"poolName\": \"" + "002GNSSC" + "\"," +
+            "\"noHp\": \"" + "628116528484" + "\"" +
+               "}";
+        string myURL = _myURL + releaseNumberService;
+        OurUtility.Write_Log("Release Number", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
 
+        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
+            strResult != "BadRequest" && strResult != "InternalServerError")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "00");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
+                    isLoading = false;
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    isLoading = false;
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                    trans.AddTrail("Release Number", "Number : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "02");
+
+                    isPopUp = false;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                isLoading = false;
+                trans.AddTrail("Release Number", "Exception Error ", "01");
+
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //isNotIdle = false;
+                //NavMan.NavigateTo("/error");
+            }
+        }
+        else
+        {
+            isLoading = false;
+            trans.AddTrail("Release Number", "Hit Webservice Error : " + strResult, "01");
+
+            trans.errorCode = "Hit Webservice Error : " + strResult;
+            OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+            //isNotIdle = false;
+            //NavMan.NavigateTo("/error");
+        }
+    }
     protected override async Task OnInitializedAsync()
     {
-        await StringToDate();
+        //await StringToDate();
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);

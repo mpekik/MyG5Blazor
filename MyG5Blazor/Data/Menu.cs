@@ -158,6 +158,7 @@ namespace MyG5Blazor.Data
             public string _labelNominal { get; set; }
             public string _icon { get; set; }
             public string _addHTML { get; set; }
+            public int _harga { get; set; }
         }
 
         public List<MenuPulsa> _menuPulsa = new List<MenuPulsa>();
@@ -169,6 +170,7 @@ namespace MyG5Blazor.Data
             menuPulsa._labelNominal = labelNominal;
             menuPulsa._icon = icon;
             menuPulsa._addHTML = addHTML;
+            menuPulsa._harga = int.Parse(nominal);
             _menuPulsa.Add(menuPulsa);
         }
         public class MainMenu

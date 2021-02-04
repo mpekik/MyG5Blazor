@@ -257,7 +257,7 @@
 
             if (ConnectToValidator(reconnectionAttempts, 2))
             {
-                //Console.WriteLine("1");
+                Console.WriteLine("1");
                 Running = true;
                 //Payout.ConfigureBezel(0x00, 0xFF, 0x00);
             }
@@ -265,7 +265,7 @@
             while (loopCash)
             {
                 await Task.Delay(1000);
-                //Console.WriteLine("2");
+                Console.WriteLine("2");
                 if (!Payout.DoPoll())
                 {
                     //Console.WriteLine("Poll failed, attempting to reconnect...\r\n");

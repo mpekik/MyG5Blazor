@@ -17,7 +17,7 @@
 @inject Transaction trans
 @inject Config config
 @inject Menu menu
-    <div class="bg-edc-process">
+    <div class="bg-edc-process" style="z-index:1;">
         <div class="main-panel bg-edc-process">
             <!-- Navbar -->
             <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
@@ -81,7 +81,7 @@
                                 <tr>
                                     <td>Batas Pemakaian</td>
                                     <td>&ensp; :</td>
-                                    <td>&ensp; Rp @trans.psbDetail.batasPemakaian (2x Harga Paket)</td>
+                                    <td>&ensp; Rp @int.Parse(trans.psbDetail.batasPemakaian).ToString("N0") (2x Harga Paket)</td>
                                 </tr>
                             </table>
                         </div>
@@ -136,7 +136,7 @@
     }
     @if (isLoading)
     {
-        <div id="myModal" class="modal">
+        <div id="myModal" class="modal" style="z-index:999;">
             <div class="modal-blank">
                 <img class="lds-spinner" src="../../assets/image/loader.gif">
                 <p><br>Mohon tunggu</p>
