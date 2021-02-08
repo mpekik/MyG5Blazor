@@ -176,7 +176,7 @@
         }
         private async Task MainMenu()
         {
-
+            isLoading = true;
             trans.AddTrail("KONFIRMASI DATA", "BACK TO MAIN MENU", "02");
             trans.status = "02";
             await ReleaseNumber();

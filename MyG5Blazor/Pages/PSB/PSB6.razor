@@ -224,10 +224,19 @@
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                         if (trans.errorCode == "303002")
                         {
-                            isLoading = false;
-                            strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> yang Anda gunakan tidak sesuai dengan <br>eKTP. Mohon periksa kembali NoKK yang digunakan.";
-                            trans.AddTrail("Validasi NIK & NOKK", "NIK : " + trans.psbDetail.nik + ", NOKK : " + trans.psbDetail.nokk, "02");
                             invalid += 1;
+
+                            isLoading = false;
+                            trans.AddTrail("Validasi NIK & NOKK", "NIK : " + trans.psbDetail.nik + ", NOKK : " + trans.psbDetail.nokk, "02");
+
+                            if (invalid < 3)
+                            {
+                                strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> yang Anda gunakan tidak sesuai dengan <br>eKTP. Mohon periksa kembali NoKK yang digunakan.";
+                            }
+                            else
+                            {
+                                strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> Anda tidak terbaca pada sistem <br>MyGraPARI. Silahkan hubungi <span style=\"font-weight: bold; \">Costumer Service</span><br>GraPARI untuk bantuan.";
+                            }
 
                             isPopUp = true;
                             return;
@@ -285,10 +294,11 @@
 
     private async Task MainMenu()
     {
+        isLoading = true;
         trans.AddTrail("INPUT NOKK", "BACK TO MAIN MENU", "02");
         trans.status = "02";
         await ReleaseNumber();
-        //await OurUtility.AuditTrailPSB(trans, menu, cst);
+        await OurUtility.AuditTrailPSB(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
     private async Task ReleaseNumber()

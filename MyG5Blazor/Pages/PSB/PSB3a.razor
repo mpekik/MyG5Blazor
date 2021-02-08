@@ -180,7 +180,7 @@
                     <p class="text-header2">Rp @int.Parse(menuNominal[paramMenu]).ToString("N0")/bulan (@menuVarianName[paramMenu])</p>
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee; padding-left:0px">
-                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
+                            <img src="../../assets/image/icon_internet.png" style="width: 85%;">
                         </div>
                         <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
                             <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data All Net</b>
@@ -191,7 +191,7 @@
                     </div>
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee; padding-left:0px">
-                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
+                            <img src="../../assets/image/icon_internet.png" style="width: 85%;">
                         </div>
                         <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
                             <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data Roaming</b>
@@ -203,7 +203,7 @@
 
                     <div class="col-md-12" style="margin-top: 3%; height: 40px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
-                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
+                            <img src="../../assets/image/icon_internet.png" style="width: 85%;">
                         </div>
                         <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
                             <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data Content</b>
@@ -220,7 +220,7 @@
                     {
                         <div class="col-md-12" style="margin-top: 3%; height: 40px; display: flex;">
                             <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
-                                <img src="../../assets/image/icon_internet.png" style="width: 90%;">
+                                <img src="../../assets/image/icon_internet.png" style="width: 85%;">
                             </div>
                             <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
                                 <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data Subscription</b>
@@ -235,7 +235,7 @@
                     }
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
-                            <img src="../../assets/image/icon_telepon.png" style="width: 90%;">
+                            <img src="../../assets/image/icon_telepon.png" style="width: 85%;">
                         </div>
                         <div class="col-md-8" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
                             <b class="teks-pop" style="font-size: 23px;  font-weight: bold;">Telepon</b>
@@ -247,7 +247,7 @@
 
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex; border-bottom: 1px solid #eeeeee;">
                         <div class="col-md-1" style="padding-left: 0px">
-                            <img src="../../assets/image/icon_SMS.png" style="width: 90%;">
+                            <img src="../../assets/image/icon_SMS.png" style="width: 85%;">
                         </div>
                         <div class="col-md-6" style="text-align: left;">
                             <b class="teks-pop" style="font-size: 23px; font-weight: bold;">SMS</b>
@@ -262,7 +262,7 @@
                             <b class="teks-pop" style="font-size: 23px; margin-left: -1rem; font-weight: bold;">Rp Pembayaran di Muka</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right;">
-                            <p>Rp @int.Parse(trans.psbDetail.PaketPSB._hargaAwal).ToString("N0")</p>
+                            <p>Rp @int.Parse(menuHargaAwal[paramMenu]).ToString("N0")</p>
                         </div>
                     </div>
 
@@ -402,6 +402,7 @@
     }
     private async Task MainMenu()
     {
+        isLoading = true;
         trans.AddTrail("CHOOSE PACKAGE", "BACK TO MAIN MENU", "02");
         trans.status = "02";
         await OurUtility.AuditTrailPSB(trans, menu, cst);

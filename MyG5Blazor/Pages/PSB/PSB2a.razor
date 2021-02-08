@@ -189,7 +189,7 @@
 
     private async Task OTPTime()
     {
-        if (kirim < 4)
+        if (kirim < 3)
         {
             //InvokeAsync(StateHasChanged);
             do
@@ -589,6 +589,7 @@
     }
     private async Task MainMenu()
     {
+        isLoading = true;
         trans.AddTrail("INPUT OTP", "BACK TO MAIN MENU", "02");
         trans.status = "02";
         await OurUtility.AuditTrailPSB(trans, menu, cst);

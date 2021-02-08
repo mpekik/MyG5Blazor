@@ -72,7 +72,16 @@
                             {
                                 <div class="col-md-6">
                                     <div class="teks-title">Berlangganan KartuHalo</div>
-                                    <div id="status-pay" class="teks-center teks-bold">Proses Pembayaran Berlangganan KartuHalo<br> <b class="green">Berhasil</b></div>
+                                    <div id="status-pay" class="teks-center teks-bold">
+                                        Proses Pembayaran Berlangganan KartuHalo<br> <b class="green">Berhasil</b><br />
+                                        <span style="font-weight:normal">
+                                            Silakan Ambil kartuHalo Anda dan <br />Selamat Menikmati Layanan Prioritas di <br />Jaringan kartuHalo.<br />
+                                            Formulir Elektronik Berlangganan <br />KartuHalo Anda akan Kami Kirimkan ke <br />Email yang Didaftarkan. Silakan Tekan Tautan <br />di Bawah untuk Melihat.
+                                            <a href="" @onclick="SendDocument" @onclick:preventDefault>
+                                                Formulir Elektronik Berlangganan KartuHalo
+                                            </a>
+                                        </span>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6">
@@ -140,7 +149,10 @@
                                         Proses Pembayaran Berlangganan KartuHalo<br> <b class="green">Berhasil</b><br />
                                         <span style="font-weight:normal">
                                         Silakan Ambil kartuHalo Anda dan <br />Selamat Menikmati Layanan Prioritas di <br />Jaringan kartuHalo.<br />
-                                        @*Formulir Elektronik Berlangganan <br />KartuHalo Anda akan Kami Kirimkan ke <br />Email yang Didaftarkan. Silakan Tekan Tautan <br />di Bawah untuk Melihat.*@
+                                        Formulir Elektronik Berlangganan <br />KartuHalo Anda akan Kami Kirimkan ke <br />Email yang Didaftarkan. Silakan Tekan Tautan <br />di Bawah untuk Melihat.
+                                                                                                                                                                       <a href="" @onclick="SendDocument" @onclick:preventDefault>
+                                                                                                                                                                           Formulir Elektronik Berlangganan KartuHalo
+                                                                                                                                                                       </a>
                                         </span>
                                     </div>
                        
@@ -197,7 +209,17 @@
                             {
                                 <div class="col-md-6">
                                     <div class="teks-title">Berlangganan KartuHalo</div>
-                                    <div id="status-pay" class="teks-center teks-bold">Proses Pembayaran Berlangganan KartuHalo<br> <b class="green">Berhasil</b></div>
+                                    <div id="status-pay" class="teks-center teks-bold">
+                                        Proses Pembayaran Berlangganan KartuHalo<br> <b class="green">Berhasil</b><br />
+                                        <span style="font-weight:normal">
+                                            Silakan Ambil kartuHalo Anda dan <br />Selamat Menikmati Layanan Prioritas di <br />Jaringan kartuHalo.<br />
+                                            Formulir Elektronik Berlangganan <br />KartuHalo Anda akan Kami Kirimkan ke <br />Email yang Didaftarkan. Silakan Tekan Tautan <br />di Bawah untuk Melihat.
+                                            <a href="" @onclick="SendDocument" @onclick:preventDefault>
+                                                Formulir Elektronik Berlangganan KartuHalo
+                                            </a>
+                                        </span>
+                                    </div>
+            
                                 </div>
 
                                 <div class="col-md-6">
@@ -452,7 +474,7 @@
             trans.AddTrail("GET STOCK", "CD - 004", "01");
             trans.status = "01";
             trans.errorCode = "CARD DISPENSER";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
             trans.errorCode = "CD - 004";
             OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
             NavigateTo("/error");
@@ -713,6 +735,71 @@
         }
     }
 
+    private async Task SendDocument()
+    {
+        //isLoading = true;
+        string myJson = string.Empty;
+        string apiURL = "docman/v1/send-psb-form";
+
+        myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"" +
+                                "}";
+
+        string myURL = _myURL + apiURL;
+
+        OurUtility.Write_Log("== Send Document", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                resultPayment = (string)jobjResult["transaction"].SelectToken("statusCode");
+
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "00");
+
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "01");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                    trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "02");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "01");
+
+            }
+        }
+        else
+        {
+            trans.errorCode = strResult;
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "01");
+        }
+    }
     private async Task CancelComplete()
     {
         isTunaiComplete = false;
@@ -1130,13 +1217,13 @@
         string customerProfile = "{ \"namaLengkap\" : \"" + trans.psbDetail.nama + "\"," +
             "\"noKtp\" : \"" + trans.psbDetail.nik + "\"," +
             "\"noKk\" : \"" + trans.psbDetail.nokk + "\"," +
-            "\"tempatLahir\" : \"" + /*trans.psbDetail.ektpData.PlaceOfBirth*/"JAKARTA" + "\"," +
+            "\"tempatLahir\" : \"" + trans.psbDetail.ektpData.PlaceOfBirth/*"JAKARTA"*/ + "\"," +
             "\"tanggalLahir\" : \"" + trans.psbDetail.tglLahir + "\"," +
-            "\"alamat\" : \"" + /*trans.psbDetail.ektpData.Address*/"KP. KANDANG" + "\"," +
-            "\"jenisKelamin\" : \"" + /*trans.psbDetail.ektpData.Gender*/"LAKI-LAKI" + "\"," +
-                                "\"kota\" : \"" + /*trans.psbDetail.ektpData.City*/"JAKARTA SELATAN" + "\"," +
-                                "\"provinsi\" : \"" + /*trans.psbDetail.ektpData.Province*/"DKI JAKARTA" + "\"," +
-                                "\"pekerjaan\" : \"" + /*trans.psbDetail.ektpData.Province*/"KARYAWAN SWASTA" + "\"," +
+            "\"alamat\" : \"" + trans.psbDetail.ektpData.Address/*"KP. KANDANG"*/ + "\"," +
+            "\"jenisKelamin\" : \"" + trans.psbDetail.ektpData.Gender/*"LAKI-LAKI"*/ + "\"," +
+                                "\"kota\" : \"" + trans.psbDetail.ektpData.City/*"JAKARTA SELATAN"*/ + "\"," +
+                                "\"provinsi\" : \"" + trans.psbDetail.ektpData.Province/*"DKI JAKARTA"*/ + "\"," +
+                                "\"pekerjaan\" : \"" + trans.psbDetail.ektpData.Province/*"KARYAWAN SWASTA"*/ + "\"," +
                                 "\"email\" : \"" + trans.psbDetail.alamatEmail + "\"}";
 
         if (MetodePembayaran == 1 || MetodePembayaran == 3)

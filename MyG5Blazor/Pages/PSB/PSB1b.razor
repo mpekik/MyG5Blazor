@@ -167,6 +167,20 @@
         </div>
     </div>
 }
+@if (isVisible)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">@((MarkupString)strMsgError)</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => isVisible = false)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code
 {
     private async Task emailDev()
@@ -177,10 +191,14 @@
     private bool isSelected = false;
     private bool isLanjut = true;
     private bool isLoading = false;
+    private bool isVisible = false;
+
+    private string strMsgError = string.Empty;
     private string inputEmail = string.Empty;
     private string _myURL = string.Empty;
     private string serviceURL = "psb-halo/v1/get-otp-email";
     private bool isForbidden = false;
+    private string imageBytesStr;
 
     private string[] forbiddenDomain = { "yahoo.com", "yahoo.co.id", "ymail.com", "rocketmail.com" };
     protected override async Task OnInitializedAsync()
@@ -205,6 +223,20 @@
                     }
                     else
                     {
+                        //Capture Image From IP CAM
+                        byte[] image = OurUtility.CaptureImage();
+                        if (image != null)
+                        {
+                            imageBytesStr = Convert.ToBase64String(image);
+                        }
+                        else
+                        {
+                            isLoading = false;
+                            isVisible = true;
+                            strMsgError = "<span style=\"font-weight: bold; \">IP Camera Tidak terdeteksi</span><br>Mohon hubungi <span style=\"font-weight: bold; \">Costumer Service</span> GraPARI untuk bantuan.";
+                            return;
+                        }
+
                         trans.psbDetail.alamatEmail = inputEmail;
                         OurUtility.Write_Log("Input Email:" + trans.psbDetail.alamatEmail, "step-action");
                         trans.AddTrail("INPUT EMAIL", trans.psbDetail.alamatEmail, "00");
@@ -312,14 +344,15 @@
                 //isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }
-        }else
+        }
+        else
         {
             isLoading = false;
-            trans.AddTrail("Request OTP", "Hit Webservice Error {" + strResult+"}", "01");
+            trans.AddTrail("Request OTP", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-            trans.errorCode = "Hit Webservice Error {" + strResult+"}";
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
             OurUtility.Write_Log("== Hit Webservice Error : {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavigateTo("/error");
@@ -327,9 +360,10 @@
     }
     private async Task MainMenu()
     {
+        isLoading = true;
         trans.AddTrail("INPUT EMAIL", "BACK TO MAIN MENU", "02");
         trans.status = "02";
-        await OurUtility.AuditTrail(trans, menu, cst);
+        await OurUtility.AuditTrailPSB(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
     private async Task Back()

@@ -421,7 +421,7 @@
                     trans.AddTrail("GET SN", "", "01");
                     trans.status = "01";
                     trans.errorCode = "CARD DISPENSER";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                     OurUtility.Write_Log("=== Card Dispenser Error", "step-action");
                     trans.errorCode = "CD - 001";
                     await ReleaseNumber();
@@ -434,7 +434,7 @@
                 trans.AddTrail("GET STOCK", "", "01");
                 trans.status = "01";
                 trans.errorCode = "KARTU HABIS";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
                 await ReleaseNumber();
@@ -577,7 +577,7 @@
             isLoading = true;
             trans.AddTrail("PAYMENT METHOD", "BACK TO MAIN MENU", "02");
             trans.status = "02";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
             await ReleaseNumber();
             NavMan.NavigateTo("/main");
         }
@@ -630,7 +630,7 @@
                     }
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
                     trans.status = "01";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
                     NavigateTo("/error");
@@ -650,7 +650,7 @@
                 isLoading = false;
                 trans.AddTrail("Release Number", "Exception Error ", "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
@@ -663,7 +663,7 @@
             isLoading = false;
             trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult+"}", "01");
             trans.status = "01";
-            await OurUtility.AuditTrail(trans, menu, cst);
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult+"}";
             OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult+"}", "step-action");

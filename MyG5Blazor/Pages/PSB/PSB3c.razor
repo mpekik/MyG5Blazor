@@ -220,6 +220,7 @@
 
     private async Task MainMenu()
     {
+        isLoading = true;
         trans.AddTrail("CHOOSE NUMBER", "BACK TO MAIN MENU", "02");
         trans.status = "02";
         await OurUtility.AuditTrailPSB(trans, menu, cst);

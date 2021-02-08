@@ -152,9 +152,10 @@
     }
     private async Task MainMenu()
     {
+        isLoading = true;
         trans.AddTrail("INPUT NUMBER", "BACK TO MAIN MENU", "02");
         trans.status = "02";
-        await OurUtility.AuditTrail(trans, menu, cst);
+        await OurUtility.AuditTrailPSB(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
 
