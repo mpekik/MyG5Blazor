@@ -1793,7 +1793,7 @@ namespace MyG5Blazor.Data
             int pos = 7;
 
             pGuid = Guid.NewGuid().ToString();
-            Task.Delay(100).ContinueWith(t =>
+            await Task.Delay(100).ContinueWith(t =>
             {
                 string token = pGuid;
 
@@ -2073,7 +2073,7 @@ namespace MyG5Blazor.Data
                 return;
             }
             BindDevice();
-            OpenFPReader();
+            await OpenFPReader();
         }
 
         private void BindDevice()
@@ -2093,7 +2093,7 @@ namespace MyG5Blazor.Data
         dynamic result;
         dynamic result2;
 
-        public bool FPMatch(byte[] feature, byte[] minutiae1, byte[] minutiae2)
+        public async Task<bool> FPMatch(byte[] feature, byte[] minutiae1, byte[] minutiae2)
         {
             result = dev.Verify(5, feature, minutiae1);
             result2 = dev.Verify(5, feature, minutiae2);

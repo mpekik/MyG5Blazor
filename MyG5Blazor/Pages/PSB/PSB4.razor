@@ -352,12 +352,12 @@
             }
             else if (config.ektpType == "c")
             {
-                //await ScanEKTPC();
-                await Task.Delay(5000);
-                isLoading = false;
-                isSuccess = true;
-                isFail = false;
-                await Task.Delay(2000);
+                await ScanEKTPC();
+                //await Task.Delay(5000);
+                //isLoading = false;
+                //isSuccess = true;
+                //isFail = false;
+                //await Task.Delay(2000);
                 //NavigateTo("/PSB/5");
             }
             else

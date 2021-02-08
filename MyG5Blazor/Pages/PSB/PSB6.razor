@@ -119,7 +119,14 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="text-body">@((MarkupString)strMsgError)</p>
-                    <button class="btn btn-danger modal-button" @onclick="@(() => isPopUp = false)">OK</button>
+                    @if (invalid < 3)
+                    {
+                        <button class="btn btn-danger modal-button" @onclick="@(() => isPopUp = false)">OK</button>
+                    }
+                    else
+                    {
+                        <button class="btn btn-danger modal-button" @onclick="@(MainMenu)">OK</button>
+                    }
                 </div>
             </div>
         </div>
@@ -146,6 +153,8 @@
     private string cekNokk = "psb-halo/v1/nik-nok-validation";
     private string strMsgError = string.Empty;
 
+    private int invalid = 0;
+
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -168,6 +177,7 @@
             await CekNOKK();
             if (isValid)
             {
+                InvokeAsync(StateHasChanged);
                 await Task.Delay(5000);
                 NavigateTo("/PSB/7a");
                 //await GetPaket();
@@ -217,6 +227,7 @@
                             isLoading = false;
                             strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> yang Anda gunakan tidak sesuai dengan <br>eKTP. Mohon periksa kembali NoKK yang digunakan.";
                             trans.AddTrail("Validasi NIK & NOKK", "NIK : " + trans.psbDetail.nik + ", NOKK : " + trans.psbDetail.nokk, "02");
+                            invalid += 1;
 
                             isPopUp = true;
                             return;
@@ -239,6 +250,7 @@
                     isLoading = false;
                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     trans.AddTrail("Validasi NIK & NOKK", "NIK : " + trans.psbDetail.nik + ", NOKK : " + trans.psbDetail.nokk, "02");
+                    invalid += 1;
 
                     isPopUp = true;
                     return;

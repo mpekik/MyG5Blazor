@@ -272,6 +272,7 @@
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
                     isLoading = false;
+                    trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
                     NavigateTo("/PSB/2a");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")

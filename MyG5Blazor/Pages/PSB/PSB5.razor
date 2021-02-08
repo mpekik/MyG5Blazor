@@ -307,7 +307,7 @@
             //await Task.Delay(3000);
             if (config.ektpType == "a")
             {
-                //await FingerPrintScan();
+                await FingerPrintScan();
 
                 //await Task.Delay(6000);
                 //isLoading = false;
@@ -317,16 +317,16 @@
 
                 if (IsSuccess)
                 {
-                    trans.psbDetail.nik = "3174093010890006";
-                    trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
-                    trans.psbDetail.tglLahir = "1989-10-30";
+                    //trans.psbDetail.nik = "3174093010890006";
+                    //trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
+                    //trans.psbDetail.tglLahir = "1989-10-30";
 
                     await CekBlackList();
                 }
             }
             else if (config.ektpType == "c")
             {
-                //await FingerPrintScanC();
+                await FingerPrintScanC();
                 //isLoading = true;
                 //await Task.Delay(6000);
                 //temp = ktp.DateOfBirth;
@@ -416,7 +416,7 @@
                     feature = ektpCRT.ektpData.FPR;
 
                     bool result = false;
-                    result = ektpCRT.FPMatch(feature, ktp.minutiae1, ktp.minutiae2);
+                    result = await Task.Run(()=>ektpCRT.FPMatch(feature, ktp.minutiae1, ktp.minutiae2));
 
                     if (result)
                     {
@@ -541,9 +541,10 @@
                         trans.AddTrail("FINGERPRINT", "MATCH", "00");
 
                         OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                        temp = ktp.DateOfBirth;
+
                         trans.psbDetail.ektpData = ktp;
                         trans.psbDetail.nik = ktp.Id;
-                        cst.EKTPNumber = ktp.Id;
                         trans.psbDetail.nama = ktp.Name;
                         trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
 
@@ -563,10 +564,12 @@
                             trans.AddTrail("FINGERPRINT", "MATCH", "00");
                             OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
 
+                            temp = ktp.DateOfBirth;
+
+                            trans.psbDetail.ektpData = ktp;
                             trans.psbDetail.nik = ktp.Id;
                             trans.psbDetail.nama = ktp.Name;
                             trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
-                            trans.psbDetail.ektpData = ktp;
 
                             //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
                             isLoading = false;
