@@ -624,7 +624,7 @@
         do
         {
             await Task.Delay(1000);
-            Console.WriteLine("Idle 1 2a Time Left : " + counterTime.ToString());
+            Console.WriteLine("Idle 2a Time Left : " + counterTime.ToString());
             counterTime = counterTime - 1;
             InvokeAsync(StateHasChanged);
             if (counterTime < 1)
@@ -648,7 +648,7 @@
         do
         {
             await Task.Delay(1000);
-            Console.WriteLine("Time 2 2a Out Left : " + secondCTime.ToString());
+            Console.WriteLine("Time 2a Out Left : " + secondCTime.ToString());
             secondCTime = secondCTime - 1;
             InvokeAsync(StateHasChanged);
             if (secondCTime < 0)

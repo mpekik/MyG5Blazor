@@ -325,6 +325,7 @@
     }
     private async Task MyPerso()
     {
+        ResetTimer();
         while (intTryCount <= intTryLimit)
         {
             if (stock > 0)
@@ -630,6 +631,7 @@
 
     private bool MoveToICC()
     {
+        ResetTimer();
         OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
@@ -655,6 +657,7 @@
 
     private bool MoveToTheFront()
     {
+        ResetTimer();
         OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
@@ -684,6 +687,7 @@
     }
     private bool MoveToRFCard()
     {
+        ResetTimer();
         OurUtility.Write_Log("=== Card Dispenser Move To The RF Position", "step-action");
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
@@ -710,6 +714,7 @@
     }
     private bool MoveToBin()
     {
+        ResetTimer();
         OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
         OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
@@ -740,6 +745,7 @@
 
     private async Task<bool> CardReaderScan()
     {
+        ResetTimer();
         bool ret = false;
 
         OurUtility.Write_Log("=== Card Reader Scan IC", "step-action");
@@ -763,7 +769,7 @@
         do
         {
             await Task.Delay(1000);
-            Console.WriteLine("Idle 1 1a Time Left : " + counterTime.ToString());
+            Console.WriteLine("Idle 9a Time Left : " + counterTime.ToString());
             counterTime = counterTime - 1;
             InvokeAsync(StateHasChanged);
             if (counterTime < 1)
@@ -787,7 +793,7 @@
         do
         {
             await Task.Delay(1000);
-            Console.WriteLine("Time 2 1a Out Left : " + secondCTime.ToString());
+            Console.WriteLine("Time 9a Out Left : " + secondCTime.ToString());
             secondCTime = secondCTime - 1;
             InvokeAsync(StateHasChanged);
             if (secondCTime < 0)
