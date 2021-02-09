@@ -52,60 +52,35 @@
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 5%;">
-                        @for (int i = menu.pageIndex; i < menu.pageIndex + 2; i++)
-                        {
-                            @if (i == 0 || i == 6 || i == 12)
-                            {
-                               @if (boolNumber[i])
+                               @if (boolNumber[0+menu.pageIndex])
                                {
-                                <button @onclick="@(() => PickNomer(populateNumber[0]))" class="btn-pilih-no btn" value="">@populateNumber[0]</button>
+                                <button @onclick="@(() => PickNomer(populateNumber[0+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[0 + menu.pageIndex]</button>
                                }
-                            }
-                            @if (i == 1 || i == 7 || i == 13)
-                            {
-                                @if (boolNumber[i])
+                                @if (boolNumber[1 + menu.pageIndex])
                                 {
-                                <button @onclick="@(() => PickNomer(populateNumber[1]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[1]</button>
+                                <button @onclick="@(() => PickNomer(populateNumber[1+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[1 + menu.pageIndex]</button>
                                 }
-                            }
-                        }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
-                        @for (int i = menu.pageIndex + 2; i < menu.pageIndex + 4; i++)
-                        {
-                            @if (i == 2 || i == 8 || i == 14)
-                            {
-                                @if (boolNumber[i])
+                                @if (boolNumber[2 + menu.pageIndex])
                                 {
-                                <button @onclick="@(() => PickNomer(populateNumber[2]))" class="btn-pilih-no btn" value="">@populateNumber[2]</button>
+                                <button @onclick="@(() => PickNomer(populateNumber[2+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[2 + menu.pageIndex]</button>
                                 }
-                            }
-                            @if (i == 3 || i == 9 || i == 15)
-                            {
-                                @if (boolNumber[i])
+                                @if (boolNumber[3 + menu.pageIndex])
                                 {
-                                <button @onclick="@(() => PickNomer(populateNumber[3]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[3]</button>
+                                <button @onclick="@(() => PickNomer(populateNumber[3+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[3 + menu.pageIndex]</button>
                                 }
-                            }
-                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
-                        @for (int i = menu.pageIndex + 4; i < menu.pageIndex + 6; i++)
-                        {
-
-                            @if (i == 4 || i == 10 || i == 16)
-                            {@if (boolNumber[i])
+                                @if (boolNumber[4 + menu.pageIndex])
                                 {
-                                    <button @onclick="@(() => PickNomer(@populateNumber[4]))" class="btn-pilih-no btn" value="">@populateNumber[4]</button>
+                                    <button @onclick="@(() => PickNomer(@populateNumber[4+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[4 + menu.pageIndex]</button>
                                 }                            }
-                            @if (i == 5 || i == 11 || i == 17)
-                            {
-                                @if (boolNumber[i])
+                            
+                                @if (boolNumber[5 + menu.pageIndex])
                                 {
-                                <button @onclick="@(() => PickNomer(populateNumber[5]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[5]</button>
-                                    }
+                                <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[5 + menu.pageIndex]</button>
                                 }
-                        }
                         </div>
                 </div>
             </div>
@@ -157,8 +132,8 @@
     private string reserveNumberService = "psb-halo/v1/reserve-number";
     private string strMsgError = string.Empty;
 
-    private bool[] boolNumber = { false, false, false, false, false,false };
-    private string[] populateNumber = { "", "", "", "", "", "" };
+    private bool[] boolNumber = { false, false, false, false, false,false, false, false, false, false, false, false, false, false, false, false, false, false };
+    private string[] populateNumber = { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
     private int pageIndex = 0;
     private int inputIndex = 0;
 
@@ -167,35 +142,36 @@
         if (menu.pageIndex + 6 < menu.psbNomer.Count())
         {
             menu.pageIndex += 6;
-            PopulateNumber();
+            //PopulateNumber();
+            StateHasChanged();
         }
         else
         {
             menu.pageIndex = 0;
-            PopulateNumber();
+            //PopulateNumber();
+            StateHasChanged();
         }
 
     }
 
     private void PopulateNumber()
     {
-        boolNumber = new bool[] { false,false,false,false,false,false };
-        if (menu.psbNomer.Count() > 6)
-        { for (int i = 0; i < 6; i++)
+
+        if(menu.psbNomer.Count()>18)
+        {
+            for(int i=0;i<18;i++)
             {
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
                 StateHasChanged();
             }
-        }
-        else
+        }else
         {
             for(int i=0;i<menu.psbNomer.Count();i++)
             {
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
                 StateHasChanged();
-
             }
         }
     }

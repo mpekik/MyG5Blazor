@@ -18,7 +18,7 @@
 @inject Config config
 @inject Menu menu
 
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -38,37 +38,38 @@
 
     <div class="content">
         <div class="container-fluid">
-          <div class="row">
-            <div class="col-md-6">
-                <p class="teks-title">Berlangganan KartuHalo</p> 
-                <p id="konfirmasi-teks" class="teks-top">Dapatkan KartuHalo untuk Akses Internet Super Cepat, Jaringan Prioritas, Dan<br> Pilihan Paket Data Terbaik untuk<br> Kebutuhan Anda</p> 
-                <div class="teks-center3">Untuk melanjutkan proses, Mohon<br> Siapkan:
-                    <table>
-                    <tr>
-                        <td>-</td>
-                        <td>&nbsp; e-KTP</td>
-                    </tr>
-                    <tr>
-                        <td>-</td>
-                        <td>&nbsp; Alamat e-Mail Aktif</td>
-                    </tr>
-                    <tr>
-                        <td>-</td>
-                        <td>&nbsp; Uang Tunai/Kartu Kredit/Kartu Debit</td>
-                    </tr>
-                    </table>
-                </div> 
-                <div class="teks-bot3">Tekan <b class="teks-bold"> “Lanjut” </b>untuk melanjutkan</div>
-              </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <p class="teks-title">Berlangganan KartuHalo</p>
+                    <p id="konfirmasi-teks" class="teks-top">Dapatkan KartuHalo untuk Akses Internet Super Cepat, Jaringan Prioritas, Dan<br> Pilihan Paket Data Terbaik untuk<br> Kebutuhan Anda</p>
+                    <div class="teks-center3">
+                        Untuk melanjutkan proses, Mohon<br> Siapkan:
+                        <table>
+                            <tr>
+                                <td>-</td>
+                                <td>&nbsp; e-KTP</td>
+                            </tr>
+                            <tr>
+                                <td>-</td>
+                                <td>&nbsp; Alamat e-Mail Aktif</td>
+                            </tr>
+                            <tr>
+                                <td>-</td>
+                                <td>&nbsp; Uang Tunai/Kartu Kredit/Kartu Debit</td>
+                            </tr>
+                        </table>
+                    </div>
+                    <div class="teks-bot3">Tekan <b class="teks-bold"> “Lanjut” </b>untuk melanjutkan</div>
+                </div>
 
-            <div class="col-md-6">
-              <div class="teks-nominal" style="text-align: center;">
-                <button class="btn btn-danger btn-right" @onclick="Lanjut" id="btn-ok" value="">Lanjut</button>
-              </div>
+                <div class="col-md-6">
+                    <div class="teks-nominal" style="text-align: center;">
+                        <button class="btn btn-danger btn-right" @onclick="Lanjut" id="btn-ok" value="">Lanjut</button>
+                    </div>
+                </div>
             </div>
-          </div>
         </div>
-      </div>
+    </div>
     <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
 </div>
 
@@ -99,8 +100,8 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="text-body"><span style="font-weight: bold;">Sesi Anda akan segera berakhir.</span><br />Anda akan keluar dari sistem dalam <span style="font-weight: bold;"></span> detik.</p>
-                    <button class="btn btn-danger modal-button" >Lanjutkan Sesi</button>
-                    <button class="btn btn-white modal-button" >Selesai</button>
+                    <button class="btn btn-danger modal-button">Lanjutkan Sesi</button>
+                    <button class="btn btn-white modal-button">Selesai</button>
                     <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                 </div>
             </div>
@@ -118,15 +119,40 @@
         </div>
     </div>
 }
+@if (isIdle)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code{
     private bool isLoading = false;
-    private bool isTimeOut = false;
     protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
         if (bFirstRender)
         {
             cst.Clear();
+            #region AfterRenderTimeOut
+            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
         }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        counterTime = counterTreshold;
     }
 
     private void Lanjut()
@@ -134,4 +160,102 @@
         NavMan.NavigateTo("/PSB/1b");
     }
 
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            //Console.WriteLine("Idle 2 Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            //Console.WriteLine("Time 2 Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+
+    private bool translog = true;
+    private async Task MenuUtamaCanceled()
+    {
+        if (translog)
+        {
+            translog = false;
+            InvokeAsync(StateHasChanged);
+            isNotIdle = false;
+            NavigateTo("/main");
+        }
+    }
+    private void NavigateTo(string strURL)
+    {
+        isNotIdle = false;
+        NavMan.NavigateTo(strURL);
+    }
 }

@@ -14,7 +14,7 @@
 @inject Transaction trans
 @inject Config config
 @inject Menu menu
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -41,7 +41,7 @@
                         <p>Kami telah mengirimkan kode verifikasi melalui e-mail ke:</p> <br>
                         <p style="font-weight:bold">@trans.psbDetail.alamatEmail</p> <br>
                         <p>Harap ketikkan 6-digit kode verifikasi tersebut.</p> <br>
-                        <p style="font-size:small; font-style:italic">Jika anda tidak menerima e-mail kami, Anda bisa meminta pengiriman ulang dalam @counterTime.ToString() detik (max 3 kali pengiriman ulang).</p>
+                        <p style="font-size:small; font-style:italic">Jika anda tidak menerima e-mail kami, Anda bisa meminta pengiriman ulang dalam @counterTimeOTP.ToString() detik (max 3 kali pengiriman ulang).</p>
                     </div>
                 </div>
 
@@ -55,13 +55,13 @@
                                 <div class="omrs-input-group">
                                     <label class="omrs-input-underlined">
 
-                                            <input @bind="otp1" required readonly>
-                                            <input @bind="otp2" style="margin-left: 3%;" required readonly>
-                                            <input @bind="otp3" style="margin-left: 3%;" required readonly>
-                                            <input @bind="otp4" style="margin-left: 3%;" required readonly>
-                                            <input @bind="otp5" style="margin-left: 3%;" required readonly>
-                                            <input @bind="otp6" style="margin-left: 3%;" required readonly>
-                          
+                                        <input @bind="otp1" required readonly>
+                                        <input @bind="otp2" style="margin-left: 3%;" required readonly>
+                                        <input @bind="otp3" style="margin-left: 3%;" required readonly>
+                                        <input @bind="otp4" style="margin-left: 3%;" required readonly>
+                                        <input @bind="otp5" style="margin-left: 3%;" required readonly>
+                                        <input @bind="otp6" style="margin-left: 3%;" required readonly>
+
                                     </label>
                                 </div>
                             </form>
@@ -86,7 +86,7 @@
                     </div>
                     <div class="button-down">
                         <!-- <button class="btn-arrow" value="">Kembali</button>
-        <button class="btn-arrow" value="">Menu Utama</button> -->
+                        <button class="btn-arrow" value="">Menu Utama</button> -->
                     </div>
                 </div>
             </div>
@@ -158,7 +158,24 @@
         </div>
     </div>
 }
-
+@if (isIdle)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code{
 
     private bool isVisible = false;
@@ -183,8 +200,8 @@
     private string otp6 = string.Empty;
 
     private int kirim = 1;
-    private int counterTime;
-    private int counterTreshold = 60;
+    private int counterTimeOTP;
+    private int counterTresholdOTP = 60;
     private bool kirimUlang = true;
 
     private async Task OTPTime()
@@ -195,15 +212,15 @@
             do
             {
                 await Task.Delay(1000);
-                counterTime = counterTime - 1;
+                counterTimeOTP = counterTimeOTP - 1;
                 InvokeAsync(StateHasChanged);
-                if (counterTime < 1)
+                if (counterTimeOTP < 1)
                 {
                     kirimUlang = false;
                     InvokeAsync(StateHasChanged);
                     return;
                 }
-            } while (counterTime > 0);
+            } while (counterTimeOTP > 0);
         }
     }
 
@@ -211,7 +228,10 @@
     {
         if (bFirstRender)
         {
-            await Task.Run(() => OTPTime()).ConfigureAwait(false);
+            Task.Run(() => OTPTime()).ConfigureAwait(false);
+            #region AfterRenderTimeOut
+            Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
             return;
         }
     }
@@ -219,6 +239,7 @@
     protected override async Task OnInitializedAsync()
     {
         counterTime = counterTreshold;
+        counterTimeOTP = counterTresholdOTP;
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
     }
 
@@ -286,12 +307,12 @@
         else
         {
             isLoading = false;
-            trans.AddTrail("Request OTP", "Hit Webservice Error {"+strResult+"}", "01");
+            trans.AddTrail("Request OTP", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-            trans.errorCode = "Hit Webservice Error {" + strResult+"}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult+"}", "step-action");
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavMan.NavigateTo("/error");
         }
@@ -300,7 +321,7 @@
     {
         kirim += 1;
         kirimUlang = true;
-        counterTime = counterTreshold;
+        counterTimeOTP = counterTresholdOTP;
         await Task.Run(() => OTPTime()).ConfigureAwait(false);
 
         await RequestOTP();
@@ -311,7 +332,7 @@
         if (otp.Length < 6)
         {
             otp += strInput;
-            switch(otp.Length)
+            switch (otp.Length)
             {
                 case 1:
                     otp1 = strInput;
@@ -364,10 +385,6 @@
         }
     }
 
-    private void NavigateTo(string strURL)
-    {
-        NavMan.NavigateTo(strURL);
-    }
 
     private async Task CekOTP()
     {
@@ -430,7 +447,7 @@
             catch (Exception ex)
             {
                 isLoading = false;
-                trans.AddTrail("Validasi OTP","Exception Error" , "01");
+                trans.AddTrail("Validasi OTP", "Exception Error", "01");
                 trans.status = "01";
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
@@ -473,7 +490,8 @@
             {
                 NavigateTo("/error");
             }
-        }else if(otp.Length<6)
+        }
+        else if (otp.Length < 6)
         {
             strMsgError = "Maaf, kode verifikasi yang Anda masukkan tidak valid.\nMohon cek kembali kode verifikasi yang Anda terima.";
             isVisible = true;
@@ -570,7 +588,7 @@
         else
         {
             isLoading = false;
-            trans.AddTrail("Get Paket PSB", "Hit Webservice Error {" + strResult+"}", "01");
+            trans.AddTrail("Get Paket PSB", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
@@ -594,5 +612,104 @@
         trans.status = "02";
         await OurUtility.AuditTrailPSB(trans, menu, cst);
         NavMan.NavigateTo("/main");
+    }
+
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            //Console.WriteLine("Idle 2 Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            //Console.WriteLine("Time 2 Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+
+    private bool translog = true;
+    private async Task MenuUtamaCanceled()
+    {
+        if (translog)
+        {
+            translog = false;
+            InvokeAsync(StateHasChanged);
+            isNotIdle = false;
+            NavigateTo("/main");
+        }
+    }
+    private void NavigateTo(string strURL)
+    {
+        isNotIdle = false;
+        NavMan.NavigateTo(strURL);
     }
 }
