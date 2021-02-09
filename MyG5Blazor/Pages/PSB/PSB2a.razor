@@ -158,24 +158,6 @@
         </div>
     </div>
 }
-@if (isIdle)
-{
-    <div id="myModal" class="modal">
-        <!-- Modal content -->
-        <div class="modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <p class="text-body">
-                        Apakah Anda ingin menambah waktu lagi? <br />
-                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
-                    </p>
-                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
-                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
-                </div>
-            </div>
-        </div>
-    </div>
-}
 @code{
 
     private bool isVisible = false;
@@ -704,7 +686,7 @@
             translog = false;
             InvokeAsync(StateHasChanged);
             isNotIdle = false;
-            NavigateTo("/main");
+ //           NavigateTo("/main");
         }
     }
     private void NavigateTo(string strURL)
