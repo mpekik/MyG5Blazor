@@ -10,7 +10,7 @@
 @inject Config config
 @inject Menu menu
 
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -146,7 +146,7 @@
         </div>
         <div class="footer-side2">
             <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu Utama</button>
+            <button @onclick="@(() => InvokeAsync(MenuUtamaCanceled))" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
@@ -339,6 +339,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        counterTime = counterTreshold;
         PopulateMenu();
     }
     private void NextIndex()
@@ -377,6 +378,7 @@
     }
     private void NavigateTo(string strURL)
     {
+        isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }
     private void SelectPacket(int _index)
@@ -422,11 +424,11 @@
         trans.AddTrail("CHOOSE PACKAGE", "BACK TO MAIN MENU", "02");
         trans.status = "02";
         await OurUtility.AuditTrailPSB(trans, menu, cst);
-        NavMan.NavigateTo("/main");
+        NavigateTo("/main");
     }
     private async Task Back()
     {
-        NavMan.NavigateTo("/PSB/1b");
+        NavigateTo("/PSB/1b");
     }
 
     protected override async Task OnAfterRenderAsync(bool bFirstRender)
@@ -528,6 +530,11 @@
             translog = false;
             InvokeAsync(StateHasChanged);
             isNotIdle = false;
+            isLoading = true;
+            trans.AddTrail("CHOOSE PACKAGE", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
             NavigateTo("/main");
         }
     }

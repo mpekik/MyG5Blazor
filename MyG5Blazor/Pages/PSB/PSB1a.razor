@@ -86,8 +86,8 @@
         <span class="dot2">9</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="@(()=>NavMan.NavigateTo("/main"))" class="btn-arrow btn" value="">Kembali</button>
-        <button @onclick="@(()=>NavMan.NavigateTo("/main"))" class="btn-arrow btn" value="">Menu Utama</button>
+        <button @onclick="@(()=>NavigateTo("/main"))" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="@(()=>NavigateTo("/main"))" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
@@ -157,7 +157,8 @@
 
     private void Lanjut()
     {
-        NavMan.NavigateTo("/PSB/1b");
+
+        NavigateTo("/PSB/1b");
     }
 
     #region TimeOut
@@ -170,7 +171,7 @@
         do
         {
             await Task.Delay(1000);
-            //Console.WriteLine("Idle 2 Time Left : " + counterTime.ToString());
+            Console.WriteLine("Idle 1 1a Time Left : " + counterTime.ToString());
             counterTime = counterTime - 1;
             InvokeAsync(StateHasChanged);
             if (counterTime < 1)
@@ -194,7 +195,7 @@
         do
         {
             await Task.Delay(1000);
-            //Console.WriteLine("Time 2 Out Left : " + secondCTime.ToString());
+            Console.WriteLine("Time 2 1a Out Left : " + secondCTime.ToString());
             secondCTime = secondCTime - 1;
             InvokeAsync(StateHasChanged);
             if (secondCTime < 0)
@@ -241,7 +242,11 @@
         }
     }
     #endregion
-
+    private void NavigateTo(string strURL)
+    {
+        isNotIdle = false;
+        NavMan.NavigateTo(strURL);
+    }
     private bool translog = true;
     private async Task MenuUtamaCanceled()
     {
@@ -253,9 +258,5 @@
             NavigateTo("/main");
         }
     }
-    private void NavigateTo(string strURL)
-    {
-        isNotIdle = false;
-        NavMan.NavigateTo(strURL);
-    }
+
 }

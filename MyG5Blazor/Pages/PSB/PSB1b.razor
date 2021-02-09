@@ -15,7 +15,7 @@
 @inject Config config
 @inject Menu menu
 
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -164,7 +164,24 @@
         </div>
     </div>
 }
-
+@if (isIdle)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code
 {
     private async Task emailDev()
@@ -188,6 +205,7 @@
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        counterTime = counterTreshold;
     }
     private async Task Lanjut()
     {
@@ -266,6 +284,7 @@
     }
     private void NavigateTo(string strURL)
     {
+        isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }
     private async Task RequestOTP()
@@ -289,6 +308,7 @@
                 {
                     isLoading = false;
                     trans.startTime = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+                    isNotIdle = false;
                     NavigateTo("/PSB/2a");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
@@ -326,7 +346,7 @@
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
-                NavMan.NavigateTo("/error");
+                NavigateTo("/error");
             }
         }
         else
@@ -348,18 +368,114 @@
         trans.AddTrail("INPUT EMAIL", "BACK TO MAIN MENU", "02");
         trans.status = "02";
         await OurUtility.AuditTrailPSB(trans, menu, cst);
-        NavMan.NavigateTo("/main");
+        NavigateTo("/main");
     }
     private async Task Back()
     {
-        NavMan.NavigateTo("/PSB/1");
+        NavigateTo("/PSB/1");
     }
 
     protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
         if (bFirstRender)
         {
+            #region AfterRenderTimeOut
+            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
         }
     }
 
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Idle 2 1b Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Time 2 1b Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+
+    private bool translog = true;
+    private async Task MenuUtamaCanceled()
+    {
+        if (translog)
+        {
+            translog = false;
+            InvokeAsync(StateHasChanged);
+            isNotIdle = false;
+            NavigateTo("/main");
+        }
+    }
 }

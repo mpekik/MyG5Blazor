@@ -17,7 +17,8 @@
 @inject Costumer cst
 @inject Config config
 @inject Transaction trans
-<div class="main-panel bg-home" style="z-index:1;">
+
+<div class="main-panel bg-home" style="z-index:1;" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent fixed-top ">
         <div class="container-fluid">
@@ -140,6 +141,24 @@
         </div>
     </div>
 }
+@if (isIdle)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code{
     private bool IsVisible = false;
     private bool isLoading = true;
@@ -254,7 +273,7 @@
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
-                NavMan.NavigateTo("/error");
+                NavigateTo("/error");
             }
         }
         else
@@ -267,7 +286,7 @@
             trans.errorCode = "Hit Webservice Error : " + strResult;
             OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
             //isNotIdle = false;
-            NavMan.NavigateTo("/error");
+            NavigateTo("/error");
         }
     }
 
@@ -286,16 +305,19 @@
             NavigateTo("/main");
         }
     }
+
     private async Task Back()
     {
         NavigateTo("/PSB/4");
     }
     private void NavigateTo(string strURL)
     {
+        isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }
     private async Task CheckFinger()
     {
+        InvokeAsync(ResetTimer);
         if (IsVisible || isInit)
         {
             isInit = false;
@@ -364,18 +386,18 @@
 
                 trans.errorCode = "FP - 001";
                 OurUtility.Write_Log("== Error : FP - 001", "step-action");
-                NavMan.NavigateTo("/error");
+                NavigateTo("/error");
             }
         }
         else if (!isLoading && !IsSuccess && !IsFail)
-        {   
+        {
             isLoading = true;
         }
     }
 
     protected override async Task OnInitializedAsync()
     {
-
+        counterTime = counterTreshold;
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
@@ -400,7 +422,7 @@
 
             trans.errorCode = "FP - 101";
             OurUtility.Write_Log("== Error : FP - 101", "step-action");
-            NavMan.NavigateTo("/error");
+            NavigateTo("/error");
             return;
         }
         await Task.Run(() => ektpCRT.FPReader());
@@ -416,7 +438,7 @@
                     feature = ektpCRT.ektpData.FPR;
 
                     bool result = false;
-                    result = await Task.Run(()=>ektpCRT.FPMatch(feature, ktp.minutiae1, ktp.minutiae2));
+                    result = await Task.Run(() => ektpCRT.FPMatch(feature, ktp.minutiae1, ktp.minutiae2));
 
                     if (result)
                     {
@@ -464,7 +486,7 @@
 
             trans.errorCode = "FP - 002";
             OurUtility.Write_Log("== Error : FP - 002", "step-action");
-            NavMan.NavigateTo("/error");
+            NavigateTo("/error");
             return;
         }
     }
@@ -687,7 +709,7 @@
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
-                NavMan.NavigateTo("/error");
+                NavigateTo("/error");
             }
         }
         else
@@ -700,15 +722,99 @@
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
             OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
-            NavMan.NavigateTo("/error");
+            NavigateTo("/error");
         }
     }
 
-    protected override void OnAfterRender(bool bFirstRender)
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
         if (bFirstRender)
         {
+            #region AfterRenderTimeOut
+            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
         }
     }
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Idle 2 1b Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Time 2 1b Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
 
 }

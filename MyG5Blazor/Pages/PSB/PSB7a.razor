@@ -17,252 +17,351 @@
 @inject Transaction trans
 @inject Config config
 @inject Menu menu
-    <div class="bg-edc-process" style="z-index:1;">
-        <div class="main-panel bg-edc-process">
-            <!-- Navbar -->
-            <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
-                <div class="container-fluid">
-                    <div class="navbar-wrapper">
-                        <div class="logo">
-                            <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
-                        </div>
-                        <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
+
+<div class="bg-edc-process" style="z-index:1;" @onclick="@(()=>InvokeAsync(ResetTimer))">
+    <div class="main-panel bg-edc-process">
+        <!-- Navbar -->
+        <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+            <div class="container-fluid">
+                <div class="navbar-wrapper">
+                    <div class="logo">
+                        <img src="../../assets/image/Logo/Logo_MyGraPARI.png" />
                     </div>
-
-
-                    <form class="navbar-form">
-                    </form>
+                    <!-- <a class="navbar-brand" href="javascript:;">Dashboard</a> -->
                 </div>
-            </nav>
-            <!-- End Navbar -->
 
-            <div class="content">
-                <div class="container-fluid">
-                    <div class="row">
-                        <div class="col-md-12">
-                            <div class="teks-title">Berlangganan KartuHalo</div>
-                            <div class="teks-title4 text-center">Konfirmasi Data Pelanggan</div>
-                            <table style="font-size: 22pt; line-height: 45px; margin-top: 2%; color: black;">
-                                <tr>
-                                    <td>NIK</td>
-                                    <td>&ensp; : </td>
-                                    <td>&nbsp; @trans.psbDetail.nik</td>
-                                </tr>
-                                <tr>
-                                    <td>Nama</td>
-                                    <td>&nbsp; :</td>
-                                    <td>&nbsp; @trans.psbDetail.nama</td>
-                                </tr>
-                                <tr>
-                                    <td>Nomor kartuHalo</td>
-                                    <td>&ensp; :</td>
-                                    <td>&ensp; @trans.psbDetail.selectedNumber</td>
-                                </tr>
-                                <tr>
-                                    <td>Harga Paket</td>
-                                    <td>&ensp; :</td>
-                                    <td>&ensp; Rp @int.Parse(trans.psbDetail.PaketPSB._harga).ToString("N0") per bulan (@trans.psbDetail.PaketPSB._varianName)</td>
-                                </tr>
-                                <tr>
-                                    <td>Informasi Paket</td>
-                                    <td>&ensp; :</td>
-                                    <td>&ensp; @trans.psbDetail.PaketPSB._dataAllnet Data All Net + @trans.psbDetail.PaketPSB._dataRoaming Data Roaming </td>
-                                </tr>
-                                <tr>
-                                    <td>&ensp;</td>
-                                    <td>&ensp;</td>
-                                    <td> + @trans.psbDetail.PaketPSB._dataContent + Kuota Telepon dan SMS</td>
-                                </tr>
-                                <tr>
-                                    <td>Periode Penagihan</td>
-                                    <td>&ensp; :</td>
-                                    <td>&ensp; Tanggal 1 di Bulan Berikutnya</td>
-                                </tr>
-                                <tr>
-                                    <td>Batas Pemakaian</td>
-                                    <td>&ensp; :</td>
-                                    <td>&ensp; Rp @int.Parse(trans.psbDetail.batasPemakaian).ToString("N0") (2x Harga Paket)</td>
-                                </tr>
-                            </table>
-                        </div>
+
+                <form class="navbar-form">
+                </form>
+            </div>
+        </nav>
+        <!-- End Navbar -->
+
+        <div class="content">
+            <div class="container-fluid">
+                <div class="row">
+                    <div class="col-md-12">
+                        <div class="teks-title">Berlangganan KartuHalo</div>
+                        <div class="teks-title4 text-center">Konfirmasi Data Pelanggan</div>
+                        <table style="font-size: 22pt; line-height: 45px; margin-top: 2%; color: black;">
+                            <tr>
+                                <td>NIK</td>
+                                <td>&ensp; : </td>
+                                <td>&nbsp; @trans.psbDetail.nik</td>
+                            </tr>
+                            <tr>
+                                <td>Nama</td>
+                                <td>&nbsp; :</td>
+                                <td>&nbsp; @trans.psbDetail.nama</td>
+                            </tr>
+                            <tr>
+                                <td>Nomor kartuHalo</td>
+                                <td>&ensp; :</td>
+                                <td>&ensp; @trans.psbDetail.selectedNumber</td>
+                            </tr>
+                            <tr>
+                                <td>Harga Paket</td>
+                                <td>&ensp; :</td>
+                                <td>&ensp; Rp @int.Parse(trans.psbDetail.PaketPSB._harga).ToString("N0") per bulan (@trans.psbDetail.PaketPSB._varianName)</td>
+                            </tr>
+                            <tr>
+                                <td>Informasi Paket</td>
+                                <td>&ensp; :</td>
+                                <td>&ensp; @trans.psbDetail.PaketPSB._dataAllnet Data All Net + @trans.psbDetail.PaketPSB._dataRoaming Data Roaming </td>
+                            </tr>
+                            <tr>
+                                <td>&ensp;</td>
+                                <td>&ensp;</td>
+                                <td> + @trans.psbDetail.PaketPSB._dataContent + Kuota Telepon dan SMS</td>
+                            </tr>
+                            <tr>
+                                <td>Periode Penagihan</td>
+                                <td>&ensp; :</td>
+                                <td>&ensp; Tanggal 1 di Bulan Berikutnya</td>
+                            </tr>
+                            <tr>
+                                <td>Batas Pemakaian</td>
+                                <td>&ensp; :</td>
+                                <td>&ensp; Rp @int.Parse(trans.psbDetail.batasPemakaian).ToString("N0") (2x Harga Paket)</td>
+                            </tr>
+                        </table>
                     </div>
                 </div>
             </div>
-            <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+        </div>
+        <!-- <div class="centered">Silakan Tekan Menu yang Anda Inginkan</div> -->
+    </div>
+</div>
+<footer style="display: flex;">
+    <div id="footer-side1" class="col-md-4" style="background-color:transparent;">
+        <div style="margin-left: -1rem; margin-right: -2rem;">
+            <span style="margin:5px;" class="dot2">1</span>
+            <span style="margin:5px;" class="dot2">2</span>
+            <span style="margin:5px;" class="dot2">3</span>
+            <span style="margin:5px;" class="dot2">4</span>
+            <span style="margin:5px;" class="dot2">5</span>
+            <span style="margin:5px;" class="dot2">6</span>
+            <span style="margin:5px;" class="dot2" id="dot-active">7</span>
+            <span style="margin:5px;" class="dot2">8</span>
+            <span style="margin:5px;" class="dot2">9</span>
         </div>
     </div>
-    <footer style="display: flex;">
-        <div id="footer-side1" class="col-md-4" style="background-color:transparent;">
-            <div style="margin-left: -1rem; margin-right: -2rem;">
-                <span style="margin:5px;" class="dot2">1</span>
-                <span style="margin:5px;" class="dot2">2</span>
-                <span style="margin:5px;" class="dot2">3</span>
-                <span style="margin:5px;" class="dot2">4</span>
-                <span style="margin:5px;" class="dot2">5</span>
-                <span style="margin:5px;" class="dot2">6</span>
-                <span style="margin:5px;" class="dot2" id="dot-active">7</span>
-                <span style="margin:5px;" class="dot2">8</span>
-                <span style="margin:5px;" class="dot2">9</span>
-            </div>
+    <div class="col-md-4">
+        <button @onclick="Lanjut" class="btn btn-danger button-nps" style="bottom: 10%;" id="myBtn1">Lanjut</button>
+    </div>
+    <div id="footer-side2" class="col-md-4">
+        <div style="margin-left: -8rem; margin-right: -8rem;">
+            <button @onclick="@(()=>NavigateTo("/PSB/6"))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(()=>MainMenu())" class="btn-arrow btn" value="">Menu Utama</button>
+            <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
-        <div class="col-md-4">
-            <button @onclick="Lanjut" class="btn btn-danger button-nps" style="bottom: 10%;" id="myBtn1">Lanjut</button>
-        </div>
-        <div id="footer-side2" class="col-md-4">
-            <div style="margin-left: -8rem; margin-right: -8rem;">
-                <button @onclick="@(()=>NavigateTo("/PSB/6"))" class="btn-arrow btn" value="">Kembali</button>
-                <button @onclick="@(()=>MainMenu())" class="btn-arrow btn" value="">Menu Utama</button>
-                <!-- <sup>Powered By </sup>Trilogi Persada -->
-            </div>
-        </div>
+    </div>
 </footer>
-    @if (isTimeOut)
-    {
-        <div id="myModal" class="modal">
 
-            <!-- Modal content -->
-            <div class="modal-dialog-centered" role="document">
-                <div class="modal-content">
-                    <div class="modal-body">
-                        <p class="text-body"><span style="font-weight: bold;">Sesi Anda akan segera berakhir.</span><br />Anda akan keluar dari sistem dalam <span style="font-weight: bold;"></span> detik.</p>
-                        <button class="btn btn-danger modal-button">Lanjutkan Sesi</button>
-                        <button class="btn btn-white modal-button">Selesai</button>
-                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
-                    </div>
+@if (isLoading)
+{
+    <div id="myModal" class="modal" style="z-index:999;">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Mohon tunggu</p>
+            <p>proses sedang berlangsung...</p>
+        </div>
+    </div>
+}
+
+@if (isIdle)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
                 </div>
             </div>
-
         </div>
-    }
-    @if (isLoading)
+    </div>
+}
+@code{
+    private bool isLoading = false;
+    private bool isPopUp = false;
+
+    private string releaseNumberService = "psb-halo/v1/release-number";
+    private string _myURL = string.Empty;
+    private string strMsgError = string.Empty;
+
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
-        <div id="myModal" class="modal" style="z-index:999;">
-            <div class="modal-blank">
-                <img class="lds-spinner" src="../../assets/image/loader.gif">
-                <p><br>Mohon tunggu</p>
-                <p>proses sedang berlangsung...</p>
-            </div>
-        </div>
+        if (bFirstRender)
+        {
+
+        }
     }
-    @code{
-        private bool isLoading = false;
-        private bool isTimeOut = false;
-        private bool isPopUp = false;
+    protected override async Task OnInitializedAsync()
+    {
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+    }
 
-        private string releaseNumberService = "psb-halo/v1/release-number";
-        private string _myURL = string.Empty;
-        private string strMsgError = string.Empty;
+    private void Lanjut()
+    {
+        NavigateTo("/PSB/7b");
+    }
 
-        protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    private void NavigateTo(string strURL)
+    {
+        isNotIdle = false;
+        NavMan.NavigateTo(strURL);
+    }
+    private async Task MainMenu()
+    {
+        isLoading = true;
+        trans.AddTrail("KONFIRMASI DATA", "BACK TO MAIN MENU", "02");
+        trans.status = "02";
+        await ReleaseNumber();
+        await OurUtility.AuditTrailPSB(trans, menu, cst);
+        NavigateTo("/main");
+    }
+
+    private async Task ReleaseNumber()
+    {
+        isLoading = true;
+        await Task.Delay(500);
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"transactionId\": \"" + trans.transID + "\"," +
+            "\"poolName\": \"" + trans.psbDetail.PaketPSB._poolName + "\"," +
+            "\"noHp\": \"" + trans.psbDetail.selectedNumber + "\"" +
+               "}";
+        string myURL = _myURL + releaseNumberService;
+        OurUtility.Write_Log("Release Number", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+
+        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
+            strResult != "BadRequest" && strResult != "InternalServerError")
         {
-            if (bFirstRender)
+            try
             {
-
-            }
-        }
-        protected override async Task OnInitializedAsync()
-        {
-            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        }
-
-        private void Lanjut()
-        {
-            NavigateTo("/PSB/7b");
-        }
-
-        private void NavigateTo(string strURL)
-        {
-            NavMan.NavigateTo(strURL);
-        }
-        private async Task MainMenu()
-        {
-            isLoading = true;
-            trans.AddTrail("KONFIRMASI DATA", "BACK TO MAIN MENU", "02");
-            trans.status = "02";
-            await ReleaseNumber();
-            await OurUtility.AuditTrailPSB(trans, menu, cst);
-            NavMan.NavigateTo("/main");
-        }
-
-        private async Task ReleaseNumber()
-        {
-            isLoading = true;
-            await Task.Delay(500);
-            string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
-                "\"transactionId\": \"" + trans.transID + "\"," +
-                "\"poolName\": \"" + trans.psbDetail.PaketPSB._poolName + "\"," +
-                "\"noHp\": \"" + trans.psbDetail.selectedNumber + "\"" +
-                   "}";
-            string myURL = _myURL + releaseNumberService;
-            OurUtility.Write_Log("Release Number", "step-action");
-            OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-            string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-
-            if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
-                strResult != "BadRequest" && strResult != "InternalServerError")
-            {
-                try
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    JObject jobjResult = JObject.Parse(strResult);
-                    if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
-                    {
-                        trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "00");
-                        //NavigateTo("/PSB/4");
-                    }
-                    else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
-                    {
-                        if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
-                        {
-                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
-                        }
-                        else
-                        {
-                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
-                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
-                        }
-                        trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
-                        trans.status = "01";
-                        await OurUtility.AuditTrailPSB(trans, menu, cst);
-                        //isNotIdle = false;
-                        isLoading = false;
-                        NavigateTo("/error");
-                    }
-                    else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
-                    {
-                        isLoading = false;
-                        strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
-                        trans.AddTrail("Release Number", "Number : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "02");
-
-                        isPopUp = false;
-                        return;
-                    }
+                    trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "00");
+                    //NavigateTo("/PSB/4");
                 }
-                catch (Exception ex)
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
-                    isLoading = false;
-                    trans.AddTrail("Release Number", "Exception Error ", "01");
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
                     trans.status = "01";
                     await OurUtility.AuditTrailPSB(trans, menu, cst);
-
-                    trans.errorCode = "Exception Error";
-                    OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                     //isNotIdle = false;
+                    isLoading = false;
                     NavigateTo("/error");
                 }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    isLoading = false;
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                    trans.AddTrail("Release Number", "Number : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "02");
+
+                    isPopUp = false;
+                    return;
+                }
             }
-            else
+            catch (Exception ex)
             {
                 isLoading = false;
-                trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult+"}", "01");
+                trans.AddTrail("Release Number", "Exception Error ", "01");
                 trans.status = "01";
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-                trans.errorCode = "Hit Webservice Error {" + strResult+"}";
-                OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult + "}", "step-action");
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavigateTo("/error");
             }
         }
+        else
+        {
+            isLoading = false;
+            trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult + "}", "01");
+            trans.status = "01";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+            OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult + "}", "step-action");
+            //isNotIdle = false;
+            NavigateTo("/error");
+        }
     }
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Idle 2 1b Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Time 2 1b Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+    private bool translog = false;
+    private async Task MenuUtamaCanceled()
+    {
+        if (translog)
+        {
+            translog = false;
+            isLoading = true;
+            await ReleaseNumber();
+            trans.AddTrail("KONFIRMASI DATA", "CANCELED", "02");
+            trans.status = "02";
+            trans.errorCode = "KONFIRMASI DATA";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+            NavigateTo("/main");
+        }
+    }
+}

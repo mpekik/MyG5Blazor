@@ -14,7 +14,7 @@
 @inject Menu menu
 @inject Transaction trans
 @inject Config config
-<div class="main-panel bg-home" style="z-index:1;">
+<div class="main-panel bg-home" style="z-index:1;" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -52,36 +52,36 @@
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 5%;">
-                               @if (boolNumber[0+menu.pageIndex])
-                               {
-                                <button @onclick="@(() => PickNomer(populateNumber[0+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[0 + menu.pageIndex]</button>
-                               }
-                                @if (boolNumber[1 + menu.pageIndex])
-                                {
-                                <button @onclick="@(() => PickNomer(populateNumber[1+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[1 + menu.pageIndex]</button>
-                                }
+                        @if (boolNumber[0 + menu.pageIndex])
+                        {
+                            <button @onclick="@(() => PickNomer(populateNumber[0+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[0 + menu.pageIndex]</button>
+                        }
+                        @if (boolNumber[1 + menu.pageIndex])
+                        {
+                            <button @onclick="@(() => PickNomer(populateNumber[1+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[1 + menu.pageIndex]</button>
+                        }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
-                                @if (boolNumber[2 + menu.pageIndex])
-                                {
-                                <button @onclick="@(() => PickNomer(populateNumber[2+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[2 + menu.pageIndex]</button>
-                                }
-                                @if (boolNumber[3 + menu.pageIndex])
-                                {
-                                <button @onclick="@(() => PickNomer(populateNumber[3+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[3 + menu.pageIndex]</button>
-                                }
+                        @if (boolNumber[2 + menu.pageIndex])
+                        {
+                            <button @onclick="@(() => PickNomer(populateNumber[2+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[2 + menu.pageIndex]</button>
+                        }
+                        @if (boolNumber[3 + menu.pageIndex])
+                        {
+                            <button @onclick="@(() => PickNomer(populateNumber[3+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[3 + menu.pageIndex]</button>
+                        }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
-                                @if (boolNumber[4 + menu.pageIndex])
-                                {
-                                    <button @onclick="@(() => PickNomer(@populateNumber[4+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[4 + menu.pageIndex]</button>
-                                }                            }
-                            
-                                @if (boolNumber[5 + menu.pageIndex])
-                                {
-                                <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[5 + menu.pageIndex]</button>
-                                }
-                        </div>
+                        @if (boolNumber[4 + menu.pageIndex])
+                        {
+                            <button @onclick="@(() => PickNomer(@populateNumber[4+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[4 + menu.pageIndex]</button>
+                        }                            }
+
+                        @if (boolNumber[5 + menu.pageIndex])
+                        {
+                            <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[5 + menu.pageIndex]</button>
+                        }
+                    </div>
                 </div>
             </div>
         </div>
@@ -117,6 +117,24 @@
         </div>
     </div>
 }
+@if (isIdle)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code
 {
     private bool IsMethod = false;
@@ -132,7 +150,7 @@
     private string reserveNumberService = "psb-halo/v1/reserve-number";
     private string strMsgError = string.Empty;
 
-    private bool[] boolNumber = { false, false, false, false, false,false, false, false, false, false, false, false, false, false, false, false, false, false };
+    private bool[] boolNumber = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
     private string[] populateNumber = { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
     private int pageIndex = 0;
     private int inputIndex = 0;
@@ -151,38 +169,27 @@
             //PopulateNumber();
             StateHasChanged();
         }
-
     }
 
     private void PopulateNumber()
     {
-
-        if(menu.psbNomer.Count()>18)
+        if (menu.psbNomer.Count() > 18)
         {
-            for(int i=0;i<18;i++)
-            {
-                boolNumber[i] = true;
-                populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
-                StateHasChanged();
-            }
-        }else
-        {
-            for(int i=0;i<menu.psbNomer.Count();i++)
+            for (int i = 0; i < 18; i++)
             {
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
                 StateHasChanged();
             }
         }
-    }
-    private void SetPaymentMethod(int _intMPembayaran)
-    {
-        if (!IsMethod)
+        else
         {
-            cst.intMPembayaran = _intMPembayaran;
-            trans.intPayment = _intMPembayaran;
-            trans.AddTrail("PAYMENT METHOD", cst.strMPembayaran, "00");
-            IsMethod = true;
+            for (int i = 0; i < menu.psbNomer.Count(); i++)
+            {
+                boolNumber[i] = true;
+                populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
+                StateHasChanged();
+            }
         }
     }
 
@@ -202,24 +209,21 @@
         await OurUtility.AuditTrailPSB(trans, menu, cst);
         NavMan.NavigateTo("/main");
     }
-    //private void PopulateNumber()
-    //{
-    //    inputNumber = new string[menu.psbNomer.Count()];
-    //    for (int i = 0; i < menu.psbNomer.Count(); i++)
-    //    {
-    //        inputNumber[i] = menu.psbNomer[i];
-    //    }
-    //}
+
     private void NavigateTo(string strURL)
     {
+        isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }
+
     protected override async Task OnInitializedAsync()
     {
+        counterTime = counterTreshold;
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         strNumber = trans.psbDetail.patternNumber;
         PopulateNumber();
     }
+
     private async Task ReserveNumber()
     {
         isLoading = true;
@@ -293,14 +297,122 @@
         else
         {
             isLoading = false;
-            trans.AddTrail("Reserve Number", "Hit Webservice Error {" + strResult+"}", "01");
+            trans.AddTrail("Reserve Number", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-            trans.errorCode = "Hit Webservice Error {" + strResult+"}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult+"}", "step-action");
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavMan.NavigateTo("/error");
+        }
+    }
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Idle 1 1a Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Time 2 1a Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+
+    private bool translog = true;
+
+    private async Task MenuUtamaCanceled()
+    {
+        if (translog)
+        {
+            translog = false;
+            InvokeAsync(StateHasChanged);
+            isNotIdle = false;
+            isLoading = true;
+            trans.AddTrail("CHOOSE NUMBER", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+            NavigateTo("/main");
+        }
+    }
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            #region AfterRenderTimeOut
+            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
         }
     }
 }

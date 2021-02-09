@@ -16,7 +16,7 @@
 @inject Menu menu
 @inject Config config
 
-<div class="main-panel bg-home">
+<div class="main-panel bg-home" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -87,6 +87,24 @@
         </div>
     </div>
 }
+@if (isIdle)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code
 {
     private bool IsInvalid = false;
@@ -123,6 +141,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        counterTime = counterTreshold;
         mypersoexe = config.Read("Dispenser", Config.PARAM_PERSO_EXE);
         strCOM = strCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
@@ -135,7 +154,7 @@
     {
         cst.intMPembayaran = _intMPembayaran;
         trans.intPayment = _intMPembayaran;
-       
+
         NavigateTo("/PSB/9a");
     }
 
@@ -164,7 +183,7 @@
                     //ToDO if Reader error
                     if (await CardReaderScan())
                     {
-                        trans.AddTrail("GET SN","SN Kartu : " + p_icc_id, "00");
+                        trans.AddTrail("GET SN", "SN Kartu : " + p_icc_id, "00");
                         if (p_icc_id.Substring(2, 2) == "62")
                         {
                             await Task.Run(() => MoveToRFCard());
@@ -248,7 +267,7 @@
                                             }
                                             else
                                             {
-                                                trans.AddTrail("UPDATE BERHASIL PERSO","Perso Id : " + trans.persoID, "01");
+                                                trans.AddTrail("UPDATE BERHASIL PERSO", "Perso Id : " + trans.persoID, "01");
                                                 await Task.Run(() => MoveToRFCard());
                                                 if (!await Task.Run(() => MoveToBin()))
                                                 {
@@ -579,7 +598,7 @@
             trans.status = "02";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
             await ReleaseNumber();
-            NavMan.NavigateTo("/main");
+            NavigateTo("/main");
         }
     }
     private async Task Back()
@@ -588,6 +607,7 @@
     }
     private void NavigateTo(string strURL)
     {
+        isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }
     private async Task ReleaseNumber()
@@ -655,20 +675,128 @@
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
-                NavMan.NavigateTo("/error");
+                NavigateTo("/error");
             }
         }
         else
         {
             isLoading = false;
-            trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult+"}", "01");
+            trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-            trans.errorCode = "Hit Webservice Error {" + strResult+"}";
-            OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult+"}", "step-action");
+            trans.errorCode = "Hit Webservice Error {" + strResult + "}";
+            OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
-            NavMan.NavigateTo("/error");
+            NavigateTo("/error");
+        }
+    }
+
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Idle 2 1b Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Time 2 1b Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await MenuUtamaCanceled();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+
+    private async Task MenuUtamaCanceled()
+    {
+        if (translog)
+        {
+            isLoading = false;
+            translog = false;
+            isLoading = true;
+            await ReleaseNumber();
+            trans.AddTrail("PILIH METODE PEMBAYARAN", "CANCELED", "02");
+            trans.status = "02";
+            trans.errorCode = "METODE PEMBAYARAN";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+            NavigateTo("/main");
+        }
+    }
+
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            #region AfterRenderTimeOut
+            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
         }
     }
 }

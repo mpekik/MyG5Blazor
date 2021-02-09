@@ -109,7 +109,7 @@
     </div>
     <div class="footer-side2">
         <button @onclick="@(()=>NavigateTo("/psb/1b"))" class="btn-arrow btn" value="">Kembali</button>
-        <button @onclick="@(()=>MainMenu())" class="btn-arrow btn" value="">Menu Utama</button>
+        <button @onclick="@(()=>InvokeAsync(MenuUtamaCanceled))" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
@@ -153,6 +153,24 @@
                 <div class="modal-body">
                     <p class="text-body">@((MarkupString)strMsgError)</p>
                     <button class="btn btn-danger modal-button" @onclick="@(() => isVisible = false)">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
+@if (isIdle)
+{
+    <div id="myModal" class="modal">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTime</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktu))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTime=0)">Tidak</button>
                 </div>
             </div>
         </div>
@@ -283,7 +301,7 @@
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
-                NavMan.NavigateTo("/error");
+                NavigateTo("/error");
             }
         }
         else
@@ -296,7 +314,7 @@
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
             OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
-            NavMan.NavigateTo("/error");
+            NavigateTo("/error");
         }
     }
     private async Task KirimUlang()
@@ -593,7 +611,7 @@
         trans.AddTrail("INPUT OTP", "BACK TO MAIN MENU", "02");
         trans.status = "02";
         await OurUtility.AuditTrailPSB(trans, menu, cst);
-        NavMan.NavigateTo("/main");
+        NavigateTo("/main");
     }
 
     #region TimeOut
@@ -606,7 +624,7 @@
         do
         {
             await Task.Delay(1000);
-            //Console.WriteLine("Idle 2 Time Left : " + counterTime.ToString());
+            Console.WriteLine("Idle 1 2a Time Left : " + counterTime.ToString());
             counterTime = counterTime - 1;
             InvokeAsync(StateHasChanged);
             if (counterTime < 1)
@@ -630,7 +648,7 @@
         do
         {
             await Task.Delay(1000);
-            //Console.WriteLine("Time 2 Out Left : " + secondCTime.ToString());
+            Console.WriteLine("Time 2 2a Out Left : " + secondCTime.ToString());
             secondCTime = secondCTime - 1;
             InvokeAsync(StateHasChanged);
             if (secondCTime < 0)
@@ -686,7 +704,12 @@
             translog = false;
             InvokeAsync(StateHasChanged);
             isNotIdle = false;
- //           NavigateTo("/main");
+            isLoading = true;
+            trans.AddTrail("INPUT OTP", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+            NavigateTo("/main");
         }
     }
     private void NavigateTo(string strURL)
