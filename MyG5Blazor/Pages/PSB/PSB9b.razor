@@ -1278,6 +1278,7 @@
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
+                    isFail=true;
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
 
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
