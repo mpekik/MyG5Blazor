@@ -226,18 +226,18 @@
                     else
                     {
                         //Capture Image From IP CAM
-                        //byte[] image = OurUtility.CaptureImage();
-                        //if (image != null)
-                        //{
-                        //    imageBytesStr = Convert.ToBase64String(image);
-                        //}
-                        //else
-                        //{
-                        //    isLoading = false;
-                        //    isVisible = true;
-                        //    strMsgError = "<span style=\"font-weight: bold; \">IP Camera Tidak terdeteksi</span><br>Mohon hubungi <span style=\"font-weight: bold; \">Costumer Service</span> GraPARI untuk bantuan.";
-                        //    return;
-                        //}
+                        byte[] image = OurUtility.CaptureImage();
+                        if (image != null)
+                        {
+                            trans.imageIPCam = Convert.ToBase64String(image);
+                        }
+                        else
+                        {
+                            isLoading = false;
+                            isVisible = true;
+                            strMsgError = "<span style=\"font-weight: bold; \">IP Camera Tidak terdeteksi</span><br>Mohon hubungi <span style=\"font-weight: bold; \">Costumer Service</span> GraPARI untuk bantuan.";
+                            return;
+                        }
 
                         trans.psbDetail.alamatEmail = inputEmail;
                         OurUtility.Write_Log("Input Email:" + trans.psbDetail.alamatEmail, "step-action");
@@ -291,6 +291,7 @@
     {
         string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
             "\"transactionId\": \"" + trans.transID + "\"," +
+            "\"image\": \"" + trans.imageIPCam + "\"," +
             "\"email\": \"" + trans.psbDetail.alamatEmail + "\"" +
                "}";
         string myURL = _myURL + serviceURL;

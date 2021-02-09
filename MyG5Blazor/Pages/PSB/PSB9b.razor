@@ -495,7 +495,6 @@
                     cst.intTagihan = intBill;
                     await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
 
-                    pageClass = "main-panel bg-home";
                     if (edc.intTry < 3)
                     {
                         OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
@@ -504,6 +503,8 @@
                         await Task.Delay(200);
                         intAccBill = intBill;
                         await Payment("");
+
+                        pageClass = "main-panel bg-home";
 
                         if (resultPayment == "00")
                         {
@@ -545,7 +546,6 @@
                             if (trans.edcresp == "00")
                             {
 
-                                IsFail = false;
                                 if (respPaymentError == "C" || respPaymentError == "A")
                                 {
                                     IsVoid = true;
@@ -1479,7 +1479,7 @@
     #endregion
     private void TimerElapsedHandler()
     {
-        NavMan.NavigateTo("/main");
+        NavigateTo("/main");
     }
 
 

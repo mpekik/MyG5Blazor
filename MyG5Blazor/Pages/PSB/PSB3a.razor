@@ -48,7 +48,7 @@
                                                 <p class="card-header giga-bytes">@menuSatuanDataAllNet[0 + menu.packageIndex]</p>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="card-header detail-1">&nbsp;<br>&nbsp;</div>
+                                                <div class="card-header detail-1">@menuViewDataAllNet[0 + menu.packageIndex] @menuSatuanDataAllNet[0 + menu.packageIndex]<br>Lainnya</div>
                                                 <div class="card-header detail-2">Kuota Telepon dan SMS</div>
                                             </div>
                                         </div>
@@ -67,7 +67,7 @@
                                                 <p class="card-header giga-bytes">@menuSatuanDataAllNet[1 + menu.packageIndex]</p>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="card-header detail-1">&nbsp;<br>&nbsp;</div>
+                                                <div class="card-header detail-1">@menuViewDataAllNet[1 + menu.packageIndex] @menuSatuanDataAllNet[1 + menu.packageIndex]<br>Lainnya</div>
                                                 <div class="card-header detail-2">Kuota Telepon dan SMS</div>
                                             </div>
                                         </div>
@@ -88,7 +88,7 @@
                                                 <p class="card-header giga-bytes">@menuSatuanDataAllNet[2 + menu.packageIndex]</p>
                                             </div>
                                             <div class="col-md-6">
-                                                <div class="card-header detail-1">&nbsp;<br>&nbsp;</div>
+                                                <div class="card-header detail-1">@menuViewDataAllNet[2 + menu.packageIndex] @menuSatuanDataAllNet[2 + menu.packageIndex]<br>Lainnya</div>
                                                 <div class="card-header detail-2">Kuota Telepon dan SMS</div>
                                             </div>
                                         </div>
@@ -108,7 +108,7 @@
                                             </div>
                                             <div class="col-md-6">
                                                 @*<div class="card-header detail-1">@menuEntertainment[3] GB<br>Lainnya</div>*@
-                                                <div class="card-header detail-1">&nbsp;<br>&nbsp;</div>
+                                                <div class="card-header detail-1">@menuViewDataAllNet[3 + menu.packageIndex] @menuSatuanDataAllNet[3 + menu.packageIndex]<br>Lainnya</div>
                                                 <div class="card-header detail-2">Kuota Telepon dan SMS</div>
                                             </div>
                                         </div>
@@ -180,10 +180,10 @@
                     <p class="text-header2">Rp @int.Parse(menuNominal[paramMenu]).ToString("N0")/bulan (@menuVarianName[paramMenu])</p>
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee; padding-left:0px">
-                            <img src="../../assets/image/icon_internet.png" style="width: 85%;">
+                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
                         </div>
                         <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data All Net</b>
+                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Data All Net</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right; border-bottom: 1px solid #eeeeee;">
                             <p>@menuDataAllNet[paramMenu]</p>
@@ -191,10 +191,10 @@
                     </div>
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee; padding-left:0px">
-                            <img src="../../assets/image/icon_internet.png" style="width: 85%;">
+                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
                         </div>
                         <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data Roaming</b>
+                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Data Roaming</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right; border-bottom: 1px solid #eeeeee;">
                             <p>@menuDataRoaming[paramMenu]@menuSatuanDataAllRoaming[paramMenu]</p>
@@ -203,10 +203,10 @@
 
                     <div class="col-md-12" style="margin-top: 3%; height: 40px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
-                            <img src="../../assets/image/icon_internet.png" style="width: 85%;">
+                            <img src="../../assets/image/icon_internet.png" style="width: 90%;">
                         </div>
                         <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data Content</b>
+                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Data Content</b>
                             <p style="font-size: 12px; line-height: 15px; font-style: italic; margin-right: -1rem;">
                                 @menuDataContent[paramMenu]
                             </p>
@@ -220,10 +220,10 @@
                     {
                         <div class="col-md-12" style="margin-top: 3%; height: 40px; display: flex;">
                             <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
-                                <img src="../../assets/image/icon_internet.png" style="width: 85%;">
+                                <img src="../../assets/image/icon_internet.png" style="width: 90%;">
                             </div>
                             <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                                <b class="teks-pop" style="font-size: 23px; font-weight: bold;">Data Subscription</b>
+                                <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Data Subscription</b>
                                 <p style="font-size: 12px; line-height: 15px; font-style: italic; margin-right: -1rem;">
                                     @menuDataSubscription[paramMenu]
                                 </p>
@@ -235,10 +235,10 @@
                     }
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
-                            <img src="../../assets/image/icon_telepon.png" style="width: 85%;">
+                            <img src="../../assets/image/icon_telepon.png" style="width: 90%;">
                         </div>
                         <div class="col-md-8" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 23px;  font-weight: bold;">Telepon</b>
+                            <b class="teks-pop" style="font-size: 26px;  font-weight: bold;">Telepon</b>
                         </div>
                         <div class="col-md-3 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
                             <p>@menuTelp[paramMenu]Menit</p>
@@ -247,10 +247,10 @@
 
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex; border-bottom: 1px solid #eeeeee;">
                         <div class="col-md-1" style="padding-left: 0px">
-                            <img src="../../assets/image/icon_SMS.png" style="width: 85%;">
+                            <img src="../../assets/image/icon_SMS.png" style="width: 90%;">
                         </div>
                         <div class="col-md-6" style="text-align: left;">
-                            <b class="teks-pop" style="font-size: 23px; font-weight: bold;">SMS</b>
+                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">SMS</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right;">
                             <p>@menuSMS[paramMenu]SMS</p>
@@ -259,7 +259,7 @@
 
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex; color: red;">
                         <div class="col-md-7" style="text-align: left;">
-                            <b class="teks-pop" style="font-size: 23px; margin-left: -1rem; font-weight: bold;">Rp Pembayaran di Muka</b>
+                            <b class="teks-pop" style="font-size: 26px; margin-left: -1rem; font-weight: bold;">Rp Pembayaran di Muka</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right;">
                             <p>Rp @int.Parse(menuHargaAwal[paramMenu]).ToString("N0")</p>

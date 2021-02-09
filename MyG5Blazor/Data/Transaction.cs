@@ -23,6 +23,7 @@ namespace MyG5Blazor.Data
         public long endTime { get; set; }
         public string resultPayment { get; set; }
         public string pulsaSerialNumber { get; set; }
+        public string imageIPCam { get; set; }
         public class PSBDetail
         {
             public string alamatEmail { get; set; }
