@@ -460,6 +460,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+        counterTime = counterTreshold;
         trans.psbDetail.statusPayment = "01";
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         strCOM = strCOM + config.Read("EDC", Config.PARAM_EDC_PORT);
@@ -610,15 +611,10 @@
                         logamount = 0;
                     }
                     await Task.Delay(2000);
-                    //await MainLoop(logbank, logamount);
-
-                    Payout.total = 100000;
-                    Payout.uangCount = 1;
-                    intAccBill = Payout.total;
-                    inttotal = Payout.total;
+                    await MainLoop(logbank, logamount);
 
                     StateHasChanged();
-                    await Task.Delay(3000);
+                    await Task.Delay(200);
 
                     cst.intUangCount = Payout.uangCount;
                     cst.intTagihanTerbayar = Payout.total;
@@ -1403,7 +1399,7 @@
         {
             OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
             trans.errorCode = "Exception Error";
-            trans.AddTrail("BILL ACCEPTOR", "", "01");
+            trans.AddTrail("BILL ACCEPTOR", "BA - 001", "01");
             return;
         }
     }
@@ -1650,5 +1646,98 @@
         OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         return true;
+    }
+    #region TimeOut
+    private int counterTime;
+    private int counterTreshold = 60;
+    private bool isIdle = false;
+    private bool isNotIdle = true;
+    private async Task IdleTime()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Idle 9a Time Left : " + counterTime.ToString());
+            counterTime = counterTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (counterTime < 1)
+            {
+                isIdle = true;
+                isNotIdle = false;
+                secondCTime = counterTreshold;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdle);
+    }
+    #endregion
+
+    #region SecondTimeOut
+    private int secondCTime;
+    private bool isTimeOut = false;
+
+    private async Task TimeOut()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Time 9a Out Left : " + secondCTime.ToString());
+            secondCTime = secondCTime - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTime < 0)
+            {
+                isIdle = false;
+                isTimeOut = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdle);
+    }
+
+    private async Task TambahWaktu()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        counterTime = counterTreshold;
+        //secondCTime = 0;
+        isIdle = false;
+        isTimeOut = false;
+        isNotIdle = true;
+        await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOut()
+    {
+        await Task.Run(() => IdleTime()).ConfigureAwait(false);
+        if (isIdle)
+            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+
+        if (isTimeOut)
+        {
+            //Console.WriteLine("Time Out 2");
+            //NavigateTo("/main");
+            await TunaiExitFail();
+        }
+    }
+
+    private async Task ResetTimer()
+    {
+        if (!isIdle)
+        {
+            //Console.WriteLine("Timer Reset");
+            counterTime = counterTreshold;
+        }
+    }
+    #endregion
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            #region AfterRenderTimeOut
+            if (MetodePembayaran == 2)
+            {
+                await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            }
+            #endregion
+        }
     }
 } 

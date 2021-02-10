@@ -164,6 +164,7 @@
     private bool isInput = true;
     private bool isPopUp = false;
 
+    private string nokkUI = string.Empty;
     private string strNumber = string.Empty;
     private string _myURL = string.Empty;
     private string releaseNumberService = "psb-halo/v1/release-number";
@@ -182,7 +183,31 @@
     private void InputPhoneNumber(string strInput)
     {
         if (strNumber.Length < 16)
+        {
             strNumber += strInput;
+            nokkUI = strNumber;
+            switch(nokkUI.Length)
+            {
+                case 5:
+                    {
+                        nokkUI = nokkUI.Insert(4, "-");
+                        break;
+                    }
+                case 9:
+                    {
+                        nokkUI = nokkUI.Insert(8, "-");
+                        nokkUI = nokkUI.Insert(4, "-");
+                        break;
+                    }
+                case 13:
+                    {
+                        nokkUI = nokkUI.Insert(12, "-");
+                        nokkUI = nokkUI.Insert(8, "-");
+                        nokkUI = nokkUI.Insert(4, "-");
+                        break;
+                    }
+            }
+        }
     }
 
     private async Task OK()
@@ -204,7 +229,7 @@
         }
         else if (strNumber.Length < 16)
         {
-            strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> yang Anda gunakan tidak sesuai dengan <br>eKTP. Mohon periksa kembali NoKK yang digunakan.";
+            strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> yang Anda masukkan tidak valid. <br>Mohon periksa kembali <span style=\"font-weight: bold; \">NoKK</span> Anda.";
             isPopUp = true;
         }
     }
