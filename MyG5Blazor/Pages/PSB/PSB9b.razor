@@ -1383,6 +1383,10 @@
                     //Console.WriteLine("Reconnected\r\n");
                 }
                 //Console.WriteLine("9");
+                if(Payout.total>inttotal)
+                {
+                    ResetTimer();
+                }
                 inttotal = Payout.total;
                 //Console.WriteLine("inttotal = " + inttotal);
                 StateHasChanged();
