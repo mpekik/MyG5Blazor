@@ -117,7 +117,7 @@
 <!-- The Modal -->
 @if (isInvalid)
 {
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal"style="z-index:999;">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -136,7 +136,7 @@
 
 @if (isLoading)
 {
-    <div id="myModal" class="modal" style="z-index:1;">
+    <div id="myModal" class="modal" style="z-index:999;">
         <div class="modal-blank">
             <img class="lds-spinner" src="../../assets/image/loader.gif">
             <p><br>Mohon tunggu</p>
@@ -146,7 +146,7 @@
 }
 @if (isVisible)
 {
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal"style="z-index:999;">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -160,7 +160,7 @@
 }
 @if (isIdle)
 {
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal" style="z-index:999;">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">

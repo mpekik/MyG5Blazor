@@ -95,24 +95,6 @@
         </div>
     </div>
 </footer>
-@if (isTimeOut)
-{
-    <div id="myModal" class="modal">
-
-        <!-- Modal content -->
-        <div class="modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <p class="text-body"><span style="font-weight: bold;">Sesi Anda akan segera berakhir.</span><br />Anda akan keluar dari sistem dalam <span style="font-weight: bold;"></span> detik.</p>
-                    <button class="btn btn-danger modal-button">Lanjutkan Sesi</button>
-                    <button class="btn btn-white modal-button">Selesai</button>
-                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
-                </div>
-            </div>
-        </div>
-
-    </div>
-}
 @if (isLoading)
 {
     <div id="myModal" class="modal" style="z-index:999;">
@@ -125,7 +107,7 @@
 }
 @if (isIdle)
 {
-    <div id="myModal" class="modal">
+    <div id="myModal" class="modal"style="z-index:999;">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
