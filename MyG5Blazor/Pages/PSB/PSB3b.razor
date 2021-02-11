@@ -43,11 +43,11 @@
                 <div class="col-md-6">
                     @if (strNumber == string.Empty)
                     {
-                        <input type="text" name="number" placeholder="Contoh : 4444" class="num-field" readonly>
+                        <input type="text" style="font-weight:bold;" name="number" placeholder="Contoh : 4444" class="num-field" readonly>
                     }
                     else
                     {
-                        <input type="text" name="number" class="num-field" @bind="strNumber" readonly />
+                        <input type="text" style="font-weight:bold;" name="number" class="num-field" @bind="strNumber" readonly />
                     }
                     <div class="num-button">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>

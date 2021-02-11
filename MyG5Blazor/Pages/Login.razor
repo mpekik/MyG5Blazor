@@ -10,7 +10,7 @@
 @using System;
 @using System.Threading.Tasks;
 @using System.ComponentModel.DataAnnotations;
-
+ 
 @inject EDC edc 
 @inject Costumer cst
 @inject NavigationManager NavMan
@@ -393,7 +393,8 @@
 
         private int logbank = 0;
         private int logamount = 0;
-
+        string tes = "0811826393";
+        string tes2 = "";
         protected override async Task OnInitializedAsync()
         {
             config.vers = config.ReadUtil("MyGraPARI", Config.PARAM_ADMIN_RELEASE);
@@ -401,6 +402,7 @@
             string uiVers = config.ReadUtil("MyGraPARI", Config.PARAM_MYGRAPARI_VER);
             config.Write("MyGraPARI", Config.PARAM_MYGRAPARI_VER, uiVers);
             vers = config.vers;
+            tes2 = Regex.Replace(tes, ".{8}", "$0,");
         }
         [Microsoft.AspNetCore.Components.Inject]
 
@@ -481,7 +483,12 @@
                 menu.userName = userName;
                 //isNotAuthorized = false;
                 //isAuthorized = true;
-                menu.AddMainMenu("PSB HALO", "psb-halo/v1/init", "Menu_Berlangganan_kartuHalo.png", "PSB", "margin-left: 10%;");
+                menu.AddMainMenu("Ganti Kartu", "ganti-kartu/v1/init", "Menu_Ganti_kartu.png", "GK", "margin-left: 10%;");
+                menu.AddMainMenu("Upgrade 4G", "upgrade-4g/v1/init", "Menu_Upgrade4G.png", "UP", "margin-left: 5%;");
+                menu.AddMainMenu("Payment Halo", "bayar-halo/v1/init", "Menu_Bayar_Tagihan.png", "PB", "margin-left: 10%; margin-top: 5%; ");
+                menu.AddMainMenu("Recharge", "isi-pulsa/v1/init", "Menu_Beli_Pulsa.png", "PSB", "margin-left: 5%; margin-top: 5%; ");
+
+                menu.AddMainMenu("PSB HALO", "psb-halo/v1/init", "Menu_Berlangganan_kartuHalo.png", "PSB", "margin-left: 10%; margin-top: 10%; ");
                 authorizedLevel = "1";
                 NavigateTo("/main");
             }

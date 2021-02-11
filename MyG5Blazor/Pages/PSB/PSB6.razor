@@ -185,25 +185,7 @@
         if (strNumber.Length < 16)
         {
             strNumber += strInput;
-            nokkUI += strInput;
-            switch (nokkUI.Length)
-            {
-                case 5:
-                    {
-                        nokkUI = nokkUI.Insert(4, "-");
-                        break;
-                    }
-                case 10:
-                    {
-                        nokkUI = nokkUI.Insert(9, "-");
-                        break;
-                    }
-                case 15:
-                    {
-                        nokkUI = nokkUI.Insert(14, "-");
-                        break;
-                    }
-            }
+            nokkUI = Regex.Replace(strNumber, ".{4}", "$0-");
         }
     }
 
@@ -428,7 +410,10 @@
     private void RemovePhoneNumber()
     {
         if (strNumber.Length > 0)
+        {
             strNumber = strNumber.Substring(0, strNumber.Length - 1);
+            nokkUI = Regex.Replace(strNumber, ".{4}", "$0-");
+        }
     }
     private void NavigateTo(string strURL)
     {

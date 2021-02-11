@@ -7,6 +7,7 @@
 @using System;
 @using System.Threading.Tasks;
 @using System.Net.Http;
+@using System.Text.RegularExpressions;
 
 @inject Costumer cst
 @inject IJSRuntime JSRuntime;
@@ -48,38 +49,38 @@
                     <div class="" style="text-align: center; margin-top: 5%;">
                         @if (menu.psbIndex > 6)
                         {
-                            <button class="btn btn-danger btn-right3" @onclick="NextIndex" id="btn-ok" value="">Pilihan Berikutnya</button>
+                            <button class="btn btn-danger btn-right3" style="font-weight:bold;" @onclick="NextIndex" id="btn-ok" value="">Pilihan Berikutnya</button>
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 5%;">
                         @if (boolNumber[0 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[0+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[0 + menu.pageIndex]</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[0+menu.pageIndex]))" class="btn-pilih-no btn" value="">@numberUI[0 + menu.pageIndex]</button>
                         }
                         @if (boolNumber[1 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[1+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[1 + menu.pageIndex]</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[1+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@numberUI[1 + menu.pageIndex]</button>
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
                         @if (boolNumber[2 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[2+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[2 + menu.pageIndex]</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[2+menu.pageIndex]))" class="btn-pilih-no btn" value="">@numberUI[2 + menu.pageIndex]</button>
                         }
                         @if (boolNumber[3 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[3+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[3 + menu.pageIndex]</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[3+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@numberUI[3 + menu.pageIndex]</button>
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
                         @if (boolNumber[4 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(@populateNumber[4+menu.pageIndex]))" class="btn-pilih-no btn" value="">@populateNumber[4 + menu.pageIndex]</button>
-                        }                            }
+                            <button @onclick="@(() => PickNomer(@populateNumber[4+menu.pageIndex]))" class="btn-pilih-no btn" value="">@numberUI[4 + menu.pageIndex]</button>
+                        }                            
 
                         @if (boolNumber[5 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@populateNumber[5 + menu.pageIndex]</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@numberUI[5 + menu.pageIndex]</button>
                         }
                     </div>
                 </div>
@@ -152,6 +153,7 @@
 
     private bool[] boolNumber = { false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false, false };
     private string[] populateNumber = { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
+    private string[] numberUI = { "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "", "" };
     private int pageIndex = 0;
     private int inputIndex = 0;
 
@@ -179,6 +181,7 @@
             {
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
+                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
                 StateHasChanged();
             }
         }
@@ -188,6 +191,7 @@
             {
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
+                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
                 StateHasChanged();
             }
         }
