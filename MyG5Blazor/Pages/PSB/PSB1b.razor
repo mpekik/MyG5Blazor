@@ -289,18 +289,19 @@
     }
     private async Task RequestOTP()
     {
-        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+        string myJsonForLog = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
             "\"transactionId\": \"" + trans.transID + "\"," +
-            "\"image\": \"" + trans.imageIPCam + "\"," +
-            "\"email\": \"" + trans.psbDetail.alamatEmail + "\"" +
-               "}";
+            "\"email\": \"" + trans.psbDetail.alamatEmail + "\",";
+        string myJson = myJsonForLog +
+        "\"image\": \"" + trans.imageIPCam + "\"," +
+           "}";
         string myURL = _myURL + serviceURL;
         OurUtility.Write_Log("Request OTP", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
-        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError")
+        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
         {
             try
             {
@@ -326,7 +327,7 @@
                     }
                     trans.AddTrail("Request OTP", trans.psbDetail.alamatEmail, "01");
                     trans.status = "01";
-                    await OurUtility.AuditTrail(trans, menu, cst);
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
                     NavigateTo("/error");
@@ -339,10 +340,9 @@
             }
             catch (Exception ex)
             {
-                isLoading = false;
                 trans.AddTrail("Request OTP", "Exception Error", "01");
                 trans.status = "01";
-                await OurUtility.AuditTrail(trans, menu, cst);
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
@@ -352,7 +352,6 @@
         }
         else
         {
-            isLoading = false;
             trans.AddTrail("Request OTP", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
@@ -365,11 +364,18 @@
     }
     private async Task MainMenu()
     {
-        isLoading = true;
-        trans.AddTrail("INPUT EMAIL", "BACK TO MAIN MENU", "02");
-        trans.status = "02";
-        await OurUtility.AuditTrailPSB(trans, menu, cst);
-        NavigateTo("/main");
+        if (translog)
+        {
+            translog = false;
+            InvokeAsync(StateHasChanged);
+            isNotIdle = false;
+            isLoading = true;
+            trans.AddTrail("INPUT EMAIL", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+            NavigateTo("/main");
+        }
     }
     private async Task Back()
     {
@@ -476,6 +482,11 @@
             translog = false;
             InvokeAsync(StateHasChanged);
             isNotIdle = false;
+            isLoading = true;
+            trans.AddTrail("INPUT EMAIL", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
             NavigateTo("/main");
         }
     }

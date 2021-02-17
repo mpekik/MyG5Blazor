@@ -86,8 +86,8 @@
         <span class="dot2">9</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="@(()=>NavigateTo("/main"))" class="btn-arrow btn" value="">Kembali</button>
-        <button @onclick="@(()=>NavigateTo("/main"))" class="btn-arrow btn" value="">Menu Utama</button>
+        <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
@@ -238,6 +238,11 @@
             translog = false;
             InvokeAsync(StateHasChanged);
             isNotIdle = false;
+            isLoading = true;
+            trans.AddTrail("KONFIRMASI AWAL", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
             NavigateTo("/main");
         }
     }

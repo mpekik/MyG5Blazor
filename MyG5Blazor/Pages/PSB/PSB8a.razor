@@ -217,7 +217,7 @@
                         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                         OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" &&
-                            strResult != "BadRequest" && strResult != "Forbidden")
+                            strResult != "BadRequest" && strResult != "Forbidden" && strResult != "GatewayTimeout")
                         {
                             try
                             {
@@ -626,7 +626,7 @@
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
-        strResult != "BadRequest" && strResult != "InternalServerError")
+        strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
         {
             try
             {
@@ -667,7 +667,6 @@
             }
             catch (Exception ex)
             {
-                isLoading = false;
                 trans.AddTrail("Release Number", "Exception Error ", "01");
                 trans.status = "01";
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
@@ -680,7 +679,6 @@
         }
         else
         {
-            isLoading = false;
             trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);

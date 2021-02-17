@@ -245,7 +245,7 @@
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
-        strResult != "BadRequest" && strResult != "InternalServerError")
+        strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
         {
             try
             {
@@ -287,7 +287,6 @@
             }
             catch (Exception ex)
             {
-                isLoading = false;
                 trans.AddTrail("Reserve Number", "Exception Error ", "01");
                 trans.status = "01";
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
@@ -300,7 +299,6 @@
         }
         else
         {
-            isLoading = false;
             trans.AddTrail("Reserve Number", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);

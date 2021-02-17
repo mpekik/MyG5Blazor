@@ -36,7 +36,7 @@ div.omrs-input-group {
 .omrs-input-underlined > input,
 .omrs-input-filled > input {
 	border: none;
-	border-bottom: 0.4rem solid var(--omrs-color-ink-medium-contrast);
+	border-bottom: 0.4rem solid white;
 	width: 10%;
 	height: 5rem;
 	font-size: 70px;
@@ -46,6 +46,7 @@ div.omrs-input-group {
 	padding-top: 0rem;
 	text-align: center;
 	padding-bottom: 0rem;
+	color:white;	
 }
 
 .omrs-input-underlined > input:focus,
