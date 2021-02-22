@@ -505,10 +505,11 @@
                         intAccBill = intBill;
                         await Payment("");
 
-                        pageClass = "main-panel bg-home";
 
                         if (resultPayment == "00")
                         {
+                            pageClass = "main-panel bg-home";
+
                             trans.edcStatus = "SUCCESS";
                             isLoading = false;
                             IsFail = false;
@@ -541,6 +542,8 @@
                             isLoading = false;
                             //IsVoid = true;
                             IsFail = true;
+                            IsSuccess = false;
+                            pageClass = "main-panel bg-home";
                             strInvoice = trans.edcTrace;
                             StateHasChanged();
                             await Task.Delay(200);
@@ -1257,7 +1260,7 @@
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != "" && strResult!="NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
+        if (strResult != "" && strResult!="NotFound" && strResult != "InternalServerError" && strResult != "BadRequest" && strResult != "GatewayTimeout")
         {
             try
             {
@@ -1282,27 +1285,16 @@
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                         respPaymentError = trans.errorCode.Substring(0, 1);
-                        if(respPaymentError=="C"||respPaymentError=="A")
-                        {
-                            await Task.Run(() => MoveToRFCard());
-                            await Task.Run(() => MoveToBin());
-                            await ReleaseNumber();
-                        }
-                        else if(respPaymentError=="P")
-                        {
-                            await Task.Run(() => MoveToTheFront());
-                        }
                     }
                     else
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
-                        await Task.Run(() => MoveToRFCard());
-                        await Task.Run(() => MoveToBin());
-
-                        await ReleaseNumber();
                     }
+                    await Task.Run(() => MoveToRFCard());
+                    await Task.Run(() => MoveToBin());
 
+                    await ReleaseNumber();
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                 {

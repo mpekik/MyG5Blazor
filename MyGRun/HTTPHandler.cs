@@ -69,7 +69,7 @@ namespace MyGRun
                         await Task.Delay(2000);
 
                         var response = await client.GetAsync(url);
-                        //Console.WriteLine(response.StatusCode.ToString());
+                        Console.WriteLine(response.StatusCode.ToString());
                         if (response != null)
                         {
 

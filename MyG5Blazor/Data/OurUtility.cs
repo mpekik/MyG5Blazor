@@ -474,7 +474,7 @@ namespace MyG5Blazor.Data
                         content.Headers.Add("secret-key", secret);
                         await Task.Delay(2000);
                         var response = await client.PostAsync(url, content);
-                        //Console.WriteLine(response.StatusCode.ToString());
+                        Console.WriteLine(response.StatusCode.ToString());
                         if (response != null)
                         {
 
