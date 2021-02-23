@@ -67,7 +67,7 @@
     private string apiURL = "terminal/login";
     protected override async Task OnInitializedAsync()
     {
-        //OurUtility.Write_Log("Login Page", "step-action");
+        OurUtility.Write_Log("Login Page", "step-action");
         menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);

@@ -144,7 +144,7 @@
         _ip3 = config.ReadIP("IP", "param.IP.3");
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         cst.Clear();
-        //OurUtility.Write_Log("= Card Dispenser", "step-action");
+        OurUtility.Write_Log("= Card Dispenser", "step-action");
     }
 
     private async Task Ping(string ipParam)
@@ -192,7 +192,7 @@
     {
         if (strURL != "")
         {
-            //OurUtility.Write_Log("=== Get Phone Number", "step-action");
+            OurUtility.Write_Log("=== Get Phone Number", "step-action");
         }
         NavMan.NavigateTo(strURL);
     }

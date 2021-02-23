@@ -121,11 +121,11 @@ namespace MyGRun
                     "}";
             string myURL = _myURL + loginURL;
             
-            //OurUtility.Write_Log("== Login Non-Trilogi", "step-action");
-            //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+            OurUtility.Write_Log("== Login Non-Trilogi", "step-action");
+            OurUtility.Write_Log("== Request API : " + myJson, "step-action");
             string strResult = await httpHandler.PostCallAPI(myURL, myJson,terminalId,tokenId);
             //label3.Text = strResult;
-            //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
             //if(true)
             if (strResult != null)
             {
@@ -135,8 +135,8 @@ namespace MyGRun
                     //if (true)
                     if ((string)jobjResult["transaction"]["statusCode"] == "00")
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
-                        //OurUtility.Write_Log("== Login Berhasil", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusCode"] + " {Success}", "step-action");
+                        OurUtility.Write_Log("== Login Berhasil", "step-action");
                         //if (true)
                         if ((string)jobjResult["isUpdateAvailable"] == "Y")
                         {
@@ -157,14 +157,14 @@ namespace MyGRun
                         string statusDescSub = "";
                         if ((string)jobjResult["transaction"]["errorCode"] != null)
                         {
-                            //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");                            
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"]["statusDesc"] + " {Error}", "step-action");                            
                             statusDescSub = (string)jobjResult["transaction"]["statusDesc"];
                         }
                         else
                         {
                            string _statusDescSub = ((string)jobjResult["transaction"]["statusDesc"]);
                             statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                            //OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");                            
+                            OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");                            
                         }
                         label1.Text = "Checking Failed...";
                         label1.Left = (this.Size.Width - label1.Size.Width) / 2;
@@ -174,7 +174,7 @@ namespace MyGRun
                 }
                 catch (Exception ex)
                 {
-                    //OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
+                    OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
                     label1.Text = "Update Failed...";
                     //label2.Text = ex.Message.ToString();
                     label1.Left = (this.Size.Width - label1.Size.Width) / 2;
@@ -184,7 +184,7 @@ namespace MyGRun
             }
             else
             {
-                //OurUtility.Write_Log("== Login Error : Hit WebService {Error}", "step-action");
+                OurUtility.Write_Log("== Login Error : Hit WebService {Error}", "step-action");
                 label4.Visible = false;
                 label1.Text = "Checking Failed...";
                 label1.Left = (this.Size.Width - label1.Size.Width) / 2;

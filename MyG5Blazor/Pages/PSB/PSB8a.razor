@@ -173,11 +173,11 @@
 
                     if (!cds.Start(ref errorcode, strCOM, ref msg))
                     {
-                        //OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
+                        OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
                     }
                     else
                     {
-                        //OurUtility.Write_Log("==== Card_Dispenser.Start, Success", "step-action");
+                        OurUtility.Write_Log("==== Card_Dispenser.Start, Success", "step-action");
                         cds.Stop(ref msg);
                     }
                     //ToDO if Reader error
@@ -212,10 +212,10 @@
                                         "\"serialNumber\" : \"" + p_icc_id + "\"" +
                                         "}";
 
-                        ////OurUtility.Write_Log("=== URL : " + myURL, "step-action");
-                        //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                        OurUtility.Write_Log("=== URL : " + myURL, "step-action");
+                        OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-                        //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                        OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" &&
                             strResult != "BadRequest" && strResult != "Forbidden" && strResult != "GatewayTimeout")
                         {
@@ -232,11 +232,11 @@
                                         trans.AddTrail("GET STRING PANJANG", trans.persoID, "00");
                                         if (!cds.Start(ref errorcode, strCOM, ref msg))
                                         {
-                                            //OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
+                                            OurUtility.Write_Log("==== Card_Dispenser.Start, Failed", "step-action");
                                         }
                                         else
                                         {
-                                            //OurUtility.Write_Log("==== Card_Dispenser.Start, Success", "step-action");
+                                            OurUtility.Write_Log("==== Card_Dispenser.Start, Success", "step-action");
                                             cds.Stop(ref msg);
                                         }
                                         if (await Task.Run(() => OurUtility.MyPerso(mypersoexe, strPanjang, ref msg)))
@@ -248,10 +248,10 @@
                                             "\"persoId\" : \"" + trans.persoID + "\" ," +
                                             "\"noHp\" : \"" + trans.psbDetail.selectedNumber + "\"," +
                                             "\"persoStatus\" : \"2\"}";
-                                            //OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                            //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-                                            //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                             if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
             strResult != "BadRequest" && strResult != "InternalServerError")
                                             {
@@ -276,7 +276,7 @@
                                                     trans.AddTrail("MOVE TO BIN", "", "01");
                                                     trans.status = "01";
                                                     //await OurUtility.AuditTrail(trans, menu, cst);
-                                                    //OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
+                                                    OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
                                                     trans.errorCode = "CD - 003";
                                                     //NavigateTo("/error");
                                                 }
@@ -300,11 +300,11 @@
                                                 "\"persoId\" : \"" + trans.persoID + "\" ," +
                                                 "\"noHp\" : \"" + cst.PhoneNumber + "\"," +
                                                 "\"persoStatus\" : \"4\"}";
-                                            //OurUtility.Write_Log("=== Update Perso Status", "step-action");
-                                            //OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
+                                            OurUtility.Write_Log("=== Update Perso Status", "step-action");
+                                            OurUtility.Write_Log("=== Request API : " + myJson, "step-action");
                                             strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
                                             trans.AddTrail("UPDATE PERSO FAILED", trans.persoID, "00");
-                                            //OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
+                                            OurUtility.Write_Log("=== Response API : " + strResult, "step-action");
                                             if (intTryCount < intTryLimit)
                                                 intTryCount += 1;
                                             else
@@ -337,7 +337,7 @@
                                 {
                                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                                     {
-                                        //OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                                        OurUtility.Write_Log("=== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                                         trans.serviceErrorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                                         if ((string)jobjResult["transaction"].SelectToken("errorCode") == "303018")
@@ -351,7 +351,7 @@
                                     }
                                     else
                                     {
-                                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                                     }
                                     trans.status = "01";
@@ -362,7 +362,7 @@
                                         isSuccess = false;
                                         isError = true;
                                         trans.AddTrail("MOVE TO BIN", "", "01");
-                                        //OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
+                                        OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
                                         trans.errorCode = "CD - 003";
                                         await ReleaseNumber();
                                         return;
@@ -392,7 +392,7 @@
                             catch (Exception ex)
                             {
                                 trans.AddTrail("PERSO", trans.persoID, "01");
-                                //OurUtility.Write_Log("=== Status Code : " + ex.Message + " {Error}", "step-action");
+                                OurUtility.Write_Log("=== Status Code : " + ex.Message + " {Error}", "step-action");
                                 trans.errorCode = "Exception Error";
                                 isError = true;
                                 await ReleaseNumber();
@@ -402,7 +402,7 @@
                         else
                         {
                             trans.AddTrail("PERSO", trans.persoID, "01");
-                            //OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
+                            OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                             trans.errorCode = strResult;
                             isError = true;
                             await ReleaseNumber();
@@ -419,7 +419,7 @@
                             isSuccess = false;
                             isError = true;
                             trans.AddTrail("MOVE TO BIN", "", "01");
-                            //OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
+                            OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
                             trans.errorCode = "CD - 003";
                             await ReleaseNumber();
                             return;
@@ -441,7 +441,7 @@
                     trans.status = "01";
                     trans.errorCode = "CARD DISPENSER";
                     await OurUtility.AuditTrailPSB(trans, menu, cst);
-                    //OurUtility.Write_Log("=== Card Dispenser Error", "step-action");
+                    OurUtility.Write_Log("=== Card Dispenser Error", "step-action");
                     trans.errorCode = "CD - 001";
                     await ReleaseNumber();
                     NavigateTo("/error");
@@ -454,7 +454,7 @@
                 trans.status = "01";
                 trans.errorCode = "KARTU HABIS";
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
-                //OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
+                OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
                 await ReleaseNumber();
                 NavigateTo("/error");
@@ -465,46 +465,46 @@
 
     private bool MoveToICC()
     {
-        //OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
-        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("=== Card Dispenser Move To IC Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
-        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
         if (!cds.Start(ref errorcode, strCOM, ref msg))
         {
-            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " + errorcode + "message: " + msg, "step-action");
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed " + errorcode + "message: " + msg, "step-action");
             return false;
         }
-        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
-        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card", "step-action");
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card", "step-action");
         if (!cds.MoveTo_IC_Card(ref errorcode, ref msg))
         {
-            //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card, Failed " + errorcode + " message : " + msg, "step-action");
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_ICC_Card, Failed " + errorcode + " message : " + msg, "step-action");
             return false;
         }
         trans.AddTrail("MOVE TO ICC", "", "00");
-        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         return true;
     }
 
     private bool MoveToTheFront()
     {
-        //OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
-        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
-        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
         if (!cds.Start(ref errorcode, strCOM, ref msg))
         {
-            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
             return false;
         }
-        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
-        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
         if (!cds.MoveTo_The_Front(ref errorcode, ref msg))
         {
-            //OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed", "step-action");
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed", "step-action");
             return false;
         }
 
@@ -513,53 +513,53 @@
         trans.jumlah_kartu = stock;
         config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
 
-        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         return true;
     }
     private bool MoveToRFCard()
     {
-        //OurUtility.Write_Log("=== Card Dispenser Move To The RF Position", "step-action");
-        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("=== Card Dispenser Move To The RF Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
-        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
         if (!cds.Start(ref errorcode, strCOM, ref msg))
         {
-            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
             return false;
         }
-        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
-        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_RF", "step-action");
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_RF", "step-action");
         if (!cds.MoveTo_RF_Card(ref errorcode, ref msg))
         {
-            //OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToRFCard, Failed", "step-action");
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToRFCard, Failed", "step-action");
             return false;
         }
-        //OurUtility.Write_Log("==== " + msg, "step-action");
+        OurUtility.Write_Log("==== " + msg, "step-action");
         trans.AddTrail("MOVE TO RF", "", "00");
 
-        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         return true;
     }
     private bool MoveToBin()
     {
-        //OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
-        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
-        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
         if (!cds.Start(ref errorcode, strCOM, ref msg))
         {
-            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed", "step-action");
             return false;
         }
-        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
-        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
         if (!cds.MoveTo_Bin(ref errorcode, ref msg))
         {
-            //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin, Failed " + errorcode + " message : " + msg, "step-action");
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin, Failed " + errorcode + " message : " + msg, "step-action");
             return false;
         }
 
@@ -568,7 +568,7 @@
         trans.jumlah_kartu = stock;
         config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
 
-        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         return true;
     }
@@ -577,9 +577,9 @@
     {
         bool ret = false;
 
-        //OurUtility.Write_Log("=== Card Reader Scan IC", "step-action");
+        OurUtility.Write_Log("=== Card Reader Scan IC", "step-action");
         Card_Reader cdr = new Card_Reader();
-        //OurUtility.Write_Log("==== 1. Card_Reader.Read", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Reader.Read", "step-action");
         if (await Task.Run(() => cdr.Read(readerName, ref p_icc_id, ref msg)).ConfigureAwait(true))
         {
             ret = true;
@@ -620,10 +620,10 @@
             "\"noHp\": \"" + trans.psbDetail.selectedNumber + "\"" +
                "}";
         string myURL = _myURL + releaseNumberService;
-        //OurUtility.Write_Log("Release Number", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("Release Number", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
         strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
@@ -640,12 +640,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
@@ -672,7 +672,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
-                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavigateTo("/error");
             }
@@ -684,7 +684,7 @@
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            //OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult + "}", "step-action");
+            OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavigateTo("/error");
         }

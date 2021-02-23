@@ -160,8 +160,8 @@
             _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
             cst.Clear();
             StateHasChanged();
-            //OurUtility.Write_Log("= Bayar Tagihan KartuHalo", "step-action");
-            //OurUtility.Write_Log("== Insert Phone Number Page", "step-action");
+            OurUtility.Write_Log("= Bayar Tagihan KartuHalo", "step-action");
+            OurUtility.Write_Log("== Insert Phone Number Page", "step-action");
         }
     }
 
@@ -198,7 +198,7 @@
     {
         if (strURL != "/main")
         {
-            //OurUtility.Write_Log("=== Get Phone Number", "step-action");
+            OurUtility.Write_Log("=== Get Phone Number", "step-action");
             cst.PhoneNumber = "62" + strNumber.Substring(1);
         }
         NavMan.NavigateTo(strURL);
@@ -234,10 +234,10 @@
                             "}";
             string myURL = _myURL + serviceURL;
 
-            //OurUtility.Write_Log("== Check Phone Number", "step-action");
-            //OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
+            OurUtility.Write_Log("== Check Phone Number", "step-action");
+            OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-            //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
             if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
             {
                 try
@@ -245,11 +245,11 @@
                     JObject jobjResult = JObject.Parse(strResult);
                     if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
 
                         trans.SetTransaction((string)jobjResult["transaction"].SelectToken("transactionId"));
                         cst.CostumerProfile((string)jobjResult["profile"].SelectToken("type"), (string)jobjResult["profile"].SelectToken("nama"), (string)jobjResult["profile"].SelectToken("noHp"), (string)jobjResult["profile"].SelectToken("idType"), (string)jobjResult["profile"].SelectToken("idNumber"), (string)jobjResult["profile"].SelectToken("accountId"));
-                        //OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
+                        OurUtility.Write_Log("== Transaction ID : " + trans.transID + ", Phone Number : " + cst.PhoneNumber + " {Success}", "step-action");
                         cst.intTagihan = OurUtility.ToInt32((string)jobjResult["tagihan"]);
 
                         //Add Step To Audit Trail List
@@ -263,12 +263,12 @@
                     {
                         if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                         {
-                            //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                             trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                         }
                         else
                         {
-                            //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                             trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                         }
                         trans.AddTrail("SUBMIT NO HP", cst.PhoneNumber, "01");
@@ -291,14 +291,14 @@
                 catch (Exception ex)
                 {
                     trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-                    //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+                    OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
                     NavMan.NavigateTo("/error");
                 }
             }
             else
             {
                 trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-                //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+                OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
                 NavMan.NavigateTo("/error");
             }
         }

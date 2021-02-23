@@ -477,7 +477,7 @@
             trans.errorCode = "CARD DISPENSER";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
             trans.errorCode = "CD - 004";
-            //OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
+            OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
             NavigateTo("/error");
             return;
         }
@@ -498,7 +498,7 @@
 
                     if (edc.intTry < 3)
                     {
-                        //OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
+                        OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
                         isLoading = true;
                         StateHasChanged();
                         await Task.Delay(200);
@@ -554,7 +554,7 @@
                                 {
                                     IsVoid = true;
                                 }
-                                //OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
+                                OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
                                 Void();
                                 isLoading = false;
                                 StateHasChanged();
@@ -583,7 +583,7 @@
                     else
                     {
                         IsFail = true;
-                        //OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
+                        OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
                         trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
                         trans.status = "01";
                         await OurUtility.AuditTrailPSB(trans, menu, cst);
@@ -644,7 +644,7 @@
                     pageClass = "main-panel bg-home";
                     if (edc.intTry < 3)
                     {
-                        //OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
+                        OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
                         isLoading = true;
                         await Task.Delay(2000);
                         intAccBill = intBill;
@@ -691,7 +691,7 @@
 
                                 IsFail = false;
                                 IsVoid = true;
-                                //OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
+                                OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
 
                                 Void();
                                 isLoading = false;
@@ -722,7 +722,7 @@
                     else
                     {
                         IsFail = true;
-                        //OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
+                        OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
                         trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
                         trans.status = "01";
                         await OurUtility.AuditTrailPSB(trans, menu, cst);
@@ -746,10 +746,10 @@
 
         string myURL = _myURL + apiURL;
 
-        //OurUtility.Write_Log("== Send Document", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== Send Document", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -759,7 +759,7 @@
 
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "00");
 
                 }
@@ -767,12 +767,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "01");
@@ -787,7 +787,7 @@
             catch (Exception ex)
             {
                 trans.errorCode = "Exception Error";
-                //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "01");
 
             }
@@ -795,7 +795,7 @@
         else
         {
             trans.errorCode = strResult;
-            //OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "01");
         }
     }
@@ -911,10 +911,10 @@
 
         string myURL = _myURL + apiURL;
 
-        //OurUtility.Write_Log("== VOID Payment", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== VOID Payment", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -924,7 +924,7 @@
 
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
 
                 }
@@ -932,12 +932,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
@@ -952,14 +952,14 @@
             catch (Exception ex)
             {
                 trans.errorCode = "Exception Error";
-                //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail(" VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
             }
         }
         else
         {
             trans.errorCode = strResult;
-            //OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
         }
     }
@@ -1005,11 +1005,11 @@
                                 "}";
         string myURL = _myURL + cesURL;
 
-        //OurUtility.Write_Log("== Check CES", "step-action");
-        ////OurUtility.Write_Log("== URL API : " + myURL, "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== Check CES", "step-action");
+        OurUtility.Write_Log("== URL API : " + myURL, "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //////OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -1017,7 +1017,7 @@
                 JObject jobjResult = JObject.Parse(strResult);
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     foreach (var question in jobjResult.SelectToken("surveys"))
                     {
                         CES c = new CES();
@@ -1035,14 +1035,14 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
                         string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        //OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("CES", "", "01");
@@ -1064,7 +1064,7 @@
             catch (Exception ex)
             {
                 trans.errorCode = "Exception Error";
-                //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("CES", "", "01");
 
                 //NavMan.NavigateTo("/error");
@@ -1073,7 +1073,7 @@
         else
         {
             trans.errorCode = strResult;
-            //OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             trans.AddTrail("CES", "", "01");
 
             //NavMan.NavigateTo("/error");
@@ -1084,7 +1084,7 @@
         try
         {
             InvokeAsync(StateHasChanged);
-            //OurUtility.Write_Log("== Payment Via EDC", "step-action");
+            OurUtility.Write_Log("== Payment Via EDC", "step-action");
             string _transType = "01";
             cst.intTagihanTerbayar = intBill;
             edc.Clear();
@@ -1095,7 +1095,7 @@
             do
             {
                 await Task.Delay(200);
-                //OurUtility.Write_Log("== Payment EDC : " + edc.serialPort.PortName + " " + tagihan + " "+_transType+" "+invoice +" "+billing+" "+mPemabayaran, "step-action");
+                OurUtility.Write_Log("== Payment EDC : " + edc.serialPort.PortName + " " + tagihan + " "+_transType+" "+invoice +" "+billing+" "+mPemabayaran, "step-action");
                 edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
             } while (!edc.mre.WaitOne());
@@ -1119,7 +1119,7 @@
             if (trans.edcresp == "00")
             {
                 trans.psbDetail.statusPayment = "00";
-                //OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
+                OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
                 trans.AddTrail("PAYMENT EDC", trans.edcresp, "00");
 
                 isLoading = true;
@@ -1127,14 +1127,14 @@
             }else
             {
                 trans.psbDetail.statusPayment = "01";
-                //OurUtility.Write_Log("== Payment Via EDC Failed", "step-action");
+                OurUtility.Write_Log("== Payment Via EDC Failed", "step-action");
                 trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
             }
             //Console.WriteLine(trans.edcresp);
         }
         catch (Exception ex)
         {
-            //OurUtility.Write_Log("== Error EDC : "+ex.Message, "step-action");
+            OurUtility.Write_Log("== Error EDC : "+ex.Message, "step-action");
             trans.AddTrail("PAYMENT EDC", ex.Message, "01");
         }
     }
@@ -1142,7 +1142,7 @@
     private async Task Void(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
     {
         string _transType = "02";
-        //OurUtility.Write_Log("EDC VOID", "step-action");
+        OurUtility.Write_Log("EDC VOID", "step-action");
         edc.Clear();
         edc.serialPort = new SerialPort();
         edc.serialPort.PortName = serialPortName;
@@ -1180,12 +1180,12 @@
         {
             IsVoided = true;
             trans.edcStatus = "VOIDED";
-            //OurUtility.Write_Log("== Payment Voided", "step-action");
+            OurUtility.Write_Log("== Payment Voided", "step-action");
             trans.AddTrail("VOID EDC", trans.edcRespVoid, "00");
         }
         else
         {
-            //OurUtility.Write_Log("== Void Failed", "step-action");
+            OurUtility.Write_Log("== Void Failed", "step-action");
             trans.AddTrail("VOID EDC", trans.edcRespVoid, "01");
         }
     }
@@ -1256,10 +1256,10 @@
 
         string myURL = _myURL + serviceURL;
 
-        //OurUtility.Write_Log("== Payment", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("== Payment", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult!="NotFound" && strResult != "InternalServerError" && strResult != "BadRequest" && strResult != "GatewayTimeout")
         {
             try
@@ -1271,7 +1271,7 @@
 
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
                     await Task.Run(() => MoveToTheFront());
                 }
@@ -1282,13 +1282,13 @@
 
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                         respPaymentError = trans.errorCode.Substring(0, 1);
                     }
                     else
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     await Task.Run(() => MoveToRFCard());
@@ -1312,7 +1312,7 @@
                 trans.resultPayment = "03";
 
                 trans.errorCode = "Exception Error";
-                //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
                 await Task.Run(() => MoveToRFCard());
                 await Task.Run(() => MoveToBin());
@@ -1325,7 +1325,7 @@
             trans.resultPayment = "04";
 
             trans.errorCode = strResult;
-            //OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
             await Task.Run(() => MoveToRFCard());
             await Task.Run(() => MoveToBin());
@@ -1393,7 +1393,7 @@
         }
         catch (Exception ex)
         {
-            //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+            OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
             trans.errorCode = "Exception Error";
             trans.AddTrail("BILL ACCEPTOR", "BA - 001", "01");
             return;
@@ -1498,8 +1498,8 @@
             "\"noHp\": \"" + trans.psbDetail.selectedNumber + "\"" +
                "}";
         string myURL = _myURL + releaseNumberService;
-        //OurUtility.Write_Log("Release Number", "step-action");
-        ////OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("Release Number", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
@@ -1516,12 +1516,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
@@ -1543,7 +1543,7 @@
                 trans.AddTrail("Release Number", "Exception Error ", "01");
 
                 trans.errorCode = "Exception Error";
-                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 //NavMan.NavigateTo("/error");
             }
@@ -1554,28 +1554,28 @@
             trans.AddTrail("Release Number", "Hit Webservice Error : " + strResult, "01");
 
             trans.errorCode = "Hit Webservice Error : " + strResult;
-            //OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+            OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
             //isNotIdle = false;
             //NavMan.NavigateTo("/error");
         }
     }
     private bool MoveToTheFront()
     {
-        //OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
-        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
-        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
         if (!cds.Start(ref errorcode, cdCOM, ref msg))
         {
-            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed, error : " + errorcode + " , msg : " + msg, "step-action");
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed, error : " + errorcode + " , msg : " + msg, "step-action");
             return false;
         }
-        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
-        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Front_Hold", "step-action");
         if (!cds.MoveTo_The_Front(ref errorcode, ref msg))
         {
-            //OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed, error : " + errorcode + " , msg : " + msg, "step-action");
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToTheFront, Failed, error : " + errorcode + " , msg : " + msg, "step-action");
             return false;
         }
 
@@ -1584,53 +1584,53 @@
         trans.jumlah_kartu = stock;
         config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
 
-        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         return true;
     }
     private bool MoveToRFCard()
     {
-        //OurUtility.Write_Log("=== Card Dispenser Move To The RF Position", "step-action");
-        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("=== Card Dispenser Move To The RF Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
-        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
         if (!cds.Start(ref errorcode, cdCOM, ref msg))
         {
-            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed, error : "+ errorcode+" , msg : "+msg, "step-action");
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed, error : "+ errorcode+" , msg : "+msg, "step-action");
             return false;
         }
-        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
-        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_RF", "step-action");
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_RF", "step-action");
         if (!cds.MoveTo_RF_Card(ref errorcode, ref msg))
         {
-            //OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToRFCard, Failed, error : " + errorcode + " , msg : " + msg, "step-action");
+            OurUtility.Write_Log("==== 5. Card_Dispenser.MoveToRFCard, Failed, error : " + errorcode + " , msg : " + msg, "step-action");
             return false;
         }
-        //OurUtility.Write_Log("==== " + msg, "step-action");
+        OurUtility.Write_Log("==== " + msg, "step-action");
         trans.AddTrail("MOVE TO RF", "", "00");
 
-        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         return true;
     }
     private bool MoveToBin()
     {
-        //OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
-        //OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("=== Card Dispenser Move To Bin Position", "step-action");
+        OurUtility.Write_Log("==== 1. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
-        //OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
+        OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
         if (!cds.Start(ref errorcode, cdCOM, ref msg))
         {
-            //OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed, error : " + errorcode + " , msg : " + msg, "step-action");
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed, error : " + errorcode + " , msg : " + msg, "step-action");
             return false;
         }
-        //OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
+        OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
         cds.Initialize(ref errorcode, ref msg);
-        //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
+        OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin", "step-action");
         if (!cds.MoveTo_Bin(ref errorcode, ref msg))
         {
-            //OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin, Failed " + errorcode + " message : " + msg, "step-action");
+            OurUtility.Write_Log("==== 4. Card_Dispenser.MoveTo_Bin, Failed " + errorcode + " message : " + msg, "step-action");
             return false;
         }
 
@@ -1639,7 +1639,7 @@
         trans.jumlah_kartu = stock;
         config.Write("Dispenser", Config.PARAM_STOCK_DISPENSER_1, trans.jumlah_kartu.ToString());
 
-        //OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
+        OurUtility.Write_Log("==== 5. Card_Dispenser.Stop", "step-action");
         cds.Stop(ref msg);
         return true;
     }

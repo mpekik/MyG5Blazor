@@ -56,38 +56,38 @@
                     <div class="" style="text-align: center; margin-top: 5%;">
                         @if (menu.psbIndex > 6)
                         {
-                            <button class="btn btn-danger btn-right3" style="font-weight:bold;" @onclick="NextIndex" id="btn-ok" value="">Pilihan Berikutnya</button>
+                            <button class="btn btn-danger btn-right3" style=@fontWeight @onclick="NextIndex" id="btn-ok" value="">Pilihan Berikutnya</button>
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 5%;">
                         @if (boolNumber[0 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[0+menu.pageIndex]))" class="btn-pilih-no btn" value="">@numberUI[0 + menu.pageIndex]</button>
+                        <button @onclick="@(() => PickNomer(populateNumber[0+menu.pageIndex]))" class="btn-pilih-no btn" style=@fontWeight value="">@((MarkupString)numberUI[0 + menu.pageIndex])</button>
                         }
                         @if (boolNumber[1 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[1+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@numberUI[1 + menu.pageIndex]</button>
+                    <button @onclick="@(() => PickNomer(populateNumber[1+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[1 + menu.pageIndex])</button>
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
                         @if (boolNumber[2 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[2+menu.pageIndex]))" class="btn-pilih-no btn" value="">@numberUI[2 + menu.pageIndex]</button>
+                        <button @onclick="@(() => PickNomer(populateNumber[2+menu.pageIndex]))" class="btn-pilih-no btn" style=@fontWeight value="">@((MarkupString)numberUI[2 + menu.pageIndex])</button>
                         }
                         @if (boolNumber[3 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[3+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@numberUI[3 + menu.pageIndex]</button>
+                    <button @onclick="@(() => PickNomer(populateNumber[3+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[3 + menu.pageIndex])</button>
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
                         @if (boolNumber[4 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(@populateNumber[4+menu.pageIndex]))" class="btn-pilih-no btn" value="">@numberUI[4 + menu.pageIndex]</button>
+                        <button @onclick="@(() => PickNomer(@populateNumber[4+menu.pageIndex]))" class="btn-pilih-no btn" style=@fontWeight value="">@((MarkupString)numberUI[4 + menu.pageIndex])</button>
                         }                            
 
                         @if (boolNumber[5 + menu.pageIndex])
                         {
-                            <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style="margin-left: 3%;" value="">@numberUI[5 + menu.pageIndex]</button>
+                    <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[5 + menu.pageIndex])</button>
                         }
                     </div>
                 </div>
@@ -110,7 +110,15 @@
         <span class="dot2">9</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="@(()=>NavigateTo("/PSB/3b"))" class="btn-arrow btn" value="">Kembali</button>
+        @if (trans.psbDetail.searchNumber < 3)
+        {
+            <button @onclick="@(() => NavigateTo("/PSB/3b"))" class="btn-arrow btn" value="">Kembali</button>
+        }
+        else
+        {
+            <button @onclick="@(() => NavigateTo("/PSB/3a"))" class="btn-arrow btn" value="">Kembali</button>
+
+        }
         <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
@@ -152,6 +160,7 @@
     private bool isSubmit = true;
     private bool isPopUp = false;
 
+    private string fontWeight = "font-weight: bold;";
     private string strNumber = string.Empty;
     private string[] inputNumber;
     private string _myURL = string.Empty;
@@ -180,6 +189,33 @@
         }
     }
 
+    string NumberUI(string _numberUI)
+    {
+        string temp = strNumber;
+        string temp01 = "0" + _numberUI.Substring(2, _numberUI.IndexOf(strNumber) - 2);
+        string split1 = "0"+_numberUI.Substring(2, _numberUI.IndexOf(strNumber)-2);
+
+        int indexSplit1 = split1.Length % 4;
+        split1 = Regex.Replace(split1, ".{4}", "$0-");
+
+        if(indexSplit1!=0)
+        {
+            int posSplit = temp.Length - indexSplit1+1;
+            temp = temp.Insert(posSplit, "-");
+        }
+        int posSplit2 = 0;
+        string split2 = _numberUI.Substring(_numberUI.IndexOf(strNumber) + strNumber.Length);
+        if(split2.Length>(temp01+temp).Length)
+        {
+            posSplit2 = split2.Length - (temp01 + temp).Length+2;
+            split2 = split2.Insert(posSplit2, "-");
+        }
+        string ret = split1+ "<span style=\"font-weight: bold; \">"+temp+"</span>"+split2;
+
+
+        return ret;
+    }
+
     private void PopulateNumber()
     {
         if (menu.psbNomer.Count() > 18)
@@ -188,7 +224,8 @@
             {
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
-                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
+                //numberUI[i] = NumberUI(populateNumber[i]);
+                numberUI[i]= Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
                 StateHasChanged();
             }
         }
@@ -198,7 +235,8 @@
             {
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
-                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
+                //numberUI[i] = NumberUI(populateNumber[i]);
+                numberUI[i]= Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
                 StateHasChanged();
             }
         }
@@ -246,10 +284,10 @@
             "\"noHp\": \"" + trans.psbDetail.selectedNumber + "\"" +
                "}";
         string myURL = _myURL + reserveNumberService;
-        //OurUtility.Write_Log("Reserve Number", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("Reserve Number", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
         strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
@@ -267,12 +305,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Reserve Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.selectedPaket, "01");
@@ -299,7 +337,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
-                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }
@@ -311,7 +349,7 @@
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavMan.NavigateTo("/error");
         }

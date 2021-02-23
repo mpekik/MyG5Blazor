@@ -339,6 +339,8 @@
 
     protected override async Task OnInitializedAsync()
     {
+        menu.packageIndex=0;
+        menu.pageIndex = 0;
         counterTime = counterTreshold;
         PopulateMenu();
     }

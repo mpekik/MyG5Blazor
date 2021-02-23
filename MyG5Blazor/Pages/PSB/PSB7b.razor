@@ -198,10 +198,10 @@
             "\"noHp\": \"" + trans.psbDetail.selectedNumber + "\"" +
                "}";
         string myURL = _myURL + releaseNumberService;
-        //OurUtility.Write_Log("Release Number", "step-action");
-        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        OurUtility.Write_Log("Release Number", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
             strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
@@ -218,12 +218,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
@@ -250,7 +250,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
-                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavigateTo("/error");
             }
@@ -262,7 +262,7 @@
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            //OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult + "}", "step-action");
+            OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavigateTo("/error");
         }
