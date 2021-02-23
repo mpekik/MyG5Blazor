@@ -260,10 +260,10 @@
             "\"email\": \"" + trans.psbDetail.alamatEmail + "\"" +
                "}";
         string myURL = _myURL + serviceURL;
-        OurUtility.Write_Log("Request OTP", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("Request OTP", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
         {
@@ -280,12 +280,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Request OTP", trans.psbDetail.alamatEmail, "01");
@@ -308,7 +308,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
-                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavigateTo("/error");
             }
@@ -320,7 +320,7 @@
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavigateTo("/error");
         }
@@ -404,10 +404,10 @@
             "\"token\": \"" + trans.psbDetail.otp + "\"" +
                "}";
         string myURL = _myURL + cekOTPURL;
-        OurUtility.Write_Log("Request OTP", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("Request OTP", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
         {
@@ -426,12 +426,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Validasi OTP", trans.errorCode, "01");
@@ -459,7 +459,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
-                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavigateTo("/error");
             }
@@ -471,7 +471,7 @@
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error : {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error : {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavigateTo("/error");
         }
@@ -519,11 +519,11 @@
             "\"transactionId\": \"" + trans.transID + "\"" +
                "}";
         string myURL = _myURL + getPaket;
-        OurUtility.Write_Log("Request OTP", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("Request OTP", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         //string strResult = TestData();
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
         strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
@@ -553,12 +553,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Get Paket PSB", "", "01");
@@ -585,7 +585,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
-                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavigateTo("/error");
             }
@@ -597,7 +597,7 @@
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error : {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error : {" + strResult + "}", "step-action");
 
             //isNotIdle = false;
             NavigateTo("/error");

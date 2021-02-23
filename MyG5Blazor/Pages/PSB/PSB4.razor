@@ -306,11 +306,11 @@
             byte[] leftData = new byte[leftLen];
             byte[] rightData = new byte[rightLen];
 
-            OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints New Card", "step-action");
+            //OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints New Card", "step-action");
             ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(true);
             if (ret != 0 || leftLen == 0 || rightLen == 0)
             {
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Failed", "step-action");
+                //OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Failed", "step-action");
                 trans.AddTrail("SCAN EKTP", "FINGERPIRNT NO DATA", "01");
                 isLoading = false;
                 if (intTryCount <= intTryLimit)
@@ -331,7 +331,7 @@
                 ktp.minu1len = leftLen;
                 ktp.minu2len = rightLen;
 
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
+                //OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
 
                 trans.AddTrail("SCAN EKTP", ktp.Id, "00");
                 isLoading = false;
@@ -368,7 +368,7 @@
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(CONF, ","));
         config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(0, 1);
         config.ektpType = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(1);
-        OurUtility.Write_Log("=== Step 2. Scan e-KTP Page", "step-action");
+        //OurUtility.Write_Log("=== Step 2. Scan e-KTP Page", "step-action");
     }
 
     private async Task CheckEKTP()
@@ -398,7 +398,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "EK - 001";
-                OurUtility.Write_Log("== Error : EK - 001", "step-action");
+                //OurUtility.Write_Log("== Error : EK - 001", "step-action");
                 NavigateTo("/error");
             }
 
@@ -440,7 +440,7 @@
                     errMsg = "EK - 1" + r.ToString();
 
                 trans.AddTrail("SCAN EKTP", errMsg, "01");
-                OurUtility.Write_Log("===== EKTP ERROR - " + errMsg, "step-action");
+                //OurUtility.Write_Log("===== EKTP ERROR - " + errMsg, "step-action");
                 isLoading = false;
                 if (intTryCount <= intTryLimit)
                 {
@@ -460,7 +460,7 @@
                 {
                     demoGraphic[i] = ektpC.ektpData.byteBio[i];
                 }
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
+                //OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
 
                 ktp.demographic = demoGraphic;
 
@@ -490,27 +490,27 @@
         isFPNoDataPush = true;
         if (intTryCount <= intTryLimit)
         {
-            OurUtility.Write_Log("==== Scan e-KTP", "step-action");
-            OurUtility.Write_Log("===== Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
+            //OurUtility.Write_Log("==== Scan e-KTP", "step-action");
+            //OurUtility.Write_Log("===== Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
             if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)
             {
-                OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
+                //OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
                 Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_PCID, pbPcid, pbPcid.Length);
-                OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
+                //OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
                 Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_CONFIG, pbConf, pbConf.Length);
             }
-            OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
+            //OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
             await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
 
             int length = 2048;
             byte[] tempBuffer = new byte[length];
             int ret = -1;
-            OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic From eKTP", "step-action");
+            //OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic From eKTP", "step-action");
             ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer)).ConfigureAwait(false);
             if (length == 0 || ret != 0)
             {
                 trans.AddTrail("SCAN EKTP", "NOT EKTP", "01");
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Failed", "step-action");
+                //OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Failed", "step-action");
                 isLoading = false;
                 if (intTryCount <= intTryLimit)
                 {
@@ -528,12 +528,12 @@
             {
                 demoGraphic[i] = tempBuffer[i];
             }
-            OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
+            //OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
             ktp.demographic = demoGraphic;
             //CID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber), System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber).Length);
             KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
-            //OurUtility.Write_Log("CID : " + CID, "step-action");
-            OurUtility.Write_Log("KID : " + KID, "step-action");
+            ////OurUtility.Write_Log("CID : " + CID, "step-action");
+            //OurUtility.Write_Log("KID : " + KID, "step-action");
             IsVisible = false;
             IsNext = true;
 
@@ -543,7 +543,7 @@
                 byte[] leftData = new byte[leftLen];
                 byte[] rightData = new byte[rightLen];
 
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card", "step-action");
+                //OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card", "step-action");
                 ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(true);
                 if (ret != 0 || leftLen == 0 || rightLen == 0)
                 {
@@ -557,7 +557,7 @@
                     ktp.minu1len = leftLen;
                     ktp.minu2len = rightLen;
 
-                    OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
+                    //OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
 
                     trans.AddTrail("SCAN EKTP", KID, "00");
                     isLoading = false;
@@ -579,10 +579,10 @@
             "\"noHp\": \"" + trans.psbDetail.selectedNumber + "\"" +
                "}";
         string myURL = _myURL + releaseNumberService;
-        OurUtility.Write_Log("Release Number", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("Release Number", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
         strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
@@ -599,12 +599,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
@@ -633,7 +633,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
-                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavigateTo("/error");
             }
@@ -646,7 +646,7 @@
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavigateTo("/error");
         }

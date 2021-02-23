@@ -438,7 +438,7 @@
                 cst.Clear();
                 trans.ClearTransaction();
                 menu._mainMenu.Clear();
-                OurUtility.Write_Log("Login Page", "step-action");
+                //OurUtility.Write_Log("Login Page", "step-action");
                 menu.terminalId = config.Read("Terminal", Config.PARAM_MACHINE);
                 _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
                 menu.tokenId = config.Read("Terminal", Config.PARAM_TOKEN);
@@ -454,7 +454,7 @@
 
         private async Task loginCheck()
         {
-            OurUtility.Write_Log("= Login Page", "step-action");
+            //OurUtility.Write_Log("= Login Page", "step-action");
             if (userName == "trilogi")
             {
                 Trilogi();
@@ -474,12 +474,12 @@
 
         private void Trilogi()
         {
-            OurUtility.Write_Log("== Login Trilogi", "step-action");
-            //OurUtility.Write_Log("== ID: " + userName + " Pass: " + password, "step-action");
+            //OurUtility.Write_Log("== Login Trilogi", "step-action");
+            ////OurUtility.Write_Log("== ID: " + userName + " Pass: " + password, "step-action");
             string pass_check = "trilogi" + DateTime.Now.ToString("yyyyMMdd");
             if (password == pass_check)
             {
-                OurUtility.Write_Log("== Login Berhasil", "step-action");
+                //OurUtility.Write_Log("== Login Berhasil", "step-action");
                 menu.userName = userName;
                 //isNotAuthorized = false;
                 //isAuthorized = true;
@@ -494,7 +494,7 @@
             }
             else
             {
-                OurUtility.Write_Log("== Login Gagal", "step-action");
+                //OurUtility.Write_Log("== Login Gagal", "step-action");
                 isAuthorized = false;
                 isNotAuthorized = true;
             }
@@ -509,11 +509,11 @@
                 "\"password\": \"" + password + "\"" +
                     "}";
             string myURL = _myURL + loginURL;
-            OurUtility.Write_Log("== Login", "step-action");
-            //OurUtility.Write_Log("== URL : " + myURL, "step-action");
-            OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+            //OurUtility.Write_Log("== Login", "step-action");
+            ////OurUtility.Write_Log("== URL : " + myURL, "step-action");
+            //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+            //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
             if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
             {
                 try
@@ -529,8 +529,8 @@
                                 {
                                     if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                                     {
-                                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
-                                        OurUtility.Write_Log("== Login Berhasil", "step-action");
+                                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                                        //OurUtility.Write_Log("== Login Berhasil", "step-action");
 
                                         menu.userName = userName;
                                         authorizedLevel = (string)jobjResult["userLevel"];
@@ -543,15 +543,15 @@
                                     {
                                         if (jobjResult["transaction"].SelectToken("errorCode") != null)
                                         {
-                                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                                            //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                                             trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                                         }
                                         else
                                         {
-                                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                                            //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                                             trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                                         }
-                                        OurUtility.Write_Log("== Login Gagal", "step-action");
+                                        //OurUtility.Write_Log("== Login Gagal", "step-action");
                                         isLoading = false;
                                         isAuthorized = false;
                                         isNotAuthorized = true;
@@ -560,7 +560,7 @@
                                 else
                                 {
                                     trans.errorCode = "Invalid Status Code";
-                                    OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
+                                    //OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
                                     isLoading = false;
                                     isAuthorized = false;
                                     isNotAuthorized = true;
@@ -569,7 +569,7 @@
                             else
                             {
                                 trans.errorCode = "Invalid Transaction Response";
-                                OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
+                                //OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
                                 isLoading = false;
                                 isAuthorized = false;
                                 isNotAuthorized = true;
@@ -578,7 +578,7 @@
                         else
                         {
                             trans.errorCode = "Unauthorized";
-                            OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
+                            //OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
                             isLoading = false;
                             isAuthorized = false;
                             isNotAuthorized = true;
@@ -586,7 +586,7 @@
                     }else
                     {
                         trans.errorCode = "Forbidden";
-                        OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
+                        //OurUtility.Write_Log("== Login Gagal : " + trans.errorCode, "step-action");
                         isLoading = false;
                         isAuthorized = false;
                         isNotAuthorized = false;
@@ -596,14 +596,14 @@
                 catch (Exception ex)
                 {
                     trans.errorCode = "Exception Error";
-                    OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
+                    //OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
                     NavMan.NavigateTo("/errorlogin");
                 }
             }
             else
             {
                 trans.errorCode = strResult;
-                OurUtility.Write_Log("== Login Error : Hit WebService {Error}", "step-action");
+                //OurUtility.Write_Log("== Login Error : Hit WebService {Error}", "step-action");
                 NavMan.NavigateTo("/errorlogin");
             }
         }
@@ -614,10 +614,10 @@
             string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"" +
                     "}";
             string myURL = _myURL + menuURL;
-            OurUtility.Write_Log("== Login Non-Trilogi", "step-action");
-            OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+            //OurUtility.Write_Log("== Login Non-Trilogi", "step-action");
+            //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+            //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
             if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
             {
                 try
@@ -625,8 +625,8 @@
                     JObject jobjResult = JObject.Parse(strResult);
                     if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
-                        OurUtility.Write_Log("== Login Berhasil", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                        //OurUtility.Write_Log("== Login Berhasil", "step-action");
                         foreach ((var mm, Int32 i) in jobjResult.SelectToken("menu").Select((mm, i) => (mm, i)))
                         {
                             menu.AddMainMenu(mm.SelectToken("namaMenu").ToString(), mm.SelectToken("url").ToString(), mm.SelectToken("icon").ToString(), mm.SelectToken("menuCode").ToString(),StylePNG[i]);
@@ -638,28 +638,28 @@
                     {
                         if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                         {
-                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                            //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                             trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                         }
                         else
                         {
-                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                            //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                             trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                         }
-                        OurUtility.Write_Log("== Login Gagal", "step-action");
+                        //OurUtility.Write_Log("== Login Gagal", "step-action");
                     }
                 }
                 catch (Exception ex)
                 {
                     trans.errorCode = strResult;
-                    OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
+                    //OurUtility.Write_Log("== Login Error :" + ex.Message, "step-action");
                     NavMan.NavigateTo("/errorlogin");
                 }
             }
             else
             {
                 trans.errorCode = strResult;
-                OurUtility.Write_Log("== Login Error : Hit WebService {Error}", "step-action");
+                //OurUtility.Write_Log("== Login Error : Hit WebService {Error}", "step-action");
                 NavMan.NavigateTo("/errorlogin");
             }
         }

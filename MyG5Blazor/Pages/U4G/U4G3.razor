@@ -230,7 +230,7 @@
                 await OurUtility.AuditTrail(trans, menu, cst);
 
                 trans.errorCode = "FP - 001";
-                OurUtility.Write_Log("== Error : FP - 001", "step-action");
+                //OurUtility.Write_Log("== Error : FP - 001", "step-action");
                 isNotIdle = false;
                 NavMan.NavigateTo("/error");
             }
@@ -246,15 +246,15 @@
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
         pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
-        OurUtility.Write_Log("== FingerPrint Scan Page", "step-action");
+        //OurUtility.Write_Log("== FingerPrint Scan Page", "step-action");
         counterTime = counterTreshold;
         await CheckFinger();
     }
     private async Task FingerPrintScanC()
     {
         IsLoading = true;
-        OurUtility.Write_Log("==== Scan FingerPrint", "step-action");
-        OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
+        //OurUtility.Write_Log("==== Scan FingerPrint", "step-action");
+        //OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
 
         try
         {
@@ -267,7 +267,7 @@
             await OurUtility.AuditTrail(trans, menu, cst);
 
             trans.errorCode = "FP - 101";
-            OurUtility.Write_Log("== Error : FP - 101", "step-action");
+            //OurUtility.Write_Log("== Error : FP - 101", "step-action");
             isNotIdle = false;
             NavMan.NavigateTo("/error");
             return;
@@ -294,7 +294,7 @@
                         translog = false;
                         trans.AddTrail("FINGERPRINT", "MATCH", "00");
 
-                        OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                        //OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                         cst.EKTPNumber = ktp.Id;
                         IsLoading = false;
                         IsSuccess = true;
@@ -306,7 +306,7 @@
                     else
                     {
                         trans.AddTrail("FINGERPRINT", "NOT-MATCH", "01");
-                        OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+                        //OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
 
                         intTryCount += 1;
                         IsLoading = false;
@@ -329,7 +329,7 @@
             await OurUtility.AuditTrail(trans, menu, cst);
 
             trans.errorCode = "FP - 002";
-            OurUtility.Write_Log("== Error : FP - 002", "step-action");
+            //OurUtility.Write_Log("== Error : FP - 002", "step-action");
             isNotIdle = false;
             NavMan.NavigateTo("/error");
             return;
@@ -339,11 +339,11 @@
     {
         //ektp.InitializeEktp();
         IsLoading = true;
-        OurUtility.Write_Log("=== Scan FingerPrint", "step-action");
-        OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
+        //OurUtility.Write_Log("=== Scan FingerPrint", "step-action");
+        //OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
         await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
 
-        OurUtility.Write_Log("==== Ektp_Sdk.OpenFingerPrintReader", "step-action");
+        //OurUtility.Write_Log("==== Ektp_Sdk.OpenFingerPrintReader", "step-action");
 
         // -- Step 2, Open Device Fingerprint
         IntPtr reader = IntPtr.Zero;
@@ -351,29 +351,29 @@
         result = await Task.Run(() => Ektp_Sdk.OpenFingerPrintReader(ref reader, "uareu")).ConfigureAwait(false);
         if (reader == IntPtr.Zero)
         {
-            OurUtility.Write_Log("==== Ektp_Sdk.OpenFingerPrintReader Failed", "step-action");
+            //OurUtility.Write_Log("==== Ektp_Sdk.OpenFingerPrintReader Failed", "step-action");
 
             //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
         }
         else
         {
-            OurUtility.Write_Log("==== Ektp_Sdk.OpenFingerPrintReader Success", "step-action");
-            OurUtility.Write_Log("==== Ektp_Sdk.StartEngine", "step-action");
+            //OurUtility.Write_Log("==== Ektp_Sdk.OpenFingerPrintReader Success", "step-action");
+            //OurUtility.Write_Log("==== Ektp_Sdk.StartEngine", "step-action");
 
             IntPtr engine = IntPtr.Zero;
             int engineType = 0;//engineType = 0, it means that finger print engine is uareu
             result = await Task.Run(() => Ektp_Sdk.StartEngine(engineType, ref engine)).ConfigureAwait(false);
             if (engine == IntPtr.Zero)
             {
-                OurUtility.Write_Log("==== Ektp_Sdk.StartEngine Failed", "step-action");
+                //OurUtility.Write_Log("==== Ektp_Sdk.StartEngine Failed", "step-action");
             }
             else
             {
-                OurUtility.Write_Log("==== Ektp_Sdk.StartEngine Success", "step-action");
+                //OurUtility.Write_Log("==== Ektp_Sdk.StartEngine Success", "step-action");
 
                 Thread.Sleep(1500);
 
-                OurUtility.Write_Log("==== -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.CaptureFingerPrint", "step-action");
+                //OurUtility.Write_Log("==== -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.CaptureFingerPrint", "step-action");
 
                 int size = 120000;
                 int score = -1;
@@ -382,14 +382,14 @@
                 result = await Task.Run(() => Ektp_Sdk.CaptureFingerPrint(reader, image, ref size, ref score)).ConfigureAwait(false);
                 if (result != 0)
                 {
-                    OurUtility.Write_Log("==== Ektp_Sdk.CaptureFingerPrint Failed", "step-action");
+                    //OurUtility.Write_Log("==== Ektp_Sdk.CaptureFingerPrint Failed", "step-action");
                     //break;
                 }
                 else
                 {
-                    OurUtility.Write_Log("==== -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.MatchFingerPrint", "step-action");
+                    //OurUtility.Write_Log("==== -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.MatchFingerPrint", "step-action");
 
-                    OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Success", "step-action");
+                    //OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Success", "step-action");
                     // -- Step 5, Compare
 
                     int matched = 0;//matched == 1, it means finger print matched
@@ -407,11 +407,11 @@
                     {
                         trans.AddTrail("FINGERPRINT", "MATCH", "00");
 
-                        OurUtility.Write_Log("==== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                        //OurUtility.Write_Log("==== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                         cst.EKTPNumber = ktp.Id;
                         IsLoading = false;
                         IsSuccess = true;
-                        OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                        //OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
                         result = Ektp_Sdk.CloseReader(reader);
 
                         Timer.SetTimer(1000);
@@ -426,17 +426,17 @@
                         if (matched == 1)
                         {
                             trans.AddTrail("FINGERPRINT", "MATCH", "00");
-                            OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                            //OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
                             cst.EKTPNumber = ktp.Id;
 
-                            //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+                            ////OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
                             IsLoading = false;
                             IsSuccess = true;
 
-                            OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                            //OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
                             result = Ektp_Sdk.CloseReader(reader);
 
-                            //OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
+                            ////OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
                             //await Task.Run(() => Switcher.DOWN_eKTP("500"));
 
                             Timer.SetTimer(1000);
@@ -446,9 +446,9 @@
                         else
                         {
                             trans.AddTrail("FINGERPRINT", "NOT-MATCH", "02");
-                            OurUtility.Write_Log("==== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+                            //OurUtility.Write_Log("==== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
 
-                            OurUtility.Write_Log("==== Ektp_Sdk.CloseReader", "step-action");
+                            //OurUtility.Write_Log("==== Ektp_Sdk.CloseReader", "step-action");
                             result = Ektp_Sdk.CloseReader(reader);
 
                             intTryCount += 1;
@@ -467,9 +467,9 @@
 
     private void TimerElapsedHandler()
     {
-        OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+        //OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
         cst.EKTPNumber = ktp.Id;
-        //OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+        ////OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
         isNotIdle = false;
         NavMan.NavigateTo("/UP/4");
     }

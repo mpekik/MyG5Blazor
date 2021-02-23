@@ -472,7 +472,7 @@
                     pageClass = "main-panel bg-home";
                     if (edc.intTry < 3)
                     {
-                        OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
+                        //OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
                         IsLoading = true;
                         await Task.Delay(2000);
                         intAccBill = intBill;
@@ -520,7 +520,7 @@
 
                                 IsFail = false;
                                 IsVoid = true;
-                                OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
+                                //OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
                                 Void();
                             }
                             trans.status = "01";
@@ -547,7 +547,7 @@
                     else
                     {
                         IsFail = true;
-                        OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
+                        //OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
                         trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
                         trans.status = "01";
                         await OurUtility.AuditTrail(trans, menu, cst);
@@ -609,7 +609,7 @@
                     pageClass = "main-panel bg-home";
                     if (edc.intTry < 3)
                     {
-                        OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
+                        //OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
                         IsLoading = true;
                         StateHasChanged();
                         await Task.Delay(200);
@@ -655,7 +655,7 @@
 
                                 IsFail = false;
                                 IsVoid = true;
-                                OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
+                                //OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
 
                                 Void();
                             }
@@ -683,7 +683,7 @@
                     else
                     {
                         IsFail = true;
-                        OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
+                        //OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
                         trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
                         trans.status = "01";
                         await OurUtility.AuditTrail(trans, menu, cst);
@@ -788,10 +788,10 @@
 
         string myURL = _myURL + apiURL;
 
-        OurUtility.Write_Log("== VOID Payment", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== VOID Payment", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" &&
                             strResult != "BadRequest" && strResult != "Forbidden")
         {
@@ -802,7 +802,7 @@
 
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
 
                 }
@@ -810,12 +810,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
@@ -830,14 +830,14 @@
             catch (Exception ex)
             {
                 trans.errorCode = strResult;
-                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail(" VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
             }
         }
         else
         {
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             trans.AddTrail("VOID PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
         }
     }
@@ -883,11 +883,11 @@
                                 "}";
         string myURL = _myURL + cesURL;
 
-        OurUtility.Write_Log("== Check CES", "step-action");
-        OurUtility.Write_Log("== URL API : " + myURL, "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Check CES", "step-action");
+        //OurUtility.Write_Log("== URL API : " + myURL, "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -895,7 +895,7 @@
                 JObject jobjResult = JObject.Parse(strResult);
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     foreach (var question in jobjResult.SelectToken("surveys"))
                     {
                         CES c = new CES();
@@ -913,14 +913,14 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
                         string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
                         string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("CES", "", "01");
@@ -942,7 +942,7 @@
             catch (Exception ex)
             {
                 trans.errorCode = strResult;
-                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("CES", "", "01");
 
                 //NavMan.NavigateTo("/error");
@@ -951,7 +951,7 @@
         else
         {
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             trans.AddTrail("CES", "", "01");
 
             //NavMan.NavigateTo("/error");
@@ -962,7 +962,7 @@
         try
         {
             InvokeAsync(StateHasChanged);
-            OurUtility.Write_Log("== Payment Via EDC", "step-action");
+            //OurUtility.Write_Log("== Payment Via EDC", "step-action");
             string _transType = "01";
             cst.intTagihanTerbayar = intBill;
             edc.Clear();
@@ -973,7 +973,7 @@
             do
             {
                 await Task.Delay(200);
-                OurUtility.Write_Log("== Payment EDC : " + edc.serialPort.PortName + " " + tagihan + " " + _transType + " " + invoice + " " + billing + " " + mPemabayaran, "step-action");
+                //OurUtility.Write_Log("== Payment EDC : " + edc.serialPort.PortName + " " + tagihan + " " + _transType + " " + invoice + " " + billing + " " + mPemabayaran, "step-action");
                 edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
             } while (!edc.mre.WaitOne());
@@ -996,7 +996,7 @@
             await Task.Delay(200);
             if (trans.edcresp == "00")
             {
-                OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
+                //OurUtility.Write_Log("== Payment Via EDC Success", "step-action");
                 trans.AddTrail("PAYMENT EDC", trans.edcresp, "00");
 
                 IsLoading = true;
@@ -1004,14 +1004,14 @@
             }
             else
             {
-                OurUtility.Write_Log("== Payment Via EDC Failed", "step-action");
+                //OurUtility.Write_Log("== Payment Via EDC Failed", "step-action");
                 trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
             }
             //Console.WriteLine(trans.edcresp);
         }
         catch (Exception ex)
         {
-            OurUtility.Write_Log("== Error EDC : " + ex.Message, "step-action");
+            //OurUtility.Write_Log("== Error EDC : " + ex.Message, "step-action");
             trans.AddTrail("PAYMENT EDC", ex.Message, "01");
         }
     }
@@ -1019,7 +1019,7 @@
     private async Task Void(string serialPortName, string tagihan, string invoice, string billing, string mPemabayaran)
     {
         string _transType = "02";
-        OurUtility.Write_Log("EDC VOID", "step-action");
+        //OurUtility.Write_Log("EDC VOID", "step-action");
         edc.Clear();
         edc.serialPort = new SerialPort();
         edc.serialPort.PortName = serialPortName;
@@ -1057,12 +1057,12 @@
         {
             IsVoided = true;
             trans.edcStatus = "VOIDED";
-            OurUtility.Write_Log("== Payment Voided", "step-action");
+            //OurUtility.Write_Log("== Payment Voided", "step-action");
             trans.AddTrail("VOID EDC", trans.edcRespVoid, "00");
         }
         else
         {
-            OurUtility.Write_Log("== Void Failed", "step-action");
+            //OurUtility.Write_Log("== Void Failed", "step-action");
             trans.AddTrail("VOID EDC", trans.edcRespVoid, "01");
         }
     }
@@ -1105,10 +1105,10 @@
         }
         string myURL = _myURL + serviceURL;
 
-        OurUtility.Write_Log("== Payment", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Payment", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -1118,7 +1118,7 @@
                 trans.resultPayment = resultPayment;
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
                     sisaPulsa = int.Parse((string)jobjResult.SelectToken("amount"));
                     trans.pulsaSerialNumber = (string)jobjResult.SelectToken("serialNumber");
@@ -1127,12 +1127,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     if (trans.errorCode == "99009")
@@ -1159,14 +1159,14 @@
             catch (Exception ex)
             {
                 trans.errorCode = strResult;
-                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
             }
         }
         else
         {
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
         }
     }
@@ -1226,7 +1226,7 @@
         }
         catch (Exception ex)
         {
-            OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+            //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
             trans.AddTrail("BILL ACCEPTOR", "", "01");
             return;
         }

@@ -136,10 +136,10 @@
                                 "}";
         string myURL = _myURL + serviceURL;
 
-        OurUtility.Write_Log("== Get Bill", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("== Get Bill", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson,menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -147,7 +147,7 @@
                 JObject jobjResult = JObject.Parse(strResult);
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     foreach (var bill in jobjResult.SelectToken("billPayment").SelectToken("bill"))
                     {
                         Int32.TryParse((string)bill.SelectToken("amount"), out int amount);
@@ -170,12 +170,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("GET BILL", cst.strMPembayaran, "01");
@@ -200,7 +200,7 @@
             catch (Exception ex)
             {
                 trans.errorCode = "Exception Error";
-                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("GET BILL", cst.strMPembayaran, "01");
                 trans.status = "01";
                 await OurUtility.AuditTrail(trans, menu, cst);
@@ -211,7 +211,7 @@
         else
         {
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             trans.AddTrail("GET BILL", cst.strMPembayaran, "01");
             trans.status = "01";
             await OurUtility.AuditTrail(trans, menu, cst);

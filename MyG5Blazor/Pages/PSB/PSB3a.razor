@@ -374,7 +374,14 @@
             }
         }
         trans.AddTrail("CHOOSE PACKAGE", "Package ID : " + trans.psbDetail.selectedPaket, "00");
-        NavigateTo("/PSB/3b");
+        if (trans.psbDetail.searchNumber == 0)
+        {
+            NavigateTo("/PSB/3b");
+        }
+        else
+        {
+            NavigateTo("/PSB/3c");
+        }
     }
     private void NavigateTo(string strURL)
     {

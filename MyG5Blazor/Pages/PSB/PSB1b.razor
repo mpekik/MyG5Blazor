@@ -226,21 +226,21 @@
                     else
                     {
                         //Capture Image From IP CAM
-                        byte[] image = OurUtility.CaptureImage();
-                        if (image != null)
-                        {
-                            trans.imageIPCam = Convert.ToBase64String(image);
-                        }
-                        else
-                        {
-                            isLoading = false;
-                            isVisible = true;
-                            strMsgError = "<span style=\"font-weight: bold; \">IP Camera Tidak terdeteksi</span><br>Mohon hubungi <span style=\"font-weight: bold; \">Costumer Service</span> GraPARI untuk bantuan.";
-                            return;
-                        }
+                        //byte[] image = OurUtility.CaptureImage();
+                        //if (image != null)
+                        //{
+                        //    trans.imageIPCam = Convert.ToBase64String(image);
+                        //}
+                        //else
+                        //{
+                        //    isLoading = false;
+                        //    isVisible = true;
+                        //    strMsgError = "<span style=\"font-weight: bold; \">IP Camera Tidak terdeteksi</span><br>Mohon hubungi <span style=\"font-weight: bold; \">Costumer Service</span> GraPARI untuk bantuan.";
+                        //    return;
+                        //}
 
                         trans.psbDetail.alamatEmail = inputEmail;
-                        OurUtility.Write_Log("Input Email:" + trans.psbDetail.alamatEmail, "step-action");
+                        //OurUtility.Write_Log("Input Email:" + trans.psbDetail.alamatEmail, "step-action");
                         trans.AddTrail("INPUT EMAIL", trans.psbDetail.alamatEmail, "00");
                         await RequestOTP();
                     }
@@ -296,10 +296,10 @@
         "\"image\": \"" + trans.imageIPCam + "\"," +
            "}";
         string myURL = _myURL + serviceURL;
-        OurUtility.Write_Log("Request OTP", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
+        //OurUtility.Write_Log("Request OTP", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
         {
@@ -317,12 +317,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Request OTP", trans.psbDetail.alamatEmail, "01");
@@ -345,7 +345,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
-                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavigateTo("/error");
             }
@@ -357,7 +357,7 @@
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error : {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error : {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavigateTo("/error");
         }

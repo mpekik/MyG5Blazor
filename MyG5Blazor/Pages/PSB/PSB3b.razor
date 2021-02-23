@@ -165,6 +165,7 @@
     {
         if (strNumber.Length > 0 && strNumber.Length < 5)
         {
+            trans.psbDetail.searchNumber += 1;
             trans.psbDetail.patternNumber = strNumber;
             await GetNomor();
         }
@@ -216,10 +217,10 @@
             "\"pattern\": \"" + trans.psbDetail.patternNumber + "\"" +
                "}";
         string myURL = _myURL + getNomor;
-        OurUtility.Write_Log("Get List Number", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        //OurUtility.Write_Log("Get List Number", "step-action");
+        //OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
@@ -242,12 +243,12 @@
                 {
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        //OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Get List Number", "Pattern : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "01");
@@ -274,7 +275,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
-                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
                 NavigateTo("/error");
             }
@@ -286,7 +287,7 @@
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
-            OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
+            //OurUtility.Write_Log("== Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
             NavigateTo("/error");
         }
@@ -402,5 +403,10 @@
             await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
             #endregion
         }
+    }
+
+    void string DummyNumber()
+    {
+        return "{\"transaction\":{\"transactionId\":\"X002210209104813201932026\",\"statusCode\":\"00\",\"statusDesc\":\"success\"},\"numbers\":[\"628113922243\",\"628113922256\",\"628113922257\",\"628113922261\",\"628113922269\",\"628113922270","628113922273","628113922275","628113922276","628113922279","628113922280","628113922286","628113922289","628113922294","628115222050","628115222090","628117222383","628117222693"],"total":18}"
     }
 }
