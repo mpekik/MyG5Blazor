@@ -226,24 +226,24 @@
                     else
                     {
                         //Capture Image From IP CAM
-                        byte[] image = OurUtility.CaptureImage();
-                        if (image != null)
-                        {
-                            trans.imageIPCam = Convert.ToBase64String(image);
-                        }
-                        else
-                        {
-                            isLoading = false;
-                            isVisible = true;
-                            strMsgError = "<span style=\"font-weight: bold; \">IP Camera Tidak terdeteksi</span><br>Mohon hubungi <span style=\"font-weight: bold; \">Costumer Service</span> GraPARI untuk bantuan.";
-                            return;
-                        }
-
+                        //byte[] image = OurUtility.CaptureImage();
+                        //if (image != null)
+                        //{
+                        //    trans.imageIPCam = Convert.ToBase64String(image);
+                        //}
+                        //else
+                        //{
+                        //    isLoading = false;
+                        //    isVisible = true;
+                        //    strMsgError = "<span style=\"font-weight: bold; \">IP Camera Tidak terdeteksi</span><br>Mohon hubungi <span style=\"font-weight: bold; \">Costumer Service</span> GraPARI untuk bantuan.";
+                        //    return;
+                        //}
+                        trans.imageIPCam = "img";
                         trans.psbDetail.alamatEmail = inputEmail;
                         OurUtility.Write_Log("Input Email:" + trans.psbDetail.alamatEmail, "step-action");
                         trans.AddTrail("INPUT EMAIL", trans.psbDetail.alamatEmail, "00");
                         await RequestOTP();
-                        NavigateTo("/PSB/2a");
+                        //NavigateTo("/PSB/2a");
                     }
                 }
                 else
@@ -294,7 +294,7 @@
             "\"transactionId\": \"" + trans.transID + "\"," +
             "\"email\": \"" + trans.psbDetail.alamatEmail + "\",";
         string myJson = myJsonForLog +
-        "\"image\": \"" + trans.imageIPCam + "\"," +
+        "\"image\": \"" + trans.imageIPCam + "\"" +
            "}";
         string myURL = _myURL + serviceURL;
         OurUtility.Write_Log("Request OTP", "step-action");
