@@ -411,7 +411,7 @@
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
-    private int MetodePembayaran = 1;
+    private int MetodePembayaran = 0;
     private int CESno = 0;
     private int logbank = 0;
     private int logamount = 0;
@@ -461,7 +461,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        /*
+        
         counterTime = counterTreshold;
         trans.psbDetail.statusPayment = "01";
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -733,7 +733,7 @@
                     }
                     break;
                 }
-        }*/
+        }
     }
 
     private async Task SendDocument()

@@ -409,19 +409,40 @@
 
                     if (matched == 1)
                     {
-                        await ResetTimer();
-                        trans.AddTrail("FINGERPRINT", "MATCH", "00");
+                        if (cst.EKTPNumber == ktp.Id)
+                        {
+                            await ResetTimer();
+                            trans.AddTrail("FINGERPRINT", "MATCH", "00");
 
-                        OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
-                        cst.EKTPNumber = ktp.Id;
-                        IsLoading = false;
-                        IsSuccess = true;
-                        OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
-                        result = Ektp_Sdk.CloseReader(reader);
+                            OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                            cst.EKTPNumber = ktp.Id;
+                            IsLoading = false;
+                            IsSuccess = true;
+                            OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                            result = Ektp_Sdk.CloseReader(reader);
 
-                        Timer.SetTimer(1000);
-                        Timer.OnElapsed += TimerElapsedHandler;
-                        //break;
+                            Timer.SetTimer(1000);
+                            Timer.OnElapsed += TimerElapsedHandler;
+                            //break;
+                        }
+                        else
+                        {
+                            await ResetTimer();
+                            string KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
+                            trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "02");
+                            OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                            OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                            result = Ektp_Sdk.CloseReader(reader);
+
+                            intTryCount += 1;
+                            IsLoading = false;
+                            IsVisible = true;
+                            if (intTryCount > intTryLimit)
+                            {
+                                IsFail = true;
+                            }
+                        }
                     }
                     else
                     {

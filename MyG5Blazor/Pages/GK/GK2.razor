@@ -425,11 +425,9 @@
                 ktp.demographic = demoGraphic;
                 CID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber), System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber).Length);
                 KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
-                OurUtility.Write_Log("CID : " + CID, "step-action");
-                OurUtility.Write_Log("KID : " + KID, "step-action");
+                //OurUtility.Write_Log("CID : " + CID, "step-action");
+                //OurUtility.Write_Log("KID : " + KID, "step-action");
 
-                if (cst.EKTPNumber == ktp.Id)
-                {
                     ktp.minutiae1 = ektpC.ektpData.byteMinu1;
                     ktp.minutiae2 = ektpC.ektpData.byteMinu2;
                     ktp.minu1len = ektpC.ektpData.minu1len;
@@ -442,23 +440,7 @@
                     isNotIdle = false;
                     NavMan.NavigateTo("/GK/3");
                     return;
-                }
-                else
-                {
-                    trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "02");
-                    IsLoading = false;
-                    IsSuccess = false;
-                    if (intTryCount <= intTryLimit)
-                    {
-                        IsVisible = true;
-                        intTryCount += 1;
-                    }
-                    else
-                    {
-                        IsFail = true;
-                    }
-                    return;
-                }
+                
             }
         }
 
