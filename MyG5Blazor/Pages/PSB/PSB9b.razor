@@ -466,7 +466,7 @@
         trans.psbDetail.statusPayment = "01";
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         strCOM = strCOM + config.Read("EDC", Config.PARAM_EDC_PORT);
-        //MetodePembayaran = cst.intMPembayaran;
+        MetodePembayaran = cst.intMPembayaran;
         intBill = int.Parse(trans.psbDetail.PaketPSB._hargaAwal);
         cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
         cdCOM = cdCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);

@@ -142,7 +142,7 @@
     private bool IsFail = false;
     private bool isLoading2 = false;
     private bool isInit = true;
-
+    private bool isVisible2 = false;
     private int intTryCount = 1;
     private int intTryLimit = 3;
 
@@ -215,6 +215,7 @@
         {
             isInit = false;
             IsVisible = false;
+            isVisible2 = false;
             if (config.ektpType == "a")
             {
                 await FingerPrintScan();
@@ -291,17 +292,35 @@
 
                     if (result)
                     {
-                        translog = false;
-                        trans.AddTrail("FINGERPRINT", "MATCH", "00");
+                        if (cst.EKTPNumber == ktp.id)
+                        {
+                            translog = false;
+                            trans.AddTrail("FINGERPRINT", "MATCH", "00");
 
-                        OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
-                        cst.EKTPNumber = ktp.Id;
-                        IsLoading = false;
-                        IsSuccess = true;
+                            OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                            cst.EKTPNumber = ktp.Id;
+                            IsLoading = false;
+                            IsSuccess = true;
 
-                        Timer.SetTimer(1000);
-                        Timer.OnElapsed += TimerElapsedHandler;
-                        return;
+                            Timer.SetTimer(1000);
+                            Timer.OnElapsed += TimerElapsedHandler;
+                            return;
+                        }
+                        else
+                        {
+                            string KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
+                            trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "02");
+                            OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                            intTryCount += 1;
+                            IsLoading = false;
+                            isVisible2 = true;
+                            if (intTryCount > intTryLimit)
+                            {
+                                IsFail = true;
+                            }
+                            return;
+                        }
                     }
                     else
                     {
@@ -405,18 +424,36 @@
 
                     if (matched == 1)
                     {
-                        trans.AddTrail("FINGERPRINT", "MATCH", "00");
+                        if (cst.EKTPNumber == ktp.Id)
+                        {
+                            trans.AddTrail("FINGERPRINT", "MATCH", "00");
 
-                        OurUtility.Write_Log("==== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
-                        cst.EKTPNumber = ktp.Id;
-                        IsLoading = false;
-                        IsSuccess = true;
-                        OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
-                        result = Ektp_Sdk.CloseReader(reader);
+                            OurUtility.Write_Log("==== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                            cst.EKTPNumber = ktp.Id;
+                            IsLoading = false;
+                            IsSuccess = true;
+                            OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                            result = Ektp_Sdk.CloseReader(reader);
 
-                        Timer.SetTimer(1000);
-                        Timer.OnElapsed += TimerElapsedHandler;
-                        //break;
+                            Timer.SetTimer(1000);
+                            Timer.OnElapsed += TimerElapsedHandler;
+                            //break;
+                        }
+                        else
+                        {
+                            string KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
+                            trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "02");
+                            OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                            intTryCount += 1;
+                            IsLoading = false;
+                            isVisible2 = true;
+                            if (intTryCount > intTryLimit)
+                            {
+                                IsFail = true;
+                            }
+                            return;
+                        }
                     }
                     else
                     {
@@ -425,23 +462,41 @@
                                                         ref score, ref matched, format)).ConfigureAwait(false);
                         if (matched == 1)
                         {
-                            trans.AddTrail("FINGERPRINT", "MATCH", "00");
-                            OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
-                            cst.EKTPNumber = ktp.Id;
+                            if (cst.EKTPNumber == ktp.Id)
+                            {
+                                trans.AddTrail("FINGERPRINT", "MATCH", "00");
+                                OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                                cst.EKTPNumber = ktp.Id;
 
-                            OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
-                            IsLoading = false;
-                            IsSuccess = true;
+                                OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+                                IsLoading = false;
+                                IsSuccess = true;
 
-                            OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
-                            result = Ektp_Sdk.CloseReader(reader);
+                                OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                                result = Ektp_Sdk.CloseReader(reader);
 
-                            OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
-                            //await Task.Run(() => Switcher.DOWN_eKTP("500"));
+                                OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
+                                //await Task.Run(() => Switcher.DOWN_eKTP("500"));
 
-                            Timer.SetTimer(1000);
-                            Timer.OnElapsed += TimerElapsedHandler;
-                            //break;
+                                Timer.SetTimer(1000);
+                                Timer.OnElapsed += TimerElapsedHandler;
+                                //break;
+                            }
+                            else
+                            {
+                                string KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
+                                trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "02");
+                                OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                                intTryCount += 1;
+                                IsLoading = false;
+                                isVisible2 = true;
+                                if (intTryCount > intTryLimit)
+                                {
+                                    IsFail = true;
+                                }
+                                return;
+                            }
                         }
                         else
                         {

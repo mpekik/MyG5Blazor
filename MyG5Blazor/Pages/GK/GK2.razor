@@ -501,8 +501,8 @@
             ktp.demographic = demoGraphic;
             CID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber), System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber).Length);
             KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
-            OurUtility.Write_Log("CID : " + CID, "step-action");
-            OurUtility.Write_Log("KID : " + KID, "step-action");
+            //OurUtility.Write_Log("CID : " + CID, "step-action");
+            //OurUtility.Write_Log("KID : " + KID, "step-action");
             IsVisible = false;
             IsNext = true;
 
@@ -512,8 +512,6 @@
                 byte[] leftData = new byte[leftLen];
                 byte[] rightData = new byte[rightLen];
 
-                if (cst.EKTPNumber == ktp.Id)
-                {
                     OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card", "step-action");
                     ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(true);
                     if (ret != 0 || leftLen == 0 || rightLen == 0)
@@ -540,23 +538,6 @@
                     }
                     //Timer.SetTimer(1000);
                     //Timer.OnElapsed += TimerElapsedHandler;
-                }
-                else
-                {
-                    trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "02");
-                    IsLoading = false;
-                    IsSuccess = false;
-                    if (intTryCount <= intTryLimit)
-                    {
-                        IsVisible = true;
-                        intTryCount += 1;
-                    }
-                    else
-                    {
-                        IsFail = true;
-                    }
-                    return;
-                }
             }
         }
     }

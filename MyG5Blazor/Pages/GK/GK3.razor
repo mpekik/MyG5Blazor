@@ -105,6 +105,31 @@
 
         </div>
     }
+    @if (isVisible2)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        @if (intTryCount <= intTryLimit)
+                        {
+                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> yang digunakan tidak sesuai dengan nomor yang terdaftar pada sistem MyGraPARI. Silahkan gunakan<span style="font-weight: bold;"> e-KTP </span>yang sesuai.</p>
+                            <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
+                        }
+                        else
+                        {
+                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
+                            <button @onclick="@(()=>InvokeAsync(MenuUtama))" class="btn btn-danger modal-button" id="span1">OK</button>
+                        }
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
     @if (isLoading2)
     {
         <div id="myModal" class="modal">
@@ -142,6 +167,7 @@
     private bool IsFail = false;
     private bool isLoading2 = false;
     private bool isInit = true;
+    private bool isVisible2 = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
@@ -217,6 +243,7 @@
         {
             isInit = false;
             IsVisible = false;
+            isVisible2 = false;
             if (config.ektpType == "a")
             {
                 await FingerPrintScan();
@@ -293,17 +320,35 @@
 
                     if (result)
                     {
-                        translog = false;
-                        trans.AddTrail("FINGERPRINT", "MATCH", "00");
+                        if (cst.EKTPNumber == ktp.Id)
+                        {
+                            translog = false;
+                            trans.AddTrail("FINGERPRINT", "MATCH", "00");
 
-                        OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
-                        cst.EKTPNumber = ktp.Id;
-                        IsLoading = false;
-                        IsSuccess = true;
+                            OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                            cst.EKTPNumber = ktp.Id;
+                            IsLoading = false;
+                            IsSuccess = true;
 
-                        Timer.SetTimer(1000);
-                        Timer.OnElapsed += TimerElapsedHandler;
-                        return;
+                            Timer.SetTimer(1000);
+                            Timer.OnElapsed += TimerElapsedHandler;
+                            return;
+                        }
+                        else
+                        {
+                            string KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
+                            trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "02");
+                            OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                            intTryCount += 1;
+                            IsLoading = false;
+                            isVisible2 = true;
+                            if (intTryCount > intTryLimit)
+                            {
+                                IsFail = true;
+                            }
+                            return;
+                        }
                     }
                     else
                     {
@@ -437,7 +482,7 @@
 
                             intTryCount += 1;
                             IsLoading = false;
-                            IsVisible = true;
+                            isVisible2 = true;
                             if (intTryCount > intTryLimit)
                             {
                                 IsFail = true;
@@ -452,24 +497,45 @@
                                                     ref score, ref matched, format)).ConfigureAwait(false);
                         if (matched == 1)
                         {
-                            await ResetTimer();
-                            trans.AddTrail("FINGERPRINT", "MATCH", "00");
-                            OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
-                            cst.EKTPNumber = ktp.Id;
+                            if (cst.EKTPNumber == ktp.Id)
+                            {
+                                await ResetTimer();
+                                trans.AddTrail("FINGERPRINT", "MATCH", "00");
+                                OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                                cst.EKTPNumber = ktp.Id;
 
-                            OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
-                            IsLoading = false;
-                            IsSuccess = true;
+                                OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+                                IsLoading = false;
+                                IsSuccess = true;
 
-                            OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
-                            result = Ektp_Sdk.CloseReader(reader);
+                                OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                                result = Ektp_Sdk.CloseReader(reader);
 
-                            OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
-                            //Switcher.DOWN("500",config.usbEKTP);
+                                OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
+                                //Switcher.DOWN("500",config.usbEKTP);
 
-                            Timer.SetTimer(1000);
-                            Timer.OnElapsed += TimerElapsedHandler;
-                            //break;
+                                Timer.SetTimer(1000);
+                                Timer.OnElapsed += TimerElapsedHandler;
+                                //break;
+                            }
+                            else
+                            {
+                                await ResetTimer();
+                                string KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
+                                trans.AddTrail("SCAN EKTP", "NIK SALAH : " + cst.EKTPNumber + " " + KID, "02");
+                                OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                                OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                                result = Ektp_Sdk.CloseReader(reader);
+
+                                intTryCount += 1;
+                                IsLoading = false;
+                                isVisible2 = true;
+                                if (intTryCount > intTryLimit)
+                                {
+                                    IsFail = true;
+                                }
+                            }
                         }
                         else
                         {
