@@ -398,7 +398,7 @@
     private bool IsVisible = false;
     private bool IsVisible2 = false;
     private bool isLoading = false;
-    private bool IsSuccess = true;
+    private bool IsSuccess = false;
     private bool IsFail = false;
     private bool IsExit = false;
     private bool IsVoid = false;
@@ -415,7 +415,7 @@
     private int CESno = 0;
     private int logbank = 0;
     private int logamount = 0;
-    private int stock = 4;
+    private int stock = 0;
 
     private string strNPS1Value = string.Empty;
     private string strMsgError = string.Empty;
@@ -461,7 +461,7 @@
 
     protected override async Task OnInitializedAsync()
     {
-        
+
         counterTime = counterTreshold;
         trans.psbDetail.statusPayment = "01";
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -470,7 +470,7 @@
         intBill = int.Parse(trans.psbDetail.PaketPSB._hargaAwal);
         cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
         cdCOM = cdCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
-        
+
         if (cardStock == "")
         {
             isFail = true;
@@ -620,13 +620,14 @@
 
                     StateHasChanged();
                     await Task.Delay(200);
+                    intAccBill = Payout.total;
 
                     cst.intUangCount = Payout.uangCount;
                     cst.intTagihanTerbayar = Payout.total;
-                    logamount = logamount + Payout.total;
-                    logbank = logbank + Payout.uangCount;
-                    config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
-                    config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
+                    //logamount = logamount + Payout.total;
+                    //logbank = logbank + Payout.uangCount;
+                    //config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
+                    //config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
                     if (!IsTunaiExit)
                     {
                         intMinus = intAccBill - intBill;
@@ -634,7 +635,6 @@
                         break;
                     }
                     else { break; }
-                    break;
                 }
             case 3:
                 {
