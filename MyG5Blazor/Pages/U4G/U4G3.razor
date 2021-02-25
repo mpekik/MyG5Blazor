@@ -76,8 +76,8 @@
             <span class="dot">4</span>
         </div>
         <div class="footer-side2">
-            <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
+            <button @onclick="@(()=>InvokeAsync(Back))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(()=>InvokeAsync(MenuUtamaCanceled))" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
@@ -91,12 +91,37 @@
                         @if (intTryCount <= intTryLimit)
                         {
                             <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;"> Jari Telunjuk Kanan/Kiri </span>Anda, pastikan alat pemindai dalam keadaan bersih.</p>
-                            <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
+                            <button class="btn btn-danger modal-button" @onclick="@(()=>InvokeAsync(CheckFinger))">OK</button>
                         }
                         else
                         {
                             <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>tidak sesuai dengan eKTP yang digunakan. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
-                            <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
+                            <button @onclick="@(()=>InvokeAsync(MenuUtama))" class="btn btn-danger modal-button" id="span1">OK</button>
+                        }
+                        <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    </div>
+                </div>
+            </div>
+
+        </div>
+    }
+    @if (isVisible2)
+    {
+        <div id="myModal" class="modal">
+
+            <!-- Modal content -->
+            <div class="modal-dialog-centered" role="document">
+                <div class="modal-content">
+                    <div class="modal-body">
+                        @if (intTryCount <= intTryLimit)
+                        {
+                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> yang digunakan tidak sesuai dengan nomor yang terdaftar pada sistem MyGraPARI. Silahkan gunakan<span style="font-weight: bold;"> e-KTP </span>yang sesuai.</p>
+                            <button class="btn btn-danger modal-button" @onclick="@(()=>InvokeAsync(CheckFinger))">OK</button>
+                        }
+                        else
+                        {
+                            <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
+                            <button @onclick="@(()=>InvokeAsync(MenuUtama))" class="btn btn-danger modal-button" id="span1">OK</button>
                         }
                         <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                     </div>
@@ -211,11 +236,13 @@
     }
     private async Task CheckFinger()
     {
-        if (IsVisible || isInit)
+        if (IsVisible || isInit || isVisible2)
         {
             isInit = false;
             IsVisible = false;
             isVisible2 = false;
+            StateHasChanged();
+            await Task.Delay(100);
             if (config.ektpType == "a")
             {
                 await FingerPrintScan();
