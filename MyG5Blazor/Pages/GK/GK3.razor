@@ -91,12 +91,12 @@
                         @if (intTryCount <= intTryLimit)
                         {
                             <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;"> Jari Telunjuk Kanan/Kiri </span>Anda, pastikan alat pemindai dalam keadaan bersih.</p>
-                            <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
+                            <button class="btn btn-danger modal-button" @onclick="@(()=>InvokeAsync(CheckFinger))">OK</button>
                         }
                         else
                         {
                             <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>tidak sesuai dengan eKTP yang digunakan. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
-                            <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
+                            <button @onclick="@(()=>InvokeAsync(MenuUtama))" class="btn btn-danger modal-button" id="span1">OK</button>
                         }
                         <!-- <button class="btn btn-light modal-button">Tidak</button> -->
                     </div>
@@ -116,7 +116,7 @@
                         @if (intTryCount <= intTryLimit)
                         {
                             <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> yang digunakan tidak sesuai dengan nomor yang terdaftar pada sistem MyGraPARI. Silahkan gunakan<span style="font-weight: bold;"> e-KTP </span>yang sesuai.</p>
-                            <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
+                            <button class="btn btn-danger modal-button" @onclick="@(()=>InvokeAsync(CheckFinger))">OK</button>
                         }
                         else
                         {
@@ -190,6 +190,7 @@
             IsLoading = false;
             translog = false;
             IsVisible = false;
+            isVisible2 = false;
             isLoading2 = true;
             trans.status = "01";
             trans.errorCode = "FINGERPRINT";
@@ -209,6 +210,7 @@
             translog = false;
             IsVisible = false;
             isLoading2 = true;
+            isVisible2 = false;
             ektpCRT.isCapture = false;
             trans.AddTrail("SCAN FINGERPRINT", "CANCELED", "02");
             trans.status = "02";
@@ -244,6 +246,8 @@
             isInit = false;
             IsVisible = false;
             isVisible2 = false;
+            StateHasChanged();
+            await Task.Run(100);
             if (config.ektpType == "a")
             {
                 await FingerPrintScan();
