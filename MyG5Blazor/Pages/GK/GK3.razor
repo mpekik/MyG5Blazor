@@ -241,13 +241,13 @@
     }
     private async Task CheckFinger()
     {
-        if (IsVisible || isInit)
+        if (IsVisible || isInit || isVisible2)
         {
             isInit = false;
             IsVisible = false;
             isVisible2 = false;
             StateHasChanged();
-            await Task.Run(100);
+            await Task.Delay(100);
             if (config.ektpType == "a")
             {
                 await FingerPrintScan();
