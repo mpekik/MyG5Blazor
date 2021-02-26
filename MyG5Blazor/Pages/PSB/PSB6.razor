@@ -414,6 +414,7 @@
     }
     private void NavigateTo(string strURL)
     {
+        isIdle = false;
         isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }

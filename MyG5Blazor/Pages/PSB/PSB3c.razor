@@ -62,32 +62,32 @@
                     <div style="display: flex; text-align: center; margin-top: 5%;">
                         @if (boolNumber[0 + menu.pageIndex])
                         {
-                        <button @onclick="@(() => PickNomer(populateNumber[0+menu.pageIndex]))" class="btn-pilih-no btn" style=@fontWeight value="">@((MarkupString)numberUI[0 + menu.pageIndex])</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[0+menu.pageIndex]))" class="btn-pilih-no btn" style=@fontWeight value="">@((MarkupString)numberUI[0 + menu.pageIndex])</button>
                         }
                         @if (boolNumber[1 + menu.pageIndex])
                         {
-                    <button @onclick="@(() => PickNomer(populateNumber[1+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[1 + menu.pageIndex])</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[1+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[1 + menu.pageIndex])</button>
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
                         @if (boolNumber[2 + menu.pageIndex])
                         {
-                        <button @onclick="@(() => PickNomer(populateNumber[2+menu.pageIndex]))" class="btn-pilih-no btn" style=@fontWeight value="">@((MarkupString)numberUI[2 + menu.pageIndex])</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[2+menu.pageIndex]))" class="btn-pilih-no btn" style=@fontWeight value="">@((MarkupString)numberUI[2 + menu.pageIndex])</button>
                         }
                         @if (boolNumber[3 + menu.pageIndex])
                         {
-                    <button @onclick="@(() => PickNomer(populateNumber[3+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[3 + menu.pageIndex])</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[3+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[3 + menu.pageIndex])</button>
                         }
                     </div>
                     <div style="display: flex; text-align: center; margin-top: 4%;">
                         @if (boolNumber[4 + menu.pageIndex])
                         {
-                        <button @onclick="@(() => PickNomer(@populateNumber[4+menu.pageIndex]))" class="btn-pilih-no btn" style=@fontWeight value="">@((MarkupString)numberUI[4 + menu.pageIndex])</button>
-                        }                            
+                            <button @onclick="@(() => PickNomer(@populateNumber[4+menu.pageIndex]))" class="btn-pilih-no btn" style=@fontWeight value="">@((MarkupString)numberUI[4 + menu.pageIndex])</button>
+                        }
 
                         @if (boolNumber[5 + menu.pageIndex])
                         {
-                    <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[5 + menu.pageIndex])</button>
+                            <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[5 + menu.pageIndex])</button>
                         }
                     </div>
                 </div>
@@ -133,9 +133,23 @@
         </div>
     </div>
 }
+@if (isPopUp)
+{
+    <div id="myModal" class="modal" style="z-index:999;">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">@((MarkupString)strMsgError)</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(ButtonOkPopUp))">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @if (isIdle)
 {
-    <div id="myModal" class="modal"style="z-index:999;">
+    <div id="myModal" class="modal" style="z-index:999;">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -173,6 +187,10 @@
     private int pageIndex = 0;
     private int inputIndex = 0;
 
+    private async Task ButtonOkPopUp()
+    {
+
+    }
     private void NextIndex()
     {
         if (menu.pageIndex + 6 < menu.psbNomer.Count())
@@ -193,24 +211,24 @@
     {
         string temp = strNumber;
         string temp01 = "0" + _numberUI.Substring(2, _numberUI.IndexOf(strNumber) - 2);
-        string split1 = "0"+_numberUI.Substring(2, _numberUI.IndexOf(strNumber)-2);
+        string split1 = "0" + _numberUI.Substring(2, _numberUI.IndexOf(strNumber) - 2);
 
         int indexSplit1 = split1.Length % 4;
         split1 = Regex.Replace(split1, ".{4}", "$0-");
 
-        if(indexSplit1!=0)
+        if (indexSplit1 != 0)
         {
-            int posSplit = temp.Length - indexSplit1+1;
+            int posSplit = temp.Length - indexSplit1 + 1;
             temp = temp.Insert(posSplit, "-");
         }
         int posSplit2 = 0;
         string split2 = _numberUI.Substring(_numberUI.IndexOf(strNumber) + strNumber.Length);
-        if(split2.Length>(temp01+temp).Length)
+        if (split2.Length > (temp01 + temp).Length)
         {
-            posSplit2 = split2.Length - (temp01 + temp).Length+2;
+            posSplit2 = split2.Length - (temp01 + temp).Length + 2;
             split2 = split2.Insert(posSplit2, "-");
         }
-        string ret = split1+ "<span style=\"font-weight: bold; \">"+temp+"</span>"+split2;
+        string ret = split1 + "<span style=\"font-weight: bold; \">" + temp + "</span>" + split2;
 
 
         return ret;
@@ -225,7 +243,7 @@
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
                 //numberUI[i] = NumberUI(populateNumber[i]);
-                numberUI[i]= Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
+                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
                 StateHasChanged();
             }
         }
@@ -236,7 +254,7 @@
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
                 //numberUI[i] = NumberUI(populateNumber[i]);
-                numberUI[i]= Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
+                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
                 StateHasChanged();
             }
         }
@@ -261,6 +279,7 @@
 
     private void NavigateTo(string strURL)
     {
+        isIdle = false;
         isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }
@@ -326,7 +345,7 @@
                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     trans.AddTrail("Reserve Number", "Number : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "02");
 
-                    isPopUp = false;
+                    isPopUp = true;
                     return;
                 }
             }

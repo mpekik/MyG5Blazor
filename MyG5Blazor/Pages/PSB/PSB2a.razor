@@ -162,7 +162,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="text-body">@((MarkupString)strMsgError)</p>
-                    <button class="btn btn-danger modal-button" @onclick="@(() => isVisible = false)">OK</button>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(ButtonOkPopUp))">OK</button>
                 </div>
             </div>
         </div>
@@ -214,6 +214,11 @@
     private int counterTresholdOTP = 60;
     private bool kirimUlang = true;
 
+    private async Task ButtonOkPopUp()
+    {
+        isVisible = false;
+        buttonOK = true;
+    }
     private async Task OTPTime()
     {
         if (kirim < 3)
@@ -393,7 +398,6 @@
         }
     }
 
-
     private async Task CekOTP()
     {
         isLoading = true;
@@ -404,7 +408,7 @@
             "\"token\": \"" + trans.psbDetail.otp + "\"" +
                "}";
         string myURL = _myURL + cekOTPURL;
-        OurUtility.Write_Log("Request OTP", "step-action");
+        OurUtility.Write_Log("OTP Validation", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
@@ -439,7 +443,7 @@
                     await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
-                    isInvalid = true;
+                    isOTPError = true;
                     isValid = false;
                     //NavigateTo("/error");
                 }
@@ -447,6 +451,9 @@
                 {
                     trans.AddTrail("Validasi OTP", "", "02");
                     isLoading = false;
+                    isValid = false;
+                    isOTPError = false;
+                    isInvalid = false;
                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     isVisible = true;
                     return;
@@ -476,25 +483,26 @@
             NavigateTo("/error");
         }
     }
+    private bool buttonOK = true;
     private async Task Ok()
     {
         if (otp.Length == 6)
         {
-            trans.psbDetail.otp = otp;
-            await CekOTP();
-            //isValid=true;
-            if (isValid)
+            if (buttonOK)
             {
-                await GetPaket();
-                //NavigateTo("/PSB/3");
-            }
-            else if (isInvalid)
-            {
-                NavigateTo("/main");
-            }
-            else if (isOTPError)
-            {
-                NavigateTo("/error");
+                buttonOK = false;
+                trans.psbDetail.otp = otp;
+                await CekOTP();
+                //isValid=true;
+                if (isValid)
+                {
+                    await GetPaket();
+                    //NavigateTo("/PSB/3");
+                }
+                else if (isOTPError)
+                {
+                    NavigateTo("/error");
+                }
             }
         }
         else if (otp.Length < 6)
@@ -519,10 +527,10 @@
             "\"transactionId\": \"" + trans.transID + "\"" +
                "}";
         string myURL = _myURL + getPaket;
-        OurUtility.Write_Log("Request OTP", "step-action");
+        OurUtility.Write_Log("Get Package", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //string strResult = TestData();
+        //string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        string strResult = TestData();
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
@@ -718,6 +726,7 @@
     }
     private void NavigateTo(string strURL)
     {
+        isIdle = false;
         isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }

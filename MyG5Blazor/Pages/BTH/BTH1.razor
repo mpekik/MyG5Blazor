@@ -169,16 +169,23 @@
     {
         if (visiblestatus)
         {
-            if (strNumber.Length > 8 && strNumber.Length < 14)
+            if (strNumber.Length > 8 && strNumber.Length < 13)
             {
-                IsVisible = visiblestatus;
+                if (strNumber.Substring(0, 2) == "08")
+                {
+                    IsVisible = visiblestatus;
+                }
+                else
+                {
+                    IsInvalid = true;
+                    strMsgError = "<span style='font-weight: bold;'>Nomor tidak dikenali</span>, harap masukkan nomor Telkomsel yang benar dan aktif";
+                }
             }
         }
         else
         {
             IsVisible = visiblestatus;
             IsInvalid = visiblestatus;
-
         }
         isSubmit = true;
     }

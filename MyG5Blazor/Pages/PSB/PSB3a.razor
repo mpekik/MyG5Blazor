@@ -145,7 +145,7 @@
             <span class="dot2">9</span>
         </div>
         <div class="footer-side2">
-            <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(()=>InvokeAsync(Back))" class="btn-arrow btn" value="">Kembali</button>
             <button @onclick="@(() => InvokeAsync(MenuUtamaCanceled))" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
@@ -359,34 +359,40 @@
         }
 
     }
+    private bool buttonOk = true;
     private async Task OK()
     {
-        isLoading = true;
-        await Task.Delay(500);
-        trans.psbDetail.selectedPaket = menuPoolName[paramMenu];
-        //trans.psbDetail.selectedBuCode = menuBid[paramMenu];
-        foreach (var pp in menu._menuPSB)
+        if (buttonOk)
         {
-            if (trans.psbDetail.selectedPaket == pp._poolName)
+            buttonOk = false;
+            isLoading = true;
+            await Task.Delay(500);
+            trans.psbDetail.selectedPaket = menuPoolName[paramMenu];
+            //trans.psbDetail.selectedBuCode = menuBid[paramMenu];
+            foreach (var pp in menu._menuPSB)
             {
-                trans.psbDetail.PaketPSB = pp;
-                int tempBatasPemakaian = int.Parse(trans.psbDetail.PaketPSB._harga);
-                trans.psbDetail.batasPemakaian = (tempBatasPemakaian * 2).ToString();
-                break;
+                if (trans.psbDetail.selectedPaket == pp._poolName)
+                {
+                    trans.psbDetail.PaketPSB = pp;
+                    int tempBatasPemakaian = int.Parse(trans.psbDetail.PaketPSB._harga);
+                    trans.psbDetail.batasPemakaian = (tempBatasPemakaian * 2).ToString();
+                    break;
+                }
             }
-        }
-        trans.AddTrail("CHOOSE PACKAGE", "Package ID : " + trans.psbDetail.selectedPaket, "00");
-        if (trans.psbDetail.searchNumber == 0)
-        {
-            NavigateTo("/PSB/3b");
-        }
-        else
-        {
-            NavigateTo("/PSB/3c");
+            trans.AddTrail("CHOOSE PACKAGE", "Package ID : " + trans.psbDetail.selectedPaket, "00");
+            if (trans.psbDetail.searchNumber == 0)
+            {
+                NavigateTo("/PSB/3b");
+            }
+            else
+            {
+                NavigateTo("/PSB/3c");
+            }
         }
     }
     private void NavigateTo(string strURL)
     {
+        isIdle = false;
         isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }

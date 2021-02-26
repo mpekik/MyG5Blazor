@@ -87,8 +87,8 @@
         <span class="dot2">9</span>
     </div>
     <div class="footer-side2">
-        <button @onclick="@(()=>NavigateTo("/PSB/3a"))" class="btn-arrow btn" value="">Kembali</button>
-        <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu Utama</button>
+        <button @onclick="@(()=>InvokeAsync(Back))" class="btn-arrow btn" value="">Kembali</button>
+        <button @onclick="@(()=>InvokeAsync(MainMenu))" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
 </footer>
@@ -100,7 +100,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="text-body">@((MarkupString)strMsgError)</p>
-                    <button class="btn btn-danger modal-button" @onclick="@(() => isPopUp = false)">OK</button>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(ButtonOkPopUp))">OK</button>
                 </div>
             </div>
         </div>
@@ -152,7 +152,7 @@
     {
         counterTime = counterTreshold;
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        
+
     }
 
     private void InputPhoneNumber(string strInput)
@@ -160,25 +160,47 @@
         if (strNumber.Length < 4)
             strNumber += strInput;
     }
-
+    private async Task ButtonOkPopUp()
+    {
+        buttonNavigasi = true;
+        isPopUp = false;
+    }
+    private bool buttonNavigasi = true;
+    private async Task Back()
+    {
+        if(buttonNavigasi)
+        {
+            buttonNavigasi = false;
+            NavigateTo("/psb/3a");
+        }
+    }
+    private bool buttonOk = true;
     private async Task OkOnClick()
     {
         if (strNumber.Length > 2 && strNumber.Length < 5)
         {
-            trans.psbDetail.searchNumber += 1;
-            trans.psbDetail.patternNumber = strNumber;
-            menu.psbNomer.Clear();
-            menu.pageIndex = 0;
-            await GetNomor();
+            if (buttonOk)
+            {
+                buttonOk = false;
+                trans.psbDetail.searchNumber += 1;
+                trans.psbDetail.patternNumber = strNumber;
+                menu.psbNomer.Clear();
+                menu.pageIndex = 0;
+                await GetNomor();
+            }
         }
     }
     private async Task MainMenu()
     {
-        isLoading = true;
-        trans.AddTrail("INPUT NUMBER", "BACK TO MAIN MENU", "02");
-        trans.status = "02";
-        await OurUtility.AuditTrailPSB(trans, menu, cst);
-        NavigateTo("/main");
+        if (buttonNavigasi)
+        {
+            buttonNavigasi = false;
+            isLoading = true;
+            trans.AddTrail("INPUT NUMBER", "BACK TO MAIN MENU", "02");
+            trans.status = "02";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+            NavigateTo("/main");
+        }
     }
 
     private void RemovePhoneNumber()
@@ -192,6 +214,7 @@
         {
             if (!IsMethod)
             {
+                isIdle = false;
                 isNotIdle = false;
                 NavMan.NavigateTo(strURL);
             }
@@ -203,6 +226,7 @@
         }
         else
         {
+            isIdle = false;
             isNotIdle = false;
             NavMan.NavigateTo(strURL);
         }
@@ -267,7 +291,7 @@
                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     trans.AddTrail("Get List Number", "Pattern : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "02");
 
-                    isPopUp = false;
+                    isPopUp = true;
                     return;
                 }
             }

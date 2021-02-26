@@ -49,55 +49,55 @@
                 </div>
 
                 <div class="num-button2" style="margin-top: 5%;">
-                    <button class="key-num2 btn" value="1" @onclick="@(() => InsertCharField("1"))">1</button>
-                    <button class="key-num2 btn" value="2" @onclick="@(() => InsertCharField("2"))">2</button>
-                    <button class="key-num2 btn" value="3" @onclick="@(() => InsertCharField("3"))">3</button>
-                    <button class="key-num2 btn" value="4" @onclick="@(() => InsertCharField("4"))">4</button>
-                    <button class="key-num2 btn" value="5" @onclick="@(() => InsertCharField("5"))">5</button>
-                    <button class="key-num2 btn" value="6" @onclick="@(() => InsertCharField("6"))">6</button>
-                    <button class="key-num2 btn" value="7" @onclick="@(() => InsertCharField("7"))">7</button>
-                    <button class="key-num2 btn" value="8" @onclick="@(() => InsertCharField("8"))">8</button>
-                    <button class="key-num2 btn" value="9" @onclick="@(() => InsertCharField("9"))">9</button>
-                    <button class="key-num2 btn" value="0" @onclick="@(() => InsertCharField("0"))">0</button>
+                    <button class="key-num2 btn" value="1" @onclick="@(() => InvokeAsync(()=>InsertCharField("1")))">1</button>
+                    <button class="key-num2 btn" value="2" @onclick="@(() => InvokeAsync(()=>InsertCharField("2")))">2</button>
+                    <button class="key-num2 btn" value="3" @onclick="@(() => InvokeAsync(()=>InsertCharField("3")))">3</button>
+                    <button class="key-num2 btn" value="4" @onclick="@(() => InvokeAsync(()=>InsertCharField("4")))">4</button>
+                    <button class="key-num2 btn" value="5" @onclick="@(() => InvokeAsync(()=>InsertCharField("5")))">5</button>
+                    <button class="key-num2 btn" value="6" @onclick="@(() => InvokeAsync(()=>InsertCharField("6")))">6</button>
+                    <button class="key-num2 btn" value="7" @onclick="@(() => InvokeAsync(()=>InsertCharField("7")))">7</button>
+                    <button class="key-num2 btn" value="8" @onclick="@(() => InvokeAsync(()=>InsertCharField("8")))">8</button>
+                    <button class="key-num2 btn" value="9" @onclick="@(() => InvokeAsync(()=>InsertCharField("9")))">9</button>
+                    <button class="key-num2 btn" value="0" @onclick="@(() => InvokeAsync(()=>InsertCharField("0")))">0</button>
 
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("q"))">Q</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("w"))">W</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("e"))">E</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("r"))">R</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("t"))">T</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("y"))">Y</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("u"))">U</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("i"))">I</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("o"))">O</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("p"))">P</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("q")))">Q</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("w")))">W</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("e")))">E</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("r")))">R</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("t")))">T</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("y")))">Y</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("u")))">U</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("i")))">I</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("o")))">O</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("p")))">P</b></button>
 
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("a"))">A</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("s"))">S</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("d"))">D</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("f"))">F</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("g"))">G</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("h"))">H</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("j"))">J</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("k"))">K</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("l"))">L</b></button><br>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("a")))">A</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("s")))">S</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("d")))">D</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("f")))">F</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("g")))">G</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("h")))">H</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("j")))">J</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("k")))">K</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("l")))">L</b></button><br>
 
                     <button class="key-num3 btn" style="opacity:0%;" disabled><b class="teks-bold"></b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("z"))">Z</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("x"))">X</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("c"))">C</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("v"))">V</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("b"))">B</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("n"))">N</b></button>
-                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InsertCharField("m"))">M</b></button>
-                    <button class="key-num4 btn"><b class="teks-bold" @onclick="DeleteCharField">HAPUS</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("z")))">Z</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("x")))">X</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("c")))">C</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("v")))">V</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("b")))">B</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("n")))">N</b></button>
+                    <button class="key-num2 btn"><b class="teks-bold" @onclick="@(() => InvokeAsync(()=>InsertCharField("m")))">M</b></button>
+                    <button class="key-num4 btn"><b class="teks-bold" @onclick="@(()=>InvokeAsync(DeleteCharField))">HAPUS</b></button>
 
-                    <button class="key-num2 btn" value="1" @onclick="@(() => InsertCharField("@"))"><b class="teks-bold">&#64</b></button>
-                    <button class="key-num2 btn" value="3" @onclick="@(() => InsertCharField("_"))">_</button>
-                    <button class="key-num2 btn" value="4" @onclick="@(() => InsertCharField("."))">.</button>
-                    <button class="key-num6 btn" value="5" @onclick="@(() => InsertCharField(".com"))"><b class="teks-bold">.com</b></button>
-                    <button class="key-num6 btn" value="6" @onclick="@(() => InsertCharField(".co.id"))"><b class="teks-bold">.co.id</b></button>
+                    <button class="key-num2 btn" value="1" @onclick="@(() => InvokeAsync(()=>InsertCharField("@")))"><b class="teks-bold">&#64</b></button>
+                    <button class="key-num2 btn" value="3" @onclick="@(() => InvokeAsync(()=>InsertCharField("_")))">_</button>
+                    <button class="key-num2 btn" value="4" @onclick="@(() => InvokeAsync(()=>InsertCharField(".")))">.</button>
+                    <button class="key-num6 btn" value="5" @onclick="@(() => InvokeAsync(()=>InsertCharField(".com")))"><b class="teks-bold">.com</b></button>
+                    <button class="key-num6 btn" value="6" @onclick="@(() => InvokeAsync(()=>InsertCharField(".co.id")))"><b class="teks-bold">.co.id</b></button>
                 </div>
-                <button class="btn btn-danger btn-right3" id="myBtn1" style="margin-top: 7%;" @onclick="Lanjut">Lanjut</button>
+                <button class="btn btn-danger btn-right3" id="myBtn1" style="margin-top: 7%;" @onclick="@(()=>InvokeAsync(Lanjut))">Lanjut</button>
             </div>
         </div>
     </div>
@@ -116,8 +116,8 @@
             <span class="dot2">9</span>
         </div>
         <div class="footer-side2">
-            <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu Utama</button>
+            <button @onclick="@(()=>InvokeAsync(Back))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(()=>InvokeAsync(MainMenu))" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
@@ -158,7 +158,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="text-body">@((MarkupString)strMsgError)</p>
-                    <button class="btn btn-danger modal-button" @onclick="@(() => isVisible = false)">OK</button>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(ButtonOkPopUp))">OK</button>
                 </div>
             </div>
         </div>
@@ -202,6 +202,11 @@
     private string imageBytesStr;
 
     private string[] forbiddenDomain = { "yahoo.com", "yahoo.co.id", "ymail.com", "rocketmail.com" };
+    private async Task ButtonOkPopUp()
+    {
+        isLanjut = true;
+        isVisible = false;
+    }
     protected override async Task OnInitializedAsync()
     {
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -274,7 +279,7 @@
         }
         return true;
     }
-    private void InsertCharField(string _input)
+    private async Task InsertCharField(string _input)
     {
         inputEmail += _input;
     }
@@ -285,6 +290,7 @@
     }
     private void NavigateTo(string strURL)
     {
+        isIdle = false;
         isNotIdle = false;
         NavMan.NavigateTo(strURL);
     }

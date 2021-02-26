@@ -49,55 +49,6 @@
 
                 <div class="col-md-6">
                     <div class="col-md-12" style="margin-top: 8%; text-align: center; flex-wrap: wrap;">
-                        @*@if (stringMenu[0] == "0")
-                        {
-                            @if (MenuCount == 0)
-                            {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[0],apiURL[0],arrayTrans[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG height=@HeightPNG style=@strStyle[0]>
-                            }
-                            else
-                            {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[0],apiURL[0],arrayTrans[0]))" src="../assets/image/Menu Utama/@AssetsPNG[0]" width=@WidthPNG style=@strStyle[0]>
-                            }
-                            MenuCount += 1;
-                        }
-                        @if (stringMenu[1] == "0")
-                        {
-                            @if (MenuCount == 0)
-                            {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[1],apiURL[1],arrayTrans[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG height=@HeightPNG style=@strStyle[1]>
-                            }
-                            else
-                            {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[1],apiURL[1],arrayTrans[1]))" src="../assets/image/Menu Utama/@AssetsPNG[1]" width=@WidthPNG style=@strStyle[1]>
-                            }
-                            MenuCount += 1;
-                        }
-                        @if (stringMenu[2] == "0")
-                        {
-                            @if (MenuCount == 0)
-                            {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[2],apiURL[2],arrayTrans[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG height=@HeightPNG style=@strStyle[2]>
-                            }
-                            else
-                            {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[2],apiURL[2],arrayTrans[2]))" src="../assets/image/Menu Utama/@AssetsPNG[2]" width=@WidthPNG style=@strStyle[2]>
-                            }
-                            MenuCount += 1;
-                        }
-                        @if (stringMenu[3] == "0")
-                        {
-                            @if (MenuCount == 0)
-                            {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[3],apiURL[3],arrayTrans[3]))" src="../assets/image/Menu Utama/@AssetsPNG[3]" width=@WidthPNG height=@HeightPNG style=@strStyle[3]>
-                            }
-                            else
-                            {
-                                <img @onclick="@(()=>CheckStatus(hrefMenu[3],apiURL[3],arrayTrans[3]))" src="../assets/image/Menu Utama/@AssetsPNG[3]" width=@WidthPNG style=@strStyle[3]>
-                            }
-                            MenuCount += 1;
-                        }*@
-
                         @foreach ((Menu.MainMenu mm, Int32 i) in menu._mainMenu.Select((mm, i) => (mm, i)))
                         {
                             @if (i == 0)
@@ -109,7 +60,6 @@
                                 <img @onclick="@(()=>CheckStatus(mm._href,mm._url,mm._code))" src="../assets/image/Menu Utama/@mm._icon" width=@WidthPNG >
                             }
                         }
-
                     </div>
                 </div>
 
@@ -226,63 +176,67 @@
             isLogout = true;
         }
     }
-
+    private bool buttonMenu = true;
     private async Task CheckStatus(string strURL, string strAPIURL, string strTrans)
     {
-        IsLoading = true;
-        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"" +
-                "}";
-        string myURL = _myURL + strAPIURL;
-        OurUtility.Write_Log("= Get Menu Status Code", "step-action");
-        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
-            strResult != "BadRequest" && strResult != "InternalServerError")
+        if (buttonMenu)
         {
-            try
+            buttonMenu = false;
+            IsLoading = true;
+            string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"" +
+                    "}";
+            string myURL = _myURL + strAPIURL;
+            OurUtility.Write_Log("= Get Menu Status Code", "step-action");
+            OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+            string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+            OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+            if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
+                strResult != "BadRequest" && strResult != "InternalServerError")
             {
-                JObject jobjResult = JObject.Parse(strResult);
-                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                try
                 {
-                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
-                    trans.SetTransaction((string)jobjResult["config"].SelectToken("apiBuid"), (string)jobjResult["terminal"].SelectToken("terminalId"), strTrans);
-                    config.Terminal((string)jobjResult["terminal"].SelectToken("terminalId"), (string)jobjResult["terminal"].SelectToken("terminalDesc"), (string)jobjResult["terminal"].SelectToken("terminalLocation"), (string)jobjResult["terminal"].SelectToken("area"), (string)jobjResult["terminal"].SelectToken("regional"), (string)jobjResult["terminal"].SelectToken("unitId"), (string)jobjResult["terminal"].SelectToken("unitName"));
-                    config.ConfigIn((string)jobjResult["config"].SelectToken("menuConfigId"), (string)jobjResult["config"].SelectToken("maxRetryPerso"), (string)jobjResult["config"].SelectToken("tidEdc"), (string)jobjResult["config"].SelectToken("midEdc"), (string)jobjResult["config"].SelectToken("snEdc"), (string)jobjResult["config"].SelectToken("buid"), (string)jobjResult["config"].SelectToken("uid"), (string)jobjResult["config"].SelectToken("cardDispenser"), (string)jobjResult["config"].SelectToken("bahasa"), (string)jobjResult["config"].SelectToken("edcStatus"), (string)jobjResult["config"].SelectToken("cashStatus"));
-                    trans.SetTransaction((string)jobjResult["transaction"].SelectToken("transactionId"));
-                    OurUtility.Write_Log("== BUID : " + trans.buID + ", Terminal ID : " + trans.termID + ", Event : " + trans.jenisTrans + " {Success}", "step-action");
-
-                    NavMan.NavigateTo(strURL);
-                }
-                else
-                {
-                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    JObject jobjResult = JObject.Parse(strResult);
+                    if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                     {
-                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                        trans.SetTransaction((string)jobjResult["config"].SelectToken("apiBuid"), (string)jobjResult["terminal"].SelectToken("terminalId"), strTrans);
+                        config.Terminal((string)jobjResult["terminal"].SelectToken("terminalId"), (string)jobjResult["terminal"].SelectToken("terminalDesc"), (string)jobjResult["terminal"].SelectToken("terminalLocation"), (string)jobjResult["terminal"].SelectToken("area"), (string)jobjResult["terminal"].SelectToken("regional"), (string)jobjResult["terminal"].SelectToken("unitId"), (string)jobjResult["terminal"].SelectToken("unitName"));
+                        config.ConfigIn((string)jobjResult["config"].SelectToken("menuConfigId"), (string)jobjResult["config"].SelectToken("maxRetryPerso"), (string)jobjResult["config"].SelectToken("tidEdc"), (string)jobjResult["config"].SelectToken("midEdc"), (string)jobjResult["config"].SelectToken("snEdc"), (string)jobjResult["config"].SelectToken("buid"), (string)jobjResult["config"].SelectToken("uid"), (string)jobjResult["config"].SelectToken("cardDispenser"), (string)jobjResult["config"].SelectToken("bahasa"), (string)jobjResult["config"].SelectToken("edcStatus"), (string)jobjResult["config"].SelectToken("cashStatus"));
+                        trans.SetTransaction((string)jobjResult["transaction"].SelectToken("transactionId"));
+                        OurUtility.Write_Log("== BUID : " + trans.buID + ", Terminal ID : " + trans.termID + ", Event : " + trans.jenisTrans + " {Success}", "step-action");
+
+                        NavMan.NavigateTo(strURL);
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
-                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                        if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                        {
+                            OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                        }
+                        else
+                        {
+                            string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
+                            string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
+                            OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                            trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                        }
+                        NavMan.NavigateTo("/error");
                     }
+                }
+                catch (Exception ex)
+                {
+                    trans.errorCode = strResult;
+                    OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                     NavMan.NavigateTo("/error");
                 }
             }
-            catch (Exception ex)
+            else
             {
                 trans.errorCode = strResult;
-                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
                 NavMan.NavigateTo("/error");
             }
-        }
-        else
-        {
-            trans.errorCode = strResult;
-            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            NavMan.NavigateTo("/error");
         }
     }
 
