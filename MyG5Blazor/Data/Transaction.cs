@@ -46,6 +46,7 @@ namespace MyG5Blazor.Data
             public string reserveId { get; set; }
             public string statusPayment { get; set; }
             public int searchNumber { get; set; } = 0;
+            public string snkImage { get; set; }
         }
 
         public PSBDetail psbDetail = new PSBDetail();

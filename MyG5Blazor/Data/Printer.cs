@@ -1468,24 +1468,34 @@ namespace MyG5Blazor.Data
                 e.Graphics.DrawString("Status Registrasi kartuHALO"
                               , font8, brush, layout, formatLeft);
                 layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
-                e.Graphics.DrawString(":"
+                e.Graphics.DrawString(""
                               , font8, brush, layout, formatLeft);
                 layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
-                e.Graphics.DrawString(_statusTrx
+                e.Graphics.DrawString(":" + _statusTrx
                               , font8Bold, brush, layout, formatLeft);
                 Offset = Offset + lineheight8;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
 
-                e.Graphics.DrawString("Status Upfront Payment"
-                              , font8, brush, layout, formatLeft);
-                layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
-                e.Graphics.DrawString(":"
-                              , font8, brush, layout, formatLeft);
-                layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
-                e.Graphics.DrawString("Sedang Diproses"
-                              , font8Bold, brush, layout, formatLeft);
-                Offset = Offset + lineheight8;
-                layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+                if (_statusTrx == "BERHASIL")
+                {
+                    e.Graphics.DrawString("Status Upfront Payment"
+                                  , font8, brush, layout, formatLeft);
+                    layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                    e.Graphics.DrawString(":"
+                                  , font8, brush, layout, formatLeft);
+                    layout = new RectangleF(new PointF(_startX + 130, _startY + Offset), layoutSize);
+                    e.Graphics.DrawString("Sedang Diproses"
+                                  , font8Bold, brush, layout, formatLeft);
+                    Offset = Offset + lineheight8;
+                    layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
+
+                    e.Graphics.DrawString("Pembayaran di muka/upfront payment akan digunakan pada tagihan bulan pertama Anda"
+                                  , font6, brush, layout, formatLeft);
+                    layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                    e.Graphics.DrawString("Mohon simpan struk sebagai bukti pembayaran di muka telah dilakukan"
+                                  , font8, brush, layout, formatLeft);
+                    layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                }
 
                 Offset = Offset + lineheight8;
                 layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);

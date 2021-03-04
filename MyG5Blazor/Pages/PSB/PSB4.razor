@@ -1,4 +1,5 @@
 ﻿@page "/PSB/4"
+
 @using MyG5Blazor.Data
 @using System.Linq;
 @using Newtonsoft.Json;
@@ -6,19 +7,20 @@
 @using System;
 @using System.Threading.Tasks;
 @using System.Net.Http;
-@inject IJSRuntime JSRuntime
+@using Aratek.TrustFinger;
+
+@inject Menu menu
+@inject IJSRuntime JSRuntime;
 @inject BlazorTimer Timer
-@inject NavigationManager NavMan
 @inject Ektp_Data ktp
+@inject NavigationManager NavMan
 @inject Costumer cst
 @inject Config config
 @inject Transaction trans
-@inject Menu menu
-@using MyG5Blazor.Data
 
 <div class="main-panel bg-home" style="z-index:1;" @onclick="@(()=>InvokeAsync(ResetTimer))">
     <!-- Navbar -->
-    <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
+    <nav class="navbar navbar-expand-lg navbar-transparent fixed-top ">
         <div class="container-fluid">
             <div class="navbar-wrapper">
                 <div class="logo">
@@ -34,7 +36,7 @@
                         {
                             <img src="../../assets/image/loader.gif" />
                         }
-                        else if (isSuccess)
+                        else if (IsSuccess)
                         {
                             <img src="../../assets/image/tanda_checklist.png" />
                         }
@@ -49,31 +51,22 @@
         <div class="container-fluid">
             <div class="row">
                 <div class="col-md-6">
-                    <div class="teks-title">Berlangganan KartuHalo</div>
-
-                    @if (!isSuccess)
+                    <div class="teks-title">Ganti Kartu Hilang/Rusak</div>
+                    @if (!IsSuccess)
                     {
                         <div id="proses-pindai">
-                            <div class="teks-center"> Letakkan <span style="font-weight: bold;">e-KTP</span> Anda pada Alat Pemindai</div>
-                            <div class="teks-footer"> Lalu tekan <span style="font-weight: bold;">"Pindai"</span></div>
+                            <div class="teks-center"> Letakkan <span style="font-weight: bold;"> Telunjuk Kanan/Kiri </span> Anda pada Alat Pemindai Sidik Jari</div>
                         </div>
                     }
                     else
                     {
                         <div id="proses-berhasil">
-                            <div class="teks-center"> Proses Pindai e-Ktp Berhasil</div>
+                            <div class="teks-center">Proses Pindai Sidik Jari Berhasil</div>
                         </div>
                     }
                 </div>
-
                 <div class="col-md-6">
-                    <img class="ktp" src="../../assets/image/Scan_KTP-01.png">
-                    @if (!isSuccess)
-                    {
-                        <a id="myBtn" href="" @onclick="CheckEKTP" @onclick:preventDefault>
-                            <img class="pindai" src="../../assets/image/Pindai.png">
-                        </a>
-                    }
+                    <img class="ktp" id="myBtn" src="../../assets/image/Scan_Finger-01.png">
                 </div>
             </div>
         </div>
@@ -93,13 +86,37 @@
             <span class="dot2">9</span>
         </div>
         <div class="footer-side2">
-            <button @onclick="@Back" class="btn-arrow btn" value="">Kembali</button>
-            <button @onclick="@MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
+            <button @onclick="Back" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="MenuUtamaCanceled" class="btn-arrow btn" value="">Menu Utama</button>
             <!-- <sup>Powered By </sup>Trilogi Persada -->
         </div>
     </footer>
 
 </div>
+@if (IsVisible)
+{
+    <div id="myModal" class="modal"style="z-index:999;">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    @if (intTryCount <= intTryLimit)
+                    {
+                        <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;"> Jari Telunjuk Kanan/Kiri </span>Anda, pastikan alat pemindai dalam keadaan bersih.</p>
+                        <button class="btn btn-danger modal-button" @onclick="CheckFinger">OK</button>
+                    }
+                    else
+                    {
+                        <p class="text-body">Maaf <span style="font-weight: bold;"> Sidik Jari </span>tidak sesuai dengan eKTP yang digunakan. Silakan hubungi <span style="font-weight: bold;"> Customer Service</span> GraPARI untuk bantuan</p>
+                        <button @onclick="MenuUtama" class="btn btn-danger modal-button" id="span1">OK</button>
+                    }
+                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                </div>
+            </div>
+        </div>
+
+    </div>
+}
 @if (isLoading2)
 {
     <div id="myModal" class="modal" style="z-index:999;">
@@ -110,65 +127,18 @@
         </div>
     </div>
 }
-@if (isFPNoData)
+@if (isPopUp)
 {
     <div id="myModal" class="modal"style="z-index:999;">
-
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
                 <div class="modal-body">
-                    <p class="text-body">Silahkan menekan tombol OK <span style="font-weight:bold;">SETELAH</span> Anda mengangkat EKTP Anda dan meletakkan kembali kepada alat pemindai.</p>
-                    <button class="btn btn-danger modal-button" @onclick="FPConfirm">OK</button>
-                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                    <p class="text-body">@((MarkupString)strMsgError)</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => isPopUp = false)">OK</button>
                 </div>
             </div>
         </div>
-
-    </div>
-}
-@if (isFPNoDataConfirm)
-{
-    <div id="myModal" class="modal"style="z-index:999;">
-
-        <!-- Modal content -->
-        <div class="modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    <p class="text-body">Apakah Anda telah mengangkat EKTP Anda dan meletakkan kembali kepada alat pemindai?</p>
-                    <button class="btn btn-danger modal-button" @onclick="FPUnConfirm">Tidak</button>
-                    <button class="btn btn-white modal-button" @onclick="FP2">Ya</button>
-                    <button class="btn btn-danger modal-button" @onclick="MenuUtamaCanceled">Batal</button>
-                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
-                </div>
-            </div>
-        </div>
-
-    </div>
-}
-@if (IsVisible)
-{
-    <div id="myModal" class="modal"style="z-index:999;">
-
-        <!-- Modal content -->
-        <div class="modal-dialog-centered" role="document">
-            <div class="modal-content">
-                <div class="modal-body">
-                    @if (intTryCount <= intTryLimit)
-                    {
-                        <p class="text-body">Silakan pindai kembali <span style="font-weight: bold;">e-KTP</span> Anda, pastikan alat <br />pemindai dalam keadaan bersih</p>
-                        <button class="btn btn-danger modal-button" @onclick="CheckEKTP">OK</button>
-                    }
-                    else
-                    {
-                        <p class="text-body">Maaf, <span style="font-weight: bold;">e-KTP</span> Anda tidak terbaca pada sistem MyGraPARI. Silahkan hubungi<span style="font-weight: bold;"> Customer Service </span>GraPARI untuk bantuan.</p>
-                        <button @onclick="@(()=>InvokeAsync(MenuUtama))" class="btn btn-danger modal-button" id="span1">OK</button>
-                    }
-                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
-                </div>
-            </div>
-        </div>
-
     </div>
 }
 @if (isIdle)
@@ -191,383 +161,51 @@
 }
 @code{
     private bool IsVisible = false;
-    private bool isLoading = false;
-    private bool isSuccess = false;
-    private bool isFail = false;
-    private bool IsNext = false;
+    private bool isLoading = true;
+    private bool IsSuccess = false;
+    private bool IsFail = false;
     private bool isLoading2 = false;
-    private bool isFPNoData = false;
-    private bool isFPNoDataPush = true;
-    private bool isFPNoDataConfirm = false;
-    private bool isFPNoDataConfirmPush = true;
-    private bool isFPNoDataUnComfirmPush = false;
+    private bool isInit = true;
     private bool isPopUp = false;
-    private bool isNumberReleased = false;
 
-    public string _myURL = "";
-    public string saveURL = "log/v1/save";
-    public string PCID = string.Empty;
-    public string CONF = string.Empty;
     private string releaseNumberService = "psb-halo/v1/release-number";
-    private string strMsgError = string.Empty;
+    private string cekBlackListURL = "psb-halo/v1/check-blacklist";
 
+    string temp = string.Empty;
+    string tanggal = string.Empty;
+    string tahun = string.Empty;
+    string bulan = string.Empty;
+    string output = string.Empty;
+
+    private string strMsgError = string.Empty;
     private int intTryCount = 1;
     private int intTryLimit = 3;
 
     private IntPtr hContext = IntPtr.Zero;
+    private CRT_Interface ektpCRT = new CRT_Interface();
+    private TrustFingerDevice dev = null;
 
-    private CRT_Interface ektpC = new CRT_Interface();
-
-    string CID;
-    string KID;
+    /* FIXME: change to the right PCID & CONFIGFILE  */
     byte[] pbPcid;
-
-    byte[] pbConf;
     private bool translog = true;
+    byte[] pbConf;
+    public string _myURL = "";
+    public string saveURL = "log/v1/save";
+
     private async Task MenuUtama()
     {
         if (translog)
         {
-            translog = false;
-            IsVisible = false;
-            isLoading2 = true;
-            await ReleaseNumber();
-            if (isNumberReleased)
-            {
-                trans.status = "01";
-                trans.errorCode = "EKTP";
-                await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-                NavigateTo("/main");
-            }
-        }
-    }
-    private async Task MenuUtamaCanceled()
-    {
-        if (translog)
-        {
             isLoading = false;
             translog = false;
             IsVisible = false;
             isLoading2 = true;
-            await ReleaseNumber();
-            trans.AddTrail("SCAN EKTP", "CANCELED", "02");
-            trans.status = "02";
-            trans.errorCode = "EKTP";
+            //await ReleaseNumber();
+            trans.status = "01";
+            trans.errorCode = "FINGERPRINT";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
             NavigateTo("/main");
-        }
-    }
-    private async Task Back()
-    {
-        if (translog)
-        {
-            isLoading = false;
-            translog = false;
-            IsVisible = false;
-            isLoading2 = true;
-            await ReleaseNumber();
-            trans.AddTrail("SCAN EKTP", "CANCELED", "02");
-            trans.status = "02";
-            trans.errorCode = "EKTP";
-            NavigateTo("/PSB/3b");
-        }
-    }
-
-    private async Task FPConfirm()
-    {
-        if (isFPNoDataPush)
-        {
-            isFPNoDataPush = false;
-            isFPNoData = false;
-            isFPNoDataConfirm = true;
-            isFPNoDataUnComfirmPush = true;
-        }
-    }
-    private async Task FPUnConfirm()
-    {
-        if (isFPNoDataUnComfirmPush)
-        {
-            isFPNoDataPush = true;
-            isFPNoData = true;
-            isFPNoDataConfirm = false;
-            isFPNoDataUnComfirmPush = false;
-        }
-    }
-    private async Task FP2()
-    {
-        if (isFPNoDataConfirmPush)
-        {
-            isFPNoDataConfirmPush = false;
-            isFPNoData = false;
-            isFPNoDataConfirm = false;
-            int ret = -1;
-            int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
-            byte[] leftData = new byte[leftLen];
-            byte[] rightData = new byte[rightLen];
-
-            OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints New Card", "step-action");
-            ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(true);
-            if (ret != 0 || leftLen == 0 || rightLen == 0)
-            {
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Failed", "step-action");
-                trans.AddTrail("SCAN EKTP", "FINGERPIRNT NO DATA", "01");
-                isLoading = false;
-                if (intTryCount <= intTryLimit)
-                {
-                    IsVisible = true;
-                    intTryCount += 1;
-                }
-                else
-                {
-                    isFail = true;
-                }
-                return;
-            }
-            else if (ret == 0)
-            {
-                ktp.minutiae1 = leftData;
-                ktp.minutiae2 = rightData;
-                ktp.minu1len = leftLen;
-                ktp.minu2len = rightLen;
-
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
-
-                trans.AddTrail("SCAN EKTP", ktp.Id, "00");
-                isLoading = false;
-                isSuccess = true;
-                await Task.Delay(1000);
-                NavigateTo("/PSB/5");
-                return;
-            }
-        }
-    }
-    private void NavigateTo(string strURL)
-    {
-        isIdle = false;
-        isNotIdle = false;
-        NavMan.NavigateTo(strURL);
-    }
-
-    protected override async Task OnAfterRenderAsync(bool bFirstRender)
-    {
-        if (bFirstRender)
-        {
-            #region AfterRenderTimeOut
-            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
-            #endregion
-        }
-    }
-
-    protected override async Task OnInitializedAsync()
-    {
-        counterTime = counterTreshold;
-        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-        PCID = config.Read("EKTP", Config.PARAM_EKTP_PCID);
-        CONF = config.Read("EKTP", Config.PARAM_EKTP_CONF);
-        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(PCID, ","));
-        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(CONF, ","));
-        config.usbEKTP = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(0, 1);
-        config.ektpType = config.Read("EKTP", Config.PARAM_EKTP_USB).Substring(1);
-        OurUtility.Write_Log("=== Step 2. Scan e-KTP Page", "step-action");
-    }
-
-    private async Task CheckEKTP()
-    {
-        InvokeAsync(ResetTimer);
-        if (!isLoading && !isSuccess && !isFail && !IsVisible)
-        {
-            isLoading = true;
-            if (config.ektpType == "a")
-            {
-                await ScanKTP();
-            }
-            else if (config.ektpType == "c")
-            {
-                await ScanEKTPC();
-                //await Task.Delay(5000);
-                //isLoading = false;
-                //isSuccess = true;
-                //isFail = false;
-                //await Task.Delay(2000);
-                //NavigateTo("/PSB/5");
-            }
-            else
-            {
-                trans.AddTrail("READ EKTP", "EK - 001", "01");
-                trans.status = "01";
-                await OurUtility.AuditTrailPSB(trans, menu, cst);
-
-                trans.errorCode = "EK - 001";
-                OurUtility.Write_Log("== Error : EK - 001", "step-action");
-                NavigateTo("/error");
-            }
-
-            if (isSuccess)
-            {
-                NavigateTo("/PSB/5");
-            }
-            else if (isFail)
-            {
-                //await ReleaseNumber();
-                await MenuUtama();
-            }
-        }
-        else if (IsVisible)
-        {
-            IsVisible = false;
-        }
-    }
-    private async Task ScanEKTPC()
-    {
-        int r = -999;
-        string errMsg = string.Empty;
-        Switcher.DOWN("500", config.usbEKTP);
-        await Task.Delay(500);
-        Switcher.DOWN("500", "2");
-        await Task.Delay(500);
-        Switcher.UP("3000", config.usbEKTP);
-        await Task.Delay(3000);
-        UInt16 rf = 0;
-        UInt16 sam = 1;
-        if (intTryCount <= intTryLimit)
-        {
-            r = ektpC.StartEKTP(PCID, CONF, rf, sam);
-            if (r != 0)
-            {
-                if (r > 0 && r < 10)
-                    errMsg = "EK - 10" + r.ToString();
-                else
-                    errMsg = "EK - 1" + r.ToString();
-
-                trans.AddTrail("SCAN EKTP", errMsg, "01");
-                OurUtility.Write_Log("===== EKTP ERROR - " + errMsg, "step-action");
-                isLoading = false;
-                if (intTryCount <= intTryLimit)
-                {
-                    IsVisible = true;
-                    intTryCount += 1;
-                }
-                else
-                {
-                    isFail = true;
-                }
-                return;
-            }
-            else
-            {
-                byte[] demoGraphic = new byte[ektpC.ektpData.biolen];
-                for (int i = 0; i < ektpC.ektpData.biolen; i++)
-                {
-                    demoGraphic[i] = ektpC.ektpData.byteBio[i];
-                }
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
-
-                ktp.demographic = demoGraphic;
-
-                ktp.minutiae1 = ektpC.ektpData.byteMinu1;
-                ktp.minutiae2 = ektpC.ektpData.byteMinu2;
-                ktp.minu1len = ektpC.ektpData.minu1len;
-                ktp.minu2len = ektpC.ektpData.minu2len;
-
-                trans.AddTrail("SCAN EKTP", ktp.Id, "00");
-                isLoading = false;
-                isSuccess = true;
-                await Task.Delay(1000);
-                NavigateTo("/PSB/5");
-                return;
-
-            }
-        }
-
-    }
-    //FIXME: Create as Service
-    private async Task ScanKTP()
-    {
-        Switcher.DOWN("500", config.usbEKTP);
-        await Task.Delay(500);
-        Switcher.UP("3000", config.usbEKTP);
-        await Task.Delay(3000);
-        isFPNoDataPush = true;
-        if (intTryCount <= intTryLimit)
-        {
-            OurUtility.Write_Log("==== Scan e-KTP", "step-action");
-            OurUtility.Write_Log("===== Ektp_Sdk.EktpCstablishContext eKTP", "step-action");
-            if (Ektp_Sdk.EktpEstablishContext(ref hContext) == 0)
-            {
-                OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib PCID eKTP", "step-action");
-                Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_PCID, pbPcid, pbPcid.Length);
-                OurUtility.Write_Log("===== Ektp_Sdk.EktpSetAttrib CONF eKTP", "step-action");
-                Ektp_Sdk.EktpSetAttrib(hContext, Ektp_Sdk.EKTP_ATTR_CONFIG, pbConf, pbConf.Length);
-            }
-            OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
-            await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
-
-            int length = 2048;
-            byte[] tempBuffer = new byte[length];
-            int ret = -1;
-            OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic From eKTP", "step-action");
-            ret = await Task.Run(() => Ektp_Sdk.ReadDemographic(hContext, ref length, tempBuffer)).ConfigureAwait(false);
-            if (length == 0 || ret != 0)
-            {
-                trans.AddTrail("SCAN EKTP", "NOT EKTP", "01");
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Failed", "step-action");
-                isLoading = false;
-                if (intTryCount <= intTryLimit)
-                {
-                    IsVisible = true;
-                    intTryCount += 1;
-                }
-                else
-                {
-                    isFail = true;
-                }
-                return;
-            }
-            byte[] demoGraphic = new byte[length];
-            for (int i = 0; i < length; i++)
-            {
-                demoGraphic[i] = tempBuffer[i];
-            }
-            OurUtility.Write_Log("===== Ektp_Sdk.ReadDemographic Success", "step-action");
-            ktp.demographic = demoGraphic;
-            //CID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber), System.Text.Encoding.UTF8.GetBytes(cst.EKTPNumber).Length);
-            KID = OurUtility.ByteArrayToString(System.Text.Encoding.UTF8.GetBytes(ktp.Id), System.Text.Encoding.UTF8.GetBytes(ktp.Id).Length);
-            OurUtility.Write_Log("CID : " + CID, "step-action");
-            OurUtility.Write_Log("KID : " + KID, "step-action");
-            IsVisible = false;
-            IsNext = true;
-
-            if (IsNext)
-            {
-                int leftLen = 2048, rightLen = 2048;//max size is photo size(about 1700 bytes)
-                byte[] leftData = new byte[leftLen];
-                byte[] rightData = new byte[rightLen];
-
-                OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card", "step-action");
-                ret = await Task.Run(() => Ektp_Sdk.ReadFingerPrints(hContext, ref leftLen, leftData, ref rightLen, rightData)).ConfigureAwait(true);
-                if (ret != 0 || leftLen == 0 || rightLen == 0)
-                {
-                    isFPNoData = true;
-                    return;
-                }
-                else if (ret == 0)
-                {
-                    ktp.minutiae1 = leftData;
-                    ktp.minutiae2 = rightData;
-                    ktp.minu1len = leftLen;
-                    ktp.minu2len = rightLen;
-
-                    OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Old Card Success", "step-action");
-
-                    trans.AddTrail("SCAN EKTP", KID, "00");
-                    isLoading = false;
-                    isSuccess = true;
-                    await Task.Delay(1000);
-                    NavigateTo("/PSB/5");
-                    return;
-                }
-            }
         }
     }
     private async Task ReleaseNumber()
@@ -594,7 +232,7 @@
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "00");
-                    NavigateTo("/PSB/4");
+                    //NavigateTo("/PSB/4");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
@@ -610,7 +248,6 @@
                     }
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "01");
                     trans.status = "01";
-                    trans.errorCode = "EKTP";
                     await OurUtility.AuditTrailPSB(trans, menu, cst);
                     //isNotIdle = false;
                     isLoading = false;
@@ -630,7 +267,6 @@
             {
                 trans.AddTrail("Release Number", "Exception Error ", "01");
                 trans.status = "01";
-                trans.errorCode = "EKTP";
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
 
                 trans.errorCode = "Exception Error";
@@ -641,9 +277,443 @@
         }
         else
         {
-            trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult + "}", "01");
+            trans.AddTrail("Release Number", "Hit Webservice Error : " + strResult, "01");
             trans.status = "01";
-            trans.errorCode = "EKTP";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+            trans.errorCode = "Hit Webservice Error : " + strResult;
+            OurUtility.Write_Log("== Error : Hit Webservice Error : " + strResult, "step-action");
+            //isNotIdle = false;
+            NavigateTo("/error");
+        }
+    }
+
+    private async Task MenuUtamaCanceled()
+    {
+        if (translog)
+        {
+            translog = false;
+            IsVisible = false;
+            isLoading2 = true;
+            //await ReleaseNumber();
+            trans.AddTrail("SCAN FINGERPRINT", "CANCELED", "02");
+            trans.status = "02";
+            trans.errorCode = "FINGERPRINT";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+            NavigateTo("/main");
+        }
+    }
+
+    private async Task Back()
+    {
+        NavigateTo("/PSB/3");
+    }
+    private void NavigateTo(string strURL)
+    {
+        isIdle = false;
+        isNotIdle = false;
+        NavMan.NavigateTo(strURL);
+    }
+    private async Task CheckFinger()
+    {
+        InvokeAsync(ResetTimer);
+        if (IsVisible || isInit)
+        {
+            isInit = false;
+            IsVisible = false;
+            //StateHasChanged();
+            //Switcher.DOWN("500", "2");
+            //await Task.Delay(500);
+            //Switcher.UP("3000", "2");
+            //await Task.Delay(3000);
+            if (config.ektpType == "a")
+            {
+                await FingerPrintScan();
+
+                //await Task.Delay(6000);
+                //isLoading = false;
+                //IsSuccess = true;
+                InvokeAsync(StateHasChanged);
+                await Task.Delay(2000);
+
+                if (IsSuccess)
+                {
+                    //trans.psbDetail.nik = "3174093010890006";
+                    //trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
+                    //trans.psbDetail.tglLahir = "1989-10-30";
+
+                    await CekBlackList();
+                }
+            }
+            else if (config.ektpType == "c")
+            {
+                await FingerPrintScanC();
+                //isLoading = true;
+                //await Task.Delay(6000);
+                //temp = ktp.DateOfBirth;
+
+                //trans.psbDetail.ektpData = ktp;
+                //trans.psbDetail.nik = ktp.Id;
+                //trans.psbDetail.nama = ktp.Name;
+                //trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
+
+                //isLoading = false;
+                //IsSuccess = true;
+                //intTryCount += 1;
+                //IsVisible = true;
+                //if (intTryCount > intTryLimit)
+                //{
+                    //IsFail = true;
+                //}
+                await Task.Delay(2000);
+
+                if (IsSuccess)
+                {
+                    //trans.psbDetail.nik = "3174093010890006";
+                    //trans.psbDetail.nama = "MARCELLUS PEKIK RATSOMO";
+                    //trans.psbDetail.tglLahir = "1989-10-30";
+
+                    await CekBlackList();
+                }
+                //NavigateTo("/PSB/5");
+            }
+            else
+            {
+                trans.AddTrail("READ EKTP", "FP - 001", "01");
+                trans.status = "01";
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                trans.errorCode = "FP - 001";
+                OurUtility.Write_Log("== Error : FP - 001", "step-action");
+                NavigateTo("/error");
+            }
+        }
+        else if (!isLoading && !IsSuccess && !IsFail)
+        {
+            isLoading = true;
+        }
+    }
+
+    protected override async Task OnInitializedAsync()
+    {
+        counterTime = counterTreshold;
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        pbPcid = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_PCID), ","));
+        pbConf = OurUtility.StringToByteArray(OurUtility.strIns(config.Read("EKTP", Config.PARAM_EKTP_CONF), ","));
+        OurUtility.Write_Log("== FingerPrint Scan Page", "step-action");
+        await CheckFinger();
+    }
+    private async Task FingerPrintScanC()
+    {
+        isLoading = true;
+        OurUtility.Write_Log("==== Scan FingerPrint", "step-action");
+        OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
+
+        try
+        {
+            TrustFingerManager.GlobalInitialize();
+        }
+        catch
+        {
+            trans.AddTrail("READ EKTP", "FP - 101", "01");
+            trans.status = "01";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+            trans.errorCode = "FP - 101";
+            OurUtility.Write_Log("== Error : FP - 101", "step-action");
+            NavigateTo("/error");
+            return;
+        }
+        await Task.Run(() => ektpCRT.FPReader());
+        await Task.Run(() => ektpCRT.StartCaptureFingerprint());
+        try
+        {
+            do
+            {
+                if (ektpCRT.isCaptured)
+                {
+                    Task.Delay(500);
+                    byte[] feature = new byte[ektpCRT.ektpData.FPR.Length];
+                    feature = ektpCRT.ektpData.FPR;
+
+                    bool result = false;
+                    result = await Task.Run(() => ektpCRT.FPMatch(feature, ktp.minutiae1, ktp.minutiae2));
+
+                    if (result)
+                    {
+                        trans.AddTrail("FINGERPRINT", "MATCH", "00");
+
+                        OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                        //cst.EKTPNumber = ktp.Id;
+                        temp = ktp.DateOfBirth;
+
+                        trans.psbDetail.ektpData = ktp;
+                        trans.psbDetail.nik = ktp.Id;
+                        trans.psbDetail.nama = ktp.Name;
+                        trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
+
+                        isLoading = false;
+                        IsSuccess = true;
+
+                        return;
+                    }
+                    else
+                    {
+                        IsSuccess = false;
+                        trans.AddTrail("FINGERPRINT", "NOT-MATCH", "01");
+                        OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                        intTryCount += 1;
+                        isLoading = false;
+                        IsVisible = true;
+                        if (intTryCount > intTryLimit)
+                        {
+                            IsFail = true;
+                        }
+                        return;
+                    }
+                }
+            } while (true);
+        }
+        catch
+        {
+            isLoading = false;
+            IsFail = true;
+            trans.AddTrail("READ EKTP", "FP - 002", "01");
+            trans.status = "01";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+            trans.errorCode = "FP - 002";
+            OurUtility.Write_Log("== Error : FP - 002", "step-action");
+            NavigateTo("/error");
+            return;
+        }
+    }
+    private async Task FingerPrintScan()
+    {
+        //ektp.InitializeEktp();
+        isLoading = true;
+        OurUtility.Write_Log("==== Scan FingerPrint", "step-action");
+        OurUtility.Write_Log("===== Ektp_Sdk.EktpConnect", "step-action");
+        await Task.Run(() => Ektp_Sdk.EktpConnect(ref hContext, pbPcid, 16, pbConf, 32));
+
+        OurUtility.Write_Log("===== Ektp_Sdk.OpenFingerPrintReader", "step-action");
+
+        // -- Step 2, Open Device Fingerprint
+        IntPtr reader = IntPtr.Zero;
+        int result = -1;
+        result = await Task.Run(() => Ektp_Sdk.OpenFingerPrintReader(ref reader, "uareu")).ConfigureAwait(false);
+        if (reader == IntPtr.Zero)
+        {
+            OurUtility.Write_Log("===== Ektp_Sdk.OpenFingerPrintReader Failed", "step-action");
+
+            //Switcher.DOWN_eKTP(config_MyGraPARI.Read("MyGraPARI", Config.PARAM_DELAY_USB_DOWN));
+        }
+        else
+        {
+            OurUtility.Write_Log("===== Ektp_Sdk.OpenFingerPrintReader Success", "step-action");
+            OurUtility.Write_Log("===== Ektp_Sdk.StartEngine", "step-action");
+
+            IntPtr engine = IntPtr.Zero;
+            int engineType = 0;//engineType = 0, it means that finger print engine is uareu
+            result = await Task.Run(() => Ektp_Sdk.StartEngine(engineType, ref engine)).ConfigureAwait(false);
+            if (engine == IntPtr.Zero)
+            {
+                OurUtility.Write_Log("===== Ektp_Sdk.StartEngine Failed", "step-action");
+            }
+            else
+            {
+                OurUtility.Write_Log("===== Ektp_Sdk.StartEngine Success", "step-action");
+
+                await Task.Delay(1500);
+
+                OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.CaptureFingerPrint", "step-action");
+
+                int size = 120000;
+                int score = -1;
+
+                byte[] image = new byte[size];
+                result = await Task.Run(() => Ektp_Sdk.CaptureFingerPrint(reader, image, ref size, ref score)).ConfigureAwait(false);
+                if (result != 0)
+                {
+                    OurUtility.Write_Log("===== Ektp_Sdk.CaptureFingerPrint Failed", "step-action");
+                    //break;
+                }
+                else
+                {
+                    OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Ektp_Sdk.MatchFingerPrint", "step-action");
+
+                    OurUtility.Write_Log("===== Ektp_Sdk.ReadFingerPrints Success", "step-action");
+                    // -- Step 5, Compare
+
+                    int matched = 0;//matched == 1, it means finger print matched
+                    int format = 0;//format == 0, it means finger print template type is ISO
+                    int threshold = Config.ektpThreshold;
+
+                    Ektp_Sdk.SetMatchFingerPrintThreshold(engine, threshold);
+                    Ektp_Sdk.GetMatchFingerPrintThreshold(engine, ref threshold);
+                    //matched right finger
+                    result = await Task.Run(() => Ektp_Sdk.MatchFingerPrint(engine, image, size,
+                                                ktp.minutiae2, ktp.minu2len,
+                                                ref score, ref matched, format)).ConfigureAwait(false);
+
+                    if (matched == 1)
+                    {
+                        trans.AddTrail("FINGERPRINT", "MATCH", "00");
+
+                        OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+                        temp = ktp.DateOfBirth;
+
+                        trans.psbDetail.ektpData = ktp;
+                        trans.psbDetail.nik = ktp.Id;
+                        trans.psbDetail.nama = ktp.Name;
+                        trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
+
+                        isLoading = false;
+                        IsSuccess = true;
+                        OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                        result = Ektp_Sdk.CloseReader(reader);
+                        return;
+                    }
+                    else
+                    {
+                        result = await Task.Run(() => Ektp_Sdk.MatchFingerPrint(engine, image, size,
+                                                        ktp.minutiae1, ktp.minu1len,
+                                                        ref score, ref matched, format)).ConfigureAwait(false);
+                        if (matched == 1)
+                        {
+                            trans.AddTrail("FINGERPRINT", "MATCH", "00");
+                            OurUtility.Write_Log("===== -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+
+                            temp = ktp.DateOfBirth;
+
+                            trans.psbDetail.ektpData = ktp;
+                            trans.psbDetail.nik = ktp.Id;
+                            trans.psbDetail.nama = ktp.Name;
+                            trans.psbDetail.tglLahir = await OurUtility.ConvertTanggalKTP(ktp.DateOfBirth);
+
+                            OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+                            isLoading = false;
+                            IsSuccess = true;
+
+                            OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                            result = Ektp_Sdk.CloseReader(reader);
+
+                            OurUtility.Write_Log("=== Switcher.DOWN_eKTP", "step-action");
+                            //Switcher.DOWN("500",config.usbEKTP);
+
+                            return;
+                        }
+                        else
+                        {
+                            trans.AddTrail("FINGERPRINT", "NOT-MATCH", "01");
+                            OurUtility.Write_Log("===== -- Try " + intTryCount.ToString() + ", Failed", "step-action");
+
+                            OurUtility.Write_Log("===== Ektp_Sdk.CloseReader", "step-action");
+                            result = Ektp_Sdk.CloseReader(reader);
+
+                            intTryCount += 1;
+                            isLoading = false;
+                            IsVisible = true;
+                            if (intTryCount > intTryLimit)
+                            {
+                                IsFail = true;
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private void TimerElapsedHandler()
+    {
+        OurUtility.Write_Log("===== 9 -- Try ke-" + intTryCount.ToString() + ", Success", "step-action");
+
+        trans.psbDetail.nik = ktp.Id;
+        trans.psbDetail.nama = ktp.Name;
+        trans.psbDetail.tglLahir = ktp.DateOfBirth;
+
+        OurUtility.Write_Log("===== NIK : " + cst.EKTPNumber, "step-action");
+        //NavMan.NavigateTo("/PSB/5");
+    }
+
+    private async Task CekBlackList()
+    {
+        isLoading2 = true;
+        InvokeAsync(StateHasChanged);
+        await Task.Delay(5000);
+        string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
+            "\"transactionId\": \"" + trans.transID + "\"," +
+            "\"noKtp\": \"" + trans.psbDetail.nik + "\"," +
+            "\"nama\": \"" + trans.psbDetail.nama + "\"," +
+            "\"tanggalLahir\": \"" + trans.psbDetail.tglLahir + "\"" +
+               "}";
+        string myURL = _myURL + cekBlackListURL;
+        OurUtility.Write_Log("Validasi NIK", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+
+        if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" && strResult != "BadRequest" && strResult != "InternalServerError" && strResult != "GatewayTimeout")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    isLoading2 = false;
+                    trans.AddTrail("Cek BlackList NIK", trans.psbDetail.nik, "00");
+
+                    NavigateTo("/PSB/5");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Cek BlackList NIK", trans.psbDetail.nik, "01");
+                    trans.status = "01";
+                    await OurUtility.AuditTrailPSB(trans, menu, cst);
+                    //isNotIdle = false;
+                    isLoading2 = false;
+                    NavigateTo("/error");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    isLoading2 = false;
+                    isLoading = true;
+                    IsSuccess = false;
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                    trans.AddTrail("Cek BlackList NIK", trans.psbDetail.nik, "02");
+
+                    isPopUp = true;
+                    return;
+                }
+            }
+            catch (Exception ex)
+            {
+                trans.AddTrail("Cek BlackList Nik", "Exception Error ", "01");
+                trans.status = "01";
+                await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
+                //isNotIdle = false;
+                NavigateTo("/error");
+            }
+        }
+        else
+        {
+            trans.AddTrail("Cek BlackList Nik", "Hit Webservice Error {" + strResult + "}", "01");
+            trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
@@ -653,6 +723,15 @@
         }
     }
 
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            #region AfterRenderTimeOut
+            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            #endregion
+        }
+    }
     #region TimeOut
     private int counterTime;
     private int counterTreshold = 60;
@@ -663,7 +742,7 @@
         do
         {
             await Task.Delay(1000);
-            Console.WriteLine("Idle 4 Time Left : " + counterTime.ToString());
+            Console.WriteLine("Idle 5 Time Left : " + counterTime.ToString());
             counterTime = counterTime - 1;
             InvokeAsync(StateHasChanged);
             if (counterTime < 1)
@@ -687,7 +766,7 @@
         do
         {
             await Task.Delay(1000);
-            Console.WriteLine("Time 4 Out Left : " + secondCTime.ToString());
+            Console.WriteLine("Time 5 Out Left : " + secondCTime.ToString());
             secondCTime = secondCTime - 1;
             InvokeAsync(StateHasChanged);
             if (secondCTime < 0)

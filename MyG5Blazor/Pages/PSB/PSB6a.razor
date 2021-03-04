@@ -1,4 +1,4 @@
-﻿@page "/PSB/3a"
+﻿@page "/PSB/6a"
 
 @using MyG5Blazor.Data
 @using System.Linq;
@@ -136,10 +136,10 @@
         <div class="footer-side1">
             <span class="dot2">1</span>
             <span class="dot2">2</span>
-            <span class="dot2" id="dot-active">3</span>
+            <span class="dot2">3</span>
             <span class="dot2">4</span>
             <span class="dot2">5</span>
-            <span class="dot2">6</span>
+            <span class="dot2" id="dot-active">6</span>
             <span class="dot2">7</span>
             <span class="dot2">8</span>
             <span class="dot2">9</span>
@@ -380,13 +380,13 @@
                 }
             }
             trans.AddTrail("CHOOSE PACKAGE", "Package ID : " + trans.psbDetail.selectedPaket, "00");
-            if (trans.psbDetail.searchNumber == 0)
+            if (trans.psbDetail.searchNumber == 0||menu.psbNomer.Count<1)
             {
-                NavigateTo("/PSB/3b");
+                NavigateTo("/PSB/6b");
             }
             else
             {
-                NavigateTo("/PSB/3c");
+                NavigateTo("/PSB/6c");
             }
         }
     }
@@ -443,7 +443,7 @@
     }
     private async Task Back()
     {
-        NavigateTo("/PSB/1b");
+        NavigateTo("/PSB/3");
     }
 
     protected override async Task OnAfterRenderAsync(bool bFirstRender)

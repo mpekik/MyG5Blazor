@@ -1,4 +1,4 @@
-﻿@page "/PSB/3b"
+﻿@page "/PSB/6b"
 
 @using MyG5Blazor.Data
 @using System.Linq;
@@ -78,10 +78,10 @@
     <div class="footer-side1">
         <span class="dot2">1</span>
         <span class="dot2">2</span>
-        <span class="dot2" id="dot-active">3</span>
+        <span class="dot2">3</span>
         <span class="dot2">4</span>
         <span class="dot2">5</span>
-        <span class="dot2">6</span>
+        <span class="dot2" id="dot-active">6</span>
         <span class="dot2">7</span>
         <span class="dot2">8</span>
         <span class="dot2">9</span>
@@ -162,6 +162,7 @@
     }
     private async Task ButtonOkPopUp()
     {
+        buttonOk = true;
         buttonNavigasi = true;
         isPopUp = false;
     }
@@ -171,7 +172,7 @@
         if(buttonNavigasi)
         {
             buttonNavigasi = false;
-            NavigateTo("/psb/3a");
+            NavigateTo("/psb/6a");
         }
     }
     private bool buttonOk = true;
@@ -182,7 +183,6 @@
             if (buttonOk)
             {
                 buttonOk = false;
-                trans.psbDetail.searchNumber += 1;
                 trans.psbDetail.patternNumber = strNumber;
                 menu.psbNomer.Clear();
                 menu.pageIndex = 0;
@@ -258,13 +258,15 @@
                 JObject jobjResult = JObject.Parse(strResult);
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
+                    trans.psbDetail.searchNumber += 1;
+
                     trans.AddTrail("Get List Number", "Pattern : " + trans.psbDetail.patternNumber + ", Pool : " + trans.psbDetail.selectedPaket, "00");
                     foreach ((var num, Int32 i) in jobjResult.SelectToken("numbers").Select((pp, i) => (pp, i)))
                     {
                         menu.psbNomer.Add(num.ToString());
                     }
                     menu.psbIndex = menu.psbNomer.Count();
-                    NavigateTo("/PSB/3c");
+                    NavigateTo("/PSB/6c");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
@@ -322,7 +324,7 @@
     private void CheckNumber()
     {
         menu.psbIndex = menu.psbNomer.Count();
-        NavigateTo("/PSB/3c");
+        NavigateTo("/PSB/6c");
     }
     #region TimeOut
     private int counterTime;

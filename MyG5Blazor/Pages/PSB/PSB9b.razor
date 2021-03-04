@@ -2,6 +2,7 @@
 
 @using MyG5Blazor.Data
 @using System.IO.Ports
+@using System.IO
 @using System.Threading
 @using System.Text
 @using System
@@ -78,7 +79,7 @@
                                             Silakan Ambil kartuHalo Anda dan Selamat <br />Menikmati Layanan Prioritas di Jaringan <br />kartuHalo.<br />
                                             <span style="font-size:18px; font-style:italic"><br />Jika nomor Anda belum aktif dalam maksimal 2x24 jam,mohon hubungi Customer Service GraPARI.<br /></span>
                                             <br />Formulir Elektronik Berlangganan KartuHalo <br />Anda akan Kami Kirimkan ke Email yang <br />Didaftarkan. Silakan Tekan Tautan di Bawah <br />untuk Melihat.
-                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="SendDocument" @onclick:preventDefault>
+                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="@(()=>isOpenDoc=true)" @onclick:preventDefault>
                                                 <br />Formulir Elektronik Berlangganan KartuHalo
                                             </a>
                                         </span>
@@ -95,8 +96,8 @@
                             {
                                 <div class="col-md-6">
                                     <div class="teks-title">Berlangganan KartuHalo</div>
-                                    <div id="status-pay" class="teks-center teks-bold">
-                                        Proses Pembayaran Berlangganan KartuHalo<br> <b class="red">FAILED</b><br><br>
+                                    <div id="status-pay" class="teks-center teks-bold" style="line-height: 1; font-size: xx-large; margin-top: 3em;">
+                                        Proses Pembayaran Berlangganan KartuHalo <b class="red">Tidak Berhasil</b><br><br>
                                         @if (IsVoid)
                                         {
                                             <span style="font-weight: normal;">Silahkan <span style="font-weight: bold;"> Tekan ENTER(Tombol Hijau)</span>pada Mesin EDC untuk Proses Pengembalian Uang </span>
@@ -140,29 +141,35 @@
 
                                 @if (IsFail)
                                 {
-                                    <div id="status-pay" class="teks-status2">Proses Pembayaran Berlangganan KartuHalo <br><b class="red">Tidak Berhasil</b></div>
-                                    <div id="nominal-pay" class="teks-center"> Silakan Ambil Struk Transaksi dan <br> Hubungi Kasir GraPARI untuk Bantuan</div>
+                                    <div class="teks-title">Berlangganan KartuHalo</div>
+                                    <div id="status-pay" class="teks-center teks-bold" style="line-height: 1; font-size: xx-large; margin-top: 3em;">
+                                        Proses Pembayaran Berlangganan KartuHalo <b class="red">Tidak Berhasil</b><br><br>
+
+                                        <span style="font-weight: normal;">Silakan Ambil Struk Transaksi dan <br> Hubungi Kasir GraPARI untuk Bantuan</span>
+
+                                    </div>
                                 }
                                 else if (IsSuccess)
                                 {
                                     <div class="teks-title">Berlangganan KartuHalo</div>
-                                    <div id="status-pay" class="teks-center teks-bold">
-                                        Proses Pembayaran Berlangganan KartuHalo<br> <b class="green">Berhasil</b><br />
-                                        <span style="font-weight:normal">
-                                        Silakan Ambil kartuHalo Anda dan <br />Selamat Menikmati Layanan Prioritas di <br />Jaringan kartuHalo.<br />
-                                        Formulir Elektronik Berlangganan <br />KartuHalo Anda akan Kami Kirimkan ke <br />Email yang Didaftarkan. Silakan Tekan Tautan <br />di Bawah untuk Melihat.
-                                                                                                                                                                       <a href="" @onclick="SendDocument" @onclick:preventDefault>
-                                                                                                                                                                           Formulir Elektronik Berlangganan KartuHalo
-                                                                                                                                                                       </a>
+                                    <div id="status-pay" class="teks-center teks-bold" style="line-height: 1; font-size: xx-large; margin-top: 3em;">
+                                        Proses Berlangganan KartuHalo <b class="green">Berhasil</b><br /><br />
+                                        <span style="font-weight:normal;display:grid;">
+                                            Silakan Ambil kartuHalo Anda dan Selamat <br />Menikmati Layanan Prioritas di Jaringan <br />kartuHalo.<br />
+                                            <span style="font-size:18px; font-style:italic"><br />Jika nomor Anda belum aktif dalam maksimal 2x24 jam,mohon hubungi Customer Service GraPARI.<br /></span>
+                                            <br />Formulir Elektronik Berlangganan KartuHalo <br />Anda akan Kami Kirimkan ke Email yang <br />Didaftarkan. Silakan Tekan Tautan di Bawah <br />untuk Melihat.
+                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="@(()=>isOpenDoc=true)" @onclick:preventDefault>
+                                                <br />Formulir Elektronik Berlangganan KartuHalo
+                                            </a>
                                         </span>
                                     </div>
-                       
                                 }
                             </div>
 
-                            <div class="col-md-6" id="proses-bill">
-                                @if (!IsFail && !IsSuccess)
-                                {
+                            @if (!IsFail && !IsSuccess)
+                            {
+                                <div class="col-md-6" id="proses-bill">
+
                                     <div id="">
                                         <img class="tunai" onclick="buttonNext()" id="" src="../../assets/image/tunai.png">
                                     </div>
@@ -182,16 +189,19 @@
                                             <div class="nominal-rupiah" id="nominal-pas">Rp @inttotal.ToString("N0")</div>
                                         }
                                     </div><br>
-                                }
-                                else
-                                {
-                                    <div id="image-pulsa" class="image-center2">
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="col-md-6" style="display:grid;min-height:25vh;">
+                                    <div id="image-pulsa" class="image-center2" style="align-self:center;">
                                         <img src="../../assets/image/Logo/00_logo_KartuHalo.png" alt="" width="450px">
                                     </div>
-                                }
-                            </div>
-                            break;
+                                </div>
+                            }
                         }
+                        break;
+
                     case 3:
                         {
                             @if (!IsSuccess && !IsFail)
@@ -210,17 +220,17 @@
                             {
                                 <div class="col-md-6">
                                     <div class="teks-title">Berlangganan KartuHalo</div>
-                                    <div id="status-pay" class="teks-center teks-bold">
-                                        Proses Pembayaran Berlangganan KartuHalo<br> <b class="green">Berhasil</b><br />
-                                        <span style="font-weight:normal">
-                                            Silakan Ambil kartuHalo Anda dan <br />Selamat Menikmati Layanan Prioritas di <br />Jaringan kartuHalo.<br />
-                                            Formulir Elektronik Berlangganan <br />KartuHalo Anda akan Kami Kirimkan ke <br />Email yang Didaftarkan. Silakan Tekan Tautan <br />di Bawah untuk Melihat.
-                                            <a href="" @onclick="SendDocument" @onclick:preventDefault>
-                                                Formulir Elektronik Berlangganan KartuHalo
+                                    <div id="status-pay" class="teks-center teks-bold" style="line-height: 1; font-size: xx-large; margin-top: 3em;">
+                                        Proses Berlangganan KartuHalo <b class="green">Berhasil</b><br /><br />
+                                        <span style="font-weight:normal;display:grid;">
+                                            Silakan Ambil kartuHalo Anda dan Selamat <br />Menikmati Layanan Prioritas di Jaringan <br />kartuHalo.<br />
+                                            <span style="font-size:18px; font-style:italic"><br />Jika nomor Anda belum aktif dalam maksimal 2x24 jam,mohon hubungi Customer Service GraPARI.<br /></span>
+                                            <br />Formulir Elektronik Berlangganan KartuHalo <br />Anda akan Kami Kirimkan ke Email yang <br />Didaftarkan. Silakan Tekan Tautan di Bawah <br />untuk Melihat.
+                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="@(()=>isOpenDoc=true)" @onclick:preventDefault>
+                                                <br />Formulir Elektronik Berlangganan KartuHalo
                                             </a>
                                         </span>
                                     </div>
-            
                                 </div>
 
                                 <div class="col-md-6" style="display:grid;min-height:25vh;">
@@ -233,8 +243,8 @@
                             {
                                 <div class="col-md-6">
                                     <div class="teks-title">Berlangganan KartuHalo</div>
-                                    <div id="status-pay" class="teks-center teks-bold">
-                                        Proses Pembayaran Berlangganan KartuHalo<br> <b class="red">FAILED</b><br><br>
+                                    <div id="status-pay" class="teks-center teks-bold" style="line-height: 1; font-size: xx-large; margin-top: 3em;">
+                                        Proses Pembayaran Berlangganan KartuHalo <b class="red">Tidak Berhasil</b><br><br>
                                         @if (IsVoid)
                                         {
                                             <span style="font-weight: normal;">Silahkan <span style="font-weight: bold;"> Tekan ENTER(Tombol Hijau)</span>pada Mesin EDC untuk Proses Pengembalian Uang </span>
@@ -254,7 +264,6 @@
             </div>
         </div>
     </div>
-
 
     <footer style="z-index:2;">
         <div class="footer-side1">
@@ -279,7 +288,7 @@
 </div>
 @if (IsExit)
 {
-    <div id="myModal" class="modal"style="z-index:999;">
+    <div id="myModal" class="modal" style="z-index:999;">
 
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
@@ -294,10 +303,28 @@
     </div>
     <!-- end modal -->
 }
+@if (isOpenDoc)
+{
+    <div id="myModal" class="modal" style="z-index:999;">
+
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <div class="card example-1 scrollbar-ripe-malinka" style="text-align: center; margin-bottom:10px; height:500px;">
+                        <object data="../../assets/PSB.pdf#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="500px">
+                        </object>
+                    </div><button class="btn btn-danger modal-button" @onclick="@(()=>isOpenDoc=false)" id="btn-lanjut">Tutup</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- end modal -->
+}
 @if (IsVisible)
 {
     <!-- The Modal -->
-    <div id="myModal" class="modal"style="z-index:999;">
+    <div id="myModal" class="modal" style="z-index:999;">
         <div class="modal-dialog-centered" role="document">
             <div class="modal-nps">
                 <!-- <div class="modal-header">
@@ -327,7 +354,7 @@
 @if (IsVisible2)
 {
     <!-- The Modal -->
-    <div id="myModal" class="modal"style="z-index:999;">
+    <div id="myModal" class="modal" style="z-index:999;">
         <div class="modal-dialog-centered" role="document">
             <div class="modal-nps">
                 <!-- <div class="modal-header">
@@ -377,17 +404,17 @@
 }
 @if (isTunaiComplete)
 {
-    <div id="myModal" class="modal"style="z-index:999;">
-    <div class="modal-dialog-centered" role="document">
-        <div class="modal-content">
-            <div class="modal-body">
-                <p class="text-body">Anda memiliki <span style="font-weight: bold;">KEMBALIAN</span> sebesar<span style="font-weight: bold;"> Rp @intMinus.ToString("N0") </span> yang otomatis akan mengurangi Berlangganan kartuHalo anda di bulan berikutnya.</p>
-                <button class="btn btn-danger modal-button" @onclick="Tunai">Lanjut</button>
-                <button class="btn btn-light modal-button" @onclick="TunaiExitFail">Batal</button>
-                <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+    <div id="myModal" class="modal" style="z-index:999;">
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">Anda memiliki <span style="font-weight: bold;">KEMBALIAN</span> sebesar<span style="font-weight: bold;"> Rp @intMinus.ToString("N0") </span> yang otomatis akan mengurangi Berlangganan kartuHalo anda di bulan berikutnya.</p>
+                    <button class="btn btn-danger modal-button" @onclick="Tunai">Lanjut</button>
+                    <button class="btn btn-light modal-button" @onclick="TunaiExitFail">Batal</button>
+                    <!-- <button class="btn btn-light modal-button">Tidak</button> -->
+                </div>
             </div>
         </div>
-    </div>
     </div>
 }
 @code
@@ -408,10 +435,11 @@
     private bool isTunaiComplete = false;
     private bool isPopUp = false;
     private bool isFail = false;
+    private bool isOpenDoc = false;
 
     private int intTryCount = 1;
     private int intTryLimit = 3;
-    private int MetodePembayaran = 0;
+    private int MetodePembayaran = 1;
     private int CESno = 0;
     private int logbank = 0;
     private int logamount = 0;
@@ -421,6 +449,7 @@
     private string strMsgError = string.Empty;
     private string strBillCom = string.Empty;
     private string errorcode = string.Empty;
+    private string nohp = string.Empty;
 
     private int intBill = 0;
     private int intAccBill = 0;
@@ -445,6 +474,7 @@
     private string quID = string.Empty;
     private string quEngText = string.Empty;
 
+    private string docPSB = Directory.GetCurrentDirectory() + @"\Logs\PSB.pdf";
     private string strBill => intBill.ToString();
     private string strAccBill => intAccBill.ToString();
     private string strMinus => intMinus.ToString();
@@ -455,13 +485,13 @@
     private string resultCash = "01";
     private string cardStock = string.Empty;
     private string cdCOM = "COM";
-
+    private string imgDocman = string.Empty;
     string msg = string.Empty;
     string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
     protected override async Task OnInitializedAsync()
     {
-
+        imgDocman = trans.psbDetail.snkImage;
         counterTime = counterTreshold;
         trans.psbDetail.statusPayment = "01";
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
@@ -470,6 +500,7 @@
         intBill = int.Parse(trans.psbDetail.PaketPSB._hargaAwal);
         cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
         cdCOM = cdCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
+        nohp = trans.psbDetail.selectedNumber;
 
         if (cardStock == "")
         {
@@ -595,6 +626,7 @@
                 }
             case 2:
                 {
+                    cst.intTagihan = intBill;
                     pageClass = "main-panel bg-home";
                     Payout.total = 0;
                     Payout.uangCount = 0;
@@ -735,14 +767,82 @@
         }
     }
 
+    private async Task GetURLDocman()
+    {
+        //isLoading = true;
+        string myJson = string.Empty;
+        string apiURL = "docman/download-form-psb";
+
+        myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
+            "\"terminalId\" : \"" + trans.termID + "\"" +
+                                "}";
+
+        string myURL = _myURL + apiURL;
+
+        OurUtility.Write_Log("== Get Document", "step-action");
+        OurUtility.Write_Log("== Request API : " + myJson, "step-action");
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
+        {
+            try
+            {
+                JObject jobjResult = JObject.Parse(strResult);
+
+                if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
+                {
+                    OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
+                    trans.AddTrail("Get Document", "Transaction Id:" + trans.transID, "00");
+                    urlDocman = (string)jobjResult.SelectToken("url");
+                    string response = await OurUtility.GetCallAPI(urlDocman,"",menu);
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
+                {
+                    if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                    }
+                    else
+                    {
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
+                    }
+                    trans.AddTrail("Get Document", "Transaction Id:" + trans.transID, "01");
+                }
+                else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
+                {
+                    strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
+                    trans.AddTrail("Get Document", "Transaction Id:" + trans.transID, "02");
+                }
+
+            }
+            catch (Exception ex)
+            {
+                trans.errorCode = "Exception Error";
+                OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
+                trans.AddTrail("Get Document", "Transaction Id:" + trans.transID, "01");
+            }
+        }
+        else
+        {
+            trans.errorCode = strResult;
+            OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
+            trans.AddTrail("Get Document", "Transaction Id:" + trans.transID, "01");
+        }
+    }
+
+    private string urlDocman = String.Empty;
+
     private async Task SendDocument()
     {
         //isLoading = true;
         string myJson = string.Empty;
-        string apiURL = "docman/v1/send-psb-form";
+        string apiURL = "docman/generate-form-psb";
 
         myJson = "{ \"transactionId\" : \"" + trans.transID + "\"," +
-            "\"terminalId\" : \"" + trans.termID + "\"" +
+            "\"terminalId\" : \"" + trans.termID + "\"," +
+            "\"image\" : \"" + imgDocman + "\"" +
                                 "}";
 
         string myURL = _myURL + apiURL;
@@ -756,13 +856,12 @@
             try
             {
                 JObject jobjResult = JObject.Parse(strResult);
-                resultPayment = (string)jobjResult["transaction"].SelectToken("statusCode");
 
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "00");
-
+                    await GetURLDocman();
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
@@ -777,20 +876,19 @@
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
                     trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "01");
+                    await SendDocument();
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "02")
                 {
                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "02");
                 }
-
             }
             catch (Exception ex)
             {
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
                 trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "01");
-
             }
         }
         else
@@ -798,14 +896,13 @@
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
             trans.AddTrail("Send Document", "Transaction Id:" + trans.transID, "01");
+            await SendDocument();
         }
     }
     private async Task CancelComplete()
     {
         isTunaiComplete = false;
         //IsExit = true;
-
-
     }
     private async Task Tunai()
     {
@@ -884,7 +981,7 @@
             trans.errorCode = "CANCELED";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-            Timer.SetTimer(20000);
+            Timer.SetTimer(12000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
     }
@@ -1096,7 +1193,7 @@
             do
             {
                 await Task.Delay(200);
-                OurUtility.Write_Log("== Payment EDC : " + edc.serialPort.PortName + " " + tagihan + " "+_transType+" "+invoice +" "+billing+" "+mPemabayaran, "step-action");
+                OurUtility.Write_Log("== Payment EDC : " + edc.serialPort.PortName + " " + tagihan + " " + _transType + " " + invoice + " " + billing + " " + mPemabayaran, "step-action");
                 edc.SendCommand(tagihan, edc.serialPort, _transType, invoice, billing, mPemabayaran);
 
             } while (!edc.mre.WaitOne());
@@ -1125,7 +1222,8 @@
 
                 isLoading = true;
                 pageClass = "main-panel bg-home";
-            }else
+            }
+            else
             {
                 trans.psbDetail.statusPayment = "01";
                 OurUtility.Write_Log("== Payment Via EDC Failed", "step-action");
@@ -1135,7 +1233,7 @@
         }
         catch (Exception ex)
         {
-            OurUtility.Write_Log("== Error EDC : "+ex.Message, "step-action");
+            OurUtility.Write_Log("== Error EDC : " + ex.Message, "step-action");
             trans.AddTrail("PAYMENT EDC", ex.Message, "01");
         }
     }
@@ -1261,7 +1359,7 @@
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
-        if (strResult != "" && strResult!="NotFound" && strResult != "InternalServerError" && strResult != "BadRequest" && strResult != "GatewayTimeout")
+        if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest" && strResult != "GatewayTimeout")
         {
             try
             {
@@ -1275,10 +1373,11 @@
                     OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Success}", "step-action");
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "00");
                     await Task.Run(() => MoveToTheFront());
+                    await SendDocument();
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
-                    isFail=true;
+                    isFail = true;
                     trans.AddTrail("PAYMENT", "Payment Method:" + trans.paymentMethod + ",Payment Ammount: " + strAccBill, "01");
 
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
@@ -1362,7 +1461,7 @@
             {
                 await Task.Delay(1000);
                 //Console.WriteLine("2");
-                if (!Payout.DoPoll(trans,bankNote,bankAmount))
+                if (!Payout.DoPoll(trans, bankNote, bankAmount))
                 {
                     //Console.WriteLine("Poll failed, attempting to reconnect...\r\n");
                     while (true)
@@ -1376,7 +1475,7 @@
                     //Console.WriteLine("Reconnected\r\n");
                 }
                 //Console.WriteLine("9");
-                if(Payout.total>inttotal)
+                if (Payout.total > inttotal)
                 {
                     ResetTimer();
                 }
@@ -1597,7 +1696,7 @@
         OurUtility.Write_Log("==== 2. Card_Dispenser.Start", "step-action");
         if (!cds.Start(ref errorcode, cdCOM, ref msg))
         {
-            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed, error : "+ errorcode+" , msg : "+msg, "step-action");
+            OurUtility.Write_Log("==== 3. Card_Dispenser.Start, Failed, error : " + errorcode + " , msg : " + msg, "step-action");
             return false;
         }
         OurUtility.Write_Log("==== 3. Card_Dispenser.Initialize", "step-action");
@@ -1645,10 +1744,10 @@
         return true;
     }
     #region TimeOut
-    private int counterTime;
+    private int counterTime = 60;
     private int counterTreshold = 60;
     private bool isIdle = false;
-    private bool isNotIdle = true;
+    private bool isNotIdle = false;
     private async Task IdleTime()
     {
         do
@@ -1678,7 +1777,7 @@
         do
         {
             await Task.Delay(1000);
-            Console.WriteLine("Time 9a Out Left : " + secondCTime.ToString());
+            Console.WriteLine("Time 9b Out Left : " + secondCTime.ToString());
             secondCTime = secondCTime - 1;
             InvokeAsync(StateHasChanged);
             if (secondCTime < 0)

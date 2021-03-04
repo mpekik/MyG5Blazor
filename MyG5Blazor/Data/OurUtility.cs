@@ -497,6 +497,64 @@ namespace MyG5Blazor.Data
             }
             return ret;
         }
+        public static async Task<string> GetCallAPI(string url, string jsonString, Menu menu)
+        {
+            string secret = OurUtility.RandomString(10);
+            long unix_timestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds();
+            string unixtimestamp = DateTimeOffset.UtcNow.ToUnixTimeMilliseconds().ToString().Substring(0, 10);
+            string md5Input = menu.terminalId + secret + menu.tokenId;
+            string signature = OurUtility.CreateMD5(md5Input);
+
+            string directory = Directory.GetCurrentDirectory();
+
+            string ret = string.Empty;
+            signature = signature.ToLower();
+            await Task.Delay(2000);
+            try
+            {
+                using (var handler = new HttpClientHandler())
+                {
+                    handler.ServerCertificateCustomValidationCallback = (message, cert, chain, errors) => { return true; };
+                    using (HttpClient client = new HttpClient(handler))
+                    {
+                        var content = new StringContent(jsonString, Encoding.UTF8, "application/json");
+                        //                    client.DefaultRequestHeaders.Add("signature-key", signature);
+                        //                  client.DefaultRequestHeaders.Add("secret-key", secret);
+                        content.Headers.Add("signature-key", signature);
+                        content.Headers.Add("secret-key", secret);
+                        await Task.Delay(2000);
+                        var response = await client.GetAsync(url);
+                        Console.WriteLine(response.StatusCode.ToString());
+                        if (response != null)
+                        {
+
+                            if (response.IsSuccessStatusCode || response.StatusCode.ToString() == "BadRequest" || response.StatusCode.ToString() == "InternalServerError")
+                            {
+                                string OutputDirectory = directory + @"\wwwroot\assets\";
+                                var httpStream = await response.Content.ReadAsStreamAsync();
+                                var filePath = Path.Combine(OutputDirectory, "PSB.pdf");
+                                using (var fileStream = File.Create(filePath))
+                                using (var reader = new StreamReader(httpStream))
+                                {
+                                    httpStream.CopyTo(fileStream);
+                                    fileStream.Flush();
+                                }
+                                return "Y";
+                            }
+                            else
+                            {
+                                return response.StatusCode.ToString();
+                            }
+                        }
+                    }
+                }
+            }
+            catch (HttpRequestException e)
+            {
+                //Console.WriteLine(e.InnerException.Message);
+            }
+            return ret;
+        }
         private static string p_delay_UP = "3000";
         private static string p_delay_DOWN = "500";
 

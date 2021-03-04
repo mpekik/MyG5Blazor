@@ -1,4 +1,4 @@
-﻿@page "/PSB/3c"
+﻿@page "/PSB/6c"
 
 @using MyG5Blazor.Data
 @using System.Linq;
@@ -90,6 +90,7 @@
                             <button @onclick="@(() => PickNomer(populateNumber[5+menu.pageIndex]))" class="btn-pilih-no btn" style=@(fontWeight+"margin-left: 3%;") value="">@((MarkupString)numberUI[5 + menu.pageIndex])</button>
                         }
                     </div>
+                    
                 </div>
             </div>
         </div>
@@ -101,10 +102,10 @@
     <div class="footer-side1">
         <span class="dot2">1</span>
         <span class="dot2">2</span>
-        <span class="dot2" id="dot-active">3</span>
+        <span class="dot2">3</span>
         <span class="dot2">4</span>
         <span class="dot2">5</span>
-        <span class="dot2">6</span>
+        <span class="dot2" id="dot-active">6</span>
         <span class="dot2">7</span>
         <span class="dot2">8</span>
         <span class="dot2">9</span>
@@ -112,11 +113,11 @@
     <div class="footer-side2">
         @if (trans.psbDetail.searchNumber < 3)
         {
-            <button @onclick="@(() => NavigateTo("/PSB/3b"))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(() => NavigateTo("/PSB/6b"))" class="btn-arrow btn" value="">Kembali</button>
         }
         else
         {
-            <button @onclick="@(() => NavigateTo("/PSB/3a"))" class="btn-arrow btn" value="">Kembali</button>
+            <button @onclick="@(() => NavigateTo("/PSB/6a"))" class="btn-arrow btn" value="">Kembali</button>
 
         }
         <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu Utama</button>
@@ -206,7 +207,10 @@
             StateHasChanged();
         }
     }
-
+    private void PencarianUlang()
+    {
+        NavigateTo("/PSB/6b");
+    }
     string NumberUI(string _numberUI)
     {
         string temp = strNumber;
@@ -254,7 +258,7 @@
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
                 //numberUI[i] = NumberUI(populateNumber[i]);
-                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
+                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}(?!$)", "$0-");
                 StateHasChanged();
             }
         }
@@ -318,7 +322,7 @@
                 {
                     trans.psbDetail.reserveId = (string)jobjResult.SelectToken("idReservation");
                     trans.AddTrail("Reserve Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.selectedPaket, "00");
-                    NavigateTo("/PSB/4");
+                    NavigateTo("/PSB/7a");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {

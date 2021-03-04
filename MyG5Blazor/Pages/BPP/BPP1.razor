@@ -195,26 +195,29 @@
             {
                 if (strNumber.Substring(0, 2) == "08")
                 {
-                    IsVisible = visiblestatus;
+                    isVisible = visiblestatus;
                 }
                 else
                 {
-                    IsInvalid = true;
+                    isVisible2 = true;
                     strMsgError = "<span style='font-weight: bold;'>Nomor tidak dikenali</span>, harap masukkan nomor Telkomsel yang benar dan aktif";
                 }
             }
         }
         else
         {
-            IsVisible = visiblestatus;
-            IsInvalid = visiblestatus;
+            isVisible = visiblestatus;
+            isVisible2 = visiblestatus;
         }
         isSubmit = true;
     }
 
     private void InputPhoneNumber(string strInput)
     {
-        strNumber += strInput;
+        if (strNumber.Length < 12)
+        {
+            strNumber += strInput;
+        }
     }
 
     private void RemovePhoneNumber()

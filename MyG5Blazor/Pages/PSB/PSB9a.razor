@@ -167,7 +167,6 @@
         readerName = config.Read("Dispenser", Config.PARAM_DEVICE_CARD_READER);
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
         cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
-
     }
 
     private async Task DummyOK()
@@ -182,7 +181,7 @@
         #region Perso
         if (cardStock == "")
         {
-            isFail = true;
+            isError = true;
             trans.AddTrail("GET STOCK", "CD - 004", "01");
             trans.status = "01";
             trans.errorCode = "CARD DISPENSER";
@@ -361,7 +360,8 @@
                             }
                             else
                             {
-                                isFail = true;
+                                isError = true;
+                                trans.errorCode = "Failed Get SN";
                                 await ReleaseNumber();
                                 return;
                             }
@@ -448,7 +448,7 @@
                                                 }
                                                 trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
                                                 isLoading = false;
-                                                isFail = true;
+                                                isError = true;
                                                 await ReleaseNumber();
                                                 return;
                                             }
@@ -475,7 +475,7 @@
                                                 intTryCount += 1;
                                             else
                                             {
-                                                isFail = true;
+                                                isError = true;
                                                 trans.kip = "Perso gagal, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
                                                 await ReleaseNumber();
                                                 return;
@@ -492,7 +492,7 @@
                                         else
                                         {
                                             isLoading = false;
-                                            isFail = true;
+                                            isError = true;
                                             await ReleaseNumber();
                                             return;
                                         }
@@ -510,7 +510,7 @@
                                         {
                                             trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
                                             //OurUtility.AuditTrail(trans, menu, cst);
-                                            isFail = true;
+                                            isError = true;
                                             await ReleaseNumber();
                                             return;
                                         }
@@ -538,7 +538,7 @@
                                     else
                                     {
                                         isLoading = false;
-                                        isFail = true;
+                                        isError = true;
                                         await ReleaseNumber();
                                         return;
                                     }
@@ -550,7 +550,7 @@
                                     isLoading = false;
                                     //IsVisible = false;
                                     IsInvalid = true;
-                                    isFail = true;
+                                    isError = true;
                                     await ReleaseNumber();
                                     return;
                                 }
@@ -595,7 +595,7 @@
                         else
                         {
                             trans.errorCode = "FAILED GET SN";
-                            isFail = true;
+                            isError = true;
                             await ReleaseNumber();
                             return;
                         }

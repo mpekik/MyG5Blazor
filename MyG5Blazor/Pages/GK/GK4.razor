@@ -286,7 +286,7 @@
             await OurUtility.AuditTrail(trans, menu, cst);
             await Print();
 
-            Timer.SetTimer(20000);
+            Timer.SetTimer(12000);
             Timer.OnElapsed += TimerElapsedHandler;
             await CheckNPS("");
         }
@@ -295,7 +295,7 @@
             isLoading = false;
             trans.status = "01";
             await OurUtility.AuditTrail(trans, menu, cst);
-            Timer.SetTimer(20000);
+            Timer.SetTimer(12000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
     }
@@ -757,7 +757,7 @@
             StateHasChanged();
             await Task.Delay(2000);
             //ToDo Send Answer
-            Timer.SetTimer(20000);
+            Timer.SetTimer(12000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
     }

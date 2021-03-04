@@ -467,7 +467,7 @@
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
-                            Timer.SetTimer(20000);
+                            Timer.SetTimer(12000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
                         }
@@ -505,7 +505,7 @@
                                 Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            Timer.SetTimer(20000);
+                            Timer.SetTimer(12000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
                         }
@@ -599,7 +599,7 @@
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
-                            Timer.SetTimer(20000);
+                            Timer.SetTimer(12000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
                         }
@@ -639,7 +639,7 @@
                                 Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            Timer.SetTimer(20000);
+                            Timer.SetTimer(12000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
                         }
@@ -664,8 +664,6 @@
     {
         isTunaiComplete = false;
         //IsExit = true;
-
-
     }
     private async Task Tunai()
     {
@@ -679,20 +677,25 @@
         if (resultPayment == "00")
         {
             trans.edcStatus = "SUCCESS";
+
+            IsVisible2 = false;
             IsLoading = false;
             IsSuccess = true;
+            StateHasChanged();
+            await Task.Delay(200);
 
             Printer.PrintHalo(trans, cst, config, logoTsel, ref msg);
             await CheckNPS("");
 
             //Console.WriteLine("Payment Success");
+            StateHasChanged();
             await Task.Delay(200);
             trans.status = "00";
             trans.errorCode = "PEMBAYARAN TAGIHAN VIA CASH BERHASIL";
             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
             await OurUtility.AuditTrail(trans, menu, cst);
 
-            Timer.SetTimer(20000);
+            Timer.SetTimer(12000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
         else
@@ -706,7 +709,7 @@
             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
             await OurUtility.AuditTrail(trans, menu, cst);
 
-            Timer.SetTimer(20000);
+            Timer.SetTimer(12000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
     }
@@ -741,7 +744,7 @@
             trans.errorCode = "CANCELED";
             await OurUtility.AuditTrail(trans, menu, cst);
 
-            Timer.SetTimer(20000);
+            Timer.SetTimer(12000);
             Timer.OnElapsed += TimerElapsedHandler;
         }
     }
@@ -1184,7 +1187,7 @@
                 }
                 //Console.WriteLine("9");
                 inttotal = Payout.total;
-                //Console.WriteLine("inttotal = " + inttotal);
+                //Console.Write Line("inttotal = " + inttotal);
                 StateHasChanged();
                 // UpdateUI();
                 //if(!bFormSetup)
@@ -1199,7 +1202,7 @@
         {
             OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
             trans.errorCode = "Exception Error";
-            trans.AddTrail("BILL ACCEPTOR", "", "01");
+            trans.AddTrail("BILL ACCEPTOR", "BA - 001", "01");
             return;
         }
     }

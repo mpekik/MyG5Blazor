@@ -501,7 +501,7 @@
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
 
-                            Timer.SetTimer(20000);
+                            Timer.SetTimer(12000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
                         }
@@ -538,7 +538,7 @@
                                 Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            Timer.SetTimer(20000);
+                            Timer.SetTimer(12000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
                         }
@@ -636,7 +636,7 @@
                             trans.errorCode = "PEMBELIAN PULSA VIA CC BERHASIL";
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrail(trans, menu, cst);
-                            Timer.SetTimer(20000);
+                            Timer.SetTimer(12000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
                         }
@@ -674,7 +674,7 @@
                                 Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            Timer.SetTimer(20000);
+                            Timer.SetTimer(12000);
                             Timer.OnElapsed += TimerElapsedHandler;
                             break;
                         }
@@ -734,7 +734,7 @@
                 await OurUtility.AuditTrail(trans, menu, cst);
 
                 isCES = true;
-                timerMain.SetTimer(20000);
+                timerMain.SetTimer(12000);
                 timerMain.OnElapsed += TimerElapsedHandler;
             }
             else if(resultCash=="01")
@@ -744,7 +744,7 @@
                 trans.status = "01";
                 await OurUtility.AuditTrail(trans, menu, cst);
 
-                timerMain.SetTimer(20000);
+                timerMain.SetTimer(12000);
                 timerMain.OnElapsed += TimerElapsedHandler;
             }
             else
@@ -758,7 +758,7 @@
                 trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
                 await OurUtility.AuditTrail(trans, menu, cst);
 
-                timerMain.SetTimer(20000);
+                timerMain.SetTimer(12000);
                 timerMain.OnElapsed += TimerElapsedHandler;
             }
         }
@@ -1318,7 +1318,7 @@
             //Task.Run(() => CheckNPS("")).ConfigureAwait(true);
             Console.WriteLine("TES CES");
             isTimerMain = true;
-            timerMain.SetTimer(20000);
+            timerMain.SetTimer(12000);
             timerMain.OnElapsed += TimerElapsedHandler;
         }
     }

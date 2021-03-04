@@ -192,7 +192,10 @@
 
     private void InputPhoneNumber(string strInput)
     {
-        strNumber += strInput;
+        if (strNumber.Length < 12)
+        {
+            strNumber += strInput;
+        }
     }
 
     private void RemovePhoneNumber()

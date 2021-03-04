@@ -73,7 +73,7 @@
 <footer style="display: flex; z-index:2;">
     <div id="footer-side1" class="col-md-4" style="background-color:transparent;">
         <div style="margin-left: -1rem; margin-right: -2rem;">
-            <span style="margin:5px;" class="dot2">1</span>
+            <span style="margin:5px;" class="dot2">1</span>/
             <span style="margin:5px;" class="dot2">2</span>
             <span style="margin:5px;" class="dot2">3</span>
             <span style="margin:5px;" class="dot2">4</span>
@@ -85,7 +85,7 @@
         </div>
     </div>
     <div class="col-md-4">
-        <button @onclick="Lanjut" class="btn btn-danger button-nps" style="bottom: 10%;" id="myBtn1" disabled="@(!trans.psbDetail.isTC)">Lanjut</button>
+        <button @onclick="@(()=>InvokeAsync(Lanjut))" class="btn btn-danger button-nps" style="bottom: 10%;" id="myBtn1" disabled="@(!trans.psbDetail.isTC)">Lanjut dan Ambil Foto</button>
     </div>
     <div id="footer-side2" class="col-md-4">
         <div style="margin-left: -8rem; margin-right: -8rem;">
@@ -105,9 +105,19 @@
         </div>
     </div>
 }
+@if (isAmbilFoto)
+{
+    <div id="myModal" class="modal" style="z-index:999;">
+        <div class="modal-blank">
+            <img class="lds-spinner" src="../../assets/image/loader.gif">
+            <p><br>Proses pengambilan foto.</p>
+            <p style="line-height:1;">@((MarkupString)loadingMsg)</p>
+</div>
+    </div>
+}
 @if (isIdle)
 {
-    <div id="myModal" class="modal"style="z-index:999;">
+    <div id="myModal" class="modal" style="z-index:999;">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -123,15 +133,31 @@
         </div>
     </div>
 }
+@if (isPopUp)
+{
+    <div id="myModal" class="modal" style="z-index:999;">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">@((MarkupString)strMsgError)</p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(ButtonOkPopUp))">OK</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code{
     private bool isLoading = false;
     private bool isTC = false;
     private bool isEbill = false;
     private bool isPopUp = false;
+    private bool isAmbilFoto = false;
 
     private string releaseNumberService = "psb-halo/v1/release-number";
     private string _myURL = string.Empty;
     private string strMsgError = string.Empty;
+    private string loadingMsg = string.Empty;
 
     protected override async Task OnAfterRenderAsync(bool bFirstRender)
     {
@@ -152,9 +178,26 @@
     {
         NavigateTo("/psb/7a");
     }
-
-    private void Lanjut()
+    private async Task ButtonOkPopUp()
     {
+        if (translog)
+        {
+            translog = false;
+            isLoading = true;
+            await ReleaseNumber();
+            trans.AddTrail("SYARAT DAN KETENTUAN", "CANCELED", "02");
+            trans.status = "02";
+            trans.errorCode = "SnK";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+            NavigateTo("/main");
+        }
+    }
+    private async Task Lanjut()
+    {
+        loadingMsg = "Mohon berdiri tepat di depan mesin dan<br>tunggu sampai proses selesai.";
+        isAmbilFoto = true;
+        StateHasChanged();
+        await Task.Delay(5000);
         //trans.psbDetail.PaketPSB._hargaAwal = "100000";
         //trans.psbDetail.selectedNumber = "628116856722";
         //trans.psbDetail.PaketPSB._varianName = "Halo Unlimited 100rb";
@@ -176,6 +219,21 @@
             trans.psbDetail.strEbill = "0";
         }
 
+        byte[] image = OurUtility.CaptureImage();
+        if (image != null)
+        {
+            trans.psbDetail.snkImage = Convert.ToBase64String(image);
+            loadingMsg = "Proses pengambilan foto telah selesai.";
+            StateHasChanged();
+            await Task.Delay(3000);
+        }
+        else
+        {
+            isAmbilFoto = false;
+            isPopUp = true;
+            strMsgError = "<span style=\"font-weight: bold; \">IP Camera Tidak terdeteksi</span><br>Mohon hubungi <span style=\"font-weight: bold; \">Costumer Service</span> GraPARI untuk bantuan.";
+            return;
+        }
         NavigateTo("/PSB/8a");
     }
     private async Task MainMenu()
@@ -360,7 +418,7 @@
     {
         if (translog)
         {
-            isLoading = false;
+            translog = false;
             isLoading = true;
             await ReleaseNumber();
             trans.AddTrail("SYARAT DAN KETENTUAN", "CANCELED", "02");

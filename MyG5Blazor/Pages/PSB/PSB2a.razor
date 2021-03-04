@@ -209,7 +209,7 @@
     private string otp5 = string.Empty;
     private string otp6 = string.Empty;
 
-    private int kirim = 0;
+    private int kirim = 1;
     private int counterTimeOTP;
     private int counterTresholdOTP = 60;
     private bool kirimUlang = true;
@@ -431,7 +431,7 @@
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");                        
                     }
                     else
                     {
@@ -496,8 +496,8 @@
                 //isValid=true;
                 if (isValid)
                 {
-                    await GetPaket();
-                    //NavigateTo("/PSB/3");
+                    //await GetPaket();
+                    NavigateTo("/PSB/3");
                 }
                 else if (isOTPError)
                 {
@@ -529,8 +529,8 @@
         string myURL = _myURL + getPaket;
         OurUtility.Write_Log("Get Package", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
-        //string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        string strResult = TestData();
+        string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        //string strResult = TestData();
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
 
         if (strResult != "" && strResult != "Forbidden" && strResult != "NotFound" &&
@@ -555,7 +555,7 @@
                             pp.SelectToken("parentId").ToString(), pp.SelectToken("priceplanId").ToString());
                     }
                     menu.psbIndex = menu._menuPSB.Count();
-                    NavigateTo("/PSB/3a");
+                    NavigateTo("/PSB/3");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
