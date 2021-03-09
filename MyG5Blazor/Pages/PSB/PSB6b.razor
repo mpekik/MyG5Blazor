@@ -153,6 +153,7 @@
     {
         counterTime = counterTreshold;
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        strNumber = trans.psbDetail.patternNumber;
         if (trans.psbDetail.searchNumber > 2)
         {
             buttonDisabled = true;
@@ -181,15 +182,22 @@
     private bool buttonOk = true;
     private async Task OkOnClick()
     {
-        if (strNumber.Length < 5)
+        if (strNumber.Length == 4)
         {
             if (buttonOk)
             {
                 buttonOk = false;
                 trans.psbDetail.patternNumber = strNumber;
-                menu.psbNomer.Clear();
                 menu.pageIndex = 0;
-                await GetNomor();
+                if (trans.psbDetail.searchNumber < 3)
+                {
+                    menu.psbNomer.Clear();
+                    await GetNomor();
+                }
+                else
+                {
+                    NavigateTo("/psb/6c");
+                }
             }
         }
     }
@@ -242,7 +250,7 @@
         await Task.Delay(200);
         string myJson = "{ \"terminalId\": \"" + menu.terminalId + "\"," +
             "\"transactionId\": \"" + trans.transID + "\"," +
-            "\"poolName\": \"" + trans.psbDetail.selectedPaket + "\"," +
+            "\"poolName\": \"" + trans.psbDetail.PaketPSB._poolName + "\"," +
             "\"pattern\": \"" + trans.psbDetail.patternNumber + "\"" +
                "}";
         string myURL = _myURL + getNomor;

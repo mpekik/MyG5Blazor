@@ -220,9 +220,17 @@
         {
             case 1:
                 tempStr = tempStr.Insert(3, "-");
+                if ((len1 + strNumber.Length) == 5)
+                {
+                    temp2 = temp2.Insert(3, "-");
+                }
                 break;
             case 2:
                 tempStr = tempStr.Insert(2, "-");
+                if((len1+strNumber.Length)==6)
+                {
+                    temp2 = temp2.Insert(2, "-");
+                }
                 break;
             case 3:
                 tempStr = tempStr.Insert(1, "-");

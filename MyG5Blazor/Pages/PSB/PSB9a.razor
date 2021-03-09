@@ -200,7 +200,7 @@
             isLoading = false;
             trans.status = "01";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
-            NavigateTo("/gagalperso");
+            NavigateTo("/psb/gagalperso");
         }
         else if (isSuccess)
         {
@@ -267,7 +267,6 @@
                 {
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "00");
                     await OurUtility.AuditTrailPSB(trans, menu, cst);
-                    NavigateTo("/main");
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {

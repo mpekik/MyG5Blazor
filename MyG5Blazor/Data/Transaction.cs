@@ -35,7 +35,7 @@ namespace MyG5Blazor.Data
             public string selectedPaket { get; set; }
             public Menu.MenuPSB PaketPSB = new Menu.MenuPSB();
             public Ektp_Data ektpData = new Ektp_Data();
-            public string patternNumber { get; set; }
+            public string patternNumber { get; set; } = string.Empty;
             public string selectedNumber { get; set; }
             public string batasPemakaian { get; set; }
             public bool isTC { get; set; } = false;

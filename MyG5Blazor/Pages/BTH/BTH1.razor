@@ -245,7 +245,7 @@
             string myURL = _myURL + serviceURL;
 
             OurUtility.Write_Log("== Check Phone Number", "step-action");
-            OurUtility.Write_Log("== Request API : " + myJsonForLog, "step-action");
+            OurUtility.Write_Log("== Request API : " + myJson, "step-action");
             string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
             OurUtility.Write_Log("== Response API : " + strResult, "step-action");
             if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")

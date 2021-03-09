@@ -368,11 +368,11 @@
             buttonOk = false;
             isLoading = true;
             await Task.Delay(500);
-            trans.psbDetail.selectedPaket = menuPoolName[paramMenu];
+            trans.psbDetail.selectedPaket = menuHeader[paramMenu];
             //trans.psbDetail.selectedBuCode = menuBid[paramMenu];
             foreach (var pp in menu._menuPSB)
             {
-                if (trans.psbDetail.selectedPaket == pp._poolName)
+                if (trans.psbDetail.selectedPaket == pp._packageName)
                 {
                     trans.psbDetail.PaketPSB = pp;
                     int tempBatasPemakaian = int.Parse(trans.psbDetail.PaketPSB._harga);
