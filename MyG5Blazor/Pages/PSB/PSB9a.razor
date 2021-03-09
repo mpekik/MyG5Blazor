@@ -59,7 +59,7 @@
                                 <tr>
                                     <td>Paket</td>
                                     <td>&emsp;&emsp; : </td>
-                                    <td>&emsp;<span style="font-weight: bold; font-size:large;">@trans.psbDetail.PaketPSB._varianName</span></td>
+                                    <td>&emsp;<span style="font-weight: bold; font-size:xx-large;">@trans.psbDetail.PaketPSB._varianName</span></td>
                                 </tr>
                                 <tr>
                                     <td>Metode Bayar</td>
@@ -199,6 +199,7 @@
         {
             isLoading = false;
             trans.status = "01";
+            await ReleaseNumber();
             await OurUtility.AuditTrailPSB(trans, menu, cst);
             NavigateTo("/psb/gagalperso");
         }
@@ -211,9 +212,9 @@
         {
             isLoading = false;
             trans.status = "01";
+            await ReleaseNumber();
             await OurUtility.AuditTrailPSB(trans, menu, cst);
-            await Task.Delay(15000);
-            NavigateTo("/main");
+            NavigateTo("/psb/gagalperso");
         }
         #endregion
     }
@@ -266,7 +267,6 @@
                 if ((string)jobjResult["transaction"].SelectToken("statusCode") == "00")
                 {
                     trans.AddTrail("Release Number", "Number : " + trans.psbDetail.selectedNumber + ", Pool : " + trans.psbDetail.PaketPSB._poolName, "00");
-                    await OurUtility.AuditTrailPSB(trans, menu, cst);
                 }
                 else if ((string)jobjResult["transaction"].SelectToken("statusCode") == "01")
                 {
@@ -306,19 +306,16 @@
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error : " + ex.Message, "step-action");
                 //isNotIdle = false;
-                NavigateTo("/error");
             }
         }
         else
         {
             trans.AddTrail("Release Number", "Hit Webservice Error {" + strResult + "}", "01");
             trans.status = "01";
-            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             trans.errorCode = "Hit Webservice Error {" + strResult + "}";
             OurUtility.Write_Log("== Error : Hit Webservice Error {" + strResult + "}", "step-action");
             //isNotIdle = false;
-            NavigateTo("/error");
         }
     }
     private async Task MyPerso()
@@ -448,7 +445,6 @@
                                                 trans.kip = "Kartu Tidak Keluar, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
                                                 isLoading = false;
                                                 isError = true;
-                                                await ReleaseNumber();
                                                 return;
                                             }
                                         }
@@ -476,7 +472,6 @@
                                             {
                                                 isError = true;
                                                 trans.kip = "Perso gagal, trx id:" + trans.transID + ", terminal id:" + menu.terminalId;
-                                                await ReleaseNumber();
                                                 return;
                                             }
                                         }
@@ -492,7 +487,6 @@
                                         {
                                             isLoading = false;
                                             isError = true;
-                                            await ReleaseNumber();
                                             return;
                                         }
                                     }
@@ -510,7 +504,6 @@
                                             trans.AddTrail("GET STRING PANJANG", trans.errorCode, "01");
                                             //OurUtility.AuditTrail(trans, menu, cst);
                                             isError = true;
-                                            await ReleaseNumber();
                                             return;
                                         }
                                     }
@@ -529,7 +522,6 @@
                                         trans.AddTrail("MOVE TO BIN", "", "01");
                                         OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
                                         trans.errorCode = "CD - 003";
-                                        await ReleaseNumber();
                                         return;
                                     }
                                     if (intTryCount < intTryLimit)
@@ -538,7 +530,6 @@
                                     {
                                         isLoading = false;
                                         isError = true;
-                                        await ReleaseNumber();
                                         return;
                                     }
                                 }
@@ -550,7 +541,6 @@
                                     //IsVisible = false;
                                     IsInvalid = true;
                                     isError = true;
-                                    await ReleaseNumber();
                                     return;
                                 }
                             }
@@ -560,7 +550,6 @@
                                 OurUtility.Write_Log("=== Status Code : " + ex.Message + " {Error}", "step-action");
                                 trans.errorCode = "Exception Error";
                                 isError = true;
-                                await ReleaseNumber();
                                 return;
                             }
                         }
@@ -570,7 +559,6 @@
                             OurUtility.Write_Log("=== Status Code : " + strResult + " {Error}", "step-action");
                             trans.errorCode = strResult;
                             isError = true;
-                            await ReleaseNumber();
                             return;
                         }
                     }
@@ -586,7 +574,6 @@
                             trans.AddTrail("MOVE TO BIN", "", "01");
                             OurUtility.Write_Log("=== Card Dispenser Error, Move To BIN", "step-action");
                             trans.errorCode = "CD - 003";
-                            await ReleaseNumber();
                             return;
                         }
                         if (intTryCount < intTryLimit)
@@ -595,7 +582,6 @@
                         {
                             trans.errorCode = "FAILED GET SN";
                             isError = true;
-                            await ReleaseNumber();
                             return;
                         }
                     }
@@ -608,8 +594,7 @@
                     await OurUtility.AuditTrailPSB(trans, menu, cst);
                     OurUtility.Write_Log("=== Card Dispenser Error", "step-action");
                     trans.errorCode = "CD - 001";
-                    await ReleaseNumber();
-                    NavigateTo("/error");
+                    isError = true;
                     break;
                 }
             }
@@ -621,8 +606,7 @@
                 await OurUtility.AuditTrailPSB(trans, menu, cst);
                 OurUtility.Write_Log("=== Card Dispenser Error : Cek Persediaan Kartu", "step-action");
                 trans.errorCode = "Maaf Kartu Habis, Harap Hubungi Costumer Service MyGraPARI";
-                await ReleaseNumber();
-                NavigateTo("/error");
+                isError = true;
                 break;
             }
         }
