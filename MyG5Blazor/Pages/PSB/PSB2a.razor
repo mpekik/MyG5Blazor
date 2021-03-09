@@ -90,7 +90,7 @@
                         <button class="key-num btn btn-hapus" id="myBtn" value="ok" @onclick="Ok">Ok</button>
                         @if (kirim < 3)
                         {
-                        <button class="btn btn-danger btn-right3" id="btn-ok" style="width:100%;" value="" disabled="@(()=InvokeAsync(kirimUlang))" @onclick="KirimUlang">Kirim Ulang</button>
+                        <button class="btn btn-danger btn-right3" id="btn-ok" style="width:100%;" value="" disabled="@kirimUlang" @onclick="@(()=>InvokeAsync(KirimUlang))">Kirim Ulang</button>
                         }
 
                     </div>

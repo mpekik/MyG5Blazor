@@ -949,17 +949,19 @@
             IsSuccess = true;
 
             Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
-            await CheckNPS("");
 
             //Console.WriteLine("Payment Success");
             await Task.Delay(200);
             trans.status = "00";
             trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA CASH BERHASIL";
             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
+
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
             ctAkhir = cTresholdAkhir;
             await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
+            await CheckNPS("");
+
         }
         else
         {
@@ -974,6 +976,8 @@
 
             ctAkhir = cTresholdAkhir;
             await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
+            await CheckNPS("");
+
         }
     }
 
@@ -999,7 +1003,7 @@
 
             await Payment("");
 
-            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg); await CheckNPS("");
+            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
 
             Task.Delay(500);
 
@@ -1601,14 +1605,12 @@
         NavigateTo("/main");
     }
 
-
     private void TimerElapsedHandlerCES()
     {
         //CheckNPS("");
         isLoading = true;
         StateHasChanged();
     }
-
 
     private void NavigateTo(string strURL)
     {
@@ -1686,6 +1688,7 @@
             //NavMan.NavigateTo("/error");
         }
     }
+
     private bool MoveToTheFront()
     {
         OurUtility.Write_Log("=== Card Dispenser Move To The Front Position", "step-action");
