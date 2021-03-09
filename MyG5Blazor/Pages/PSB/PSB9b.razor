@@ -526,26 +526,6 @@
     }
     private async Task MethodCash()
     {
-        cst.intTagihan = intBill;
-        pageClass = "main-panel bg-home";
-        Payout.total = 0;
-        Payout.uangCount = 0;
-        try
-        {
-            logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
-        }
-        catch (Exception ex)
-        {
-            logbank = 0;
-        }
-        try
-        {
-            logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
-        }
-        catch (Exception ex)
-        {
-            logamount = 0;
-        }
         await Task.Delay(2000);
         await MainLoop(logbank, logamount);
 
@@ -707,6 +687,26 @@
                 }
             case 2:
                 {
+                    cst.intTagihan = intBill;
+                    pageClass = "main-panel bg-home";
+                    Payout.total = 0;
+                    Payout.uangCount = 0;
+                    try
+                    {
+                        logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
+                    }
+                    catch (Exception ex)
+                    {
+                        logbank = 0;
+                    }
+                    try
+                    {
+                        logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+                    }
+                    catch (Exception ex)
+                    {
+                        logamount = 0;
+                    }
 
                     await MethodCash();
                     break;
