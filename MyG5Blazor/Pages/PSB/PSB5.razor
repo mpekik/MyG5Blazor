@@ -50,7 +50,7 @@
                     }
                     @if (isInput)
                     {
-                        <div class="num-button">
+                        <div class="num-button" style="margin-left:180px;">
                             <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
                             <button class="key-num btn" value="2" @onclick="@(() => InputPhoneNumber("2"))">2</button>
                             <button class="key-num btn" value="3" @onclick="@(() => InputPhoneNumber("3"))">3</button>
@@ -210,7 +210,7 @@
         }
         else if (strNumber.Length < 16)
         {
-            strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> yang Anda gunakan tidak sesuai dengan <br>eKTP. Mohon periksa kembali <span style=\"font-weight: bold; \">NoKK</span> yang digunakan.";
+            strMsgError = "Maaf, <span style=\"font-weight: bold; \">NoKK</span> yang Anda masukkan tidak valid.<br>Mohon cek kembali <span style=\"font-weight: bold; \">NoKK</span> Anda.";
             isPopUp = true;
         }
     }

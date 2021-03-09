@@ -51,7 +51,7 @@
 
                 <div class="col-md-6">
                     <div class="text-primary">
-                        <input type="text" name="number" placeholder="Contoh : 4444" class="num-field" maxlength="4" @bind="strNumber" readonly>
+                        <input type="text" name="number" style="margin-left: 125px; font-weight:bold;" placeholder="Contoh : 4444" class="num-field" maxlength="4" @bind="strNumber" readonly>
                     </div>
                     <div class="" style="text-align: center; margin-top: 5%;">
                         @if (menu.psbIndex > 6)
@@ -111,15 +111,7 @@
         <span class="dot2">9</span>
     </div>
     <div class="footer-side2">
-        @if (trans.psbDetail.searchNumber < 3)
-        {
             <button @onclick="@(() => NavigateTo("/PSB/6b"))" class="btn-arrow btn" value="">Kembali</button>
-        }
-        else
-        {
-            <button @onclick="@(() => NavigateTo("/PSB/6a"))" class="btn-arrow btn" value="">Kembali</button>
-
-        }
         <button @onclick="MainMenu" class="btn-arrow btn" value="">Menu Utama</button>
         <!-- <sup>Powered By </sup>Trilogi Persada -->
     </div>
@@ -175,7 +167,7 @@
     private bool isSubmit = true;
     private bool isPopUp = false;
 
-    private string fontWeight = "font-weight: bold;";
+    private string fontWeight = "font-weight: normal;";
     private string strNumber = string.Empty;
     private string[] inputNumber;
     private string _myURL = string.Empty;
@@ -213,26 +205,42 @@
     }
     string NumberUI(string _numberUI)
     {
-        string temp = strNumber;
-        string temp01 = "0" + _numberUI.Substring(2, _numberUI.IndexOf(strNumber) - 2);
-        string split1 = "0" + _numberUI.Substring(2, _numberUI.IndexOf(strNumber) - 2);
+        string tempTotal = "0"+_numberUI.Substring(2);
+        string tempStr = strNumber;
+        string temp1 = tempTotal.Substring(0, tempTotal.IndexOf(strNumber));
+        int len1 = temp1.Length;
+        string temp2 = tempTotal.Substring(tempTotal.IndexOf(strNumber) + strNumber.Length);
+        int len2 = temp2.Length;
 
-        int indexSplit1 = split1.Length % 4;
-        split1 = Regex.Replace(split1, ".{4}", "$0-");
+        if (len1>=4)
+        {
+            temp1= Regex.Replace(temp1, ".{4}", "$0-");
+        }
+        switch((len1+strNumber.Length)%4)
+        {
+            case 1:
+                tempStr = tempStr.Insert(3, "-");
+                break;
+            case 2:
+                tempStr = tempStr.Insert(2, "-");
+                break;
+            case 3:
+                tempStr = tempStr.Insert(1, "-");
+                if((len1+strNumber.Length)==7)
+                {
+                    temp2 = temp2.Insert(1, "-");
+                }
+                break;
+            case 0:
+                tempStr = tempStr+"-";
+                if((len1+strNumber.Length)==4)
+                {
+                    temp2 = Regex.Replace(temp2, ".{4}(?!$)", "$0-");
+                }
+                break;
+        }
 
-        if (indexSplit1 != 0)
-        {
-            int posSplit = temp.Length - indexSplit1 + 1;
-            temp = temp.Insert(posSplit, "-");
-        }
-        int posSplit2 = 0;
-        string split2 = _numberUI.Substring(_numberUI.IndexOf(strNumber) + strNumber.Length);
-        if (split2.Length > (temp01 + temp).Length)
-        {
-            posSplit2 = split2.Length - (temp01 + temp).Length + 2;
-            split2 = split2.Insert(posSplit2, "-");
-        }
-        string ret = split1 + "<span style=\"font-weight: bold; \">" + temp + "</span>" + split2;
+        string ret = temp1+"<span style=\"font-weight: bold; \">"+tempStr  + "</span>"+temp2;
 
 
         return ret;
@@ -246,8 +254,8 @@
             {
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
-                //numberUI[i] = NumberUI(populateNumber[i]);
-                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}", "$0-");
+                numberUI[i] = NumberUI(populateNumber[i]);
+                //numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}(?!$)", "$0-");
                 StateHasChanged();
             }
         }
@@ -257,8 +265,8 @@
             {
                 boolNumber[i] = true;
                 populateNumber[i] = menu.psbNomer[i + menu.pageIndex];
-                //numberUI[i] = NumberUI(populateNumber[i]);
-                numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}(?!$)", "$0-");
+                numberUI[i] = NumberUI(populateNumber[i]);
+                //numberUI[i] = Regex.Replace("0" + populateNumber[i].Substring(2), ".{4}(?!$)", "$0-");
                 StateHasChanged();
             }
         }

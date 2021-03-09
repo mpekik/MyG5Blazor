@@ -43,24 +43,24 @@
                 <div class="col-md-6">
                     @if (strNumber == string.Empty)
                     {
-                        <input type="text" style="font-weight:bold;" name="number" placeholder="Contoh : 4444" class="num-field" readonly>
+                        <input type="text" style="font-weight:bold; margin-left:125px;" name="number" placeholder="Contoh : 4444" class="num-field" readonly>
                     }
                     else
                     {
-                        <input type="text" style="font-weight:bold;" name="number" class="num-field" @bind="strNumber" readonly />
+                        <input type="text" style="font-weight:bold; margin-left:125px;" name="number" class="num-field" @bind="strNumber" readonly />
                     }
-                    <div class="num-button">
-                        <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
-                        <button class="key-num btn" value="2" @onclick="@(() => InputPhoneNumber("2"))">2</button>
-                        <button class="key-num btn" value="3" @onclick="@(() => InputPhoneNumber("3"))">3</button>
-                        <button class="key-num btn" value="4" @onclick="@(() => InputPhoneNumber("4"))">4</button>
-                        <button class="key-num btn" value="5" @onclick="@(() => InputPhoneNumber("5"))">5</button>
-                        <button class="key-num btn" value="6" @onclick="@(() => InputPhoneNumber("6"))">6</button>
-                        <button class="key-num btn" value="7" @onclick="@(() => InputPhoneNumber("7"))">7</button>
-                        <button class="key-num btn" value="8" @onclick="@(() => InputPhoneNumber("8"))">8</button>
-                        <button class="key-num btn" value="9" @onclick="@(() => InputPhoneNumber("9"))">9</button>
-                        <button class="key-num btn btn-hapus" value="Hapus" @onclick="RemovePhoneNumber">Hapus</button>
-                        <button class="key-num btn" value="0" id="myBtnUndefine" @onclick="@(() => InputPhoneNumber("0"))">0</button>
+                    <div class="num-button" style="margin-left:180px;">
+                        <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))" disabled="@buttonDisabled">1</button>
+                        <button class="key-num btn" value="2" @onclick="@(() => InputPhoneNumber("2"))" disabled="@buttonDisabled">2</button>
+                        <button class="key-num btn" value="3" @onclick="@(() => InputPhoneNumber("3"))" disabled="@buttonDisabled">3</button>
+                        <button class="key-num btn" value="4" @onclick="@(() => InputPhoneNumber("4"))" disabled="@buttonDisabled">4</button>
+                        <button class="key-num btn" value="5" @onclick="@(() => InputPhoneNumber("5"))" disabled="@buttonDisabled">5</button>
+                        <button class="key-num btn" value="6" @onclick="@(() => InputPhoneNumber("6"))" disabled="@buttonDisabled">6</button>
+                        <button class="key-num btn" value="7" @onclick="@(() => InputPhoneNumber("7"))" disabled="@buttonDisabled">7</button>
+                        <button class="key-num btn" value="8" @onclick="@(() => InputPhoneNumber("8"))" disabled="@buttonDisabled">8</button>
+                        <button class="key-num btn" value="9" @onclick="@(() => InputPhoneNumber("9"))" disabled="@buttonDisabled">9</button>
+                        <button class="key-num btn btn-hapus" value="Hapus" @onclick="RemovePhoneNumber" disabled="@buttonDisabled">Hapus</button>
+                        <button class="key-num btn" value="0" id="myBtnUndefine" @onclick="@(() => InputPhoneNumber("0"))" disabled="@buttonDisabled">0</button>
                         <button class="key-num btn btn-hapus" id="myBtn" value="ok" @onclick="@(()=>InvokeAsync(OkOnClick))">Ok</button>
                     </div>
                     <div class="button-down">
@@ -94,7 +94,7 @@
 </footer>
 @if (isPopUp)
 {
-    <div id="myModal" class="modal"style="z-index:999;">
+    <div id="myModal" class="modal" style="z-index:999;">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -118,7 +118,7 @@
 }
 @if (isIdle)
 {
-    <div id="myModal" class="modal"style="z-index:999;">
+    <div id="myModal" class="modal" style="z-index:999;">
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
             <div class="modal-content">
@@ -142,6 +142,7 @@
     private bool isLoading = false;
     private bool isSubmit = true;
     private bool isPopUp = false;
+    private bool buttonDisabled = false;
 
     private string strNumber = string.Empty;
     private string _myURL = string.Empty;
@@ -152,9 +153,11 @@
     {
         counterTime = counterTreshold;
         _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-
+        if (trans.psbDetail.searchNumber > 2)
+        {
+            buttonDisabled = true;
+        }
     }
-
     private void InputPhoneNumber(string strInput)
     {
         if (strNumber.Length < 4)
@@ -169,7 +172,7 @@
     private bool buttonNavigasi = true;
     private async Task Back()
     {
-        if(buttonNavigasi)
+        if (buttonNavigasi)
         {
             buttonNavigasi = false;
             NavigateTo("/psb/6a");
@@ -178,7 +181,7 @@
     private bool buttonOk = true;
     private async Task OkOnClick()
     {
-        if (strNumber.Length > 2 && strNumber.Length < 5)
+        if (strNumber.Length < 5)
         {
             if (buttonOk)
             {
@@ -436,6 +439,6 @@
 
     private string DummyNumber()
     {
-        return "{\"transaction\":{\"transactionId\":\"X002210209104813201932026\",\"statusCode\":\"00\",\"statusDesc\":\"success\"},\"numbers\":[\"628113922243\",\"628113922256\",\"628113922257\",\"628113922261\",\"628113922269\",\"628113922270\",\"628113922273\",\"628113922275\",\"628113922276\",\"628113922279\",\"628113922280\",\"628113922286\",\"628113922289\",\"628113922294\",\"628115222050\",\"628115222090\",\"628117222383\",\"628117222693\"],\"total\":18}";
+        return "{\"transaction\":{\"transactionId\":\"X002210209104813201932026\",\"statusCode\":\"00\",\"statusDesc\":\"success\"},\"numbers\":[\"628122225443\",\"628112222456\",\"628113922227\",\"628113912222\",\"628113922221\",\"628113222270\",\"628112222373\",\"628122223245\",\"628113952222\",\"628113222279\",\"628112222380\",\"628113922226\",\"628113942222\",\"628122224394\",\"628113222250\",\"628113122220\",\"628113132222\",\"628113692222\"],\"total\":18}";
     }
 }

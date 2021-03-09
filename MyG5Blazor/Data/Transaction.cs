@@ -47,6 +47,11 @@ namespace MyG5Blazor.Data
             public string statusPayment { get; set; }
             public int searchNumber { get; set; } = 0;
             public string snkImage { get; set; }
+            public void clearSelectedPackage()
+            {
+                selectedPaket = string.Empty;
+                PaketPSB = new Menu.MenuPSB();
+            }
         }
 
         public PSBDetail psbDetail = new PSBDetail();
@@ -88,6 +93,7 @@ namespace MyG5Blazor.Data
             transID = strTransID;
         }
 
+        
         public void SetTransaction(string strBUID, string strTermID, string strJenisTrans)
         {
             buID = strBUID;

@@ -75,7 +75,7 @@
                         </div>
                     </div>
 
-                    <div class="num-button">
+                    <div class="num-button" style="margin-left:170px;">
                         <button class="key-num btn" value="1" @onclick="@(() => InputPhoneNumber("1"))">1</button>
                         <button class="key-num btn" value="2" @onclick="@(() => InputPhoneNumber("2"))">2</button>
                         <button class="key-num btn" value="3" @onclick="@(() => InputPhoneNumber("3"))">3</button>
@@ -90,7 +90,7 @@
                         <button class="key-num btn btn-hapus" id="myBtn" value="ok" @onclick="Ok">Ok</button>
                         @if (kirim < 3)
                         {
-                        <button class="btn btn-danger btn-right3" id="btn-ok" style="width:100%;" value="" disabled="@kirimUlang" @onclick="KirimUlang">Kirim Ulang</button>
+                        <button class="btn btn-danger btn-right3" id="btn-ok" style="width:100%;" value="" disabled="@(()=InvokeAsync(kirimUlang))" @onclick="KirimUlang">Kirim Ulang</button>
                         }
 
                     </div>
@@ -287,6 +287,10 @@
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
+                        if(trans.errorCode=="30600")
+                        {
+                            return;
+                        }
                     }
                     else
                     {
@@ -335,9 +339,9 @@
         kirim += 1;
         kirimUlang = true;
         counterTimeOTP = counterTresholdOTP;
-        await Task.Run(() => OTPTime()).ConfigureAwait(false);
-
         await RequestOTP();
+
+        await Task.Run(() => OTPTime()).ConfigureAwait(false);
     }
 
     private void InputPhoneNumber(string strInput)
@@ -431,7 +435,7 @@
                     if ((string)jobjResult["transaction"].SelectToken("errorCode") != null)
                     {
                         OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusDesc") + " {Error}", "step-action");
-                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");                        
+                        trans.errorCode = (string)jobjResult["transaction"].SelectToken("errorCode");
                     }
                     else
                     {

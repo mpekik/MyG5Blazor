@@ -183,7 +183,7 @@
                             <img src="../../assets/image/icon_internet.png" style="width: 90%;">
                         </div>
                         <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Data All Net</b>
+                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Internet</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right; border-bottom: 1px solid #eeeeee;">
                             <p>@menuDataAllNet[paramMenu]</p>
@@ -194,7 +194,7 @@
                             <img src="../../assets/image/icon_internet.png" style="width: 90%;">
                         </div>
                         <div class="col-md-6" style="text-align: left; border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Data Roaming</b>
+                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Internet Roaming</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right; border-bottom: 1px solid #eeeeee;">
                             <p>@menuDataRoaming[paramMenu]@menuSatuanDataAllRoaming[paramMenu]</p>
@@ -206,7 +206,7 @@
                             <img src="../../assets/image/icon_internet.png" style="width: 90%;">
                         </div>
                         <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Data Content</b>
+                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Internet Daily Apps</b>
                             <p style="font-size: 12px; line-height: 15px; font-style: italic; margin-right: -1rem;">
                                 @menuDataContent[paramMenu]
                             </p>
@@ -216,29 +216,12 @@
                         </div>
                     </div>
 
-                    @if (menuDataSubscription[paramMenu] != "-")
-                    {
-                        <div class="col-md-12" style="margin-top: 3%; height: 40px; display: flex;">
-                            <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
-                                <img src="../../assets/image/icon_internet.png" style="width: 90%;">
-                            </div>
-                            <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                                <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Data Subscription</b>
-                                <p style="font-size: 12px; line-height: 15px; font-style: italic; margin-right: -1rem;">
-                                    @menuDataSubscription[paramMenu]
-                                </p>
-                            </div>
-                            <div class="col-md-2 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
-
-                            </div>
-                        </div>
-                    }
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex;">
                         <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
                             <img src="../../assets/image/icon_telepon.png" style="width: 90%;">
                         </div>
                         <div class="col-md-8" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
-                            <b class="teks-pop" style="font-size: 26px;  font-weight: bold;">Telepon</b>
+                            <b class="teks-pop" style="font-size: 26px;  font-weight: bold;">Telepon Semua Operator</b>
                         </div>
                         <div class="col-md-3 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
                             <p>@menuTelp[paramMenu]Menit</p>
@@ -250,13 +233,30 @@
                             <img src="../../assets/image/icon_SMS.png" style="width: 90%;">
                         </div>
                         <div class="col-md-6" style="text-align: left;">
-                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">SMS</b>
+                            <b class="teks-pop" style="font-size: 26px; font-weight: bold;">SMS Semua Operator</b>
                         </div>
                         <div class="col-md-5 teks-bold" style="text-align: right;">
                             <p>@menuSMS[paramMenu]SMS</p>
                         </div>
                     </div>
 
+                    @if (menuDataSubscription[paramMenu] != "-")
+                    {
+                        <div class="col-md-12" style="margin-top: 3%; height: 40px; display: flex;">
+                            <div class="col-md-1" style="border-bottom: 1px solid #eeeeee;padding-left: 0px">
+                                <img src="../../assets/image/icon_internet.png" style="width: 90%;">
+                            </div>
+                            <div class="col-md-9" style="text-align: left;  border-bottom: 1px solid #eeeeee;">
+                                <b class="teks-pop" style="font-size: 26px; font-weight: bold;">Berlangganan</b>
+                                <p style="font-size: 12px; line-height: 15px; font-style: italic; margin-right: -1rem;">
+                                    @menuDataSubscription[paramMenu]
+                                </p>
+                            </div>
+                            <div class="col-md-2 teks-bold" style="text-align: right;  border-bottom: 1px solid #eeeeee;">
+
+                            </div>
+                        </div>
+                    }
                     <div class="col-md-12" style="margin-top: 3%; height: 37px; display: flex; color: red;">
                         <div class="col-md-7" style="text-align: left;">
                             <b class="teks-pop" style="font-size: 26px; margin-left: -1rem; font-weight: bold;">Rp Pembayaran di Muka</b>
@@ -339,6 +339,7 @@
 
     protected override async Task OnInitializedAsync()
     {
+
         menu.packageIndex=0;
         menu.pageIndex = 0;
         counterTime = counterTreshold;
