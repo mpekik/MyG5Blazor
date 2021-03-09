@@ -22,7 +22,7 @@
 @inject Menu menu
 @inject Card_Dispenser cds
 
-<div class=@pageClass style="z-index:1;">
+<div class="main-panel bg-home" style="z-index:1;">
     <!-- Navbar -->
     <nav class="navbar navbar-expand-lg navbar-transparent navbar-absolute fixed-top ">
         <div class="container-fluid">
@@ -47,12 +47,20 @@
     <div class="content">
         <div class="container-fluid">
             <div class="row">
-                <div class="teks-title">Berlangganan KartuHalo</div>
-                <div id="status-pay" class="teks-center teks-bold" style="line-height: 1; font-size: xx-large; margin-top: 3em;">
-                    Proses Pembayaran Berlangganan KartuHalo <b class="red">Tidak Berhasil</b><br><br>
+                <div class="col-md-6">
+                    <div class="teks-title">Berlangganan KartuHalo</div>
+                    <div id="status-pay" class="teks-center teks-bold" style="line-height: 1; font-size: xx-large; margin-top: 3em;">
+                        Proses Pembayaran Berlangganan KartuHalo <b class="red">Tidak Berhasil</b><br><br>
 
-                    <span style="font-weight: normal;">Silakan hubungi Customer Service GraPARI untuk bantuan.</span>
+                        <span style="font-weight: normal;">Silakan hubungi Customer Service GraPARI untuk bantuan.</span>
 
+                    </div>
+                </div>
+
+                <div class="col-md-6" style="display:grid;min-height:25vh;">
+                    <div id="image-pulsa" class="image-center2" style="align-self:center;">
+                        <img src="../../assets/image/Logo/00_logo_KartuHalo.png" alt="" width="450px">
+                     </div>
                 </div>
             </div>
         </div>
