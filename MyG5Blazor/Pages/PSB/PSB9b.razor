@@ -79,7 +79,7 @@
                                             Silakan Ambil kartuHalo Anda dan Selamat <br />Menikmati Layanan Prioritas di Jaringan <br />kartuHalo.<br />
                                             <span style="font-size:18px; font-style:italic"><br />Jika nomor Anda belum aktif dalam maksimal 2x24 jam,mohon hubungi Customer Service GraPARI.<br /></span>
                                             <br />Formulir Elektronik Berlangganan KartuHalo <br />Anda akan Kami Kirimkan ke Email yang <br />Didaftarkan. Silakan Tekan Tautan di Bawah <br />untuk Melihat.
-                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="@(()=>isOpenDoc=true)" @onclick:preventDefault>
+                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="@(()=>InvokeAsync(OpenDocument))" @onclick:preventDefault>
                                                 <br />Formulir Elektronik Berlangganan KartuHalo
                                             </a>
                                         </span>
@@ -158,7 +158,7 @@
                                             Silakan Ambil kartuHalo Anda dan Selamat <br />Menikmati Layanan Prioritas di Jaringan <br />kartuHalo.<br />
                                             <span style="font-size:18px; font-style:italic"><br />Jika nomor Anda belum aktif dalam maksimal 2x24 jam,mohon hubungi Customer Service GraPARI.<br /></span>
                                             <br />Formulir Elektronik Berlangganan KartuHalo <br />Anda akan Kami Kirimkan ke Email yang <br />Didaftarkan. Silakan Tekan Tautan di Bawah <br />untuk Melihat.
-                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="@(()=>isOpenDoc=true)" @onclick:preventDefault>
+                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="@(()=>InvokeAsync(OpenDocument))" @onclick:preventDefault>
                                                 <br />Formulir Elektronik Berlangganan KartuHalo
                                             </a>
                                         </span>
@@ -226,7 +226,7 @@
                                             Silakan Ambil kartuHalo Anda dan Selamat <br />Menikmati Layanan Prioritas di Jaringan <br />kartuHalo.<br />
                                             <span style="font-size:18px; font-style:italic"><br />Jika nomor Anda belum aktif dalam maksimal 2x24 jam,mohon hubungi Customer Service GraPARI.<br /></span>
                                             <br />Formulir Elektronik Berlangganan KartuHalo <br />Anda akan Kami Kirimkan ke Email yang <br />Didaftarkan. Silakan Tekan Tautan di Bawah <br />untuk Melihat.
-                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="@(()=>isOpenDoc=true)" @onclick:preventDefault>
+                                            <a style="font-size: 18px; justify-self: center; text-decoration: underline;" href="" @onclick="@(()=>InvokeAsync(OpenDocument))" @onclick:preventDefault>
                                                 <br />Formulir Elektronik Berlangganan KartuHalo
                                             </a>
                                         </span>
@@ -280,7 +280,7 @@
         <div class="footer-side2">
             @if (MetodePembayaran == 2 && !IsFail && !IsSuccess)
             {
-                <button @onclick="@(()=>IsExit = true)" class="btn-arrow btn" value="">Menu Utama</button>
+                <button @onclick="@(()=>InvokeAsync(MenuUtamaCash))" class="btn-arrow btn" value="">Menu Utama</button>
             }
             <!--<sup>Powered By </sup>Trilogi Persada -->
         </div>
@@ -305,7 +305,7 @@
 }
 @if (isOpenDoc)
 {
-    <div id="myModal" class="modal" style="z-index:999;">
+    <div id="myModal" class="modal" style="z-index:999;" @onclick="@(()=>InvokeAsync(TambahWaktuDocument))">
 
         <!-- Modal content -->
         <div class="modal-dialog-centered" role="document">
@@ -314,7 +314,7 @@
                     <div class="card example-1 scrollbar-ripe-malinka" style="text-align: center; margin-bottom:10px; height:500px;">
                         <object data="../../assets/PSB.pdf#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="500px">
                         </object>
-                    </div><button class="btn btn-danger modal-button" @onclick="@(()=>isOpenDoc=false)" id="btn-lanjut">Tutup</button>
+                    </div><button class="btn btn-danger modal-button" @onclick="@(()=>InvokeAsync(CloseDocument))" id="btn-lanjut">Tutup</button>
                 </div>
             </div>
         </div>
@@ -435,6 +435,24 @@
         </div>
     </div>
 }
+@if (isIdleDocument)
+{
+    <div id="myModal" class="modal" style="z-index:3;">
+        <!-- Modal content -->
+        <div class="modal-dialog-centered" role="document">
+            <div class="modal-content">
+                <div class="modal-body">
+                    <p class="text-body">
+                        Apakah Anda ingin menambah waktu lagi? <br />
+                        Anda akan keluar secara otomatis dalam waktu<span style="font-weight:bold;"> @secondCTimeDocument</span> detik.
+                    </p>
+                    <button class="btn btn-danger modal-button" @onclick="@(() => InvokeAsync(TambahWaktuDocument))">Ya</button>
+                    <button class="btn btn-light modal-button" @onclick="@(()=>secondCTimeDocument=0)">Tidak</button>
+                </div>
+            </div>
+        </div>
+    </div>
+}
 @code
 {
     public List<CES> surveys = new List<CES>();
@@ -507,6 +525,22 @@
     string msg = string.Empty;
     string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
+    #region Document
+    private async Task OpenDocument()
+    {
+        isOpenDoc = true;
+        isNotIdleDocument = true;
+        await Task.Run(() => DoubleTimeOutDocument()).ConfigureAwait(false);
+    }
+
+    private async Task CloseDocument()
+    {
+        isNotIdleDocument = false;
+        isIdleDocument = false;
+        isTimeOutDocument = false;
+        NavigateTo("/main");
+    }
+    #endregion
     #region Cash
     private async Task MenuUtamaCash()
     {
@@ -592,10 +626,11 @@
                     {
                         OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
                         isLoading = true;
-                        StateHasChanged();
+                        InvokeAsync(StateHasChanged);
                         await Task.Delay(200);
                         intAccBill = intBill;
                         await Payment("");
+                        //resultPayment = "00";
 
                         if (resultPayment == "00")
                         {
@@ -606,7 +641,7 @@
                             IsFail = false;
                             IsSuccess = true;
                             //Console.WriteLine("Payment Success");
-                            StateHasChanged();
+                            InvokeAsync(StateHasChanged);
                             await Task.Delay(200);
 
                             if (trans.edcresp == "00")
@@ -619,8 +654,6 @@
                             trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA DEBIT BERHASIL";
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
                             await OurUtility.AuditTrailPSB(trans, menu, cst);
-
-                            await CheckNPS("");
 
                             ctAkhir = cTresholdAkhir;
                             await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
@@ -743,8 +776,6 @@
 
                             Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
 
-                            await CheckNPS("");
-
                             trans.status = "00";
                             trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA CC BERHASIL";
                             trans.kip = "Berhasil, terminal id:" + menu.terminalId;
@@ -830,6 +861,7 @@
         OurUtility.Write_Log("== Get Document", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        //string strResult = "{\"transaction\":{\"statusCode\":\"00\",\"statusDesc\":\"success\"},\"url\":\"https://10.1.89.24/trilogi/mygrapari/v4/docman/download/doc_mygrapari_flp_X002210310020309605896069.pdf\"}";
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
@@ -898,6 +930,7 @@
         OurUtility.Write_Log("== Send Document", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        //string strResult = "{\"transaction\":{\"statusCode\":\"00\",\"statusDesc\":\"success\"}}";
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
@@ -954,6 +987,8 @@
     }
     private async Task Tunai()
     {
+        isTimeOut = false;
+        isNotIdle = false;
         isTunaiComplete = false;
         resultCash = "00";
         trans.psbDetail.statusPayment = "00";
@@ -981,8 +1016,6 @@
 
             ctAkhir = cTresholdAkhir;
             await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
-            await CheckNPS("");
-
         }
         else
         {
@@ -1141,6 +1174,8 @@
         if (CESno >= surveys.Count())
         {
             IsVisible = false;
+            isIdleSurvey = false;
+            isNotIdleSurvey = false;
             StateHasChanged();
             await Task.Delay(2000);
             //ToDo Send Answer
@@ -1156,10 +1191,10 @@
         string myURL = _myURL + cesURL;
 
         OurUtility.Write_Log("== Check CES", "step-action");
-        OurUtility.Write_Log("== URL API : " + myURL, "step-action");
+        //OurUtility.Write_Log("== URL API : " + myURL, "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
-        //OurUtility.Write_Log("== Response API : " + strResult, "step-action");
+        OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest")
         {
             try
@@ -1177,7 +1212,6 @@
                         c.answID = (string)question.SelectToken("answerId");
                         surveys.Add(c);
                     }
-                    trans.AddTrail("CES", "", "00");
                     IsVisible = true;
                     return;
                 }
@@ -1190,13 +1224,10 @@
                     }
                     else
                     {
-                        string _statusDescSub = ((string)jobjResult["transaction"].SelectToken("statusDesc"));
-                        string statusDescSub = _statusDescSub.Substring(0, _statusDescSub.IndexOf(":"));
-                        OurUtility.Write_Log("== Status Code : " + statusDescSub + " {Error}", "step-action");
+                        OurUtility.Write_Log("== Status Code : " + (string)jobjResult["transaction"].SelectToken("statusCode") + " {Error}", "step-action");
                         trans.errorCode = (string)jobjResult["transaction"].SelectToken("statusCode");
                     }
-                    trans.AddTrail("CES", "", "01");
-
+                    
                     //                    isLoading = false;
                     //                  IsVisible = false;
                     //                IsInvalid = true;
@@ -1207,16 +1238,14 @@
                     strMsgError = (string)jobjResult["transaction"].SelectToken("statusDesc");
                     IsVisible = false;
                     IsInvalid = true;
-                    trans.AddTrail("CES", "", "02");
-
+                    
                 }
             }
             catch (Exception ex)
             {
                 trans.errorCode = "Exception Error";
                 OurUtility.Write_Log("== Error :" + ex.Message, "step-action");
-                trans.AddTrail("CES", "", "01");
-
+                
                 //NavMan.NavigateTo("/error");
             }
         }
@@ -1224,8 +1253,7 @@
         {
             trans.errorCode = strResult;
             OurUtility.Write_Log("== Error : Hit WebService {Error}", "step-action");
-            trans.AddTrail("CES", "", "01");
-
+            
             //NavMan.NavigateTo("/error");
         }
     }
@@ -1410,6 +1438,7 @@
         OurUtility.Write_Log("== Payment", "step-action");
         OurUtility.Write_Log("== Request API : " + myJson, "step-action");
         string strResult = await OurUtility.PostCallAPI(myURL, myJson, menu);
+        //string strResult = "{\"transaction\":{\"transactionId\":\"X002210310020309605896069\",\"statusCode\":\"00\",\"statusDesc\":\"success\"}}";
         OurUtility.Write_Log("== Response API : " + strResult, "step-action");
         if (strResult != "" && strResult != "NotFound" && strResult != "InternalServerError" && strResult != "BadRequest" && strResult != "GatewayTimeout")
         {
@@ -1513,7 +1542,7 @@
             {
                 await Task.Delay(1000);
                 //Console.WriteLine("2");
-                if (!Payout.DoPoll(trans, bankNote, bankAmount,ref counterTime))
+                if (!Payout.DoPoll(trans, bankNote, bankAmount, ref counterTime))
                 {
                     //Console.WriteLine("Poll failed, attempting to reconnect...\r\n");
                     while (true)
@@ -1889,8 +1918,8 @@
         }
     }
     #region TimeOutAkhir
-    private int ctAkhir = 30;
-    private int cTresholdAkhir = 10;
+    private int ctAkhir = 20;
+    private int cTresholdAkhir = 20;
     private bool isIdleAkhir = false;
     private bool isNotIdleAkhir = true;
     private async Task IdleTimeAkhir()
@@ -1901,11 +1930,23 @@
             Console.WriteLine("Idle 9b Akhir Time Left : " + ctAkhir.ToString());
             ctAkhir = ctAkhir - 1;
             InvokeAsync(StateHasChanged);
+            if (ctAkhir == 10)
+            {
+                await CheckNPS("");
+                //IsVisible = true;
+                if (IsVisible)
+                {
+                    isIdleAkhir = false;
+                    isNotIdleAkhir = false;
+                    await Task.Run(() => DoubleTimeOutSurvey()).ConfigureAwait(false);
+                }
+            }
             if (ctAkhir < 1)
             {
-                isIdleAkhir = true;
+                isIdleAkhir = false;
                 isNotIdleAkhir = false;
                 secondCTimeAkhir = cTresholdAkhir;
+                isTimeOutAkhir = true;
                 InvokeAsync(StateHasChanged);
                 return;
             }
@@ -1969,4 +2010,166 @@
     }
     #endregion
 
+    #region TimeOutSurvey
+    private int ctSurvey = 20;
+    private int cTresholdSurvey = 20;
+    private bool isIdleSurvey = false;
+    private bool isNotIdleSurvey = true;
+    private async Task IdleTimeSurvey()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Idle 9b Survey Time Left : " + ctSurvey.ToString());
+            ctSurvey = ctSurvey - 1;
+            InvokeAsync(StateHasChanged);
+            if (ctSurvey < 1)
+            {
+                isIdleSurvey = false;
+                isNotIdleSurvey = false;
+                isTimeOutSurvey = true;
+                secondCTimeSurvey = cTresholdSurvey;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdleSurvey);
+    }
+    #endregion
+
+    #region SecondTimeOutSurvey
+    private int secondCTimeSurvey;
+    private bool isTimeOutSurvey = false;
+
+    private async Task TimeOutSurvey()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Time 9b Survey Out Left : " + secondCTimeSurvey.ToString());
+            secondCTimeSurvey = secondCTimeSurvey - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTimeSurvey < 0)
+            {
+                isIdleSurvey = false;
+                isTimeOutSurvey = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdleSurvey);
+    }
+
+    private async Task TambahWaktuSurvey()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        ctSurvey = cTresholdSurvey;
+        //secondCTime = 0;
+        isIdleSurvey = false;
+        isTimeOutSurvey = false;
+        isNotIdleSurvey = true;
+        await Task.Run(() => DoubleTimeOutSurvey()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOutSurvey()
+    {
+        await Task.Run(() => IdleTimeSurvey()).ConfigureAwait(false);
+        if (isIdleSurvey)
+            await Task.Run(() => TimeOutSurvey()).ConfigureAwait(false);
+        if (isTimeOutSurvey)
+        {
+            //Console.WriteLine("Time Out 2");
+            NavigateTo("/main");
+            //await TunaiExitFail();
+        }
+    }
+
+    private async Task ResetTimerSurvey()
+    {
+        if (!isIdleSurvey)
+        {
+            //Console.WriteLine("Timer Reset");
+            ctSurvey = cTresholdSurvey;
+        }
+    }
+    #endregion
+
+    #region TimeOutDocument
+    private int ctDocument = 60;
+    private int cTresholdDocument = 60;
+    private bool isIdleDocument = false;
+    private bool isNotIdleDocument = true;
+    private async Task IdleTimeDocument()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Idle 9b Document Time Left : " + ctDocument.ToString());
+            ctDocument = ctDocument - 1;
+            InvokeAsync(StateHasChanged);
+            if (ctDocument < 1)
+            {
+                isIdleDocument = true;
+                isNotIdleDocument = false;
+                secondCTimeDocument = cTresholdSurvey;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isNotIdleDocument);
+    }
+    #endregion
+
+    #region SecondTimeOutDocument
+    private int secondCTimeDocument;
+    private bool isTimeOutDocument = false;
+
+    private async Task TimeOutDocument()
+    {
+        do
+        {
+            await Task.Delay(1000);
+            Console.WriteLine("Time 9b Survey Out Left : " + secondCTimeDocument.ToString());
+            secondCTimeDocument = secondCTimeDocument - 1;
+            InvokeAsync(StateHasChanged);
+            if (secondCTimeDocument < 0)
+            {
+                isIdleDocument = false;
+                isTimeOutDocument = true;
+                InvokeAsync(StateHasChanged);
+                return;
+            }
+        } while (isIdleDocument);
+    }
+
+    private async Task TambahWaktuDocument()
+    {
+        //Console.WriteLine("Tambah Waktu");
+        ctDocument = cTresholdDocument;
+        //secondCTime = 0;
+        isIdleDocument = false;
+        isTimeOutDocument = false;
+        isNotIdleDocument = true;
+        await Task.Run(() => DoubleTimeOutDocument()).ConfigureAwait(false);
+    }
+
+    private async Task DoubleTimeOutDocument()
+    {
+        await Task.Run(() => IdleTimeDocument()).ConfigureAwait(false);
+        if (isIdleDocument)
+            await Task.Run(() => TimeOutDocument()).ConfigureAwait(false);
+        if (isTimeOutDocument)
+        {
+            //Console.WriteLine("Time Out 2");
+            NavigateTo("/main");
+            //await TunaiExitFail();
+        }
+    }
+
+    private async Task ResetTimerDocument()
+    {
+        if (!isIdleDocument)
+        {
+            //Console.WriteLine("Timer Reset");
+            ctDocument = cTresholdDocument;
+        }
+    }
+    #endregion
 } 

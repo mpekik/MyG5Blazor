@@ -1491,12 +1491,12 @@ namespace MyG5Blazor.Data
 
                     e.Graphics.DrawString("Pembayaran di muka/upfront payment akan digunakan pada tagihan bulan pertama Anda"
                                   , font8, brush, layout, formatCenter);
-                    Offset = Offset + lineheight8;
-                    layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                    Offset = Offset + (lineheight8*2);
+                    layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
                     e.Graphics.DrawString("Mohon simpan struk sebagai bukti pembayaran di muka telah dilakukan"
                                   , font8, brush, layout, formatCenter);
                     Offset = Offset + lineheight8;
-                    layout = new RectangleF(new PointF(_startX + 120, _startY + Offset), layoutSize);
+                    layout = new RectangleF(new PointF(_startX, _startY + Offset), layoutSize);
                 }
 
                 Offset = Offset + lineheight8;

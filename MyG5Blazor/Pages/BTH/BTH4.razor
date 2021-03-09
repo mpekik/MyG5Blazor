@@ -251,8 +251,8 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>tagihan kartuHalo. Jika Anda keluar dari menu ini,<br>seluruh uang yang Anda masukkan dapat diambil di<br>Kasir GraPARI dengan menunjukkan struk dari<br>MyGraPARI.</p>
-                    <button class="btn btn-danger modal-button" @onclick="TunaiExitFail" id="btn-lanjut">Lanjut</button>
-                    <button @onclick="@(()=>IsExit = false)" class="btn btn-light modal-button">Batal</button>
+                    <button class="btn btn-danger modal-button" @onclick="@(()=>IsExit = false)" id="btn-lanjut">Lanjut Pembayaran</button>
+                    <button @onclick="@(()=>InvokeAsync(TunaiExitFail))" class="btn btn-light modal-button">Batal Pembayaran</button>
                 </div>
             </div>
         </div>
