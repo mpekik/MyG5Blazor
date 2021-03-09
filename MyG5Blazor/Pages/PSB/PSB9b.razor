@@ -507,293 +507,284 @@
     string msg = string.Empty;
     string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
-    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    protected override async Task OnInitializedAsync()
     {
-        if (bFirstRender)
+        imgDocman = trans.psbDetail.snkImage;
+        counterTime = counterTreshold;
+        trans.psbDetail.statusPayment = "01";
+        _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
+        strCOM = strCOM + config.Read("EDC", Config.PARAM_EDC_PORT);
+        MetodePembayaran = cst.intMPembayaran;
+        intBill = int.Parse(trans.psbDetail.PaketPSB._hargaAwal);
+        cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
+        cdCOM = cdCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
+        nohp = trans.psbDetail.selectedNumber;
+
+        if (cardStock == "")
         {
-            imgDocman = trans.psbDetail.snkImage;
-            counterTime = counterTreshold;
-            trans.psbDetail.statusPayment = "01";
-            _myURL = config.Read("URL", Config.PARAM_DEFAULT_URL);
-            strCOM = strCOM + config.Read("EDC", Config.PARAM_EDC_PORT);
-            MetodePembayaran = cst.intMPembayaran;
-            intBill = int.Parse(trans.psbDetail.PaketPSB._hargaAwal);
-            cardStock = config.Read("Dispenser", Config.PARAM_STOCK_DISPENSER_1);
-            cdCOM = cdCOM + config.Read("Dispenser", Config.PARAM_DEVICE_DISPENSER);
-            nohp = trans.psbDetail.selectedNumber;
+            isFail = true;
+            trans.AddTrail("GET STOCK", "CD - 004", "01");
+            trans.status = "01";
+            trans.errorCode = "CARD DISPENSER";
+            await OurUtility.AuditTrailPSB(trans, menu, cst);
+            trans.errorCode = "CD - 004";
+            OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
+            NavigateTo("/error");
+            return;
+        }
+        stock = Int32.Parse(cardStock);
 
-            #region AfterRenderTimeOut
-            if (MetodePembayaran == 2)
-            {
-                await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
-            }
-            #endregion
+        StateHasChanged();
+        //intAccBill = 10000;
+        //intMinus = intBill - intAccBill;
+        switch (MetodePembayaran)
+        {
+            case 1:
+                {
+                    pageClass = "main-panel bg-edc-process";
 
-            if (cardStock == "")
-            {
-                isFail = true;
-                trans.AddTrail("GET STOCK", "CD - 004", "01");
-                trans.status = "01";
-                trans.errorCode = "CARD DISPENSER";
-                await OurUtility.AuditTrailPSB(trans, menu, cst);
-                trans.errorCode = "CD - 004";
-                OurUtility.Write_Log("==== Card Stock Config Null", "step-action");
-                NavigateTo("/error");
-                return;
-            }
-            stock = Int32.Parse(cardStock);
+                    //TODO Integrate with EDC Debit Card
+                    cst.intTagihan = intBill;
+                    await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
 
-            StateHasChanged();
-            //intAccBill = 10000;
-            //intMinus = intBill - intAccBill;
-            switch (MetodePembayaran)
-            {
-                case 1:
+                    if (edc.intTry < 3)
                     {
-                        pageClass = "main-panel bg-edc-process";
-
-                        //TODO Integrate with EDC Debit Card
-                        cst.intTagihan = intBill;
-                        await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
-
-                        if (edc.intTry < 3)
-                        {
-                            OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
-                            isLoading = true;
-                            StateHasChanged();
-                            await Task.Delay(200);
-                            intAccBill = intBill;
-                            await Payment("");
-
-                            if (resultPayment == "00")
-                            {
-                                pageClass = "main-panel bg-home";
-
-                                trans.edcStatus = "SUCCESS";
-                                isLoading = false;
-                                IsFail = false;
-                                IsSuccess = true;
-                                //Console.WriteLine("Payment Success");
-                                StateHasChanged();
-                                await Task.Delay(200);
-
-                                if (trans.edcresp == "00")
-                                {
-                                    Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
-                                }
-
-                                Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
-                                trans.status = "00";
-                                trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA DEBIT BERHASIL";
-                                trans.kip = "Berhasil, terminal id:" + menu.terminalId;
-                                await OurUtility.AuditTrailPSB(trans, menu, cst);
-
-                                await CheckNPS("");
-
-                                ctAkhir = cTresholdAkhir;
-                                await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
-                                break;
-                            }
-                            else
-                            {
-                                //ToDO Add if Void
-                                isLoading = false;
-                                //IsVoid = true;
-                                IsFail = true;
-                                IsSuccess = false;
-                                pageClass = "main-panel bg-home";
-                                strInvoice = trans.edcTrace;
-                                StateHasChanged();
-                                await Task.Delay(200);
-                                if (trans.edcresp == "00")
-                                {
-
-                                    if (respPaymentError == "C" || respPaymentError == "A")
-                                    {
-                                        IsVoid = true;
-                                    }
-                                    OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
-                                    Void();
-                                    isLoading = false;
-                                    StateHasChanged();
-                                }
-                                trans.status = "01";
-                                trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
-                                await OurUtility.AuditTrailPSB(trans, menu, cst);
-                                if (trans.edcresp == "00")
-                                {
-                                    Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
-                                }
-
-                                Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
-
-                                if (trans.edcRespVoid == "00")
-                                {
-                                    Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
-                                }
-
-                                ctAkhir = cTresholdAkhir;
-                                await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
-                                break;
-                            }
-                            break;
-                        }
-                        else
-                        {
-                            IsFail = true;
-                            OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
-                            trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
-                            trans.status = "01";
-                            await OurUtility.AuditTrailPSB(trans, menu, cst);
-
-                            //Console.WriteLine("Payment Failed");
-                        }
-                        break;
-                    }
-                case 2:
-                    {
-
-                        cst.intTagihan = intBill;
-                        pageClass = "main-panel bg-home";
-                        Payout.total = 0;
-                        Payout.uangCount = 0;
-                        try
-                        {
-                            logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
-                        }
-                        catch (Exception ex)
-                        {
-                            logbank = 0;
-                        }
-                        try
-                        {
-                            logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
-                        }
-                        catch (Exception ex)
-                        {
-                            logamount = 0;
-                        }
-                        await Task.Delay(2000);
-                        await MainLoop(logbank, logamount);
-
+                        OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
+                        isLoading = true;
                         StateHasChanged();
                         await Task.Delay(200);
-                        intAccBill = Payout.total;
+                        intAccBill = intBill;
+                        await Payment("");
 
-                        cst.intUangCount = Payout.uangCount;
-                        cst.intTagihanTerbayar = Payout.total;
-                        //logamount = logamount + Payout.total;
-                        //logbank = logbank + Payout.uangCount;
-                        //config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
-                        //config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
-                        if (!IsTunaiExit)
+                        if (resultPayment == "00")
                         {
-                            intMinus = intAccBill - intBill;
-                            isTunaiComplete = true;
-                            break;
-                        }
-                        else { break; }
-                    }
-                case 3:
-                    {
-                        pageClass = "main-panel bg-edc-process";
+                            pageClass = "main-panel bg-home";
 
-                        //TODO Integrate with EDC Debit Card
-                        cst.intTagihan = intBill;
-                        await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
-                        pageClass = "main-panel bg-home";
-                        if (edc.intTry < 3)
-                        {
-                            OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
-                            isLoading = true;
-                            await Task.Delay(2000);
-                            intAccBill = intBill;
-                            await Payment("");
+                            trans.edcStatus = "SUCCESS";
+                            isLoading = false;
+                            IsFail = false;
+                            IsSuccess = true;
+                            //Console.WriteLine("Payment Success");
+                            StateHasChanged();
+                            await Task.Delay(200);
 
-                            if (resultPayment == "00")
+                            if (trans.edcresp == "00")
                             {
-                                trans.edcStatus = "SUCCESS";
-                                isLoading = false;
-                                IsSuccess = true;
-                                StateHasChanged();
-                                //Console.WriteLine("Payment Success");
-                                await Task.Delay(200);
-
-                                if (trans.edcresp == "00")
-                                {
-                                    Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
-                                }
-
-                                Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
-
-                                await CheckNPS("");
-
-                                trans.status = "00";
-                                trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA CC BERHASIL";
-                                trans.kip = "Berhasil, terminal id:" + menu.terminalId;
-                                await OurUtility.AuditTrailPSB(trans, menu, cst);
-
-                                ctAkhir = cTresholdAkhir;
-                                await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
-                                break;
+                                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
                             }
-                            else
-                            {
-                                //ToDO Add if Void
-                                isLoading = false;
-                                //IsVoid = true;
-                                IsFail = true;
-                                strInvoice = trans.edcTrace;
-                                StateHasChanged();
-                                await Task.Delay(200);
-                                if (trans.edcresp == "00")
-                                {
 
-                                    IsFail = false;
-                                    IsVoid = true;
-                                    OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
+                            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
+                            trans.status = "00";
+                            trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA DEBIT BERHASIL";
+                            trans.kip = "Berhasil, terminal id:" + menu.terminalId;
+                            await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-                                    Void();
-                                    isLoading = false;
-                                    StateHasChanged();
-                                }
-                                trans.status = "01";
-                                trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
-                                await OurUtility.AuditTrailPSB(trans, menu, cst);
+                            await CheckNPS("");
 
-                                if (trans.edcresp == "00")
-                                {
-                                    Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
-                                }
-
-                                Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
-
-                                if (trans.edcRespVoid == "00")
-                                {
-                                    Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
-                                }
-
-                                ctAkhir = cTresholdAkhir;
-                                await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
-                                break;
-                            }
+                            ctAkhir = cTresholdAkhir;
+                            await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
                             break;
                         }
                         else
                         {
+                            //ToDO Add if Void
+                            isLoading = false;
+                            //IsVoid = true;
                             IsFail = true;
-                            OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
-                            trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
-                            trans.status = "01";
-                            await OurUtility.AuditTrailPSB(trans, menu, cst);
+                            IsSuccess = false;
+                            pageClass = "main-panel bg-home";
+                            strInvoice = trans.edcTrace;
+                            StateHasChanged();
+                            await Task.Delay(200);
+                            if (trans.edcresp == "00")
+                            {
 
-                            //Console.WriteLine("Payment Failed");
+                                if (respPaymentError == "C" || respPaymentError == "A")
+                                {
+                                    IsVoid = true;
+                                }
+                                OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
+                                Void();
+                                isLoading = false;
+                                StateHasChanged();
+                            }
+                            trans.status = "01";
+                            trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
+                            await OurUtility.AuditTrailPSB(trans, menu, cst);
+                            if (trans.edcresp == "00")
+                            {
+                                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+                            }
+
+                            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
+
+                            if (trans.edcRespVoid == "00")
+                            {
+                                Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
+                            }
+
+                            ctAkhir = cTresholdAkhir;
+                            await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
+                            break;
                         }
                         break;
                     }
-            }
+                    else
+                    {
+                        IsFail = true;
+                        OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
+                        trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
+                        trans.status = "01";
+                        await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                        //Console.WriteLine("Payment Failed");
+                    }
+                    break;
+                }
+            case 2:
+                {
+
+                    cst.intTagihan = intBill;
+                    pageClass = "main-panel bg-home";
+                    Payout.total = 0;
+                    Payout.uangCount = 0;
+                    try
+                    {
+                        logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
+                    }
+                    catch (Exception ex)
+                    {
+                        logbank = 0;
+                    }
+                    try
+                    {
+                        logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+                    }
+                    catch (Exception ex)
+                    {
+                        logamount = 0;
+                    }
+                    await Task.Delay(2000);
+                    await MainLoop(logbank, logamount);
+
+                    StateHasChanged();
+                    await Task.Delay(200);
+                    intAccBill = Payout.total;
+
+                    cst.intUangCount = Payout.uangCount;
+                    cst.intTagihanTerbayar = Payout.total;
+                    //logamount = logamount + Payout.total;
+                    //logbank = logbank + Payout.uangCount;
+                    //config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
+                    //config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
+                    if (!IsTunaiExit)
+                    {
+                        intMinus = intAccBill - intBill;
+                        isTunaiComplete = true;
+                        break;
+                    }
+                    else { break; }
+                }
+            case 3:
+                {
+                    pageClass = "main-panel bg-edc-process";
+
+                    //TODO Integrate with EDC Debit Card
+                    cst.intTagihan = intBill;
+                    await Pay(strCOM, strBill, strInvoice, strBilling, MetodePembayaran.ToString());
+                    pageClass = "main-panel bg-home";
+                    if (edc.intTry < 3)
+                    {
+                        OurUtility.Write_Log("Trace Number : " + trans.edcTrace, "step-action");
+                        isLoading = true;
+                        await Task.Delay(2000);
+                        intAccBill = intBill;
+                        await Payment("");
+
+                        if (resultPayment == "00")
+                        {
+                            trans.edcStatus = "SUCCESS";
+                            isLoading = false;
+                            IsSuccess = true;
+                            StateHasChanged();
+                            //Console.WriteLine("Payment Success");
+                            await Task.Delay(200);
+
+                            if (trans.edcresp == "00")
+                            {
+                                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+                            }
+
+                            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
+
+                            await CheckNPS("");
+
+                            trans.status = "00";
+                            trans.errorCode = "PEMBAYARAN BERLANGGANAN VIA CC BERHASIL";
+                            trans.kip = "Berhasil, terminal id:" + menu.terminalId;
+                            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                            ctAkhir = cTresholdAkhir;
+                            await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
+                            break;
+                        }
+                        else
+                        {
+                            //ToDO Add if Void
+                            isLoading = false;
+                            //IsVoid = true;
+                            IsFail = true;
+                            strInvoice = trans.edcTrace;
+                            StateHasChanged();
+                            await Task.Delay(200);
+                            if (trans.edcresp == "00")
+                            {
+
+                                IsFail = false;
+                                IsVoid = true;
+                                OurUtility.Write_Log("== Void Payment Trace Number = " + strInvoice, "step-action");
+
+                                Void();
+                                isLoading = false;
+                                StateHasChanged();
+                            }
+                            trans.status = "01";
+                            trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
+                            await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                            if (trans.edcresp == "00")
+                            {
+                                Printer.PrintEDCPay(trans, cst, config, logoTsel, ref msg);
+                            }
+
+                            Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
+
+                            if (trans.edcRespVoid == "00")
+                            {
+                                Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
+                            }
+
+                            ctAkhir = cTresholdAkhir;
+                            await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
+                            break;
+                        }
+                        break;
+                    }
+                    else
+                    {
+                        IsFail = true;
+                        OurUtility.Write_Log("== Payment EDC Failed ", "step-action");
+                        trans.AddTrail("PAYMENT EDC", trans.edcresp, "01");
+                        trans.status = "01";
+                        await OurUtility.AuditTrailPSB(trans, menu, cst);
+
+                        //Console.WriteLine("Payment Failed");
+                    }
+                    break;
+                }
         }
     }
+
     private async Task GetURLDocman()
     {
         //isLoading = true;
@@ -1854,18 +1845,18 @@
         }
     }
     #endregion
-    //protected override async Task OnAfterRenderAsync(bool bFirstRender)
-    //{
-    //    if (bFirstRender)
-    //    {
-    //        #region AfterRenderTimeOut
-    //        if (MetodePembayaran == 2)
-    //        {
-    //            await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
-    //        }
-    //        #endregion
-    //    }
-    //}
+    protected override async Task OnAfterRenderAsync(bool bFirstRender)
+    {
+        if (bFirstRender)
+        {
+            #region AfterRenderTimeOut
+            if (MetodePembayaran == 2)
+            {
+                await Task.Run(() => DoubleTimeOut()).ConfigureAwait(false);
+            }
+            #endregion
+        }
+    }
     #region TimeOutAkhir
     private int ctAkhir = 30;
     private int cTresholdAkhir = 10;
