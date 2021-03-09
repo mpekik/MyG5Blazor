@@ -623,8 +623,9 @@
                                 Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            ctAkhir = cTresholdAkhir;
-                            await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
+
+                            await Task.Delay(15000);
+                            NavigateTo("/main");
                             break;
                         }
                         break;
@@ -637,6 +638,8 @@
                         trans.status = "01";
                         await OurUtility.AuditTrailPSB(trans, menu, cst);
 
+                        await Task.Delay(15000);
+                        NavigateTo("/main");
                         //Console.WriteLine("Payment Failed");
                     }
                     break;
@@ -764,8 +767,9 @@
                                 Printer.PrintEDCVoid(trans, cst, config, logoTsel, ref msg);
                             }
 
-                            ctAkhir = cTresholdAkhir;
-                            await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
+
+                            await Task.Delay(15000);
+                            NavigateTo("/main");
                             break;
                         }
                         break;
@@ -778,6 +782,9 @@
                         trans.status = "01";
                         await OurUtility.AuditTrailPSB(trans, menu, cst);
 
+
+                        await Task.Delay(15000);
+                        NavigateTo("/main");
                         //Console.WriteLine("Payment Failed");
                     }
                     break;
@@ -959,16 +966,16 @@
             isLoading = false;
             IsFail = true;
 
+            StateHasChanged();
+            await Task.Delay(100);
             Printer.PrintPSB(trans, cst, config, logoTsel, ref msg);
 
             trans.status = "01";
             trans.kip = "Pembayaran oleh pelanggan berhasil, payment ke Payment Gateway gagal, trx id:" + trans.transID + " , terminal id:" + menu.terminalId;
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-            ctAkhir = cTresholdAkhir;
-            await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
-            await CheckNPS("");
-
+            await Task.Delay(15000);
+            NavigateTo("/main");
         }
     }
 
@@ -1003,8 +1010,8 @@
             trans.errorCode = "CANCELED";
             await OurUtility.AuditTrailPSB(trans, menu, cst);
 
-            ctAkhir = cTresholdAkhir;
-            await Task.Run(() => DoubleTimeOutAkhir()).ConfigureAwait(false);
+            await Task.Delay(15000);
+            NavigateTo("/main");
         }
     }
 
@@ -1768,7 +1775,7 @@
     private int counterTime = 60;
     private int counterTreshold = 60;
     private bool isIdle = false;
-    private bool isNotIdle = false;
+    private bool isNotIdle = true;
     private async Task IdleTime()
     {
         do
@@ -1919,7 +1926,13 @@
     {
         await Task.Run(() => IdleTimeAkhir()).ConfigureAwait(false);
         if (isIdleAkhir)
-            await Task.Run(() => TimeOut()).ConfigureAwait(false);
+            await Task.Run(() => TimeOutAkhir()).ConfigureAwait(false);
+        if (isTimeOutAkhir)
+        {
+            //Console.WriteLine("Time Out 2");
+            NavigateTo("/main");
+            //await TunaiExitFail();
+        }
     }
 
     private async Task ResetTimerAkhir()
