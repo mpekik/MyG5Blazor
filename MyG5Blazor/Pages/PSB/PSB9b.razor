@@ -295,7 +295,7 @@
             <div class="modal-content">
                 <div class="modal-body">
                     <p class="text-body">Anda belum menyelesaikan proses pembayaran<br>berlangganan kartuHalo. Jika Anda keluar dari menu ini,<br>seluruh uang yang Anda masukkan dapat diambil di<br>Kasir GraPARI dengan menunjukkan struk dari<br>MyGraPARI.</p>
-                    <button class="btn btn-danger modal-button" @onclick="@(()=>IsExit = false)" id="btn-lanjut">Lanjutkan Pembayaran</button>
+                    <button class="btn btn-danger modal-button" @onclick="@(()=>InvokeAsync(LanjutPembayaran))" id="btn-lanjut">Lanjutkan Pembayaran</button>
                     <button @onclick="@(()=>InvokeAsync(TunaiExitFail))" class="btn btn-light modal-button">Batal</button>
                 </div>
             </div>
@@ -507,6 +507,67 @@
     string msg = string.Empty;
     string logoTsel = System.IO.Directory.GetCurrentDirectory() + @"\wwwroot\assets\image\Logo\Logo_MyGraPARI_mini.png";
 
+    #region Cash
+    private async Task MenuUtamaCash()
+    {
+        Payout.DisableValidator();
+        Payout.SSPComms.CloseComPort();
+
+        IsExit = true;
+        isIdle = true;
+        isNotIdle = false;
+    }
+
+    private async Task LanjutPembayaran()
+    {
+        IsExit = false;
+        await TambahWaktu();
+        await MethodCash();
+    }
+    private async Task MethodCash()
+    {
+        cst.intTagihan = intBill;
+        pageClass = "main-panel bg-home";
+        Payout.total = 0;
+        Payout.uangCount = 0;
+        try
+        {
+            logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
+        }
+        catch (Exception ex)
+        {
+            logbank = 0;
+        }
+        try
+        {
+            logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
+        }
+        catch (Exception ex)
+        {
+            logamount = 0;
+        }
+        await Task.Delay(2000);
+        await MainLoop(logbank, logamount);
+
+        StateHasChanged();
+        await Task.Delay(200);
+        intAccBill = Payout.total;
+
+        cst.intUangCount = Payout.uangCount;
+        cst.intTagihanTerbayar = Payout.total;
+        //logamount = logamount + Payout.total;
+        //logbank = logbank + Payout.uangCount;
+        //config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
+        //config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
+        if (!IsTunaiExit)
+        {
+            intMinus = intAccBill - intBill;
+            isTunaiComplete = true;
+            return;
+        }
+        else { return; }
+    }
+    #endregion
     protected override async Task OnInitializedAsync()
     {
         imgDocman = trans.psbDetail.snkImage;
@@ -647,46 +708,8 @@
             case 2:
                 {
 
-                    cst.intTagihan = intBill;
-                    pageClass = "main-panel bg-home";
-                    Payout.total = 0;
-                    Payout.uangCount = 0;
-                    try
-                    {
-                        logbank = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_BANK_STOK));
-                    }
-                    catch (Exception ex)
-                    {
-                        logbank = 0;
-                    }
-                    try
-                    {
-                        logamount = Int32.Parse(config.Read("BILL", Config.PARAM_BILL_AMOUNT));
-                    }
-                    catch (Exception ex)
-                    {
-                        logamount = 0;
-                    }
-                    await Task.Delay(2000);
-                    await MainLoop(logbank, logamount);
-
-                    StateHasChanged();
-                    await Task.Delay(200);
-                    intAccBill = Payout.total;
-
-                    cst.intUangCount = Payout.uangCount;
-                    cst.intTagihanTerbayar = Payout.total;
-                    //logamount = logamount + Payout.total;
-                    //logbank = logbank + Payout.uangCount;
-                    //config.Write("BILL", Config.PARAM_BILL_AMOUNT, logamount.ToString());
-                    //config.Write("BILL", Config.PARAM_BILL_BANK_STOK, logbank.ToString());
-                    if (!IsTunaiExit)
-                    {
-                        intMinus = intAccBill - intBill;
-                        isTunaiComplete = true;
-                        break;
-                    }
-                    else { break; }
+                    await MethodCash();
+                    break;
                 }
             case 3:
                 {
@@ -995,9 +1018,9 @@
             IsTunaiExit = true;
             isTunaiComplete = false;
             IsFail = true;
+            isIdle = false;
+            isNotIdle = false;
             trans.AddTrail("PAYMENT CASH", "Paid Ammount:" + intAccBill.ToString(), "02");
-            Payout.DisableValidator();
-            Payout.SSPComms.CloseComPort();
 
             await Payment("");
 
@@ -1781,12 +1804,13 @@
         do
         {
             await Task.Delay(1000);
-            Console.WriteLine("Idle 9a Time Left : " + counterTime.ToString());
+            Console.WriteLine("Idle 9b Time Left : " + counterTime.ToString());
             counterTime = counterTime - 1;
             InvokeAsync(StateHasChanged);
             if (counterTime < 1)
             {
                 isIdle = true;
+                IsExit = true;
                 isNotIdle = false;
                 secondCTime = counterTreshold;
                 InvokeAsync(StateHasChanged);
